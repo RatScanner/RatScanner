@@ -1,13 +1,13 @@
-<img src="media/RatLogo.png" height=35 align=left style="margin-right:5px">
+<img src="media/RatLogo.png" height=100 align=right>
 
-<div style="position:absolute;right:50px">
-<a href="https://patreon.com/RatScanner">
-<img src="https://img.shields.io/badge/dynamic/json?color=%23e85b46&label=Patreon&query=data.attributes.patron_count&suffix=%20patrons&url=https%3A%2F%2Fwww.patreon.com%2Fapi%2Fcampaigns%2F4117180&style=for-the-badge&logo=patreon" />
-</a>
+<div>
+  <a href="https://patreon.com/RatScanner">
+    <img src="https://img.shields.io/badge/dynamic/json?color=%23e85b46&label=Patreon&query=data.attributes.patron_count&suffix=%20patrons&url=https%3A%2F%2Fwww.patreon.com%2Fapi%2Fcampaigns%2F4117180&style=for-the-badge&logo=patreon" />
+  </a>
 
-<a href="https://discord.gg/aHZf7aP" style="padding:10px">
-<img src="https://img.shields.io/discord/687549250435153930?label=Discord&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2&style=for-the-badge" />
-</a>
+  <a href="https://discord.gg/aHZf7aP" style="padding:10px">
+    <img src="https://img.shields.io/discord/687549250435153930?label=Discord&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2&style=for-the-badge" />
+  </a>
 </div>
 
 # Rat Scanner
