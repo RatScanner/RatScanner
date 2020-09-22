@@ -73,7 +73,7 @@ Notes
 
 ## Download
 
-You can download the latest version [here][latest-release] or choose a specific version to download [here][releases].
+You can directly download the latest version [here][latest-release] or choose a specific version to download [here][releases].
 
 <br/>
 
@@ -109,5 +109,5 @@ This will help to pay for the backend server as well as the [API][tarkov-market]
 [escape-from-tarkov]: https://www.escapefromtarkov.com/
 [tarkov-market]: https://tarkov-market.com/
 [eft-icons-repo]: https://github.com/Blightbuster/EfTIcons
-[latest-release]: https://github.com/Blightbuster/RatScanner/releases/latest/download/package.zip
+[latest-release]: https://github.com/Blightbuster/RatScanner/releases/latest/download/RatScanner.zip
 [releases]: https://github.com/Blightbuster/RatScanner/releases/
