@@ -20,7 +20,7 @@ namespace RatScanner
         private readonly IconScanToolTip _iconScanToolTip;
 
         private ItemScan _currentItemScan;
-        private bool _isScanning = false;
+        internal static bool ScanLock = false;
 
         internal static MarketDB MarketDB;
 
@@ -131,8 +131,8 @@ namespace RatScanner
 
         private bool IconScan(Vector2 mouseVector2)
         {
-            if (_isScanning) return false;
-            _isScanning = true;
+            if (ScanLock) return false;
+            ScanLock = true;
 
             _iconScanToolTip.Dispatcher.Invoke(() =>
             {
@@ -151,21 +151,21 @@ namespace RatScanner
 
             if (!itemIconScan.ValidItem)
             {
-                _isScanning = false;
+                ScanLock = false;
                 return false;
             }
             CurrentItemScan = itemIconScan;
 
             ShowToolTip(itemIconScan);
 
-            _isScanning = false;
+            ScanLock = false;
             return true;
         }
 
         private bool NameScan(Vector2 mouseVector2)
         {
-            if (_isScanning) return false;
-            _isScanning = true;
+            if (ScanLock) return false;
+            ScanLock = true;
 
             _nameScanToolTip.Dispatcher.Invoke(() =>
             {
@@ -189,14 +189,14 @@ namespace RatScanner
 
             if (!itemNameScan.ValidItem)
             {
-                _isScanning = false;
+                ScanLock = false;
                 return false;
             }
             CurrentItemScan = itemNameScan;
 
             ShowToolTip(itemNameScan);
 
-            _isScanning = false;
+            ScanLock = false;
             return true;
         }
 

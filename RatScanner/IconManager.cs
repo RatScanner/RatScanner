@@ -313,10 +313,16 @@ namespace RatScanner
         /// Event which gets called when the dynamic correlation data file
         /// get changed. Dynamic icons and correlation data get updated.
         /// </summary>
-        private static void OnDynamicCorrelationDataChange(object source, FileSystemEventArgs e)
+        private static async void OnDynamicCorrelationDataChange(object source, FileSystemEventArgs e)
         {
             Logger.LogDebug("Dynamic correlation data changed");
             if (!RatConfig.UseCachedIcons) return;
+
+            // Wait if currently scanning a item
+            while (RatScannerMain.ScanLock) await Task.Delay(25);
+
+            // Acquire the lock
+            RatScannerMain.ScanLock = true;
 
             // Remove old and load new dynamic icons
             DynamicIcons.Clear();
@@ -327,6 +333,9 @@ namespace RatScanner
 
             // Update inverse correlation data
             InverseCorrelationData();
+
+            // Release the lock
+            RatScannerMain.ScanLock = false;
         }
 
         /// <summary>
