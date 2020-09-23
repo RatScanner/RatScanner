@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace RatScanner.FetchModels
 {
+    [Serializable]
     public class MarketItem
     {
         // Item data

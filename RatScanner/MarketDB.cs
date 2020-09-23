@@ -19,7 +19,7 @@ namespace RatScanner
             if (uid?.Length > 0)
             {
                 var item = _items.FirstOrDefault(i => i.Uid == uid);
-                if (item != null) return item;
+                if (item != null) return item.DeepClone();
 
                 Logger.LogWarning("Could not find item with uid: " + uid);
                 return new MarketItem(uid);
@@ -68,7 +68,7 @@ namespace RatScanner
             else confidence /= bestMatchItem.Name.Length;
             confidence = 1f - confidence;
 
-            return bestMatchItem;
+            return bestMatchItem.DeepClone();
         }
 
         public static int Distance(string value1, string value2)
