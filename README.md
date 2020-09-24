@@ -28,9 +28,9 @@ The information is taken from a [third-party API][tarkov-market] which takes the
 
 ## How it works
 
-The tool is entirely external. This means its not accessing any memory of the game, like cheats do.
+The tool is entirely external. This means it is not accessing any memory of the game, like cheats do.
 
-Instead when you want to scan a item, a screenshot is taken and image processing is applied to identify the clicked item. The item is then looked up in the database and information is displayed in the window and with a overlayed tooltip.
+Instead, when you want to scan a item, a screenshot is taken and image processing is applied to identify the clicked item. The item is then looked up in the database and information is displayed in the window and with a overlayed tooltip.
 
 <br/>
 
@@ -61,7 +61,7 @@ _Icon scanning refers to scanning the icon of a item._
 Limitations
 
 - Uses / durability is always assumed at 100%
-- Items which share a icon with other items (especially key's) will result in a uncertain match
+- Items which share a icon with other items (especially keys) will result in a uncertain match
 
 Notes
 
