@@ -28,7 +28,7 @@ The information is taken from a [third-party API][tarkov-market] which takes the
 
 ## How it works
 
-The tool is entierly external. This means its not accessing any memory of the game, like cheats do.
+The tool is entirely external. This means its not accessing any memory of the game, like cheats do.
 
 Instead when you want to scan a item, a screenshot is taken and image processing is applied to identify the clicked item. The item is then looked up in the database and information is displayed in the window and with a overlayed tooltip.
 
