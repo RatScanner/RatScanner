@@ -11,18 +11,6 @@
         ResizeMode="CanMinimize"
         Height="400" Width="300">
 
-  <Window.Resources>
-    <Style TargetType="{x:Type Hyperlink}">
-      <Setter Property="TextBlock.FontSize" Value="14" />
-      <Setter Property="Foreground" Value="White" />
-      <Style.Triggers>
-        <Trigger Property="IsMouseOver" Value="True">
-          <Setter Property="Foreground" Value="#569CD6" />
-        </Trigger>
-      </Style.Triggers>
-    </Style>
-  </Window.Resources>
-
   <Grid Margin="10,0">
     <StackPanel Grid.Row="0">
       <Grid Margin="0, 10, 0, 10">
@@ -147,8 +135,8 @@
         <Separator/>
 
         <Grid Margin="0,5">
-          <Label Grid.Column="0" Content="Links" VerticalAlignment="Center"/>
-          <TextBlock Grid.Column="1" VerticalAlignment="Center">
+          <Label Grid.Column="0" Content="Links"/>
+          <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="0,0,5,0">
             <Hyperlink NavigateUri="{Binding WikiLink}" RequestNavigate="HyperlinkRequestNavigate">
               <Underline>Wiki</Underline>
             </Hyperlink>
