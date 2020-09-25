@@ -1,0 +1,10 @@
+[*]
+end_of_line = crlf
+insert_final_newline = true
+indent_style=space
+indent_size=4
+tab_width=4
+
+[*.{vb,xaml,xamlx,xoml}]
+indent_size=2
+tab_width=2
