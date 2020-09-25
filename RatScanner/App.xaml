@@ -16,7 +16,6 @@
 
     <SolidColorBrush x:Key="Button.Static.Background" Color="#EEEEEE"/>
     <SolidColorBrush x:Key="Button.Static.Border" Color="#EEEEEE"/>
-    <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#DDDDDD"/>
     <SolidColorBrush x:Key="Button.MouseOver.Border" Color="#DDDDDD"/>
     <SolidColorBrush x:Key="Button.Pressed.Background" Color="#AAAAAA"/>
     <SolidColorBrush x:Key="Button.Pressed.Border" Color="#AAAAAA"/>
@@ -85,6 +84,17 @@
     <Style TargetType="{x:Type Separator}">
       <Setter Property="Margin" Value="0"/>
       <Setter Property="Background" Value="#AAAAAA"/>
+    </Style>
+     
+    <Style TargetType="{x:Type Hyperlink}">
+      <Setter Property="TextBlock.FontSize" Value="14" />
+      <Setter Property="Foreground" Value="#EEEEEE" />
+      <Setter Property="FontFamily" Value="Roboto Medium" />
+      <Style.Triggers>
+        <Trigger Property="IsMouseOver" Value="True">
+          <Setter Property="Foreground" Value="#569CD6" />
+        </Trigger>
+      </Style.Triggers>
     </Style>
   </Application.Resources>
 </Application>

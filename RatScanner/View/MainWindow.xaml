@@ -135,10 +135,10 @@
         <Separator/>
 
         <Grid Margin="0,5">
-          <Label Grid.Column="0" Content="Wiki Link"/>
-          <TextBlock Grid.Column="1">
-            <Hyperlink NavigateUri="{Binding WikiLink}" RequestNavigate="HyperlinkRequestNavigate" TextDecorations="">
-              <Label Content="Click to open"/>
+          <Label Grid.Column="0" Content="Links"/>
+          <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="0,0,5,0">
+            <Hyperlink NavigateUri="{Binding WikiLink}" RequestNavigate="HyperlinkRequestNavigate">
+              <Underline>Wiki</Underline>
             </Hyperlink>
           </TextBlock>
 
