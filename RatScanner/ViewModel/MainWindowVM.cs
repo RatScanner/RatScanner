@@ -31,6 +31,8 @@ namespace RatScanner.ViewModel
 
 		public string Name => MatchedItems[0].Name;
 
+		public bool HasMods => MatchedItems[0].HasMods;
+
 		public string Price => PriceToString(GetPrice());
 
 		private int GetPrice()

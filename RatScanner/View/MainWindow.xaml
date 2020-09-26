@@ -13,7 +13,45 @@
 	<Grid Margin="10,0">
 		<StackPanel Grid.Row="0">
 			<Grid Margin="0, 10, 0, 10">
-				<Label Grid.Column="0" Content="{Binding Name}" VerticalAlignment="Center"/>
+				<StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+					<WrapPanel VerticalAlignment="Center">
+						<Rectangle Margin="5,0,0,0" Width="20" Height="20">
+							<Rectangle.Fill>
+								<SolidColorBrush Color="#EEEEEE"/>
+							</Rectangle.Fill>
+							<Rectangle.OpacityMask>
+								<ImageBrush ImageSource="../Resources/iconMods.png"/>
+							</Rectangle.OpacityMask>
+						</Rectangle>
+
+						<Separator Margin="1,1,3,1">
+							<Separator.LayoutTransform>
+								<RotateTransform Angle="90"/>
+							</Separator.LayoutTransform>
+						</Separator>
+
+						<WrapPanel.ToolTip>
+							<TextBlock>
+								Prices include attached mods
+							</TextBlock>
+						</WrapPanel.ToolTip>
+
+						<WrapPanel.Style>
+							<Style TargetType="WrapPanel">
+								<Style.Triggers>
+									<DataTrigger Binding="{Binding Path=HasMods}" Value="True">
+										<Setter Property="Visibility" Value="Visible"/>
+									</DataTrigger>
+									<DataTrigger Binding="{Binding Path=HasMods}" Value="False">
+										<Setter Property="Visibility" Value="Collapsed"/>
+									</DataTrigger>
+								</Style.Triggers>
+							</Style>
+						</WrapPanel.Style>
+					</WrapPanel>
+					<Label Content="{Binding Name}" Padding="0" VerticalAlignment="Center"/>
+				</StackPanel>
+
 				<Border Grid.Column="1" Background="#EEEEEE" HorizontalAlignment="Right" CornerRadius="3">
 					<Image Source="{Binding IconPath}" MinWidth="32" MaxWidth="96" Height="32"/>
 				</Border>

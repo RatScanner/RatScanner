@@ -23,11 +23,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\iconMods.png" />
     <None Remove="Resources\RatLogoMedium.png" />
     <None Remove="Resources\settings.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\iconMods.png" />
     <Resource Include="Resources\settings.png" />
   </ItemGroup>
 
