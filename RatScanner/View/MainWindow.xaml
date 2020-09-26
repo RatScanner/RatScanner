@@ -15,7 +15,7 @@
 			<Grid Margin="0, 10, 0, 10">
 				<Label Grid.Column="0" Content="{Binding Name}" VerticalAlignment="Center"/>
 				<Border Grid.Column="1" Background="#EEEEEE" HorizontalAlignment="Right" CornerRadius="3">
-					<Image Source="{Binding IconPath}" Width="32" Height="32"/>
+					<Image Source="{Binding IconPath}" MinWidth="32" MaxWidth="96" Height="32"/>
 				</Border>
 
 				<Grid.ColumnDefinitions>
