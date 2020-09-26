@@ -8,82 +8,82 @@ using Color = System.Windows.Media.Color;
 
 namespace RatScanner.ViewModel
 {
-    internal class ToolTipVM : INotifyPropertyChanged
-    {
-        private ItemScan _dataSource;
+	internal class ToolTipVM : INotifyPropertyChanged
+	{
+		private ItemScan _dataSource;
 
-        internal ItemScan DataSource
-        {
-            get => _dataSource;
-            set
-            {
-                _dataSource = value;
-                OnPropertyChanged();
-            }
-        }
+		internal ItemScan DataSource
+		{
+			get => _dataSource;
+			set
+			{
+				_dataSource = value;
+				OnPropertyChanged();
+			}
+		}
 
-        private MarketItem[] MatchedItems => DataSource.MatchedItems;
+		private MarketItem[] MatchedItems => DataSource.MatchedItems;
 
-        // https://youtrack.jetbrains.com/issue/RSRP-468572
-        // ReSharper disable InconsistentNaming
-        public string Avg24hPrice => PriceToString(GetAvg24hPrice());
+		// https://youtrack.jetbrains.com/issue/RSRP-468572
+		// ReSharper disable InconsistentNaming
+		public string Avg24hPrice => PriceToString(GetAvg24hPrice());
 
-        private int GetAvg24hPrice()
-        {
-            return MatchedItems[0].SumMods(item => item.Avg24hPrice);
-        }
-        // ReSharper restore InconsistentNaming
+		private int GetAvg24hPrice()
+		{
+			return MatchedItems[0].SumMods(item => item.Avg24hPrice);
+		}
+		// ReSharper restore InconsistentNaming
 
-        public string IconPath => IconManager.GetIconPath(DataSource.MatchedItems[0]);
+		public string IconPath => IconManager.GetIconPath(DataSource.MatchedItems[0]);
 
-        public int IconAngle => DataSource is ItemIconScan scan && scan.Rotated ? 90 : 0;
+		public int IconAngle => DataSource is ItemIconScan scan && scan.Rotated ? 90 : 0;
 
-        public float ScaleFactor => RatConfig.GetScreenScaleFactor();
+		public float ScaleFactor => RatConfig.GetScreenScaleFactor();
 
-        public Brush WarningBrush
-        {
-            get
-            {
-                var color = Color.FromRgb(238, 238, 238);
+		public Brush WarningBrush
+		{
+			get
+			{
+				var color = Color.FromRgb(238, 238, 238);
 
-                var threshold = 1.0f;
-                if (DataSource is ItemNameScan) threshold = RatConfig.NameConfWarnThreshold;
-                if (DataSource is ItemIconScan) threshold = RatConfig.IconConfWarnThreshold;
+				var threshold = 1.0f;
+				if (DataSource is ItemNameScan) threshold = RatConfig.NameConfWarnThreshold;
+				if (DataSource is ItemIconScan) threshold = RatConfig.IconConfWarnThreshold;
 
-                if (DataSource.Confidence < threshold) color = Color.FromRgb(227, 38, 25);
-                return new SolidColorBrush(color);
-            }
-        }
+				if (DataSource.Confidence < threshold) color = Color.FromRgb(227, 38, 25);
+				return new SolidColorBrush(color);
+			}
+		}
 
-        public event PropertyChangedEventHandler PropertyChanged;
+		public event PropertyChangedEventHandler PropertyChanged;
 
-        internal ToolTipVM(ItemScan itemScan)
-        {
-            DataSource = itemScan;
-        }
+		internal ToolTipVM(ItemScan itemScan)
+		{
+			DataSource = itemScan;
+		}
 
-        protected virtual void OnPropertyChanged(string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+		protected virtual void OnPropertyChanged(string propertyName = null)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+		}
 
-        private string PriceToString(int price)
-        {
-            if (MatchedItems.Length == 1)
-            {
-                return IntToGroupedString(price) + " ₽";
-            }
+		private string PriceToString(int price)
+		{
+			if (MatchedItems.Length == 1)
+			{
+				return IntToGroupedString(price) + " ₽";
+			}
 
-            // TODO make this more informative. Perhaps a value range?
-            return "Uncertain";
-        }
+			// TODO make this more informative. Perhaps a value range?
+			return "Uncertain";
+		}
 
-        private static string IntToGroupedString(int? value)
-        {
-            if (value == null) return "ERROR";
+		private static string IntToGroupedString(int? value)
+		{
+			if (value == null) return "ERROR";
 
-            var text = $"{value:n0}";
-            return text.Replace(NumberFormatInfo.CurrentInfo.NumberGroupSeparator, RatConfig.ToolTipDigitGroupingSymbol);
-        }
-    }
+			var text = $"{value:n0}";
+			return text.Replace(NumberFormatInfo.CurrentInfo.NumberGroupSeparator, RatConfig.ToolTipDigitGroupingSymbol);
+		}
+	}
 }

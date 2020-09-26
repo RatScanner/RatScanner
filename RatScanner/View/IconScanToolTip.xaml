@@ -3,7 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:RatScanner"
         xmlns:framework="clr-namespace:RatScanner.Framework"
         mc:Ignorable="d"
         ScrollViewer.VerticalScrollBarVisibility="Disabled"
@@ -15,24 +14,24 @@
         IsTabStop="False"
         WindowStyle="None"
         AllowsTransparency="True" x:ClassModifier="internal">
-  <Grid Background="{Binding WarningBrush}">
-    <Image Source="{Binding IconPath}" Stretch="None">
-      <Image.LayoutTransform>
-        <TransformGroup>
-          <ScaleTransform ScaleX="{Binding ScaleFactor}" ScaleY="{Binding ScaleFactor}"/>
-          <RotateTransform Angle="{Binding IconAngle}"/>
-        </TransformGroup>
-      </Image.LayoutTransform>
-    </Image>
-    <StackPanel>
-      <framework:OutlinedTextBlock Text="{Binding Avg24hPrice}"
+	<Grid Background="{Binding WarningBrush}">
+		<Image Source="{Binding IconPath}" Stretch="None">
+			<Image.LayoutTransform>
+				<TransformGroup>
+					<ScaleTransform ScaleX="{Binding ScaleFactor}" ScaleY="{Binding ScaleFactor}"/>
+					<RotateTransform Angle="{Binding IconAngle}"/>
+				</TransformGroup>
+			</Image.LayoutTransform>
+		</Image>
+		<StackPanel>
+			<framework:OutlinedTextBlock Text="{Binding Avg24hPrice}"
                                    FontWeight="Bold"
                                    FontFamily="Roboto Normal"
                                    Fill="Black"
                                    Stroke="{Binding WarningBrush}"
                                    FontSize="14"
                                    StrokeThickness="1">
-      </framework:OutlinedTextBlock>
-    </StackPanel>
-  </Grid>
+			</framework:OutlinedTextBlock>
+		</StackPanel>
+	</Grid>
 </Window>
