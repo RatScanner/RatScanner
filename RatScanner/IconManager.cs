@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using OpenCvSharp;
 using Size = OpenCvSharp.Size;
+using RCPaths = RatScanner.RatConfig.Paths;
 
 namespace RatScanner
 {
@@ -87,26 +88,26 @@ namespace RatScanner
 		internal static void Init()
 		{
 			LoadStaticIcons();
-			if (RatConfig.UseCachedIcons) LoadDynamicIcons();
+			if (RatConfig.IconScan.UseCachedIcons) LoadDynamicIcons();
 
 			LoadStaticCorrelationData();
-			if (RatConfig.UseCachedIcons) LoadDynamicCorrelationData();
+			if (RatConfig.IconScan.UseCachedIcons) LoadDynamicCorrelationData();
 
 			InverseCorrelationData();
 
-			if (RatConfig.UseCachedIcons) InitFileWatcher();
+			if (RatConfig.IconScan.UseCachedIcons) InitFileWatcher();
 		}
 
 		#region Icon loading
 		private static void LoadStaticIcons()
 		{
 			Logger.LogInfo("Loading static icons...");
-			if (!Directory.Exists(RatConfig.StaticIconPath))
+			if (!Directory.Exists(RCPaths.StaticIcon))
 			{
-				Logger.LogError("Could not find icon folder at: " + RatConfig.StaticIconPath);
+				Logger.LogError("Could not find icon folder at: " + RCPaths.StaticIcon);
 			}
 
-			var iconPathArray = Directory.GetFiles(RatConfig.StaticIconPath, "*.png");
+			var iconPathArray = Directory.GetFiles(RCPaths.StaticIcon, "*.png");
 
 			var loadedIcons = 0;
 			var totalIcons = iconPathArray.Length;
@@ -146,12 +147,12 @@ namespace RatScanner
 		private static void LoadDynamicIcons()
 		{
 			Logger.LogInfo("Loading dynamic icons...");
-			if (!Directory.Exists(RatConfig.DynamicIconPath))
+			if (!Directory.Exists(RCPaths.DynamicIcon))
 			{
-				Logger.LogError("Could not find icon cache folder at: " + RatConfig.DynamicIconPath);
+				Logger.LogError("Could not find icon cache folder at: " + RCPaths.DynamicIcon);
 			}
 
-			var iconPathArray = Directory.GetFiles(RatConfig.DynamicIconPath, "*.png");
+			var iconPathArray = Directory.GetFiles(RCPaths.DynamicIcon, "*.png");
 
 			var loadedIcons = 0;
 			var totalIcons = iconPathArray.Length;
@@ -194,12 +195,12 @@ namespace RatScanner
 		{
 			Logger.LogInfo("Loading static correlation data...");
 
-			if (!File.Exists(RatConfig.StaticCorrelationPath))
+			if (!File.Exists(RCPaths.StaticCorrelation))
 			{
-				Logger.LogError("Could not find static correlation data at: " + RatConfig.StaticCorrelationPath);
+				Logger.LogError("Could not find static correlation data at: " + RCPaths.StaticCorrelation);
 			}
 
-			var json = File.ReadAllText(RatConfig.StaticCorrelationPath);
+			var json = File.ReadAllText(RCPaths.StaticCorrelation);
 			var correlations = JArray.Parse(json);
 
 			foreach (var jToken in correlations)
@@ -225,12 +226,12 @@ namespace RatScanner
 		{
 			Logger.LogInfo("Loading dynamic correlation data...");
 
-			if (!File.Exists(RatConfig.DynamicCorrelationPath))
+			if (!File.Exists(RCPaths.DynamicCorrelation))
 			{
-				Logger.LogError("Could not find dynamic correlation data at: " + RatConfig.DynamicCorrelationPath);
+				Logger.LogError("Could not find dynamic correlation data at: " + RCPaths.DynamicCorrelation);
 			}
 
-			var json = File.ReadAllText(RatConfig.DynamicCorrelationPath);
+			var json = File.ReadAllText(RCPaths.DynamicCorrelation);
 			var correlations = JObject.Parse(json);
 
 			foreach (var correlation in correlations.Properties())
@@ -302,8 +303,8 @@ namespace RatScanner
 		{
 			Logger.LogInfo("Initializing file watcher for icon cache...");
 			var fileWatcher = new FileSystemWatcher();
-			fileWatcher.Path = Path.GetDirectoryName(RatConfig.DynamicCorrelationPath);
-			fileWatcher.Filter = Path.GetFileName(RatConfig.DynamicCorrelationPath);
+			fileWatcher.Path = Path.GetDirectoryName(RCPaths.DynamicCorrelation);
+			fileWatcher.Filter = Path.GetFileName(RCPaths.DynamicCorrelation);
 			fileWatcher.NotifyFilter = NotifyFilters.Size;
 			fileWatcher.Changed += OnDynamicCorrelationDataChange;
 			fileWatcher.EnableRaisingEvents = true;
@@ -316,7 +317,7 @@ namespace RatScanner
 		private static async void OnDynamicCorrelationDataChange(object source, FileSystemEventArgs e)
 		{
 			Logger.LogDebug("Dynamic correlation data changed");
-			if (!RatConfig.UseCachedIcons) return;
+			if (!RatConfig.IconScan.UseCachedIcons) return;
 
 			// Wait if currently scanning a item
 			while (RatScannerMain.ScanLock) await Task.Delay(25);
@@ -344,11 +345,11 @@ namespace RatScanner
 		/// <returns>Count of icons in the icon cache folder</returns>
 		internal static int GetIconCacheSize()
 		{
-			if (!Directory.Exists(RatConfig.DynamicIconPath))
+			if (!Directory.Exists(RCPaths.DynamicIcon))
 			{
-				Logger.LogError("Could not find icon cache folder at: " + RatConfig.DynamicIconPath);
+				Logger.LogError("Could not find icon cache folder at: " + RCPaths.DynamicIcon);
 			}
-			return Directory.GetFiles(RatConfig.DynamicIconPath, "*.png").Length;
+			return Directory.GetFiles(RCPaths.DynamicIcon, "*.png").Length;
 		}
 
 		/// <summary>
@@ -358,7 +359,7 @@ namespace RatScanner
 		{
 			try
 			{
-				var iconPathArray = Directory.GetFiles(RatConfig.DynamicIconPath, "*.png");
+				var iconPathArray = Directory.GetFiles(RCPaths.DynamicIcon, "*.png");
 				foreach (var iconPath in iconPathArray) File.Delete(iconPath);
 				GC.Collect();
 				GC.WaitForPendingFinalizers();
@@ -367,7 +368,7 @@ namespace RatScanner
 			{
 				Logger.LogWarning("Could not delete icon cache folder", e);
 			}
-			File.WriteAllText(RatConfig.DynamicCorrelationPath, "{}");
+			File.WriteAllText(RCPaths.DynamicCorrelation, "{}");
 		}
 
 		/// <summary>
@@ -414,20 +415,20 @@ namespace RatScanner
 			if (!success)
 			{
 				Logger.LogWarning("Could not find icon key for:\n" + itemInfo);
-				return RatConfig.UnknownIconPath;
+				return RCPaths.UnknownIcon;
 			}
 
 			success = IconPaths.TryGetValue(iconKey, out var path);
 			if (!success)
 			{
 				Logger.LogWarning("Could not find path for icon key: " + iconKey);
-				return RatConfig.UnknownIconPath;
+				return RCPaths.UnknownIcon;
 			}
 
 			if (!File.Exists(path))
 			{
 				Logger.LogWarning("Could not find icon for: " + itemInfo.Uid + "\nat: " + path);
-				return RatConfig.UnknownIconPath;
+				return RCPaths.UnknownIcon;
 			}
 
 			return path;
@@ -442,7 +443,7 @@ namespace RatScanner
 		internal static int PixelsToSlots(int pixels, int? slotSize = null)
 		{
 			// Use converter class to round to nearest int instead of always rounding down
-			return Convert.ToInt32((pixels - 1) / (float)(slotSize ?? RatConfig.ItemSlotSize));
+			return Convert.ToInt32((pixels - 1) / (float)(slotSize ?? RatConfig.IconScan.ItemSlotSize));
 		}
 
 		/// <summary>
@@ -452,7 +453,7 @@ namespace RatScanner
 		/// <returns>Pixel size of the icon</returns>
 		internal static int SlotsToPixels(int slots)
 		{
-			return slots * RatConfig.ItemSlotSize + 1;
+			return slots * RatConfig.IconScan.ItemSlotSize + 1;
 		}
 
 		/// <summary>
@@ -463,7 +464,7 @@ namespace RatScanner
 		/// <returns>True if the pixels can be converted to slots</returns>
 		private static bool IsValidPixelSize(int pixels, int? slotSize = null)
 		{
-			return 1 == pixels % (slotSize ?? RatConfig.ItemSlotSize);
+			return 1 == pixels % (slotSize ?? RatConfig.IconScan.ItemSlotSize);
 		}
 	}
 }

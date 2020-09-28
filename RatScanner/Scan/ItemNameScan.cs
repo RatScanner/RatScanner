@@ -5,6 +5,7 @@ using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using OpenCvSharp.Text;
 using RatScanner.Properties;
+using RCNameScan = RatScanner.RatConfig.NameScan;
 
 namespace RatScanner.Scan
 {
@@ -28,7 +29,7 @@ namespace RatScanner.Scan
 		internal static void Init()
 		{
 			Logger.LogInfo("Loading OCR data...");
-			var traineddataDir = RatConfig.DataPath + "\\";
+			var traineddataDir = RatConfig.Paths.Data + "\\";
 			var traineddataPath = traineddataDir + "bender.traineddata";
 			if (!System.IO.File.Exists(traineddataPath))
 			{
@@ -49,17 +50,17 @@ namespace RatScanner.Scan
 			MousePos = mouseVector2;
 
 			// Get potential marker section of the screenshot
-			var rectMarker = new Rectangle(0, 0, RatConfig.MarkerScanSize, RatConfig.MarkerScanSize);
+			var rectMarker = new Rectangle(0, 0, RCNameScan.MarkerScanSize, RCNameScan.MarkerScanSize);
 			var markerSection = new Bitmap(Capture).Clone(rectMarker, Capture.PixelFormat);
 
 			// Check if the section contains the marker
-			LocalMarkerPos = GetMarkerPosition(markerSection, RatConfig.Marker);
+			LocalMarkerPos = GetMarkerPosition(markerSection, RCNameScan.Marker);
 
 			// If the marker could not be found, check for short name marker
 			if (!ContainsMarker)
 			{
 				IsShortName = true;
-				LocalMarkerPos = GetMarkerPosition(markerSection, RatConfig.MarkerShort);
+				LocalMarkerPos = GetMarkerPosition(markerSection, RCNameScan.MarkerShort);
 			}
 
 			// No marker matched so we can stop the scan
@@ -69,11 +70,11 @@ namespace RatScanner.Scan
 			// Calculate global marker position
 			MarkerPos = MousePos;
 			MarkerPos += LocalMarkerPos;
-			MarkerPos -= new Vector2(RatConfig.MarkerScanSize, RatConfig.MarkerScanSize) / 2;
+			MarkerPos -= new Vector2(RCNameScan.MarkerScanSize, RCNameScan.MarkerScanSize) / 2;
 
 			// Get text section of the screenshot
-			var textSectionX = LocalMarkerPos.X + RatConfig.TextHorizontalOffset;
-			var rectText = new Rectangle(textSectionX, LocalMarkerPos.Y, RatConfig.TextWidth, RatConfig.TextHeight);
+			var textSectionX = LocalMarkerPos.X + RCNameScan.TextHorizontalOffset;
+			var rectText = new Rectangle(textSectionX, LocalMarkerPos.Y, RCNameScan.TextWidth, RCNameScan.TextHeight);
 			var textSection = new Bitmap(Capture).Clone(rectText, Capture.PixelFormat);
 
 			// Use OCR to read the text
@@ -100,7 +101,7 @@ namespace RatScanner.Scan
 			const string regexFilter = @"[^A-Za-z0-9]+"; // Filter out everything which is not alphanumerical
 			MatchedItems = new[] { RatScannerMain.MarketDB.GetItemByName(ScannedText, IsShortName, out Confidence, regexFilter, false) };
 
-			if (Confidence < RatConfig.NameConfWarnThreshold)
+			if (Confidence < RCNameScan.ConfWarnThreshold)
 			{
 				var tmp = "OCR:\"" + ScannedText + "\" Matched:\"" + MatchedItems[0].Name + "\"";
 				Logger.LogWarning("Item below threshold. Perhaps a new item? " + tmp);
@@ -126,7 +127,7 @@ namespace RatScanner.Scan
 
 				Cv2.MinMaxLoc(res, out _, out var maxVal, out _, out var maxLoc);
 
-				if (maxVal >= RatConfig.MarkerThreshold) return new Vector2(maxLoc.X, maxLoc.Y);
+				if (maxVal >= RCNameScan.MarkerThreshold) return new Vector2(maxLoc.X, maxLoc.Y);
 			}
 
 			return null;    // No match found
@@ -172,7 +173,7 @@ namespace RatScanner.Scan
 		{
 			var position = MarkerPos;
 			position += new Vector2(0, Resources.markerFHD.Height);
-			position += new Vector2(RatConfig.BToolTipWidthOffset, RatConfig.BToolTipHeightOffset);
+			position += new Vector2(RatConfig.ToolTip.WidthOffset, RatConfig.ToolTip.HeightOffset);
 			return position;
 		}
 	}

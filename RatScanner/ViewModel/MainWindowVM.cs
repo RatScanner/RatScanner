@@ -183,7 +183,8 @@ namespace RatScanner.ViewModel
 			if (value == null) return "ERROR";
 
 			var text = $"{value:n0}";
-			return text.Replace(NumberFormatInfo.CurrentInfo.NumberGroupSeparator, RatConfig.ToolTipDigitGroupingSymbol);
+			var numberGroupSeparator = NumberFormatInfo.CurrentInfo.NumberGroupSeparator;
+			return text.Replace(numberGroupSeparator, RatConfig.ToolTip.DigitGroupingSymbol);
 		}
 	}
 }
