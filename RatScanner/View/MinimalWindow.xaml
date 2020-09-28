@@ -13,7 +13,7 @@
         x:ClassModifier="internal">
 
 	<StackPanel>
-		<StackPanel Margin="5,10" Orientation="Horizontal" VerticalAlignment="Center">
+		<StackPanel Margin="5,10" Orientation="Horizontal" VerticalAlignment="Center" x:Name="NameDisplay">
 			<WrapPanel VerticalAlignment="Center">
 				<Rectangle Width="20" Height="20">
 					<Rectangle.Fill>
@@ -54,7 +54,7 @@
 
 		<StackPanel>
 			<Separator/>
-			<Grid Margin="0,5,0,0">
+			<Grid Margin="0,5,0,0" x:Name="PriceDisplay">
 				<Label Grid.Column="0" Content="Price"/>
 				<Label Grid.Column="1" Content="{Binding Price}"/>
 
@@ -64,7 +64,7 @@
 				</Grid.ColumnDefinitions>
 			</Grid>
 
-			<Grid>
+			<Grid x:Name="AvgDayPriceDisplay">
 				<Label Grid.Column="0" Content="Avg. Day Price"/>
 				<Label Grid.Column="1" Content="{Binding Diff24h}" FontSize="10">
 					<Label.Style>
@@ -89,7 +89,7 @@
 				</Grid.ColumnDefinitions>
 			</Grid>
 
-			<Grid>
+			<Grid x:Name="AvgWeekPriceDisplay">
 				<Label Grid.Column="0" Content="Avg. Week Price"/>
 				<Label Grid.Column="1" Content="{Binding Diff7d}" FontSize="10">
 					<Label.Style>
@@ -114,7 +114,7 @@
 				</Grid.ColumnDefinitions>
 			</Grid>
 
-			<Grid>
+			<Grid x:Name="PricePerSlotDisplay">
 				<Label Grid.Column="0" Content="Price per Slot"/>
 				<Label Grid.Column="1" Content="{Binding PricePerSlot}"/>
 
@@ -125,7 +125,7 @@
 			</Grid>
 		</StackPanel>
 
-		<StackPanel>
+		<StackPanel x:Name="TraderPriceDisplay">
 			<Separator/>
 			<Grid>
 				<Label Grid.Column="0" Content="{Binding TraderName}"/>
@@ -148,17 +148,17 @@
 			</StackPanel.Style>
 		</StackPanel>
 
-			<StackPanel>
-				<Separator/>
-				<Grid Margin="0,5,0,0">
-					<Label Grid.Column="0" Content="Updated" FontSize="10"/>
-					<Label Grid.Column="1" Content="{Binding Updated}" FontSize="10"/>
+		<StackPanel x:Name="UpdatedDisplay">
+			<Separator/>
+			<Grid Margin="0,5,0,0">
+				<Label Grid.Column="0" Content="Updated" FontSize="10"/>
+				<Label Grid.Column="1" Content="{Binding Updated}" FontSize="10"/>
 
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="*"/>
-						<ColumnDefinition Width="Auto"/>
-					</Grid.ColumnDefinitions>
-				</Grid>
-			</StackPanel>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="Auto"/>
+				</Grid.ColumnDefinitions>
+			</Grid>
+		</StackPanel>
 	</StackPanel>
 </Window>

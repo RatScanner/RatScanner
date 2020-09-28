@@ -74,6 +74,14 @@ namespace RatScanner
 			internal static int HeightOffset = 5;
 		}
 
+		// Minimal UI
+		internal static bool MinUiShowName = true;
+		internal static bool MinUiShowPrice = true;
+		internal static bool MinUiShowAvgDayPrice = true;
+		internal static bool MinUiShowAvgWeekPrice = true;
+		internal static bool MinUiShowPricePerSlot = true;
+		internal static bool MinUiShowUpdated = true;
+
 		// Other
 		internal static bool LogDebug = false;
 		internal static bool MinimizeToTray = false;
