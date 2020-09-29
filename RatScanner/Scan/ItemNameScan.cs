@@ -41,7 +41,7 @@ namespace RatScanner.Scan
 
 		internal ItemNameScan()
 		{
-			MatchedItems = new[] { RatScannerMain.MarketDB.GetItemByName("", false, out var _) };
+			MatchedItems = new[] { RatScannerMain.Instance.MarketDB.GetItemByName("", false, out var _) };
 		}
 
 		internal ItemNameScan(Bitmap capture, Vector2 mouseVector2)
@@ -99,7 +99,7 @@ namespace RatScanner.Scan
 
 			// Get market item from detected text
 			const string regexFilter = @"[^A-Za-z0-9]+"; // Filter out everything which is not alphanumerical
-			MatchedItems = new[] { RatScannerMain.MarketDB.GetItemByName(ScannedText, IsShortName, out Confidence, regexFilter, false) };
+			MatchedItems = new[] { RatScannerMain.Instance.MarketDB.GetItemByName(ScannedText, IsShortName, out Confidence, regexFilter, false) };
 
 			if (Confidence < RCNameScan.ConfWarnThreshold)
 			{

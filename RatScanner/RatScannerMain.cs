@@ -13,18 +13,20 @@ namespace RatScanner
 {
 	public class RatScannerMain : INotifyPropertyChanged
 	{
+		private static RatScannerMain _instance = null;
+		internal static RatScannerMain Instance => _instance ??= new RatScannerMain();
 
-		private static UserActivityHook activityHook;
+		private UserActivityHook activityHook;
 
 		private readonly NameScanToolTip _nameScanToolTip;
 		private readonly IconScanToolTip _iconScanToolTip;
 
 		private ItemScan _currentItemScan;
-		internal static bool ScanLock = false;
+		internal bool ScanLock = false;
 
-		internal static MarketDB MarketDB;
+		internal MarketDB MarketDB;
 
-		internal static bool ModifierDown;
+		internal bool ModifierDown;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
@@ -40,6 +42,8 @@ namespace RatScanner
 
 		internal RatScannerMain()
 		{
+			_instance = this;
+
 			// Remove old log
 			Logger.Clear();
 

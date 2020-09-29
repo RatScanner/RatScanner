@@ -699,7 +699,7 @@ namespace RatScanner
 			}
 			//if event handled in application do not handoff to other listeners
 			// TODO this is ugly. Make a custom mouse event instead
-			if (RatScannerMain.ModifierDown && wParam == WM_LBUTTONDOWN) return 1;
+			if (RatScannerMain.Instance.ModifierDown && wParam == WM_LBUTTONDOWN) return 1;
 			else return CallNextHookEx(hMouseHook, nCode, wParam, lParam);
 		}
 

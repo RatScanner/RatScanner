@@ -1,28 +1,31 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Windows;
-using System.Windows.Forms;
-using System.Windows.Navigation;
-using RatScanner.ViewModel;
-using Application = System.Windows.Application;
+using System.Windows.Controls;
+using RatScanner.View;
+using NotifyIcon = System.Windows.Forms.NotifyIcon;
 
-namespace RatScanner.View
+namespace RatScanner
 {
 	/// <summary>
-	/// Interaction logic for MainWindow.xaml
+	/// Interaction logic for PageSwitcher.xaml
 	/// </summary>
-	public partial class MainWindow : Window
+	public partial class PageSwitcher : Window
 	{
-		private Settings _settings;
 		private NotifyIcon _notifyIcon;
 
-		public MainWindow()
+		private static PageSwitcher _instance;
+		public static PageSwitcher Instance => _instance ??= new PageSwitcher();
+
+		public PageSwitcher()
 		{
 			try
 			{
+				_instance = this;
+
 				InitializeComponent();
-				var ratScanner = new RatScannerMain();
-				DataContext = new MainWindowVM(ratScanner);
+
+				Navigate(new MainMenu());
+
 				AddTrayIcon();
 				Topmost = RatConfig.AlwaysOnTop;
 			}
@@ -32,10 +35,20 @@ namespace RatScanner.View
 			}
 		}
 
-		private void HyperlinkRequestNavigate(object sender, RequestNavigateEventArgs e)
+		internal void Navigate(UserControl nextPage)
 		{
-			Process.Start("explorer.exe", e.Uri.ToString());
-			e.Handled = true;
+			ContentControl.Content = nextPage;
+		}
+
+		internal void Navigate(UserControl nextPage, object state)
+		{
+			ContentControl.Content = nextPage;
+
+			if (nextPage is ISwitchable s) s.UtilizeState(state);
+			else
+			{
+				throw new ArgumentException("NextPage is not ISwitchable! " + nextPage.Name);
+			}
 		}
 
 		protected override void OnStateChanged(EventArgs e)
@@ -52,16 +65,6 @@ namespace RatScanner.View
 
 			base.OnClosed(e);
 			Application.Current.Shutdown();
-		}
-
-		private void OpenSettingsWindow(object sender, RoutedEventArgs e)
-		{
-			_settings?.Close();
-			_settings = new Settings();
-			_settings.ShowDialog();
-
-			// Apply changed settings which affect appearance
-			Topmost = RatConfig.AlwaysOnTop;
 		}
 
 		private void AddTrayIcon()

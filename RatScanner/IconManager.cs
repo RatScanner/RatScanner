@@ -320,10 +320,10 @@ namespace RatScanner
 			if (!RatConfig.IconScan.UseCachedIcons) return;
 
 			// Wait if currently scanning a item
-			while (RatScannerMain.ScanLock) await Task.Delay(25);
+			while (RatScannerMain.Instance.ScanLock) await Task.Delay(25);
 
 			// Acquire the lock
-			RatScannerMain.ScanLock = true;
+			RatScannerMain.Instance.ScanLock = true;
 
 			// Remove old and load new dynamic icons
 			DynamicIcons.Clear();
@@ -336,7 +336,7 @@ namespace RatScanner
 			InverseCorrelationData();
 
 			// Release the lock
-			RatScannerMain.ScanLock = false;
+			RatScannerMain.Instance.ScanLock = false;
 		}
 
 		/// <summary>

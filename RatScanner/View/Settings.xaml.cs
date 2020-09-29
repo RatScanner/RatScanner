@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using RatScanner.ViewModel;
 
 namespace RatScanner.View
@@ -6,7 +7,7 @@ namespace RatScanner.View
 	/// <summary>
 	/// Interaction logic for Settings.xaml
 	/// </summary>
-	internal partial class Settings : Window
+	internal partial class Settings : UserControl, ISwitchable
 	{
 		internal Settings()
 		{
@@ -22,7 +23,7 @@ namespace RatScanner.View
 
 		private void CloseSettings(object sender, RoutedEventArgs e)
 		{
-			Close();
+			PageSwitcher.Instance.Navigate(new MainMenu());
 		}
 
 		private void SaveSettings(object sender, RoutedEventArgs e)
@@ -44,7 +45,26 @@ namespace RatScanner.View
 
 			Logger.LogInfo("Saving config...");
 			RatConfig.SaveConfig();
-			Close();
+
+			// Apply config
+			var window = Window.GetWindow(this);
+			if (window == null) Logger.LogWarning("Could not find parent window of settings control");
+			else
+			{
+				window.Topmost = RatConfig.AlwaysOnTop;
+			}
+
+			PageSwitcher.Instance.Navigate(new MainMenu());
+		}
+
+		public void UtilizeState(object state)
+		{
+			throw new System.NotImplementedException();
+		}
+
+		private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+		{
+			throw new System.NotImplementedException();
 		}
 	}
 }

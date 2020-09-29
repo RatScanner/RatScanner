@@ -1,14 +1,14 @@
-﻿<Window x:Class="RatScanner.View.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d"
+﻿<UserControl x:Class="RatScanner.View.MainMenu"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 
-        Title="Rat Scanner"
-        Background="#444444"
-        ResizeMode="CanMinimize"
-        Height="400" Width="300">
+             mc:Ignorable="d"
+             x:ClassModifier="internal"
+             
+             Background="#444444"
+             d:DesignHeight="400" d:DesignWidth="300">
 
 	<Grid Margin="10,0">
 		<StackPanel Grid.Row="0">
@@ -246,4 +246,4 @@
 			<RowDefinition Height="Auto"/>
 		</Grid.RowDefinitions>
 	</Grid>
-</Window>
+</UserControl>

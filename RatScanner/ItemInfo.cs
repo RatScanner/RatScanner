@@ -37,7 +37,7 @@ namespace RatScanner
 		{
 			try
 			{
-				var marketDB = RatScannerMain.MarketDB;
+				var marketDB = RatScannerMain.Instance.MarketDB;
 
 				var baseItem = marketDB.GetItemByUid(Uid);
 				if (baseItem == null) return null;
