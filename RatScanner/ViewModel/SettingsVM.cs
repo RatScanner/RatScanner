@@ -18,12 +18,15 @@ namespace RatScanner.ViewModel
 
 		internal SettingsVM()
 		{
-			ToolTipDuration = RatConfig.ToolTipDuration.ToString();
-			EnableNameScan = RatConfig.EnableNameScan;
-			EnableIconScan = RatConfig.EnableIconScan;
-			ScanRotatedIcons = RatConfig.ScanRotatedIcons;
-			UseCachedIcons = RatConfig.UseCachedIcons;
-			IconScanModifier = RatConfig.ModifierKeyCode;
+			EnableNameScan = RatConfig.NameScan.Enable;
+
+			EnableIconScan = RatConfig.IconScan.Enable;
+			ScanRotatedIcons = RatConfig.IconScan.ScanRotatedIcons;
+			IconScanModifier = RatConfig.IconScan.ModifierKeyCode;
+			UseCachedIcons = RatConfig.IconScan.UseCachedIcons;
+			
+			ToolTipDuration = RatConfig.ToolTip.Duration.ToString();
+
 			ScreenResolution = (int)RatConfig.ScreenResolution;
 			MinimizeToTray = RatConfig.MinimizeToTray;
 			AlwaysOnTop = RatConfig.AlwaysOnTop;

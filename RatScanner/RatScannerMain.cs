@@ -102,14 +102,14 @@ namespace RatScanner
 				{
 					Task.Run(delegate
 					{
-						if (RatConfig.EnableIconScan) IconScan(new Vector2(e.Location));
+						if (RatConfig.IconScan.Enable) IconScan(new Vector2(e.Location));
 					});
 				}
 				else
 				{
 					Task.Run(delegate
 					{
-						if (RatConfig.EnableNameScan) NameScan(new Vector2(e.Location));
+						if (RatConfig.NameScan.Enable) NameScan(new Vector2(e.Location));
 					});
 				}
 			}
@@ -121,12 +121,12 @@ namespace RatScanner
 
 		private void OnKeyDown(object sender, KeyEventArgs e)
 		{
-			if ((int)e.KeyCode == RatConfig.ModifierKeyCode) ModifierDown = true;
+			if ((int)e.KeyCode == RatConfig.IconScan.ModifierKeyCode) ModifierDown = true;
 		}
 
 		private void OnKeyUp(object sender, KeyEventArgs e)
 		{
-			if ((int)e.KeyCode == RatConfig.ModifierKeyCode) ModifierDown = false;
+			if ((int)e.KeyCode == RatConfig.IconScan.ModifierKeyCode) ModifierDown = false;
 		}
 
 		private bool IconScan(Vector2 mouseVector2)
@@ -140,11 +140,11 @@ namespace RatScanner
 				_iconScanToolTip.Hide();    // Hide it instantly
 			});
 
-			var x = mouseVector2.X - (RatConfig.IconScanWidth / 2);
-			var y = mouseVector2.Y - (RatConfig.IconScanHeight / 2);
+			var x = mouseVector2.X - (RatConfig.IconScan.ScanWidth / 2);
+			var y = mouseVector2.Y - (RatConfig.IconScan.ScanHeight / 2);
 
 			var position = new Vector2(x, y);
-			var size = new Size(RatConfig.IconScanWidth, RatConfig.IconScanHeight);
+			var size = new Size(RatConfig.IconScan.ScanWidth, RatConfig.IconScan.ScanHeight);
 			var screenshot = GetScreenshot(position, size);
 
 			var itemIconScan = new ItemIconScan(screenshot, mouseVector2);
@@ -177,10 +177,10 @@ namespace RatScanner
 			Thread.Sleep(50);
 
 			// Get raw screenshot which includes the icon and text
-			var markerScanSize = RatConfig.MarkerScanSize;
+			var markerScanSize = RatConfig.NameScan.MarkerScanSize;
 			var positionX = mouseVector2.X - (markerScanSize / 2);
 			var positionY = mouseVector2.Y - (markerScanSize / 2);
-			var sizeWidth = markerScanSize + RatConfig.TextWidth + RatConfig.TextHorizontalOffset;
+			var sizeWidth = markerScanSize + RatConfig.NameScan.TextWidth + RatConfig.NameScan.TextHorizontalOffset;
 			var sizeHeight = markerScanSize;
 			var screenshot = GetScreenshot(new Vector2(positionX, positionY), new Size(sizeWidth, sizeHeight));
 
@@ -219,8 +219,8 @@ namespace RatScanner
 			var pos = itemScan.GetToolTipPosition();
 			if (pos == null) return;
 
-			if (itemScan is ItemNameScan) NameScanToolTip.ScheduleShow(itemScan, pos, RatConfig.ToolTipDuration);
-			if (itemScan is ItemIconScan) IconScanToolTip.ScheduleShow(itemScan, pos, RatConfig.ToolTipDuration);
+			if (itemScan is ItemNameScan) NameScanToolTip.ScheduleShow(itemScan, pos, RatConfig.ToolTip.Duration);
+			if (itemScan is ItemIconScan) IconScanToolTip.ScheduleShow(itemScan, pos, RatConfig.ToolTip.Duration);
 		}
 
 		protected virtual void OnPropertyChanged(string propertyName = null)

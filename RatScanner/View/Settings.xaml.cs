@@ -29,12 +29,14 @@ namespace RatScanner.View
 		{
 			var settingsVM = (SettingsVM)DataContext;
 
-			RatConfig.ToolTipDuration = int.TryParse(settingsVM.ToolTipDuration, out var i) ? i : 0;
-			RatConfig.EnableNameScan = settingsVM.EnableNameScan;
-			RatConfig.EnableIconScan = settingsVM.EnableIconScan;
-			RatConfig.ScanRotatedIcons = settingsVM.ScanRotatedIcons;
-			RatConfig.UseCachedIcons = settingsVM.UseCachedIcons;
-			RatConfig.ModifierKeyCode = settingsVM.IconScanModifier;
+			RatConfig.NameScan.Enable = settingsVM.EnableNameScan;
+
+			RatConfig.IconScan.Enable = settingsVM.EnableIconScan;
+			RatConfig.IconScan.ScanRotatedIcons = settingsVM.ScanRotatedIcons;
+			RatConfig.IconScan.UseCachedIcons = settingsVM.UseCachedIcons;
+			RatConfig.IconScan.ModifierKeyCode = settingsVM.IconScanModifier;
+
+			RatConfig.ToolTip.Duration = int.TryParse(settingsVM.ToolTipDuration, out var i) ? i : 0;
 			RatConfig.ScreenResolution = (RatConfig.Resolution)settingsVM.ScreenResolution;
 			RatConfig.MinimizeToTray = settingsVM.MinimizeToTray;
 			RatConfig.AlwaysOnTop = settingsVM.AlwaysOnTop;

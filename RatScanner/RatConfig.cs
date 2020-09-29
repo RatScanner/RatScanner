@@ -17,47 +17,62 @@ namespace RatScanner
 			UHD,    // 3840x2160
 		}
 
-		// String resources
+		// Version
 		internal static string Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
-		internal static string BasePath = AppDomain.CurrentDomain.BaseDirectory;
-		internal static string DataPath = Path.Combine(BasePath, "Data");
-		internal static string StaticIconPath = Path.Combine(DataPath, "name");
-		private const string EftTempDir = "Battlestate Games\\EscapeFromTarkov\\";
-		private static readonly string EftTempPath = Path.Combine(Path.GetTempPath(), EftTempDir);
-		internal static string DynamicIconPath = Path.Combine(EftTempPath, "Icon Cache");
-		internal static string StaticCorrelationPath = Path.Combine(DataPath, "correlation.json");
-		internal static string DynamicCorrelationPath = Path.Combine(DynamicIconPath, "index.json");
-		internal static string UnknownIconPath = Path.Combine(DataPath, "unknown.png");
-		internal static string ConfigFilePath = Path.Combine(BasePath, "config.cfg");
-		internal static string DebugPath = Path.Combine(BasePath, "Debug");
+
+		// Paths
+		internal static class Paths
+		{
+			internal static string Base = AppDomain.CurrentDomain.BaseDirectory;
+			internal static string Data = Path.Combine(Base, "Data");
+			internal static string StaticIcon = Path.Combine(Data, "name");
+
+			private const string EftTempDir = "Battlestate Games\\EscapeFromTarkov\\";
+			private static readonly string EftTemp = Path.Combine(Path.GetTempPath(), EftTempDir);
+			internal static string DynamicIcon = Path.Combine(EftTemp, "Icon Cache");
+			internal static string StaticCorrelation = Path.Combine(Data, "correlation.json");
+			internal static string DynamicCorrelation = Path.Combine(DynamicIcon, "index.json");
+			internal static string UnknownIcon = Path.Combine(Data, "unknown.png");
+			internal static string ConfigFile = Path.Combine(Base, "config.cfg");
+			internal static string Debug = Path.Combine(Base, "Debug");
+		}
 
 		// Name Scan options
-		internal static Bitmap Marker = Resources.markerFHD;
-		internal static Bitmap MarkerShort = Resources.markerShortFHD;
-		internal static bool EnableNameScan = true;
-		internal static float NameConfWarnThreshold = 0.90f;
-		internal static int MarkerScanSize = 50;
-		internal static float MarkerThreshold = 0.9f;
-		internal static int TextHorizontalOffset = 21;
-		internal static int TextWidth = 500;
-		internal static int TextHeight = 17;
+		internal static class NameScan
+		{
+			internal static bool Enable = true;
+			internal static Bitmap Marker = Resources.markerFHD;
+			internal static Bitmap MarkerShort = Resources.markerShortFHD;
+			internal static float ConfWarnThreshold = 0.90f;
+			internal static int MarkerScanSize = 50;
+			internal static float MarkerThreshold = 0.9f;
+			internal static int TextHorizontalOffset = 21;
+			internal static int TextWidth = 500;
+			internal static int TextHeight = 17;
+		}
 
 		// Icon Scan options
-		internal static bool EnableIconScan = true;
-		internal static float IconConfWarnThreshold = 0.95f;
-		internal static bool ScanRotatedIcons = true;
-		internal static int IconPadding = 10;
-		internal static int IconScanWidth = 640;
-		internal static int IconScanHeight = 896;
-		internal static int ItemSlotSize = 63;
-		internal static int ModifierKeyCode = 160; // SHIFT = 160, CTRL = 162, ALT = 164
-		internal static bool UseCachedIcons = true;
+		internal static class IconScan
+		{
+			internal static bool Enable = true;
+			internal static float ConfWarnThreshold = 0.95f;
+			internal static bool ScanRotatedIcons = true;
+			internal static int ScanPadding = 10;
+			internal static int ScanWidth = 640;
+			internal static int ScanHeight = 896;
+			internal static int ItemSlotSize = 63;
+			internal static int ModifierKeyCode = 160; // SHIFT = 160, CTRL = 162, ALT = 164
+			internal static bool UseCachedIcons = true;
+		}
 
 		// ToolTip options
-		internal static string ToolTipDigitGroupingSymbol = ".";
-		internal static int ToolTipDuration = 1500;
-		internal static int BToolTipWidthOffset = 0;
-		internal static int BToolTipHeightOffset = 5;
+		internal static class ToolTip
+		{
+			internal static string DigitGroupingSymbol = ".";
+			internal static int Duration = 1500;
+			internal static int WidthOffset = 0;
+			internal static int HeightOffset = 5;
+		}
 
 		// Other
 		internal static bool LogDebug = false;
@@ -89,47 +104,47 @@ namespace RatScanner
 
 		private static void LoadFHD()
 		{
-			Marker = Resources.markerFHD;
-			MarkerShort = Resources.markerShortFHD;
-			MarkerScanSize = 50;
-			MarkerThreshold = 0.9f;
-			TextHorizontalOffset = 21;
-			TextWidth = 500;
-			TextHeight = 17;
+			NameScan.Marker = Resources.markerFHD;
+			NameScan.MarkerShort = Resources.markerShortFHD;
+			NameScan.MarkerScanSize = 50;
+			NameScan.MarkerThreshold = 0.9f;
+			NameScan.TextHorizontalOffset = 21;
+			NameScan.TextWidth = 500;
+			NameScan.TextHeight = 17;
 
-			ItemSlotSize = 63;
+			IconScan.ItemSlotSize = 63;
 
-			BToolTipHeightOffset = 5;
+			ToolTip.HeightOffset = 5;
 		}
 
 		private static void LoadQHD()
 		{
-			Marker = Resources.markerQHD;
-			MarkerShort = Resources.markerShortQHD;
-			MarkerScanSize = 75;
-			MarkerThreshold = 0.9f;
-			TextHorizontalOffset = 28;
-			TextWidth = 750;
-			TextHeight = 23;
+			NameScan.Marker = Resources.markerQHD;
+			NameScan.MarkerShort = Resources.markerShortQHD;
+			NameScan.MarkerScanSize = 75;
+			NameScan.MarkerThreshold = 0.9f;
+			NameScan.TextHorizontalOffset = 28;
+			NameScan.TextWidth = 750;
+			NameScan.TextHeight = 23;
 
-			ItemSlotSize = 84;
+			IconScan.ItemSlotSize = 84;
 
-			BToolTipHeightOffset = 8;
+			ToolTip.HeightOffset = 8;
 		}
 
 		private static void LoadUHD()
 		{
-			Marker = Resources.markerUHD;
-			MarkerShort = Resources.markerShortUHD;
-			MarkerScanSize = 100;
-			MarkerThreshold = 0.9f;
-			TextHorizontalOffset = 40;
-			TextWidth = 1000;
-			TextHeight = 34;
+			NameScan.Marker = Resources.markerUHD;
+			NameScan.MarkerShort = Resources.markerShortUHD;
+			NameScan.MarkerScanSize = 100;
+			NameScan.MarkerThreshold = 0.9f;
+			NameScan.TextHorizontalOffset = 40;
+			NameScan.TextWidth = 1000;
+			NameScan.TextHeight = 34;
 
-			ItemSlotSize = 126;
+			IconScan.ItemSlotSize = 126;
 
-			BToolTipHeightOffset = 10;
+			ToolTip.HeightOffset = 10;
 		}
 
 		internal static float GetScreenScaleFactor()
@@ -151,36 +166,42 @@ namespace RatScanner
 
 		internal static void LoadConfig()
 		{
-			if (!File.Exists(ConfigFilePath)) SaveConfig();
+			if (!File.Exists(Paths.ConfigFile)) SaveConfig();
 
-			var config = new SimpleConfig(ConfigFilePath);
-			EnableNameScan = config.ReadBool(nameof(EnableNameScan), true);
-			EnableIconScan = config.ReadBool(nameof(EnableIconScan), true);
-			ScanRotatedIcons = config.ReadBool(nameof(ScanRotatedIcons), true);
-			ToolTipDuration = config.ReadInt(nameof(ToolTipDuration), 1500);
-			ModifierKeyCode = config.ReadInt(nameof(ModifierKeyCode), 160);
-			LogDebug = config.ReadBool(nameof(LogDebug), false);
+			var config = new SimpleConfig(Paths.ConfigFile);
+			NameScan.Enable = config.ReadBool(nameof(NameScan.Enable), true);
+
+			IconScan.Enable = config.ReadBool(nameof(IconScan.Enable), true);
+			IconScan.ScanRotatedIcons = config.ReadBool(nameof(IconScan.ScanRotatedIcons), true);
+			IconScan.ModifierKeyCode = config.ReadInt(nameof(IconScan.ModifierKeyCode), 160);
+			IconScan.UseCachedIcons = config.ReadBool(nameof(IconScan.UseCachedIcons), true);
+
+			ToolTip.Duration = config.ReadInt(nameof(ToolTip.Duration), 1500);
+			ToolTip.DigitGroupingSymbol = config.ReadString(nameof(ToolTip.DigitGroupingSymbol), NumberFormatInfo.CurrentInfo.NumberGroupSeparator);
+			
+			ScreenResolution = (Resolution)config.ReadInt(nameof(ScreenResolution), 1);
 			MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), false);
 			AlwaysOnTop = config.ReadBool(nameof(AlwaysOnTop), false);
-			ScreenResolution = (Resolution)config.ReadInt(nameof(ScreenResolution), 1);
-			ToolTipDigitGroupingSymbol = config.ReadString(nameof(ToolTipDigitGroupingSymbol), NumberFormatInfo.CurrentInfo.NumberGroupSeparator);
-			UseCachedIcons = config.ReadBool(nameof(UseCachedIcons), true);
+			LogDebug = config.ReadBool(nameof(LogDebug), false);
 		}
 
 		internal static void SaveConfig()
 		{
-			var config = new SimpleConfig(ConfigFilePath);
-			config.WriteBool(nameof(EnableNameScan), EnableNameScan);
-			config.WriteBool(nameof(EnableIconScan), EnableIconScan);
-			config.WriteBool(nameof(ScanRotatedIcons), ScanRotatedIcons);
-			config.WriteInt(nameof(ToolTipDuration), ToolTipDuration);
-			config.WriteInt(nameof(ModifierKeyCode), ModifierKeyCode);
-			config.WriteBool(nameof(LogDebug), LogDebug);
+			var config = new SimpleConfig(Paths.ConfigFile);
+			config.WriteBool(nameof(NameScan.Enable), NameScan.Enable);
+
+			config.WriteBool(nameof(IconScan.Enable), IconScan.Enable);
+			config.WriteBool(nameof(IconScan.ScanRotatedIcons), IconScan.ScanRotatedIcons);
+			config.WriteInt(nameof(IconScan.ModifierKeyCode), IconScan.ModifierKeyCode);
+			config.WriteBool(nameof(IconScan.UseCachedIcons), IconScan.UseCachedIcons);
+
+			config.WriteInt(nameof(ToolTip.Duration), ToolTip.Duration);
+			config.WriteString(nameof(ToolTip.DigitGroupingSymbol), ToolTip.DigitGroupingSymbol);
+
+			config.WriteInt(nameof(ScreenResolution), (int)ScreenResolution);
 			config.WriteBool(nameof(MinimizeToTray), MinimizeToTray);
 			config.WriteBool(nameof(AlwaysOnTop), AlwaysOnTop);
-			config.WriteInt(nameof(ScreenResolution), (int)ScreenResolution);
-			config.WriteString(nameof(ToolTipDigitGroupingSymbol), ToolTipDigitGroupingSymbol);
-			config.WriteBool(nameof(UseCachedIcons), UseCachedIcons);
+			config.WriteBool(nameof(LogDebug), LogDebug);
 		}
 	}
 }

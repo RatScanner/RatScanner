@@ -47,8 +47,8 @@ namespace RatScanner.ViewModel
 				var color = Color.FromRgb(238, 238, 238);
 
 				var threshold = 1.0f;
-				if (DataSource is ItemNameScan) threshold = RatConfig.NameConfWarnThreshold;
-				if (DataSource is ItemIconScan) threshold = RatConfig.IconConfWarnThreshold;
+				if (DataSource is ItemNameScan) threshold = RatConfig.NameScan.ConfWarnThreshold;
+				if (DataSource is ItemIconScan) threshold = RatConfig.IconScan.ConfWarnThreshold;
 
 				if (DataSource.Confidence < threshold) color = Color.FromRgb(227, 38, 25);
 				return new SolidColorBrush(color);
@@ -83,7 +83,8 @@ namespace RatScanner.ViewModel
 			if (value == null) return "ERROR";
 
 			var text = $"{value:n0}";
-			return text.Replace(NumberFormatInfo.CurrentInfo.NumberGroupSeparator, RatConfig.ToolTipDigitGroupingSymbol);
+			var numberGroupSeparator = NumberFormatInfo.CurrentInfo.NumberGroupSeparator;
+			return text.Replace(numberGroupSeparator, RatConfig.ToolTip.DigitGroupingSymbol);
 		}
 	}
 }

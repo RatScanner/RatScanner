@@ -62,11 +62,11 @@ namespace RatScanner
 			fileName = fileName.Replace(' ', '_');
 
 			var index = 0;
-			var uniquePath = Path.Combine(RatConfig.DebugPath, fileName + index + extension);
+			var uniquePath = Path.Combine(RatConfig.Paths.Debug, fileName + index + extension);
 
 			while (File.Exists(uniquePath)) index += 1;
 
-			return Path.Combine(RatConfig.DebugPath, fileName + index + extension);
+			return Path.Combine(RatConfig.Paths.Debug, fileName + index + extension);
 		}
 
 		private static void AppendToLog(string content)
@@ -90,7 +90,7 @@ namespace RatScanner
 
 		internal static void ClearMats(string pattern = "*.png")
 		{
-			var files = Directory.GetFiles(RatConfig.DataPath, pattern);
+			var files = Directory.GetFiles(RatConfig.Paths.Data, pattern);
 			foreach (var file in files)
 			{
 				File.Delete(file);
