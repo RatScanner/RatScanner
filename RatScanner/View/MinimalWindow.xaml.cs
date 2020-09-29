@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 using RatScanner.ViewModel;
+using RCMinUi = RatScanner.RatConfig.MinimalUi;
 
 namespace RatScanner.View
 {
@@ -21,12 +22,12 @@ namespace RatScanner.View
 			const Visibility v = Visibility.Visible;
 			const Visibility c = Visibility.Collapsed;
 
-			NameDisplay.Visibility = RatConfig.MinUiShowName ? v : c;
-			PriceDisplay.Visibility = RatConfig.MinUiShowPrice ? v : c;
-			AvgDayPriceDisplay.Visibility = RatConfig.MinUiShowAvgDayPrice ? v : c;
-			AvgWeekPriceDisplay.Visibility = RatConfig.MinUiShowAvgWeekPrice ? v : c;
-			PricePerSlotDisplay.Visibility = RatConfig.MinUiShowPricePerSlot ? v : c;
-			UpdatedDisplay.Visibility = RatConfig.MinUiShowUpdated ? v : c;
+			NameDisplay.Visibility = RCMinUi.ShowName ? v : c;
+			PriceDisplay.Visibility = RCMinUi.ShowPrice ? v : c;
+			AvgDayPriceDisplay.Visibility = RCMinUi.ShowAvgDayPrice ? v : c;
+			AvgWeekPriceDisplay.Visibility = RCMinUi.ShowAvgWeekPrice ? v : c;
+			PricePerSlotDisplay.Visibility = RCMinUi.ShowPricePerSlot ? v : c;
+			UpdatedDisplay.Visibility = RCMinUi.ShowUpdated ? v : c;
 		}
 
 		private void OnMouseDown(object sender, MouseButtonEventArgs e)

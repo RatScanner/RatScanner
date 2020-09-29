@@ -234,6 +234,95 @@
 					</Grid>
 				</StackPanel>
 			</TabItem>
+
+			<TabItem Header="Minimal UI">
+				<StackPanel>
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								Show the name of the item
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0" Content="Show Name"/>
+						<CheckBox Grid.Column="1" VerticalAlignment="Center" Margin="5,0" IsChecked="{Binding ShowName}"/>
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="Auto"/>
+						</Grid.ColumnDefinitions>
+					</Grid>
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								Show the price of the item
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0" Content="Show Price"/>
+						<CheckBox Grid.Column="1" VerticalAlignment="Center" Margin="5,0" IsChecked="{Binding ShowPrice}"/>
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="Auto"/>
+						</Grid.ColumnDefinitions>
+					</Grid>
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								Show the daily average price of the item
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0" Content="Show Average Day Price"/>
+						<CheckBox Grid.Column="1" VerticalAlignment="Center" Margin="5,0" IsChecked="{Binding ShowAvgDayPrice}"/>
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="Auto"/>
+						</Grid.ColumnDefinitions>
+					</Grid>
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								Show the weekly average price of the item
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0" Content="Show Average Week Price"/>
+						<CheckBox Grid.Column="1" VerticalAlignment="Center" Margin="5,0" IsChecked="{Binding ShowAvgWeekPrice}"/>
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="Auto"/>
+						</Grid.ColumnDefinitions>
+					</Grid>
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								Show the price per slot of the item
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0" Content="Show Price per Slot"/>
+						<CheckBox Grid.Column="1" VerticalAlignment="Center" Margin="5,0" IsChecked="{Binding ShowPricePerSlot}"/>
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="Auto"/>
+						</Grid.ColumnDefinitions>
+					</Grid>
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								Show when the data was last updated
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0" Content="Show Updated"/>
+						<CheckBox Grid.Column="1" VerticalAlignment="Center" Margin="5,0" IsChecked="{Binding ShowUpdated}"/>
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="Auto"/>
+						</Grid.ColumnDefinitions>
+					</Grid>
+				</StackPanel>
+			</TabItem>
 		</TabControl>
 
 		<Grid Grid.Row="1" Margin="10" Height="30">

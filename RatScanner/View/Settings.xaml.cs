@@ -38,6 +38,14 @@ namespace RatScanner.View
 			RatConfig.IconScan.ModifierKeyCode = settingsVM.IconScanModifier;
 
 			RatConfig.ToolTip.Duration = int.TryParse(settingsVM.ToolTipDuration, out var i) ? i : 0;
+
+			RatConfig.MinimalUi.ShowName = settingsVM.ShowName;
+			RatConfig.MinimalUi.ShowPrice = settingsVM.ShowPrice;
+			RatConfig.MinimalUi.ShowAvgDayPrice = settingsVM.ShowAvgDayPrice;
+			RatConfig.MinimalUi.ShowAvgWeekPrice = settingsVM.ShowAvgWeekPrice;
+			RatConfig.MinimalUi.ShowPricePerSlot = settingsVM.ShowPricePerSlot;
+			RatConfig.MinimalUi.ShowUpdated = settingsVM.ShowUpdated;
+
 			RatConfig.ScreenResolution = (RatConfig.Resolution)settingsVM.ScreenResolution;
 			RatConfig.MinimizeToTray = settingsVM.MinimizeToTray;
 			RatConfig.AlwaysOnTop = settingsVM.AlwaysOnTop;
