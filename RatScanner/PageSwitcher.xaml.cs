@@ -29,7 +29,7 @@ namespace RatScanner
 				AddTrayIcon();
 				Topmost = RatConfig.AlwaysOnTop;
 
-				(new MinimalWindow { DataContext = DataContext }).Show();
+				new MinimalWindow().Show();
 			}
 			catch (Exception e)
 			{

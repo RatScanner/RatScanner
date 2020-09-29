@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Input;
+using RatScanner.ViewModel;
 
 namespace RatScanner.View
 {
@@ -11,6 +12,7 @@ namespace RatScanner.View
 		internal MinimalWindow()
 		{
 			InitializeComponent();
+			DataContext = new MainWindowVM(RatScannerMain.Instance);
 			UpdateElements();
 		}
 
