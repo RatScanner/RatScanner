@@ -1,14 +1,16 @@
-[*.{c,c++,cc,cp,cpp,cu,cuh,cxx,h,hh,hpp,hxx,inc,inl,ino,ipp,mpp,tpp}]
-indent_size=tab
-tab_width=4
+[*.{cs}]
+indent_size = 4
+tab_width = 4
 
 [*.{appxmanifest,build,config,csproj,dbml,discomap,dtd,json,jsproj,lsproj,njsproj,nuspec,proj,props,resjson,resw,resx,StyleCop,targets,tasks,vbproj,xaml,xamlx,xml,xoml,xsd}]
-indent_size=2
-tab_width=2
+indent_size = 2
+tab_width = 2
 
 [*]
 indent_style = tab
 end_of_line = crlf
+trim_trailing_whitespace = true
+insert_final_newline = true
 
 # Microsoft .NET properties
 csharp_new_line_before_members_in_object_initializers=false
