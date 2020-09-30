@@ -82,6 +82,7 @@ namespace RatScanner
 			internal static bool ShowAvgDayPrice = true;
 			internal static bool ShowAvgWeekPrice = true;
 			internal static bool ShowPricePerSlot = true;
+			internal static bool ShowTraderPrice = true;
 			internal static bool ShowUpdated = true;
 		}
 
@@ -195,6 +196,7 @@ namespace RatScanner
 			MinimalUi.ShowAvgDayPrice = config.ReadBool(nameof(MinimalUi.ShowAvgDayPrice), true);
 			MinimalUi.ShowAvgWeekPrice = config.ReadBool(nameof(MinimalUi.ShowAvgWeekPrice), true);
 			MinimalUi.ShowPricePerSlot = config.ReadBool(nameof(MinimalUi.ShowPricePerSlot), true);
+			MinimalUi.ShowTraderPrice = config.ReadBool(nameof(MinimalUi.ShowTraderPrice), true);
 			MinimalUi.ShowUpdated = config.ReadBool(nameof(MinimalUi.ShowUpdated), true);
 
 			ScreenResolution = (Resolution)config.ReadInt(nameof(ScreenResolution), 1);
@@ -221,6 +223,7 @@ namespace RatScanner
 			config.WriteBool(nameof(MinimalUi.ShowAvgDayPrice), MinimalUi.ShowAvgDayPrice);
 			config.WriteBool(nameof(MinimalUi.ShowAvgWeekPrice), MinimalUi.ShowAvgWeekPrice);
 			config.WriteBool(nameof(MinimalUi.ShowPricePerSlot), MinimalUi.ShowPricePerSlot);
+			config.WriteBool(nameof(MinimalUi.ShowTraderPrice), MinimalUi.ShowTraderPrice);
 			config.WriteBool(nameof(MinimalUi.ShowUpdated), MinimalUi.ShowUpdated);
 
 			config.WriteInt(nameof(ScreenResolution), (int)ScreenResolution);

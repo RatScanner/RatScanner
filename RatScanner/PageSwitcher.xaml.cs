@@ -1,7 +1,8 @@
-﻿using System;
+﻿using RatScanner.View;
+using System;
 using System.Windows;
 using System.Windows.Controls;
-using RatScanner.View;
+using System.Windows.Input;
 using NotifyIcon = System.Windows.Forms.NotifyIcon;
 
 namespace RatScanner
@@ -11,6 +12,9 @@ namespace RatScanner
 	/// </summary>
 	public partial class PageSwitcher : Window
 	{
+		private const int WindowWidth = 280;
+		private const int WindowHeight = 390;
+
 		private NotifyIcon _notifyIcon;
 
 		private static PageSwitcher _instance;
@@ -23,18 +27,24 @@ namespace RatScanner
 				_instance = this;
 
 				InitializeComponent();
-
-				Navigate(new MainMenu());
+				ResetWindowSize();
 
 				AddTrayIcon();
 				Topmost = RatConfig.AlwaysOnTop;
 
-				new MinimalWindow().Show();
+				Navigate(new MainMenu());
 			}
 			catch (Exception e)
 			{
 				Logger.LogError(e.Message, e);
 			}
+		}
+
+		internal void ResetWindowSize()
+		{
+			SizeToContent = SizeToContent.Manual;
+			Width = WindowWidth;
+			Height = WindowHeight;
 		}
 
 		internal void Navigate(UserControl nextPage)
@@ -66,6 +76,7 @@ namespace RatScanner
 			_notifyIcon.Dispose();
 
 			base.OnClosed(e);
+
 			Application.Current.Shutdown();
 		}
 
@@ -83,6 +94,44 @@ namespace RatScanner
 				Show();
 				WindowState = WindowState.Normal;
 			};
+		}
+
+		private void OnTitleBarMouseDown(object sender, MouseButtonEventArgs e)
+		{
+			if (e.ChangedButton == MouseButton.Left) DragMove();
+		}
+
+		private void OnTitleBarMinimize(object sender, RoutedEventArgs e)
+		{
+			WindowState = WindowState.Minimized;
+		}
+
+		private void OnTitleBarMinimal(object sender, RoutedEventArgs e)
+		{
+			CollapseTitleBar();
+			SizeToContent = SizeToContent.WidthAndHeight;
+			Navigate(new MinimalMenu());
+		}
+
+		private void OnTitleBarClose(object sender, RoutedEventArgs e)
+		{
+			Close();
+		}
+
+		internal void CollapseTitleBar()
+		{
+			TitleBar.Visibility = Visibility.Collapsed;
+		}
+
+		internal void ShowTitleBar()
+		{
+			TitleBar.Visibility = Visibility.Visible;
+		}
+
+		internal void SetBackgroundOpacity(double opacity)
+		{
+			opacity = Math.Clamp(opacity, 0, 1);
+			Background.Opacity = opacity;
 		}
 	}
 }

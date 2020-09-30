@@ -44,6 +44,7 @@ namespace RatScanner.View
 			RatConfig.MinimalUi.ShowAvgDayPrice = settingsVM.ShowAvgDayPrice;
 			RatConfig.MinimalUi.ShowAvgWeekPrice = settingsVM.ShowAvgWeekPrice;
 			RatConfig.MinimalUi.ShowPricePerSlot = settingsVM.ShowPricePerSlot;
+			RatConfig.MinimalUi.ShowTraderPrice = settingsVM.ShowTraderPrice;
 			RatConfig.MinimalUi.ShowUpdated = settingsVM.ShowUpdated;
 
 			RatConfig.ScreenResolution = (RatConfig.Resolution)settingsVM.ScreenResolution;

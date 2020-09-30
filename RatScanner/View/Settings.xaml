@@ -1,344 +1,438 @@
-﻿<UserControl x:Class="RatScanner.View.Settings"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+﻿<UserControl
+  x:Class="RatScanner.View.Settings"
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  d:DesignHeight="400"
+  d:DesignWidth="300"
+  x:ClassModifier="internal"
+  Background="#444444"
+  mc:Ignorable="d">
+  <Grid>
+    <TabControl Grid.Row="0" Margin="0,5">
+      <TabItem Header="General">
+        <StackPanel>
+          <Grid>
+            <Grid.ToolTip>
+              <TextBlock>
+                The duration in millisecond, how long<LineBreak />
+                the tool tip should be shown.</TextBlock>
+            </Grid.ToolTip>
+            <Label Grid.Column="0" Content="ToolTip Duration" />
+            <TextBox
+              Grid.Column="1"
+              Width="64"
+              Text="{Binding ToolTipDuration}" />
 
-             mc:Ignorable="d"
-             x:ClassModifier="internal"
-             
-             Background="#444444"
-             d:DesignHeight="400" d:DesignWidth="300">
-	<Grid>
-		<TabControl Grid.Row="0" Margin="0,5">
-			<TabItem Header="General">
-				<StackPanel>
-					<Grid>
-						<Grid.ToolTip>
-							<TextBlock>
-            The duration in millisecond, how long<LineBreak/>
-            the tool tip should be shown.
-							</TextBlock>
-						</Grid.ToolTip>
-						<Label Grid.Column="0" Content="ToolTip Duration"/>
-						<TextBox Grid.Column="1" Width="64" Text="{Binding ToolTipDuration}"/>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+          </Grid>
 
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="Auto"/>
-						</Grid.ColumnDefinitions>
-					</Grid>
+          <Grid>
+            <Grid.ToolTip>
+              <TextBlock>
+                The resolution of your game. Adjust this to<LineBreak />
+                make sure both Name Scan and Icon Scan will work.<LineBreak />
+                WXGA = 1366x768<LineBreak />
+                FHD = 1920x1080<LineBreak />
+                QHD = 2560x1440<LineBreak />
+                UHD = 3840x2160</TextBlock>
+            </Grid.ToolTip>
+            <Label Grid.Column="0" Content="Resolution" />
+            <ComboBox
+              Grid.Column="1"
+              Width="64"
+              Margin="5,0"
+              VerticalAlignment="Center"
+              SelectedValue="{Binding ScreenResolution}"
+              SelectedValuePath="Tag">
+              <ComboBoxItem Content="WXGA" Tag="0" />
+              <ComboBoxItem Content="FHD" Tag="1" />
+              <ComboBoxItem Content="QHD" Tag="2" />
+              <ComboBoxItem Content="UHD" Tag="3" />
+            </ComboBox>
 
-					<Grid>
-						<Grid.ToolTip>
-							<TextBlock>
-            The resolution of your game. Adjust this to<LineBreak/>
-            make sure both Name Scan and Icon Scan will work.
-            <LineBreak/>
-            WXGA = 1366x768
-            <LineBreak/>
-            FHD = 1920x1080
-            <LineBreak/>
-            QHD = 2560x1440
-            <LineBreak/>
-            UHD = 3840x2160
-							</TextBlock>
-						</Grid.ToolTip>
-						<Label Grid.Column="0" Content="Resolution"/>
-						<ComboBox Grid.Column="1"
-                  Width="64"
-                  VerticalAlignment="Center"
-                  Margin="5,0"
-                  SelectedValue="{Binding ScreenResolution}"
-                  SelectedValuePath="Tag">
-							<ComboBoxItem Content="WXGA" Tag="0"/>
-							<ComboBoxItem Content="FHD" Tag="1"/>
-							<ComboBoxItem Content="QHD" Tag="2"/>
-							<ComboBoxItem Content="UHD" Tag="3"/>
-						</ComboBox>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+          </Grid>
 
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition/>
-							<ColumnDefinition Width="Auto"/>
-						</Grid.ColumnDefinitions>
-					</Grid>
+          <Grid>
+            <Grid.ToolTip>
+              <TextBlock>
+                When minimizing this windows, it will no long<LineBreak />
+                show in the task bar but instead in the icon tray.</TextBlock>
+            </Grid.ToolTip>
+            <Label Grid.Column="0" Content="Minimize to Tray" />
+            <CheckBox
+              Grid.Column="1"
+              Margin="5,0"
+              VerticalAlignment="Center"
+              IsChecked="{Binding MinimizeToTray}" />
 
-					<Grid>
-						<Grid.ToolTip>
-							<TextBlock>
-            When minimizing this windows, it will no long<LineBreak/>
-            show in the task bar but instead in the icon tray.
-							</TextBlock>
-						</Grid.ToolTip>
-						<Label Grid.Column="0" Content="Minimize to Tray"/>
-						<CheckBox Grid.Column="1" VerticalAlignment="Center" Margin="5,0" IsChecked="{Binding MinimizeToTray}"/>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+          </Grid>
 
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="Auto"/>
-						</Grid.ColumnDefinitions>
-					</Grid>
+          <Grid>
+            <Grid.ToolTip>
+              <TextBlock>
+                Makes this windows always stay<LineBreak />
+                on top of other windows.</TextBlock>
+            </Grid.ToolTip>
+            <Label Grid.Column="0" Content="Always on Top" />
+            <CheckBox
+              Grid.Column="1"
+              Margin="5,0"
+              VerticalAlignment="Center"
+              IsChecked="{Binding AlwaysOnTop}" />
 
-					<Grid>
-						<Grid.ToolTip>
-							<TextBlock>
-            Makes this windows always stay<LineBreak/>
-            on top of other windows.
-							</TextBlock>
-						</Grid.ToolTip>
-						<Label Grid.Column="0" Content="Always on Top"/>
-						<CheckBox Grid.Column="1" VerticalAlignment="Center" Margin="5,0" IsChecked="{Binding AlwaysOnTop}"/>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+          </Grid>
 
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="Auto"/>
-						</Grid.ColumnDefinitions>
-					</Grid>
+          <Grid>
+            <Grid.ToolTip>
+              <TextBlock>
+                Writes additional information into the log file,<LineBreak />
+                as well as saving screenshots of scanned items,<LineBreak />
+                which can be useful for further investigation.<LineBreak />
+                This will impact performance slightly.</TextBlock>
+            </Grid.ToolTip>
+            <Label Grid.Column="0" Content="Log Debug Info" />
+            <CheckBox
+              Grid.Column="1"
+              Margin="5,0"
+              VerticalAlignment="Center"
+              IsChecked="{Binding LogDebug}" />
 
-					<Grid>
-						<Grid.ToolTip>
-							<TextBlock>
-								Writes additional information into the log file,<LineBreak/>
-								as well as saving screenshots of scanned items,<LineBreak/>
-								which can be useful for further investigation.<LineBreak/>
-								This will impact performance slightly.
-							</TextBlock>
-						</Grid.ToolTip>
-						<Label Grid.Column="0" Content="Log Debug Info"/>
-						<CheckBox Grid.Column="1" VerticalAlignment="Center" Margin="5,0" IsChecked="{Binding LogDebug}"/>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+          </Grid>
+        </StackPanel>
+      </TabItem>
 
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="Auto"/>
-						</Grid.ColumnDefinitions>
-					</Grid>
-				</StackPanel>
-			</TabItem>
+      <TabItem Header="Scan Options">
+        <StackPanel>
+          <Grid>
+            <Grid.ToolTip>
+              <TextBlock>
+                A name scan is executed when left clicking on<LineBreak />
+                the magnifier glass in the top left corner of<LineBreak />
+                the inspection window.</TextBlock>
+            </Grid.ToolTip>
+            <Label Grid.Column="0" Content="Enable Name Scan" />
+            <CheckBox
+              Grid.Column="1"
+              Margin="5,0"
+              VerticalAlignment="Center"
+              IsChecked="{Binding EnableNameScan}" />
 
-			<TabItem Header="Scan Options">
-				<StackPanel>
-					<Grid>
-						<Grid.ToolTip>
-							<TextBlock>
-            A name scan is executed when left clicking on<LineBreak/>
-            the magnifier glass in the top left corner of<LineBreak/>
-            the inspection window.
-							</TextBlock>
-						</Grid.ToolTip>
-						<Label Grid.Column="0" Content="Enable Name Scan"/>
-						<CheckBox Grid.Column="1" VerticalAlignment="Center" Margin="5,0" IsChecked="{Binding EnableNameScan}"/>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+          </Grid>
 
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="Auto"/>
-						</Grid.ColumnDefinitions>
-					</Grid>
+          <Separator />
+          <Grid>
+            <Grid.ToolTip>
+              <TextBlock>
+                A icon scan is executed when holding the modifier key<LineBreak />
+                and left clicking on a icon of a item.</TextBlock>
+            </Grid.ToolTip>
+            <Label Grid.Column="0" Content="Enable Icon Scan" />
+            <CheckBox
+              Grid.Column="1"
+              Margin="5,0"
+              VerticalAlignment="Center"
+              IsChecked="{Binding EnableIconScan}" />
 
-					<Separator/>
-					<Grid>
-						<Grid.ToolTip>
-							<TextBlock>
-            A icon scan is executed when holding the modifier key<LineBreak/>
-            and left clicking on a icon of a item.
-							</TextBlock>
-						</Grid.ToolTip>
-						<Label Grid.Column="0" Content="Enable Icon Scan"/>
-						<CheckBox Grid.Column="1" VerticalAlignment="Center" Margin="5,0" IsChecked="{Binding EnableIconScan}"/>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+          </Grid>
 
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="Auto"/>
-						</Grid.ColumnDefinitions>
-					</Grid>
+          <Grid>
+            <Grid.ToolTip>
+              <TextBlock>
+                Also scan for rotated icons.<LineBreak />
+                Scanning for rotated icons will make the<LineBreak />
+                total scan time take twice as long.</TextBlock>
+            </Grid.ToolTip>
+            <Label Grid.Column="0" Content="Scan Rotated Icons" />
+            <CheckBox
+              Grid.Column="1"
+              Margin="5,0"
+              VerticalAlignment="Center"
+              IsChecked="{Binding ScanRotatedIcons}" />
 
-					<Grid>
-						<Grid.ToolTip>
-							<TextBlock>
-            Also scan for rotated icons.<LineBreak/>
-            Scanning for rotated icons will make the<LineBreak/>
-            total scan time take twice as long.
-							</TextBlock>
-						</Grid.ToolTip>
-						<Label Grid.Column="0" Content="Scan Rotated Icons"/>
-						<CheckBox Grid.Column="1" VerticalAlignment="Center" Margin="5,0" IsChecked="{Binding ScanRotatedIcons}"/>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+          </Grid>
 
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="Auto"/>
-						</Grid.ColumnDefinitions>
-					</Grid>
+          <Grid>
+            <Grid.ToolTip>
+              <StackPanel>
+                <TextBlock>
+                  Scan for items inside your icon cache folder.<LineBreak />
+                  This will allow you to scan weapons, armor and<LineBreak />
+                  other items a like.</TextBlock>
+                <TextBlock FontWeight="Bold" TextAlignment="Center">-  Requires restart  -</TextBlock>
+              </StackPanel>
+            </Grid.ToolTip>
+            <Label Grid.Column="0" Content="Use Cached Icons" />
+            <CheckBox
+              Grid.Column="1"
+              Margin="5,0"
+              VerticalAlignment="Center"
+              IsChecked="{Binding UseCachedIcons}" />
 
-					<Grid>
-						<Grid.ToolTip>
-							<StackPanel>
-								<TextBlock>
-            Scan for items inside your icon cache folder.<LineBreak/>
-            This will allow you to scan weapons, armor and<LineBreak/>
-            other items a like.
-								</TextBlock>
-								<TextBlock TextAlignment="Center" FontWeight="Bold">-  Requires restart  -</TextBlock>
-							</StackPanel>
-						</Grid.ToolTip>
-						<Label Grid.Column="0" Content="Use Cached Icons"/>
-						<CheckBox Grid.Column="1" VerticalAlignment="Center" Margin="5,0" IsChecked="{Binding UseCachedIcons}"/>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+          </Grid>
 
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="Auto"/>
-						</Grid.ColumnDefinitions>
-					</Grid>
+          <Grid>
+            <Grid.ToolTip>
+              <StackPanel>
+                <TextBlock>
+                  Clearing the icon cache will increase scanning speed.<LineBreak />
+                  You should only clean the cache when it's larger<LineBreak />
+                  than 300 and impacting performance noticeably.</TextBlock>
+                <TextBlock FontWeight="Bold" TextAlignment="Center">Recommended to close EfT</TextBlock>
+              </StackPanel>
+            </Grid.ToolTip>
+            <WrapPanel Grid.Column="0">
+              <Label Content="Icon Cache Folder" />
+              <Label
+                Padding="0"
+                VerticalAlignment="Center"
+                Content="["
+                Foreground="DarkGray" />
+              <Label
+                Padding="2,0"
+                VerticalAlignment="Center"
+                Content="{Binding IconCacheSize}"
+                Foreground="DarkGray" />
+              <Label
+                Padding="0"
+                VerticalAlignment="Center"
+                Content="]"
+                Foreground="DarkGray" />
+            </WrapPanel>
+            <Button
+              Grid.Column="1"
+              Width="64"
+              Height="21"
+              Margin="0,0,5,0"
+              Click="ClearIconCache"
+              Content="Clear" />
 
-					<Grid>
-						<Grid.ToolTip>
-							<StackPanel>
-								<TextBlock>
-              Clearing the icon cache will increase scanning speed.<LineBreak/>
-              You should only clean the cache when it's larger<LineBreak/>
-              than 300 and impacting performance noticeably.
-								</TextBlock>
-								<TextBlock TextAlignment="Center" FontWeight="Bold">Recommended to close EfT</TextBlock>
-							</StackPanel>
-						</Grid.ToolTip>
-						<WrapPanel Grid.Column="0">
-							<Label Content="Icon Cache Folder"/>
-							<Label Content="[" Padding="0" VerticalAlignment="Center" Foreground="DarkGray"/>
-							<Label Content="{Binding IconCacheSize}" Padding="2,0" VerticalAlignment="Center" Foreground="DarkGray"/>
-							<Label Content="]" Padding="0" VerticalAlignment="Center" Foreground="DarkGray"/>
-						</WrapPanel>
-						<Button Grid.Column="1" Margin="0,0,5,0" Width="64" Content="Clear" Click="ClearIconCache" Height="21"/>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+          </Grid>
 
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="Auto"/>
-						</Grid.ColumnDefinitions>
-					</Grid>
+          <Grid>
+            <Grid.ToolTip>
+              <TextBlock>
+                The key you have to hold down in addition to<LineBreak />
+                left clicking on the icon you want to scan.</TextBlock>
+            </Grid.ToolTip>
+            <Label Grid.Column="0" Content="Icon Scan Modifier" />
+            <ComboBox
+              Grid.Column="1"
+              Width="64"
+              Margin="5,0"
+              VerticalAlignment="Center"
+              SelectedValue="{Binding IconScanModifier}"
+              SelectedValuePath="Tag">
+              <ComboBoxItem Content="CTRL" Tag="162" />
+              <ComboBoxItem Content="ALT" Tag="164" />
+              <ComboBoxItem Content="SHIFT" Tag="160" />
+            </ComboBox>
 
-					<Grid>
-						<Grid.ToolTip>
-							<TextBlock>
-            The key you have to hold down in addition to<LineBreak/>
-            left clicking on the icon you want to scan.
-							</TextBlock>
-						</Grid.ToolTip>
-						<Label Grid.Column="0" Content="Icon Scan Modifier"/>
-						<ComboBox Grid.Column="1" Width="64" VerticalAlignment="Center" Margin="5,0" SelectedValue="{Binding IconScanModifier}" SelectedValuePath="Tag">
-							<ComboBoxItem Content="CTRL" Tag="162"/>
-							<ComboBoxItem Content="ALT" Tag="164"/>
-							<ComboBoxItem Content="SHIFT" Tag="160"/>
-						</ComboBox>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+          </Grid>
+        </StackPanel>
+      </TabItem>
 
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="Auto"/>
-						</Grid.ColumnDefinitions>
-					</Grid>
-				</StackPanel>
-			</TabItem>
+      <TabItem Header="Minimal UI">
+        <StackPanel>
+          <Grid>
+            <Grid.ToolTip>
+              <TextBlock>
+                Show the name of the item
+              </TextBlock>
+            </Grid.ToolTip>
+            <Label Grid.Column="0" Content="Show Name" />
+            <CheckBox
+              Grid.Column="1"
+              Margin="5,0"
+              VerticalAlignment="Center"
+              IsChecked="{Binding ShowName}" />
 
-			<TabItem Header="Minimal UI">
-				<StackPanel>
-					<Grid>
-						<Grid.ToolTip>
-							<TextBlock>
-								Show the name of the item
-							</TextBlock>
-						</Grid.ToolTip>
-						<Label Grid.Column="0" Content="Show Name"/>
-						<CheckBox Grid.Column="1" VerticalAlignment="Center" Margin="5,0" IsChecked="{Binding ShowName}"/>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+          </Grid>
+          <Grid>
+            <Grid.ToolTip>
+              <TextBlock>
+                Show the price of the item
+              </TextBlock>
+            </Grid.ToolTip>
+            <Label Grid.Column="0" Content="Show Price" />
+            <CheckBox
+              Grid.Column="1"
+              Margin="5,0"
+              VerticalAlignment="Center"
+              IsChecked="{Binding ShowPrice}" />
 
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="Auto"/>
-						</Grid.ColumnDefinitions>
-					</Grid>
-					<Grid>
-						<Grid.ToolTip>
-							<TextBlock>
-								Show the price of the item
-							</TextBlock>
-						</Grid.ToolTip>
-						<Label Grid.Column="0" Content="Show Price"/>
-						<CheckBox Grid.Column="1" VerticalAlignment="Center" Margin="5,0" IsChecked="{Binding ShowPrice}"/>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+          </Grid>
+          <Grid>
+            <Grid.ToolTip>
+              <TextBlock>
+                Show the daily average price of the item
+              </TextBlock>
+            </Grid.ToolTip>
+            <Label Grid.Column="0" Content="Show Average Day Price" />
+            <CheckBox
+              Grid.Column="1"
+              Margin="5,0"
+              VerticalAlignment="Center"
+              IsChecked="{Binding ShowAvgDayPrice}" />
 
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="Auto"/>
-						</Grid.ColumnDefinitions>
-					</Grid>
-					<Grid>
-						<Grid.ToolTip>
-							<TextBlock>
-								Show the daily average price of the item
-							</TextBlock>
-						</Grid.ToolTip>
-						<Label Grid.Column="0" Content="Show Average Day Price"/>
-						<CheckBox Grid.Column="1" VerticalAlignment="Center" Margin="5,0" IsChecked="{Binding ShowAvgDayPrice}"/>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+          </Grid>
+          <Grid>
+            <Grid.ToolTip>
+              <TextBlock>
+                Show the weekly average price of the item
+              </TextBlock>
+            </Grid.ToolTip>
+            <Label Grid.Column="0" Content="Show Average Week Price" />
+            <CheckBox
+              Grid.Column="1"
+              Margin="5,0"
+              VerticalAlignment="Center"
+              IsChecked="{Binding ShowAvgWeekPrice}" />
 
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="Auto"/>
-						</Grid.ColumnDefinitions>
-					</Grid>
-					<Grid>
-						<Grid.ToolTip>
-							<TextBlock>
-								Show the weekly average price of the item
-							</TextBlock>
-						</Grid.ToolTip>
-						<Label Grid.Column="0" Content="Show Average Week Price"/>
-						<CheckBox Grid.Column="1" VerticalAlignment="Center" Margin="5,0" IsChecked="{Binding ShowAvgWeekPrice}"/>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+          </Grid>
+          <Grid>
+            <Grid.ToolTip>
+              <TextBlock>
+                Show the price per slot of the item
+              </TextBlock>
+            </Grid.ToolTip>
+            <Label Grid.Column="0" Content="Show Price per Slot" />
+            <CheckBox
+              Grid.Column="1"
+              Margin="5,0"
+              VerticalAlignment="Center"
+              IsChecked="{Binding ShowPricePerSlot}" />
 
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="Auto"/>
-						</Grid.ColumnDefinitions>
-					</Grid>
-					<Grid>
-						<Grid.ToolTip>
-							<TextBlock>
-								Show the price per slot of the item
-							</TextBlock>
-						</Grid.ToolTip>
-						<Label Grid.Column="0" Content="Show Price per Slot"/>
-						<CheckBox Grid.Column="1" VerticalAlignment="Center" Margin="5,0" IsChecked="{Binding ShowPricePerSlot}"/>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+          </Grid>
+          <Grid>
+            <Grid.ToolTip>
+              <TextBlock>
+                Show the price which the trader offers for this item
+              </TextBlock>
+            </Grid.ToolTip>
+            <Label Grid.Column="0" Content="Show Trader Price" />
+            <CheckBox
+              Grid.Column="1"
+              Margin="5,0"
+              VerticalAlignment="Center"
+              IsChecked="{Binding ShowTraderPrice}" />
 
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="Auto"/>
-						</Grid.ColumnDefinitions>
-					</Grid>
-					<Grid>
-						<Grid.ToolTip>
-							<TextBlock>
-								Show when the data was last updated
-							</TextBlock>
-						</Grid.ToolTip>
-						<Label Grid.Column="0" Content="Show Updated"/>
-						<CheckBox Grid.Column="1" VerticalAlignment="Center" Margin="5,0" IsChecked="{Binding ShowUpdated}"/>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+          </Grid>
+          <Grid>
+            <Grid.ToolTip>
+              <TextBlock>
+                Show when the data was last updated
+              </TextBlock>
+            </Grid.ToolTip>
+            <Label Grid.Column="0" Content="Show Updated" />
+            <CheckBox
+              Grid.Column="1"
+              Margin="5,0"
+              VerticalAlignment="Center"
+              IsChecked="{Binding ShowUpdated}" />
 
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="Auto"/>
-						</Grid.ColumnDefinitions>
-					</Grid>
-				</StackPanel>
-			</TabItem>
-		</TabControl>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+          </Grid>
+        </StackPanel>
+      </TabItem>
+    </TabControl>
 
-		<Grid Grid.Row="1" Margin="10" Height="30">
-			<Button Grid.Column="0"  Content="Save" Background="#3EDE69" Click="SaveSettings"/>
-			<Button Grid.Column="2" Content="Cancel" Background="#F05454" Click="CloseSettings"/>
+    <Grid
+      Grid.Row="1"
+      Height="30"
+      Margin="10">
+      <Button
+        Grid.Column="0"
+        Background="#3EDE69"
+        Click="SaveSettings"
+        Content="Save" />
+      <Button
+        Grid.Column="2"
+        Background="#F05454"
+        Click="CloseSettings"
+        Content="Cancel" />
 
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="30*"/>
-				<ColumnDefinition Width="40*"/>
-				<ColumnDefinition Width="30*"/>
-			</Grid.ColumnDefinitions>
-		</Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="30*" />
+        <ColumnDefinition Width="40*" />
+        <ColumnDefinition Width="30*" />
+      </Grid.ColumnDefinitions>
+    </Grid>
 
-		<Grid.RowDefinitions>
-			<RowDefinition Height="*"/>
-			<RowDefinition Height="Auto"/>
-		</Grid.RowDefinitions>
-	</Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+  </Grid>
 </UserControl>
