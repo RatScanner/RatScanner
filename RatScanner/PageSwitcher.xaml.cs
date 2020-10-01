@@ -44,6 +44,9 @@ namespace RatScanner
 			SizeToContent = SizeToContent.Manual;
 			Width = WindowWidth;
 			Height = WindowHeight;
+
+			// Avoid window stretching when using minimal menu
+			MaxWidth = WindowWidth;
 		}
 
 		internal void Navigate(UserControl nextPage)
