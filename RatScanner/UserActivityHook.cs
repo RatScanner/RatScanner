@@ -507,7 +507,7 @@ namespace RatScanner
 		/// <exception cref="Win32Exception">Any windows problem.</exception>
 		internal void Start()
 		{
-			this.Start(true, true);
+			Start(true, true);
 		}
 
 		/// <summary>
@@ -573,7 +573,7 @@ namespace RatScanner
 		/// <exception cref="Win32Exception">Any windows problem.</exception>
 		internal void Stop()
 		{
-			this.Stop(true, true, true);
+			Stop(true, true, true);
 		}
 
 		/// <summary>
