@@ -10,11 +10,11 @@ using Size = OpenCvSharp.Size;
 namespace RatScanner.Scan
 {
 	/*
-     * Ideas to improve performance:
-     *
-     * - Detect item background color and against equals
-     * - Cache item masks
-     */
+	 * Ideas to improve performance:
+	 *
+	 * - Detect item background color and against equals
+	 * - Cache item masks
+	 */
 
 	internal class ItemIconScan : ItemScan
 	{

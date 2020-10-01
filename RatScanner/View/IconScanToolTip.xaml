@@ -1,37 +1,40 @@
-﻿<Window x:Class="RatScanner.View.IconScanToolTip"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:framework="clr-namespace:RatScanner.Framework"
-        mc:Ignorable="d"
-        ScrollViewer.VerticalScrollBarVisibility="Disabled"
-        Topmost="True"
-        SizeToContent="WidthAndHeight"
-        ShowInTaskbar="False"
-        ResizeMode="NoResize"
-        Focusable="False"
-        IsTabStop="False"
-        WindowStyle="None"
-        AllowsTransparency="True" x:ClassModifier="internal">
+﻿<Window
+	x:Class="RatScanner.View.IconScanToolTip"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+	xmlns:framework="clr-namespace:RatScanner.Framework"
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	x:ClassModifier="internal"
+	AllowsTransparency="True"
+	Focusable="False"
+	IsTabStop="False"
+	ResizeMode="NoResize"
+	ScrollViewer.VerticalScrollBarVisibility="Disabled"
+	ShowInTaskbar="False"
+	SizeToContent="WidthAndHeight"
+	Topmost="True"
+	WindowStyle="None"
+	mc:Ignorable="d">
+
 	<Grid Background="{Binding WarningBrush}">
 		<Image Source="{Binding IconPath}" Stretch="None">
 			<Image.LayoutTransform>
 				<TransformGroup>
-					<ScaleTransform ScaleX="{Binding ScaleFactor}" ScaleY="{Binding ScaleFactor}"/>
-					<RotateTransform Angle="{Binding IconAngle}"/>
+					<ScaleTransform ScaleX="{Binding ScaleFactor}" ScaleY="{Binding ScaleFactor}" />
+					<RotateTransform Angle="{Binding IconAngle}" />
 				</TransformGroup>
 			</Image.LayoutTransform>
 		</Image>
 		<StackPanel>
-			<framework:OutlinedTextBlock Text="{Binding Avg24hPrice}"
-                                   FontWeight="Bold"
-                                   FontFamily="Roboto Normal"
-                                   Fill="Black"
-                                   Stroke="{Binding WarningBrush}"
-                                   FontSize="14"
-                                   StrokeThickness="1">
-			</framework:OutlinedTextBlock>
+			<framework:OutlinedTextBlock
+				Fill="Black"
+				FontFamily="Roboto Normal"
+				FontSize="14"
+				FontWeight="Bold"
+				Stroke="{Binding WarningBrush}"
+				StrokeThickness="1"
+				Text="{Binding Avg24hPrice}" />
 		</StackPanel>
 	</Grid>
 </Window>
