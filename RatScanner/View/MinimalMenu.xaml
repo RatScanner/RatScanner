@@ -10,7 +10,7 @@
   MouseDown="OnMouseDown"
   mc:Ignorable="d">
 
-  <StackPanel>
+  <StackPanel Background="Transparent">
     <StackPanel
       x:Name="NameDisplay"
       Margin="5,10"

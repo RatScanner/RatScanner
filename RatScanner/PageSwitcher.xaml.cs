@@ -109,7 +109,7 @@ namespace RatScanner
 		{
 			CollapseTitleBar();
 			SizeToContent = SizeToContent.WidthAndHeight;
-			SetBackgroundOpacity(RatConfig.MinimalUi.Opacity / 100d);
+			SetBackgroundOpacity(RatConfig.MinimalUi.Opacity / 100f);
 			Navigate(new MinimalMenu());
 		}
 
@@ -128,10 +128,9 @@ namespace RatScanner
 			TitleBar.Visibility = Visibility.Visible;
 		}
 
-		internal void SetBackgroundOpacity(double opacity)
+		internal void SetBackgroundOpacity(float opacity)
 		{
-			opacity = Math.Clamp(opacity, 0, 1);
-			Background.Opacity = opacity;
+			Background.Opacity = Math.Clamp(opacity, (1f / 510f), 1f);
 		}
 	}
 }
