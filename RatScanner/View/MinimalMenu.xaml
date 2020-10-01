@@ -11,54 +11,55 @@
   mc:Ignorable="d">
 
   <StackPanel Background="Transparent">
-    <StackPanel
-      x:Name="NameDisplay"
-      Margin="5,10"
-      VerticalAlignment="Center"
-      Orientation="Horizontal">
-      <WrapPanel VerticalAlignment="Center">
-        <Rectangle Width="20" Height="20">
-          <Rectangle.Fill>
-            <SolidColorBrush Color="#EEEEEE" />
-          </Rectangle.Fill>
-          <Rectangle.OpacityMask>
-            <ImageBrush ImageSource="../Resources/iconMods.png" />
-          </Rectangle.OpacityMask>
-        </Rectangle>
-
-        <Separator Margin="1,1,3,1">
-          <Separator.LayoutTransform>
-            <RotateTransform Angle="90" />
-          </Separator.LayoutTransform>
-        </Separator>
-
-        <WrapPanel.ToolTip>
-          <TextBlock>
-            Prices include attached mods
-          </TextBlock>
-        </WrapPanel.ToolTip>
-
-        <WrapPanel.Style>
-          <Style TargetType="WrapPanel">
-            <Style.Triggers>
-              <DataTrigger Binding="{Binding Path=HasMods}" Value="True">
-                <Setter Property="Visibility" Value="Visible" />
-              </DataTrigger>
-              <DataTrigger Binding="{Binding Path=HasMods}" Value="False">
-                <Setter Property="Visibility" Value="Collapsed" />
-              </DataTrigger>
-            </Style.Triggers>
-          </Style>
-        </WrapPanel.Style>
-      </WrapPanel>
-      <Label
-        Padding="0"
+    <StackPanel x:Name="NameDisplay">
+      <StackPanel
+        Margin="5,10"
         VerticalAlignment="Center"
-        Content="{Binding Name}" />
+        Orientation="Horizontal">
+        <WrapPanel VerticalAlignment="Center">
+          <Rectangle Width="20" Height="20">
+            <Rectangle.Fill>
+              <SolidColorBrush Color="#EEEEEE" />
+            </Rectangle.Fill>
+            <Rectangle.OpacityMask>
+              <ImageBrush ImageSource="../Resources/iconMods.png" />
+            </Rectangle.OpacityMask>
+          </Rectangle>
+
+          <Separator Margin="1,1,3,1">
+            <Separator.LayoutTransform>
+              <RotateTransform Angle="90" />
+            </Separator.LayoutTransform>
+          </Separator>
+
+          <WrapPanel.ToolTip>
+            <TextBlock>
+              Prices include attached mods
+            </TextBlock>
+          </WrapPanel.ToolTip>
+
+          <WrapPanel.Style>
+            <Style TargetType="WrapPanel">
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding Path=HasMods}" Value="True">
+                  <Setter Property="Visibility" Value="Visible" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Path=HasMods}" Value="False">
+                  <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </WrapPanel.Style>
+        </WrapPanel>
+        <Label
+          Padding="0"
+          VerticalAlignment="Center"
+          Content="{Binding Name}" />
+      </StackPanel>
+      <Separator />
     </StackPanel>
 
     <StackPanel>
-      <Separator />
       <Grid x:Name="PriceDisplay" Margin="0,5,0,0">
         <Label Grid.Column="0" Content="Price" />
         <Label Grid.Column="1" Content="{Binding Price}" />
