@@ -11,6 +11,12 @@
 	mc:Ignorable="d">
 
 	<StackPanel Background="Transparent">
+		<StackPanel.Effect>
+			<DropShadowEffect
+				BlurRadius="3"
+				ShadowDepth="1"
+				Color="#000000" />
+		</StackPanel.Effect>
 		<StackPanel x:Name="NameDisplay">
 			<StackPanel
 				Margin="5,10"
