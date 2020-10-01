@@ -57,12 +57,7 @@ namespace RatScanner.View
 			RatConfig.SaveConfig();
 
 			// Apply config
-			var window = Window.GetWindow(this);
-			if (window == null) Logger.LogWarning("Could not find parent window of settings control");
-			else
-			{
-				window.Topmost = RatConfig.AlwaysOnTop;
-			}
+			PageSwitcher.Instance.Topmost = RatConfig.AlwaysOnTop;
 
 			PageSwitcher.Instance.Navigate(new MainMenu());
 		}

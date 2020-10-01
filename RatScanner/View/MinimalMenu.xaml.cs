@@ -34,7 +34,7 @@ namespace RatScanner.View
 
 		private void OnMouseDown(object sender, MouseButtonEventArgs e)
 		{
-			if (e.ChangedButton == MouseButton.Left) Window.GetWindow(this)?.DragMove();
+			if (e.ChangedButton == MouseButton.Left) PageSwitcher.Instance.DragMove();
 		}
 
 		private void OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
