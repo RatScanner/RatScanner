@@ -38,6 +38,16 @@ namespace RatScanner.View
 			RatConfig.IconScan.ModifierKeyCode = settingsVM.IconScanModifier;
 
 			RatConfig.ToolTip.Duration = int.TryParse(settingsVM.ToolTipDuration, out var i) ? i : 0;
+
+			RatConfig.MinimalUi.ShowName = settingsVM.ShowName;
+			RatConfig.MinimalUi.ShowPrice = settingsVM.ShowPrice;
+			RatConfig.MinimalUi.ShowAvgDayPrice = settingsVM.ShowAvgDayPrice;
+			RatConfig.MinimalUi.ShowAvgWeekPrice = settingsVM.ShowAvgWeekPrice;
+			RatConfig.MinimalUi.ShowPricePerSlot = settingsVM.ShowPricePerSlot;
+			RatConfig.MinimalUi.ShowTraderPrice = settingsVM.ShowTraderPrice;
+			RatConfig.MinimalUi.ShowUpdated = settingsVM.ShowUpdated;
+			RatConfig.MinimalUi.Opacity = settingsVM.Opacity;
+
 			RatConfig.ScreenResolution = (RatConfig.Resolution)settingsVM.ScreenResolution;
 			RatConfig.MinimizeToTray = settingsVM.MinimizeToTray;
 			RatConfig.AlwaysOnTop = settingsVM.AlwaysOnTop;
@@ -47,12 +57,7 @@ namespace RatScanner.View
 			RatConfig.SaveConfig();
 
 			// Apply config
-			var window = Window.GetWindow(this);
-			if (window == null) Logger.LogWarning("Could not find parent window of settings control");
-			else
-			{
-				window.Topmost = RatConfig.AlwaysOnTop;
-			}
+			PageSwitcher.Instance.Topmost = RatConfig.AlwaysOnTop;
 
 			PageSwitcher.Instance.Navigate(new MainMenu());
 		}

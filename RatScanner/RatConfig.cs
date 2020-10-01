@@ -74,6 +74,19 @@ namespace RatScanner
 			internal static int HeightOffset = 5;
 		}
 
+		// Minimal UI
+		internal static class MinimalUi
+		{
+			internal static bool ShowName = true;
+			internal static bool ShowPrice = true;
+			internal static bool ShowAvgDayPrice = true;
+			internal static bool ShowAvgWeekPrice = true;
+			internal static bool ShowPricePerSlot = true;
+			internal static bool ShowTraderPrice = true;
+			internal static bool ShowUpdated = true;
+			internal static int Opacity = 50;
+		}
+
 		// Other
 		internal static bool LogDebug = false;
 		internal static bool MinimizeToTray = false;
@@ -178,7 +191,16 @@ namespace RatScanner
 
 			ToolTip.Duration = config.ReadInt(nameof(ToolTip.Duration), 1500);
 			ToolTip.DigitGroupingSymbol = config.ReadString(nameof(ToolTip.DigitGroupingSymbol), NumberFormatInfo.CurrentInfo.NumberGroupSeparator);
-			
+
+			MinimalUi.ShowName = config.ReadBool(nameof(MinimalUi.ShowName), true);
+			MinimalUi.ShowPrice = config.ReadBool(nameof(MinimalUi.ShowPrice), true);
+			MinimalUi.ShowAvgDayPrice = config.ReadBool(nameof(MinimalUi.ShowAvgDayPrice), true);
+			MinimalUi.ShowAvgWeekPrice = config.ReadBool(nameof(MinimalUi.ShowAvgWeekPrice), true);
+			MinimalUi.ShowPricePerSlot = config.ReadBool(nameof(MinimalUi.ShowPricePerSlot), true);
+			MinimalUi.ShowTraderPrice = config.ReadBool(nameof(MinimalUi.ShowTraderPrice), true);
+			MinimalUi.ShowUpdated = config.ReadBool(nameof(MinimalUi.ShowUpdated), true);
+			MinimalUi.Opacity = config.ReadInt(nameof(MinimalUi.Opacity), 50);
+
 			ScreenResolution = (Resolution)config.ReadInt(nameof(ScreenResolution), 1);
 			MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), false);
 			AlwaysOnTop = config.ReadBool(nameof(AlwaysOnTop), false);
@@ -197,6 +219,15 @@ namespace RatScanner
 
 			config.WriteInt(nameof(ToolTip.Duration), ToolTip.Duration);
 			config.WriteString(nameof(ToolTip.DigitGroupingSymbol), ToolTip.DigitGroupingSymbol);
+
+			config.WriteBool(nameof(MinimalUi.ShowName), MinimalUi.ShowName);
+			config.WriteBool(nameof(MinimalUi.ShowPrice), MinimalUi.ShowPrice);
+			config.WriteBool(nameof(MinimalUi.ShowAvgDayPrice), MinimalUi.ShowAvgDayPrice);
+			config.WriteBool(nameof(MinimalUi.ShowAvgWeekPrice), MinimalUi.ShowAvgWeekPrice);
+			config.WriteBool(nameof(MinimalUi.ShowPricePerSlot), MinimalUi.ShowPricePerSlot);
+			config.WriteBool(nameof(MinimalUi.ShowTraderPrice), MinimalUi.ShowTraderPrice);
+			config.WriteBool(nameof(MinimalUi.ShowUpdated), MinimalUi.ShowUpdated);
+			config.WriteInt(nameof(MinimalUi.Opacity), MinimalUi.Opacity);
 
 			config.WriteInt(nameof(ScreenResolution), (int)ScreenResolution);
 			config.WriteBool(nameof(MinimizeToTray), MinimizeToTray);
