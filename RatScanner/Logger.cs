@@ -102,6 +102,8 @@ namespace RatScanner
 
 		internal static void ClearDebugMats()
 		{
+			if(!Directory.Exists(RatConfig.Paths.Debug)) return;
+
 			var files = Directory.GetFiles(RatConfig.Paths.Debug, "*.png");
 			foreach (var file in files)
 			{
