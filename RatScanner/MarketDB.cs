@@ -22,7 +22,7 @@ namespace RatScanner
 				if (item != null) return item.DeepClone();
 
 				Logger.LogWarning("Could not find item with uid: " + uid);
-				return new MarketItem(uid);
+				return null;
 			}
 			Logger.LogWarning("Trying to get item without supplying uid");
 			throw new ArgumentException();
