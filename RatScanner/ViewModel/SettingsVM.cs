@@ -21,6 +21,7 @@ namespace RatScanner.ViewModel
 		public bool ShowPricePerSlot { get; set; }
 		public bool ShowTraderPrice { get; set; }
 		public bool ShowUpdated { get; set; }
+		public int Opacity { get; set; }
 
 		public int ScreenResolution { get; set; }
 		public bool MinimizeToTray { get; set; }
@@ -45,6 +46,7 @@ namespace RatScanner.ViewModel
 			ShowPricePerSlot = RatConfig.MinimalUi.ShowPricePerSlot;
 			ShowTraderPrice = RatConfig.MinimalUi.ShowTraderPrice;
 			ShowUpdated = RatConfig.MinimalUi.ShowUpdated;
+			Opacity = RatConfig.MinimalUi.Opacity;
 
 			ScreenResolution = (int)RatConfig.ScreenResolution;
 			MinimizeToTray = RatConfig.MinimizeToTray;

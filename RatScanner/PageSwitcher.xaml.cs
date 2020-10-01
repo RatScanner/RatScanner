@@ -28,11 +28,10 @@ namespace RatScanner
 
 				InitializeComponent();
 				ResetWindowSize();
-
-				AddTrayIcon();
-				Topmost = RatConfig.AlwaysOnTop;
-
 				Navigate(new MainMenu());
+				AddTrayIcon();
+
+				Topmost = RatConfig.AlwaysOnTop;
 			}
 			catch (Exception e)
 			{
@@ -110,6 +109,7 @@ namespace RatScanner
 		{
 			CollapseTitleBar();
 			SizeToContent = SizeToContent.WidthAndHeight;
+			SetBackgroundOpacity(RatConfig.MinimalUi.Opacity / 100d);
 			Navigate(new MinimalMenu());
 		}
 

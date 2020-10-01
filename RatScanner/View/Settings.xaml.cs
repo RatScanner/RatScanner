@@ -46,6 +46,7 @@ namespace RatScanner.View
 			RatConfig.MinimalUi.ShowPricePerSlot = settingsVM.ShowPricePerSlot;
 			RatConfig.MinimalUi.ShowTraderPrice = settingsVM.ShowTraderPrice;
 			RatConfig.MinimalUi.ShowUpdated = settingsVM.ShowUpdated;
+			RatConfig.MinimalUi.Opacity = settingsVM.Opacity;
 
 			RatConfig.ScreenResolution = (RatConfig.Resolution)settingsVM.ScreenResolution;
 			RatConfig.MinimizeToTray = settingsVM.MinimizeToTray;

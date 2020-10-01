@@ -404,6 +404,34 @@
               <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
           </Grid>
+          <Separator />
+          <Grid>
+            <Grid.ToolTip>
+              <TextBlock>
+                Adjust the background opacity
+              </TextBlock>
+            </Grid.ToolTip>
+            <Label Grid.Column="0" Content="Opacity" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+              <Slider
+                x:Name="opacitySlider"
+                Width="100"
+                Margin="5,0"
+                VerticalAlignment="Center"
+                IsSnapToTickEnabled="True"
+                Maximum="100"
+                Minimum="0"
+                TickFrequency="10"
+                TickPlacement="BottomRight"
+                Value="{Binding Opacity}" />
+              <TextBox Width="40" Text="{Binding ElementName=opacitySlider, Path=Value, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+          </Grid>
         </StackPanel>
       </TabItem>
     </TabControl>
