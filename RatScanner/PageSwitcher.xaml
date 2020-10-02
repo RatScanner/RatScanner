@@ -51,8 +51,20 @@
 					<TextBlock
 						VerticalAlignment="Center"
 						FontSize="12"
-						Foreground="#000000"
-						Text="Rat Scanner" />
+						Text="Rat Scanner">
+						<TextBlock.Style>
+							<Style TargetType="{x:Type TextBlock}">
+								<Style.Triggers>
+									<DataTrigger Binding="{Binding Path=IsActive, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" Value="True">
+										<Setter Property="Foreground" Value="#000000" />
+									</DataTrigger>
+									<DataTrigger Binding="{Binding Path=IsActive, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" Value="False">
+										<Setter Property="Foreground" Value="#999999" />
+									</DataTrigger>
+								</Style.Triggers>
+							</Style>
+						</TextBlock.Style>
+					</TextBlock>
 				</StackPanel>
 
 				<StackPanel
