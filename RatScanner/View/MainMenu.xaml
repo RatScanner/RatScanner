@@ -237,38 +237,41 @@
 				Grid.Column="0"
 				VerticalAlignment="Bottom"
 				Orientation="Horizontal">
-				<TextBlock Margin="5,0">
+				<Button
+					Margin="5,0"
+					Padding="0"
+					Background="#E64413">
 					<Hyperlink
 						NavigateUri="{Binding PatreonLink}"
 						RequestNavigate="HyperlinkRequestNavigate"
 						TextDecorations="">
-						<Border Background="#E64413" CornerRadius="3">
-							<Label Content="Patreon" />
-						</Border>
+						<Label Content="Patreon" />
 					</Hyperlink>
-				</TextBlock>
+				</Button>
 
-				<TextBlock Margin="5,0">
+				<Button
+					Margin="5,0"
+					Padding="0"
+					Background="#7289DA">
 					<Hyperlink
 						NavigateUri="{Binding DiscordLink}"
 						RequestNavigate="HyperlinkRequestNavigate"
 						TextDecorations="">
-						<Border Background="#7289DA" CornerRadius="3">
-							<Label Content="Discord" />
-						</Border>
+						<Label Content="Discord" />
 					</Hyperlink>
-				</TextBlock>
+				</Button>
 
-				<TextBlock Margin="5,0">
+				<Button
+					Margin="5,0"
+					Padding="0"
+					Background="#24292E">
 					<Hyperlink
 						NavigateUri="{Binding GithubLink}"
 						RequestNavigate="HyperlinkRequestNavigate"
 						TextDecorations="">
-						<Border Background="#24292E" CornerRadius="3">
-							<Label Content="GitHub" />
-						</Border>
+						<Label Content="GitHub" />
 					</Hyperlink>
-				</TextBlock>
+				</Button>
 			</StackPanel>
 
 			<Button
