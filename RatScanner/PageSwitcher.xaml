@@ -16,71 +16,87 @@
 			<RowDefinition Height="*" />
 		</Grid.RowDefinitions>
 
-		<Grid
+		<Border
 			x:Name="TitleBar"
 			Grid.Row="0"
-			Height="30"
-			Background="#FFFFFF"
-			MouseDown="OnTitleBarMouseDown">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="*" />
-				<ColumnDefinition Width="Auto" />
-			</Grid.ColumnDefinitions>
+			BorderThickness="1,1,1,0">
+			<Border.Style>
+				<Style TargetType="{x:Type Border}">
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding Path=IsActive, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" Value="True">
+							<Setter Property="BorderBrush" Value="#444444" />
+						</DataTrigger>
+						<DataTrigger Binding="{Binding Path=IsActive, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" Value="False">
+							<Setter Property="BorderBrush" Value="#999999" />
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</Border.Style>
 
-			<StackPanel Grid.Column="0" Orientation="Horizontal">
-				<Image
-					Margin="7,6,4,6"
-					RenderOptions.BitmapScalingMode="HighQuality"
-					Source="/Resources/RatLogoMedium.png" />
+			<Grid
+				Height="30"
+				Background="#FFFFFF"
+				MouseDown="OnTitleBarMouseDown">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
 
-				<TextBlock
-					VerticalAlignment="Center"
-					FontSize="12"
-					Foreground="#000000"
-					Text="Rat Scanner" />
-			</StackPanel>
+				<StackPanel Grid.Column="0" Orientation="Horizontal">
+					<Image
+						Margin="7,6,4,6"
+						RenderOptions.BitmapScalingMode="HighQuality"
+						Source="/Resources/RatLogoMedium.png" />
 
-			<StackPanel
-				Grid.Column="1"
-				Margin="0,-1,0,1"
-				Orientation="Horizontal">
-				<Button
-					Width="46"
-					Background="#FFFFFF"
-					Click="OnTitleBarMinimize"
-					Style="{DynamicResource TitleBarButtonStyle}">
-					<Path
-						Data="M 0,0.5 H 10"
-						SnapsToDevicePixels="True"
-						Stroke="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=Foreground}"
-						StrokeThickness="1" />
-				</Button>
+					<TextBlock
+						VerticalAlignment="Center"
+						FontSize="12"
+						Foreground="#000000"
+						Text="Rat Scanner" />
+				</StackPanel>
 
-				<Button
-					Width="46"
-					Background="#FFFFFF"
-					Click="OnTitleBarMinimal"
-					Style="{DynamicResource TitleBarButtonStyle}">
-					<Path
-						Data="M 0.5 3.5 v -3 h 3 m 4 0 h 3 v 3 m 0 4 v 3 h -3 m -4 0 h -3 v -3 M 2.5 3.5 h 6 v 4 h -6 z"
-						SnapsToDevicePixels="True"
-						Stroke="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=Foreground}"
-						StrokeThickness="1" />
-				</Button>
+				<StackPanel
+					Grid.Column="1"
+					Margin="0,0,0,1"
+					Orientation="Horizontal">
+					<Button
+						Width="46"
+						Background="#FFFFFF"
+						Click="OnTitleBarMinimize"
+						Style="{DynamicResource TitleBarButtonStyle}">
+						<Path
+							Data="M 0,0.5 H 10"
+							SnapsToDevicePixels="True"
+							Stroke="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=Foreground}"
+							StrokeThickness="1" />
+					</Button>
 
-				<Button
-					Width="46"
-					Background="#FFFFFF"
-					Click="OnTitleBarClose"
-					Style="{DynamicResource TitleBarCloseButtonStyle}">
-					<Path
-						Data="M 0,0 10,10 M 0,10 10,0"
-						SnapsToDevicePixels="True"
-						Stroke="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=Foreground}"
-						StrokeThickness="1" />
-				</Button>
-			</StackPanel>
-		</Grid>
+					<Button
+						Width="46"
+						Background="#FFFFFF"
+						Click="OnTitleBarMinimal"
+						Style="{DynamicResource TitleBarButtonStyle}">
+						<Path
+							Data="M 0.5 3.5 v -3 h 3 m 4 0 h 3 v 3 m 0 4 v 3 h -3 m -4 0 h -3 v -3 M 2.5 3.5 h 6 v 4 h -6 z"
+							SnapsToDevicePixels="True"
+							Stroke="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=Foreground}"
+							StrokeThickness="1" />
+					</Button>
+
+					<Button
+						Width="46"
+						Background="#FFFFFF"
+						Click="OnTitleBarClose"
+						Style="{DynamicResource TitleBarCloseButtonStyle}">
+						<Path
+							Data="M 0,0 10,10 M 0,10 10,0"
+							SnapsToDevicePixels="True"
+							Stroke="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Button}, Path=Foreground}"
+							StrokeThickness="1" />
+					</Button>
+				</StackPanel>
+			</Grid>
+		</Border>
 
 		<ContentControl x:Name="ContentControl" Grid.Row="1" />
 	</Grid>
