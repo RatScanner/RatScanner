@@ -217,6 +217,9 @@
 							<Trigger Property="IsPressed" Value="true">
 								<Setter TargetName="border" Property="Background" Value="#CACACA" />
 							</Trigger>
+							<DataTrigger Binding="{Binding Path=IsActive, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" Value="False">
+								<Setter Property="Foreground" Value="#999999" />
+							</DataTrigger>
 						</ControlTemplate.Triggers>
 					</ControlTemplate>
 				</Setter.Value>
@@ -253,6 +256,9 @@
 								<Setter TargetName="border" Property="Background" Value="#F1707A" />
 								<Setter Property="Foreground" Value="#FFFFFF" />
 							</Trigger>
+							<DataTrigger Binding="{Binding Path=IsActive, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" Value="False">
+								<Setter Property="Foreground" Value="#999999" />
+							</DataTrigger>
 						</ControlTemplate.Triggers>
 					</ControlTemplate>
 				</Setter.Value>
