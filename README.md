@@ -16,6 +16,8 @@ Rat Scanner is a open source tool for [Escape from Tarkov][escape-from-tarkov].
 
 Please consider [supporting](#Support-the-project) the project to help finance the backend server as well as the [API][tarkov-market].
 
+[Tutorial / Demo Video][demo-video]
+
 <br/>
 
 ## What it does
@@ -138,3 +140,4 @@ This will help to pay for the backend server as well as the [API][tarkov-market]
 [latest-release]: https://github.com/Blightbuster/RatScanner/releases/latest/download/RatScanner.zip
 [releases]: https://github.com/Blightbuster/RatScanner/releases/
 [net-core-download]: https://dotnet.microsoft.com/download/dotnet-core/current/runtime
+[demo-video]: https://www.youtube.com/watch?v=tXoIkgXFmdA
