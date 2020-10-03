@@ -65,11 +65,20 @@ Limitations
 
 Notes
 
+- Check out the [indicator for modded items](#modded-item-indicator)
 - If the item size does not get detected correctly, try to click in a corner of the item
 
 <img src="media/IconScan.gif" width=400px>
 
 <br/>
+
+## Modded Item Indicator
+When attached mods on a item were detected, they will be included in the data.
+This is indicated by an icon which is displayed to the left of the item name.
+
+Price includes attached mods       | Price **does not** include attached mods
+:--------------------------------: | :------------------------------------:
+![AttachedMods](media/ModIcon.png) | ![NoAttachedMods](media/NoModIcon.png)
 
 ## Minimal UI
 Switch to the minimal ui by clicking the dedicated button inside the titlebar.
