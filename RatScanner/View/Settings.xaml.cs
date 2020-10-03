@@ -1,48 +1,75 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using RatScanner.ViewModel;
 
 namespace RatScanner.View
 {
-    /// <summary>
-    /// Interaction logic for Settings.xaml
-    /// </summary>
-    internal partial class Settings : Window
-    {
-        internal Settings()
-        {
-            InitializeComponent();
-            DataContext = new SettingsVM();
-        }
+	/// <summary>
+	/// Interaction logic for Settings.xaml
+	/// </summary>
+	internal partial class Settings : UserControl, ISwitchable
+	{
+		internal Settings()
+		{
+			InitializeComponent();
+			DataContext = new SettingsVM();
+		}
 
-        private void ClearIconCache(object sender, RoutedEventArgs e)
-        {
-            IconManager.ClearIconCache();
-            ((SettingsVM) DataContext).OnPropertyChanged();
-        }
+		private void ClearIconCache(object sender, RoutedEventArgs e)
+		{
+			IconManager.ClearIconCache();
+			((SettingsVM)DataContext).OnPropertyChanged();
+		}
 
-        private void CloseSettings(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
+		private void CloseSettings(object sender, RoutedEventArgs e)
+		{
+			PageSwitcher.Instance.Navigate(new MainMenu());
+		}
 
-        private void SaveSettings(object sender, RoutedEventArgs e)
-        {
-            var settingsVM = (SettingsVM)DataContext;
+		private void SaveSettings(object sender, RoutedEventArgs e)
+		{
+			var settingsVM = (SettingsVM)DataContext;
 
-            RatConfig.ToolTipDuration = int.TryParse(settingsVM.ToolTipDuration, out var i) ? i : 0;
-            RatConfig.EnableNameScan = settingsVM.EnableNameScan;
-            RatConfig.EnableIconScan = settingsVM.EnableIconScan;
-            RatConfig.ScanRotatedIcons = settingsVM.ScanRotatedIcons;
-            RatConfig.UseCachedIcons = settingsVM.UseCachedIcons;
-            RatConfig.ModifierKeyCode = settingsVM.IconScanModifier;
-            RatConfig.ScreenResolution = (RatConfig.Resolution)settingsVM.ScreenResolution;
-            RatConfig.MinimizeToTray = settingsVM.MinimizeToTray;
-            RatConfig.AlwaysOnTop = settingsVM.AlwaysOnTop;
-            RatConfig.LogDebug = settingsVM.LogDebug;
+			RatConfig.NameScan.Enable = settingsVM.EnableNameScan;
 
-            Logger.LogInfo("Saving config...");
-            RatConfig.SaveConfig();
-            Close();
-        }
-    }
+			RatConfig.IconScan.Enable = settingsVM.EnableIconScan;
+			RatConfig.IconScan.ScanRotatedIcons = settingsVM.ScanRotatedIcons;
+			RatConfig.IconScan.UseCachedIcons = settingsVM.UseCachedIcons;
+			RatConfig.IconScan.ModifierKeyCode = settingsVM.IconScanModifier;
+
+			RatConfig.ToolTip.Duration = int.TryParse(settingsVM.ToolTipDuration, out var i) ? i : 0;
+
+			RatConfig.MinimalUi.ShowName = settingsVM.ShowName;
+			RatConfig.MinimalUi.ShowPrice = settingsVM.ShowPrice;
+			RatConfig.MinimalUi.ShowAvgDayPrice = settingsVM.ShowAvgDayPrice;
+			RatConfig.MinimalUi.ShowAvgWeekPrice = settingsVM.ShowAvgWeekPrice;
+			RatConfig.MinimalUi.ShowPricePerSlot = settingsVM.ShowPricePerSlot;
+			RatConfig.MinimalUi.ShowTraderPrice = settingsVM.ShowTraderPrice;
+			RatConfig.MinimalUi.ShowUpdated = settingsVM.ShowUpdated;
+			RatConfig.MinimalUi.Opacity = settingsVM.Opacity;
+
+			RatConfig.ScreenResolution = (RatConfig.Resolution)settingsVM.ScreenResolution;
+			RatConfig.MinimizeToTray = settingsVM.MinimizeToTray;
+			RatConfig.AlwaysOnTop = settingsVM.AlwaysOnTop;
+			RatConfig.LogDebug = settingsVM.LogDebug;
+
+			Logger.LogInfo("Saving config...");
+			RatConfig.SaveConfig();
+
+			// Apply config
+			PageSwitcher.Instance.Topmost = RatConfig.AlwaysOnTop;
+
+			PageSwitcher.Instance.Navigate(new MainMenu());
+		}
+
+		public void UtilizeState(object state)
+		{
+			throw new System.NotImplementedException();
+		}
+
+		private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+		{
+			throw new System.NotImplementedException();
+		}
+	}
 }

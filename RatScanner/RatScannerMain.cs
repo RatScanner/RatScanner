@@ -11,221 +11,225 @@ using Size = System.Drawing.Size;
 
 namespace RatScanner
 {
-    public class RatScannerMain : INotifyPropertyChanged
-    {
+	public class RatScannerMain : INotifyPropertyChanged
+	{
+		private static RatScannerMain _instance = null;
+		internal static RatScannerMain Instance => _instance ??= new RatScannerMain();
 
-        private static UserActivityHook activityHook;
+		private UserActivityHook activityHook;
 
-        private readonly NameScanToolTip _nameScanToolTip;
-        private readonly IconScanToolTip _iconScanToolTip;
+		private readonly NameScanToolTip _nameScanToolTip;
+		private readonly IconScanToolTip _iconScanToolTip;
 
-        private ItemScan _currentItemScan;
-        private bool _isScanning = false;
+		private ItemScan _currentItemScan;
+		internal bool ScanLock = false;
 
-        internal static MarketDB MarketDB;
+		internal MarketDB MarketDB;
 
-        internal static bool ModifierDown;
+		internal bool ModifierDown;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+		public event PropertyChangedEventHandler PropertyChanged;
 
-        internal ItemScan CurrentItemScan
-        {
-            get => _currentItemScan;
-            set
-            {
-                _currentItemScan = value;
-                OnPropertyChanged();
-            }
-        }
+		internal ItemScan CurrentItemScan
+		{
+			get => _currentItemScan;
+			set
+			{
+				_currentItemScan = value;
+				OnPropertyChanged();
+			}
+		}
 
-        internal RatScannerMain()
-        {
-            // Remove old log
-            Logger.Clear();
+		internal RatScannerMain()
+		{
+			_instance = this;
 
-            Logger.LogInfo("----- RatScanner " + RatConfig.Version + " -----");
-            Logger.LogInfo("Starting RatScanner...");
+			// Remove old log
+			Logger.Clear();
 
-            Logger.LogInfo("Loading config...");
-            RatConfig.LoadConfig();
+			Logger.LogInfo("----- RatScanner " + RatConfig.Version + " -----");
+			Logger.LogInfo("Starting RatScanner...");
 
-            Logger.LogInfo("Loading price data...");
-            MarketDB = new MarketDB();
-            MarketDB.Init();
+			Logger.LogInfo("Loading config...");
+			RatConfig.LoadConfig();
 
-            Logger.LogInfo("Setting default item...");
-            CurrentItemScan = new ItemNameScan();
+			Logger.LogInfo("Loading price data...");
+			MarketDB = new MarketDB();
+			MarketDB.Init();
 
-            // Init item scan types
-            Logger.LogInfo("Initializing name scan...");
-            ItemNameScan.Init();
+			Logger.LogInfo("Setting default item...");
+			CurrentItemScan = new ItemNameScan();
 
-            Logger.LogInfo("Initializing icon scan...");
-            ItemIconScan.Init();
+			// Init item scan types
+			Logger.LogInfo("Initializing name scan...");
+			ItemNameScan.Init();
 
-            // Prewarm tool tips
-            Logger.LogInfo("Prewarming name tool tip...");
-            _nameScanToolTip = new NameScanToolTip();
-            _nameScanToolTip.Show();
+			Logger.LogInfo("Initializing icon scan...");
+			ItemIconScan.Init();
 
-            Logger.LogInfo("Prewarming icon tool tip...");
-            _iconScanToolTip = new IconScanToolTip();
-            _iconScanToolTip.Show();
+			// Prewarm tool tips
+			Logger.LogInfo("Prewarming name tool tip...");
+			_nameScanToolTip = new NameScanToolTip();
+			_nameScanToolTip.Show();
 
-            Logger.LogInfo("Registering mouse and keyboard hooks...");
-            activityHook = new UserActivityHook();
-            activityHook.OnMouseActivity += OnMouseEvent;
-            activityHook.KeyDown += OnKeyDown;
-            activityHook.KeyUp += OnKeyUp;
+			Logger.LogInfo("Prewarming icon tool tip...");
+			_iconScanToolTip = new IconScanToolTip();
+			_iconScanToolTip.Show();
 
-            Logger.LogInfo("Ready!");
+			Logger.LogInfo("Registering mouse and keyboard hooks...");
+			activityHook = new UserActivityHook();
+			activityHook.OnMouseActivity += OnMouseEvent;
+			activityHook.KeyDown += OnKeyDown;
+			activityHook.KeyUp += OnKeyUp;
 
-            // Check for new versions
-            var mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ClientVersion);
-            if (RatConfig.Version != mostRecentVersion)
-            {
-                var message = "Version " + mostRecentVersion + " is available!\n";
-                message += "Get it from GitHub or join our Discord.\n\n";
-                message += "You are using: " + RatConfig.Version;
-                MessageBox.Show(message, "Rat Scanner Updater");
-                Logger.LogInfo("A new version is available: " + mostRecentVersion);
-            }
-        }
+			Logger.LogInfo("Ready!");
 
-        private void OnMouseEvent(object sender, MouseEventArgs e)
-        {
-            if ((e.Button & MouseButtons.Left) == 0) return;
+			// Check for new versions
+			var mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ClientVersion);
+			if (RatConfig.Version != mostRecentVersion)
+			{
+				var message = "Version " + mostRecentVersion + " is available!\n";
+				message += "Get it from GitHub or join our Discord.\n\n";
+				message += "You are using: " + RatConfig.Version;
+				MessageBox.Show(message, "Rat Scanner Updater");
+				Logger.LogInfo("A new version is available: " + mostRecentVersion);
+			}
+		}
 
-            try
-            {
-                if (ModifierDown)
-                {
-                    Task.Run(delegate
-                    {
-                        if (RatConfig.EnableIconScan) IconScan(new Vector2(e.Location));
-                    });
-                }
-                else
-                {
-                    Task.Run(delegate
-                    {
-                        if (RatConfig.EnableNameScan) NameScan(new Vector2(e.Location));
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex.Message, ex);
-            }
-        }
+		private void OnMouseEvent(object sender, MouseEventArgs e)
+		{
+			if ((e.Button & MouseButtons.Left) == 0) return;
 
-        private void OnKeyDown(object sender, KeyEventArgs e)
-        {
-            if ((int)e.KeyCode == RatConfig.ModifierKeyCode) ModifierDown = true;
-        }
+			try
+			{
+				if (ModifierDown)
+				{
+					Task.Run(delegate
+					{
+						if (RatConfig.IconScan.Enable) IconScan(new Vector2(e.Location));
+					});
+				}
+				else
+				{
+					Task.Run(delegate
+					{
+						if (RatConfig.NameScan.Enable) NameScan(new Vector2(e.Location));
+					});
+				}
+			}
+			catch (Exception ex)
+			{
+				Logger.LogError(ex.Message, ex);
+			}
+		}
 
-        private void OnKeyUp(object sender, KeyEventArgs e)
-        {
-            if ((int)e.KeyCode == RatConfig.ModifierKeyCode) ModifierDown = false;
-        }
+		private void OnKeyDown(object sender, KeyEventArgs e)
+		{
+			if ((int)e.KeyCode == RatConfig.IconScan.ModifierKeyCode) ModifierDown = true;
+		}
 
-        private bool IconScan(Vector2 mouseVector2)
-        {
-            if (_isScanning) return false;
-            _isScanning = true;
+		private void OnKeyUp(object sender, KeyEventArgs e)
+		{
+			if ((int)e.KeyCode == RatConfig.IconScan.ModifierKeyCode) ModifierDown = false;
+		}
 
-            _iconScanToolTip.Dispatcher.Invoke(() =>
-            {
-                IconScanToolTip.ScheduleHide();
-                _iconScanToolTip.Hide();    // Hide it instantly
-            });
+		private bool IconScan(Vector2 mouseVector2)
+		{
+			if (ScanLock) return false;
+			ScanLock = true;
 
-            var x = mouseVector2.X - (RatConfig.IconScanWidth / 2);
-            var y = mouseVector2.Y - (RatConfig.IconScanHeight / 2);
+			_iconScanToolTip.Dispatcher.Invoke(() =>
+			{
+				IconScanToolTip.ScheduleHide();
+				_iconScanToolTip.Hide();    // Hide it instantly
+			});
 
-            var position = new Vector2(x, y);
-            var size = new Size(RatConfig.IconScanWidth, RatConfig.IconScanHeight);
-            var screenshot = GetScreenshot(position, size);
+			var x = mouseVector2.X - (RatConfig.IconScan.ScanWidth / 2);
+			var y = mouseVector2.Y - (RatConfig.IconScan.ScanHeight / 2);
 
-            var itemIconScan = new ItemIconScan(screenshot, mouseVector2);
+			var position = new Vector2(x, y);
+			var size = new Size(RatConfig.IconScan.ScanWidth, RatConfig.IconScan.ScanHeight);
+			var screenshot = GetScreenshot(position, size);
 
-            if (!itemIconScan.ValidItem)
-            {
-                _isScanning = false;
-                return false;
-            }
-            CurrentItemScan = itemIconScan;
+			var itemIconScan = new ItemIconScan(screenshot, mouseVector2);
 
-            ShowToolTip(itemIconScan);
+			if (!itemIconScan.ValidItem)
+			{
+				ScanLock = false;
+				return false;
+			}
+			CurrentItemScan = itemIconScan;
 
-            _isScanning = false;
-            return true;
-        }
+			ShowToolTip(itemIconScan);
 
-        private bool NameScan(Vector2 mouseVector2)
-        {
-            if (_isScanning) return false;
-            _isScanning = true;
+			ScanLock = false;
+			return true;
+		}
 
-            _nameScanToolTip.Dispatcher.Invoke(() =>
-            {
-                NameScanToolTip.ScheduleHide();
-                _nameScanToolTip.Hide();    // Hide it instantly
-            });
+		private bool NameScan(Vector2 mouseVector2)
+		{
+			if (ScanLock) return false;
+			ScanLock = true;
 
-            // Wait for game ui to update the click
-            Thread.Sleep(50);
+			_nameScanToolTip.Dispatcher.Invoke(() =>
+			{
+				NameScanToolTip.ScheduleHide();
+				_nameScanToolTip.Hide();    // Hide it instantly
+			});
 
-            // Get raw screenshot which includes the icon and text
-            var markerScanSize = RatConfig.MarkerScanSize;
-            var positionX = mouseVector2.X - (markerScanSize / 2);
-            var positionY = mouseVector2.Y - (markerScanSize / 2);
-            var sizeWidth = markerScanSize + RatConfig.TextWidth + RatConfig.TextHorizontalOffset;
-            var sizeHeight = markerScanSize;
-            var screenshot = GetScreenshot(new Vector2(positionX, positionY), new Size(sizeWidth, sizeHeight));
+			// Wait for game ui to update the click
+			Thread.Sleep(50);
 
-            // Scan the item
-            var itemNameScan = new ItemNameScan(screenshot, mouseVector2);
+			// Get raw screenshot which includes the icon and text
+			var markerScanSize = RatConfig.NameScan.MarkerScanSize;
+			var positionX = mouseVector2.X - (markerScanSize / 2);
+			var positionY = mouseVector2.Y - (markerScanSize / 2);
+			var sizeWidth = markerScanSize + RatConfig.NameScan.TextWidth + RatConfig.NameScan.TextHorizontalOffset;
+			var sizeHeight = markerScanSize;
+			var screenshot = GetScreenshot(new Vector2(positionX, positionY), new Size(sizeWidth, sizeHeight));
 
-            if (!itemNameScan.ValidItem)
-            {
-                _isScanning = false;
-                return false;
-            }
-            CurrentItemScan = itemNameScan;
+			// Scan the item
+			var itemNameScan = new ItemNameScan(screenshot, mouseVector2);
 
-            ShowToolTip(itemNameScan);
+			if (!itemNameScan.ValidItem)
+			{
+				ScanLock = false;
+				return false;
+			}
+			CurrentItemScan = itemNameScan;
 
-            _isScanning = false;
-            return true;
-        }
+			ShowToolTip(itemNameScan);
 
-        // Returns the ruff screenshot
-        private Bitmap GetScreenshot(Vector2 vector2, Size size)
-        {
-            var bmp = new Bitmap(size.Width, size.Height, PixelFormat.Format24bppRgb);
+			ScanLock = false;
+			return true;
+		}
 
-            using (var gfx = Graphics.FromImage(bmp))
-            {
-                gfx.CopyFromScreen(vector2.X, vector2.Y, 0, 0, size, CopyPixelOperation.SourceCopy);
-            }
+		// Returns the ruff screenshot
+		private Bitmap GetScreenshot(Vector2 vector2, Size size)
+		{
+			var bmp = new Bitmap(size.Width, size.Height, PixelFormat.Format24bppRgb);
 
-            return bmp;
-        }
+			using (var gfx = Graphics.FromImage(bmp))
+			{
+				gfx.CopyFromScreen(vector2.X, vector2.Y, 0, 0, size, CopyPixelOperation.SourceCopy);
+			}
 
-        // Display the item information in a ToolTip
-        private void ShowToolTip(ItemScan itemScan)
-        {
-            var pos = itemScan.GetToolTipPosition();
-            if (pos == null) return;
+			return bmp;
+		}
 
-            if (itemScan is ItemNameScan) NameScanToolTip.ScheduleShow(itemScan, pos, RatConfig.ToolTipDuration);
-            if (itemScan is ItemIconScan) IconScanToolTip.ScheduleShow(itemScan, pos, RatConfig.ToolTipDuration);
-        }
+		// Display the item information in a ToolTip
+		private void ShowToolTip(ItemScan itemScan)
+		{
+			var pos = itemScan.GetToolTipPosition();
+			if (pos == null) return;
 
-        protected virtual void OnPropertyChanged(string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-    }
+			if (itemScan is ItemNameScan) NameScanToolTip.ScheduleShow(itemScan, pos, RatConfig.ToolTip.Duration);
+			if (itemScan is ItemIconScan) IconScanToolTip.ScheduleShow(itemScan, pos, RatConfig.ToolTip.Duration);
+		}
+
+		protected virtual void OnPropertyChanged(string propertyName = null)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+		}
+	}
 }

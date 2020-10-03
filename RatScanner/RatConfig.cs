@@ -2,186 +2,237 @@
 using System.Drawing;
 using System.Globalization;
 using System.IO;
-using System.IO.Packaging;
 using System.Reflection;
 using RatScanner.Properties;
 
 namespace RatScanner
 {
-    internal static class RatConfig
-    {
-        internal enum Resolution
-        {
-            WXGA,   // 1366x768
-            FHD,    // 1920x1080
-            QHD,    // 2560x1440
-            UHD,    // 3840x2160
-        }
+	internal static class RatConfig
+	{
+		internal enum Resolution
+		{
+			WXGA,   // 1366x768
+			FHD,    // 1920x1080
+			QHD,    // 2560x1440
+			UHD,    // 3840x2160
+		}
 
-        // String resources
-        internal static string Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
-        internal static string BasePath = AppDomain.CurrentDomain.BaseDirectory;
-        internal static string DataPath = Path.Combine(BasePath, "Data");
-        internal static string StaticIconPath = Path.Combine(DataPath, "name");
-        private const string EftTempDir = "Battlestate Games\\EscapeFromTarkov\\";
-        private static readonly string EftTempPath = Path.Combine(Path.GetTempPath(), EftTempDir);
-        internal static string DynamicIconPath = Path.Combine(EftTempPath, "Icon Cache");
-        internal static string StaticCorrelationPath = Path.Combine(DataPath, "correlation.json");
-        internal static string DynamicCorrelationPath = Path.Combine(DynamicIconPath, "index.json");
-        internal static string UnknownIconPath = Path.Combine(DataPath, "unknown.png");
-        internal static string ConfigFilePath = Path.Combine(BasePath, "config.cfg");
-        internal static string DebugPath = Path.Combine(BasePath, "Debug");
+		// Version
+		internal static string Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
 
-        // Name Scan options
-        internal static Bitmap Marker = Resources.markerFHD;
-        internal static Bitmap MarkerShort = Resources.markerShortFHD;
-        internal static bool EnableNameScan = true;
-        internal static float NameConfWarnThreshold = 0.90f;
-        internal static int MarkerScanSize = 50;
-        internal static float MarkerThreshold = 0.9f;
-        internal static int TextHorizontalOffset = 21;
-        internal static int TextWidth = 500;
-        internal static int TextHeight = 17;
+		// Paths
+		internal static class Paths
+		{
+			internal static string Base = AppDomain.CurrentDomain.BaseDirectory;
+			internal static string Data = Path.Combine(Base, "Data");
+			internal static string StaticIcon = Path.Combine(Data, "name");
 
-        // Icon Scan options
-        internal static bool EnableIconScan = true;
-        internal static float IconConfWarnThreshold = 0.95f;
-        internal static bool ScanRotatedIcons = true;
-        internal static int IconPadding = 10;
-        internal static int IconScanWidth = 640;
-        internal static int IconScanHeight = 896;
-        internal static int ItemSlotSize = 63;
-        internal static int ModifierKeyCode = 160; // SHIFT = 160, CTRL = 162, ALT = 164
-        internal static bool UseCachedIcons = true;
+			private const string EftTempDir = "Battlestate Games\\EscapeFromTarkov\\";
+			private static readonly string EftTemp = Path.Combine(Path.GetTempPath(), EftTempDir);
+			internal static string DynamicIcon = Path.Combine(EftTemp, "Icon Cache");
+			internal static string StaticCorrelation = Path.Combine(Data, "correlation.json");
+			internal static string DynamicCorrelation = Path.Combine(DynamicIcon, "index.json");
+			internal static string UnknownIcon = Path.Combine(Data, "unknown.png");
+			internal static string ConfigFile = Path.Combine(Base, "config.cfg");
+			internal static string Debug = Path.Combine(Base, "Debug");
+		}
 
-        // ToolTip options
-        internal static string ToolTipDigitGroupingSymbol = ".";
-        internal static int ToolTipDuration = 1500;
-        internal static int BToolTipWidthOffset = 0;
-        internal static int BToolTipHeightOffset = 5;
+		// Name Scan options
+		internal static class NameScan
+		{
+			internal static bool Enable = true;
+			internal static Bitmap Marker = Resources.markerFHD;
+			internal static Bitmap MarkerShort = Resources.markerShortFHD;
+			internal static float ConfWarnThreshold = 0.90f;
+			internal static int MarkerScanSize = 50;
+			internal static float MarkerThreshold = 0.9f;
+			internal static int TextHorizontalOffset = 21;
+			internal static int TextWidth = 500;
+			internal static int TextHeight = 17;
+		}
 
-        // Other
-        internal static bool LogDebug = false;
-        internal static bool MinimizeToTray = false;
-        internal static bool AlwaysOnTop = false;
+		// Icon Scan options
+		internal static class IconScan
+		{
+			internal static bool Enable = true;
+			internal static float ConfWarnThreshold = 0.95f;
+			internal static bool ScanRotatedIcons = true;
+			internal static int ScanPadding = 10;
+			internal static int ScanWidth = 640;
+			internal static int ScanHeight = 896;
+			internal static int ItemSlotSize = 63;
+			internal static int ModifierKeyCode = 160; // SHIFT = 160, CTRL = 162, ALT = 164
+			internal static bool UseCachedIcons = true;
+		}
 
-        private static Resolution screenResolution = Resolution.FHD;
-        internal static Resolution ScreenResolution
-        {
-            get => screenResolution;
-            set
-            {
-                screenResolution = value;
-                switch (screenResolution)
-                {
-                    case Resolution.WXGA: LoadWXGA(); break;
-                    case Resolution.FHD: LoadFHD(); break;
-                    case Resolution.QHD: LoadQHD(); break;
-                    case Resolution.UHD: LoadUHD(); break;
-                    default: throw new ArgumentOutOfRangeException(nameof(value), "Unknown screen resolution");
-                }
-            }
-        }
+		// ToolTip options
+		internal static class ToolTip
+		{
+			internal static string DigitGroupingSymbol = ".";
+			internal static int Duration = 1500;
+			internal static int WidthOffset = 0;
+			internal static int HeightOffset = 5;
+		}
 
-        private static void LoadWXGA()
-        {
-            throw new NotImplementedException("No WXGA preset defined");
-        }
+		// Minimal UI
+		internal static class MinimalUi
+		{
+			internal static bool ShowName = true;
+			internal static bool ShowPrice = true;
+			internal static bool ShowAvgDayPrice = true;
+			internal static bool ShowAvgWeekPrice = true;
+			internal static bool ShowPricePerSlot = true;
+			internal static bool ShowTraderPrice = true;
+			internal static bool ShowUpdated = true;
+			internal static int Opacity = 50;
+		}
 
-        private static void LoadFHD()
-        {
-            Marker = Resources.markerFHD;
-            MarkerShort = Resources.markerShortFHD;
-            MarkerScanSize = 50;
-            MarkerThreshold = 0.9f;
-            TextHorizontalOffset = 21;
-            TextWidth = 500;
-            TextHeight = 17;
+		// Other
+		internal static bool LogDebug = false;
+		internal static bool MinimizeToTray = false;
+		internal static bool AlwaysOnTop = false;
 
-            ItemSlotSize = 63;
+		private static Resolution screenResolution = Resolution.FHD;
+		internal static Resolution ScreenResolution
+		{
+			get => screenResolution;
+			set
+			{
+				screenResolution = value;
+				switch (screenResolution)
+				{
+					case Resolution.WXGA: LoadWXGA(); break;
+					case Resolution.FHD: LoadFHD(); break;
+					case Resolution.QHD: LoadQHD(); break;
+					case Resolution.UHD: LoadUHD(); break;
+					default: throw new ArgumentOutOfRangeException(nameof(value), "Unknown screen resolution");
+				}
+			}
+		}
 
-            BToolTipHeightOffset = 5;
-        }
+		private static void LoadWXGA()
+		{
+			throw new NotImplementedException("No WXGA preset defined");
+		}
 
-        private static void LoadQHD()
-        {
-            Marker = Resources.markerQHD;
-            MarkerShort = Resources.markerShortQHD;
-            MarkerScanSize = 75;
-            MarkerThreshold = 0.9f;
-            TextHorizontalOffset = 28;
-            TextWidth = 750;
-            TextHeight = 23;
+		private static void LoadFHD()
+		{
+			NameScan.Marker = Resources.markerFHD;
+			NameScan.MarkerShort = Resources.markerShortFHD;
+			NameScan.MarkerScanSize = 50;
+			NameScan.MarkerThreshold = 0.9f;
+			NameScan.TextHorizontalOffset = 21;
+			NameScan.TextWidth = 500;
+			NameScan.TextHeight = 17;
 
-            ItemSlotSize = 84;
+			IconScan.ItemSlotSize = 63;
 
-            BToolTipHeightOffset = 8;
-        }
+			ToolTip.HeightOffset = 5;
+		}
 
-        private static void LoadUHD()
-        {
-            Marker = Resources.markerUHD;
-            MarkerShort = Resources.markerShortUHD;
-            MarkerScanSize = 100;
-            MarkerThreshold = 0.9f;
-            TextHorizontalOffset = 40;
-            TextWidth = 1000;
-            TextHeight = 34;
+		private static void LoadQHD()
+		{
+			NameScan.Marker = Resources.markerQHD;
+			NameScan.MarkerShort = Resources.markerShortQHD;
+			NameScan.MarkerScanSize = 75;
+			NameScan.MarkerThreshold = 0.9f;
+			NameScan.TextHorizontalOffset = 28;
+			NameScan.TextWidth = 750;
+			NameScan.TextHeight = 23;
 
-            ItemSlotSize = 126;
+			IconScan.ItemSlotSize = 84;
 
-            BToolTipHeightOffset = 10;
-        }
+			ToolTip.HeightOffset = 8;
+		}
 
-        internal static float GetScreenScaleFactor()
-        {
-            return ScreenResolution switch
-            {
-                Resolution.WXGA => 768f / 1080f,
-                Resolution.FHD => 1f,
-                Resolution.QHD => 1440f / 1080f,
-                Resolution.UHD => 2f,
-                _ => throw new InvalidOperationException("Unknown ScreenResolution"),
-            };
-        }
+		private static void LoadUHD()
+		{
+			NameScan.Marker = Resources.markerUHD;
+			NameScan.MarkerShort = Resources.markerShortUHD;
+			NameScan.MarkerScanSize = 100;
+			NameScan.MarkerThreshold = 0.9f;
+			NameScan.TextHorizontalOffset = 40;
+			NameScan.TextWidth = 1000;
+			NameScan.TextHeight = 34;
 
-        internal static float GetInverseScreenScaleFactor()
-        {
-            return 1 / GetScreenScaleFactor();
-        }
+			IconScan.ItemSlotSize = 126;
 
-        internal static void LoadConfig()
-        {
-            if (!File.Exists(ConfigFilePath)) SaveConfig();
+			ToolTip.HeightOffset = 10;
+		}
 
-            var config = new SimpleConfig(ConfigFilePath);
-            EnableNameScan = config.ReadBool(nameof(EnableNameScan), true);
-            EnableIconScan = config.ReadBool(nameof(EnableIconScan), true);
-            ScanRotatedIcons = config.ReadBool(nameof(ScanRotatedIcons), true);
-            ToolTipDuration = config.ReadInt(nameof(ToolTipDuration), 1500);
-            ModifierKeyCode = config.ReadInt(nameof(ModifierKeyCode), 160);
-            LogDebug = config.ReadBool(nameof(LogDebug), false);
-            MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), false);
-            AlwaysOnTop = config.ReadBool(nameof(AlwaysOnTop), false);
-            ScreenResolution = (Resolution)config.ReadInt(nameof(ScreenResolution), 1);
-            ToolTipDigitGroupingSymbol = config.ReadString(nameof(ToolTipDigitGroupingSymbol), NumberFormatInfo.CurrentInfo.NumberGroupSeparator);
-            UseCachedIcons = config.ReadBool(nameof(UseCachedIcons), true);
-        }
+		internal static float GetScreenScaleFactor()
+		{
+			return ScreenResolution switch
+			{
+				Resolution.WXGA => 768f / 1080f,
+				Resolution.FHD => 1f,
+				Resolution.QHD => 1440f / 1080f,
+				Resolution.UHD => 2f,
+				_ => throw new InvalidOperationException("Unknown ScreenResolution"),
+			};
+		}
 
-        internal static void SaveConfig()
-        {
-            var config = new SimpleConfig(ConfigFilePath);
-            config.WriteBool(nameof(EnableNameScan), EnableNameScan);
-            config.WriteBool(nameof(EnableIconScan), EnableIconScan);
-            config.WriteBool(nameof(ScanRotatedIcons), ScanRotatedIcons);
-            config.WriteInt(nameof(ToolTipDuration), ToolTipDuration);
-            config.WriteInt(nameof(ModifierKeyCode), ModifierKeyCode);
-            config.WriteBool(nameof(LogDebug), LogDebug);
-            config.WriteBool(nameof(MinimizeToTray), MinimizeToTray);
-            config.WriteBool(nameof(AlwaysOnTop), AlwaysOnTop);
-            config.WriteInt(nameof(ScreenResolution), (int)ScreenResolution);
-            config.WriteString(nameof(ToolTipDigitGroupingSymbol), ToolTipDigitGroupingSymbol);
-            config.WriteBool(nameof(UseCachedIcons), UseCachedIcons);
-        }
-    }
+		internal static float GetInverseScreenScaleFactor()
+		{
+			return 1 / GetScreenScaleFactor();
+		}
+
+		internal static void LoadConfig()
+		{
+			if (!File.Exists(Paths.ConfigFile)) SaveConfig();
+
+			var config = new SimpleConfig(Paths.ConfigFile);
+			NameScan.Enable = config.ReadBool(nameof(NameScan.Enable), true);
+
+			IconScan.Enable = config.ReadBool(nameof(IconScan.Enable), true);
+			IconScan.ScanRotatedIcons = config.ReadBool(nameof(IconScan.ScanRotatedIcons), true);
+			IconScan.ModifierKeyCode = config.ReadInt(nameof(IconScan.ModifierKeyCode), 160);
+			IconScan.UseCachedIcons = config.ReadBool(nameof(IconScan.UseCachedIcons), true);
+
+			ToolTip.Duration = config.ReadInt(nameof(ToolTip.Duration), 1500);
+			ToolTip.DigitGroupingSymbol = config.ReadString(nameof(ToolTip.DigitGroupingSymbol), NumberFormatInfo.CurrentInfo.NumberGroupSeparator);
+
+			MinimalUi.ShowName = config.ReadBool(nameof(MinimalUi.ShowName), true);
+			MinimalUi.ShowPrice = config.ReadBool(nameof(MinimalUi.ShowPrice), true);
+			MinimalUi.ShowAvgDayPrice = config.ReadBool(nameof(MinimalUi.ShowAvgDayPrice), true);
+			MinimalUi.ShowAvgWeekPrice = config.ReadBool(nameof(MinimalUi.ShowAvgWeekPrice), true);
+			MinimalUi.ShowPricePerSlot = config.ReadBool(nameof(MinimalUi.ShowPricePerSlot), true);
+			MinimalUi.ShowTraderPrice = config.ReadBool(nameof(MinimalUi.ShowTraderPrice), true);
+			MinimalUi.ShowUpdated = config.ReadBool(nameof(MinimalUi.ShowUpdated), true);
+			MinimalUi.Opacity = config.ReadInt(nameof(MinimalUi.Opacity), 50);
+
+			ScreenResolution = (Resolution)config.ReadInt(nameof(ScreenResolution), 1);
+			MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), false);
+			AlwaysOnTop = config.ReadBool(nameof(AlwaysOnTop), false);
+			LogDebug = config.ReadBool(nameof(LogDebug), false);
+		}
+
+		internal static void SaveConfig()
+		{
+			var config = new SimpleConfig(Paths.ConfigFile);
+			config.WriteBool(nameof(NameScan.Enable), NameScan.Enable);
+
+			config.WriteBool(nameof(IconScan.Enable), IconScan.Enable);
+			config.WriteBool(nameof(IconScan.ScanRotatedIcons), IconScan.ScanRotatedIcons);
+			config.WriteInt(nameof(IconScan.ModifierKeyCode), IconScan.ModifierKeyCode);
+			config.WriteBool(nameof(IconScan.UseCachedIcons), IconScan.UseCachedIcons);
+
+			config.WriteInt(nameof(ToolTip.Duration), ToolTip.Duration);
+			config.WriteString(nameof(ToolTip.DigitGroupingSymbol), ToolTip.DigitGroupingSymbol);
+
+			config.WriteBool(nameof(MinimalUi.ShowName), MinimalUi.ShowName);
+			config.WriteBool(nameof(MinimalUi.ShowPrice), MinimalUi.ShowPrice);
+			config.WriteBool(nameof(MinimalUi.ShowAvgDayPrice), MinimalUi.ShowAvgDayPrice);
+			config.WriteBool(nameof(MinimalUi.ShowAvgWeekPrice), MinimalUi.ShowAvgWeekPrice);
+			config.WriteBool(nameof(MinimalUi.ShowPricePerSlot), MinimalUi.ShowPricePerSlot);
+			config.WriteBool(nameof(MinimalUi.ShowTraderPrice), MinimalUi.ShowTraderPrice);
+			config.WriteBool(nameof(MinimalUi.ShowUpdated), MinimalUi.ShowUpdated);
+			config.WriteInt(nameof(MinimalUi.Opacity), MinimalUi.Opacity);
+
+			config.WriteInt(nameof(ScreenResolution), (int)ScreenResolution);
+			config.WriteBool(nameof(MinimizeToTray), MinimizeToTray);
+			config.WriteBool(nameof(AlwaysOnTop), AlwaysOnTop);
+			config.WriteBool(nameof(LogDebug), LogDebug);
+		}
+	}
 }
