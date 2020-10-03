@@ -123,7 +123,7 @@
 				</StackPanel>
 			</TabItem>
 
-			<TabItem Header="Scan Options">
+			<TabItem Header="Scanning">
 				<StackPanel>
 					<Grid>
 						<Grid.ToolTip>
