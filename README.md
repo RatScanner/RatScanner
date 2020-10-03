@@ -94,6 +94,8 @@ Background opacity as well as the data which is shown can be configured in the s
 
 You can directly download the latest version [here][latest-release] or choose a specific version to download [here][releases].
 
+After you downloaded the Zip-Archive (you only need `RatScanner.zip`) extract it anywhere on your PC and run `RatScanner.exe`.
+
 **Important:** If the tool does not seem to start, make sure you have the [.Net Core Runtime][net-core-download] installed.
 
 <br/>
