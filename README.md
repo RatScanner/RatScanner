@@ -71,6 +71,14 @@ Notes
 
 <br/>
 
+## Minimal UI
+Switch to the minimal ui by clicking the dedicated button inside the titlebar.
+Get back to the standard view by **double clicking** anywhere inside the window.
+
+Background opacity as well as the data which is shown can be configured in the settings.
+
+<img src="media/MinimalUI-HowTo.gif" width=280px>
+
 ## Download
 
 You can directly download the latest version [here][latest-release] or choose a specific version to download [here][releases].
