@@ -96,6 +96,8 @@ You can directly download the latest version [here][latest-release] or choose a 
 
 After you downloaded the Zip-Archive (you only need `RatScanner.zip`) extract it anywhere on your PC and run `RatScanner.exe`.
 
+Once it has launched, go into the settings menu (bottom right corner) and check that your resolution is set properly (default is FullHD).
+
 **Important:** If the tool does not seem to start, make sure you have the [.Net Core Runtime][net-core-download] installed.
 
 <br/>
