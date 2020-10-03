@@ -36,7 +36,7 @@ Instead, when you want to scan a item, a screenshot is taken and image processin
 
 ## How to use
 
-Your game has to be in either `Borderless` or `Windowed` mode for the overlay to work!
+Your game may need to be in either `Borderless` or `Windowed` mode for the overlay to work.
 
 There are currently two types of item scan methods
 
