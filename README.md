@@ -36,6 +36,8 @@ Instead, when you want to scan a item, a screenshot is taken and image processin
 
 ## How to use
 
+Your game has to be in either `Borderless` or `Windowed` mode for the overlay to work!
+
 There are currently two types of item scan methods
 
 ### Name scanning
@@ -65,15 +67,36 @@ Limitations
 
 Notes
 
+- Check out the [indicator for modded items](#modded-item-indicator)
 - If the item size does not get detected correctly, try to click in a corner of the item
 
 <img src="media/IconScan.gif" width=400px>
 
 <br/>
 
+## Modded Item Indicator
+When attached mods on a item were detected, they will be included in the data.
+This is indicated by an icon which is displayed to the left of the item name.
+
+Price includes attached mods       | Price **does not** include attached mods
+:--------------------------------: | :------------------------------------:
+![AttachedMods](media/ModIcon.png) | ![NoAttachedMods](media/NoModIcon.png)
+
+## Minimal UI
+Switch to the minimal ui by clicking the dedicated button inside the titlebar.
+Get back to the standard view by **double clicking** anywhere inside the window.
+
+Background opacity as well as the data which is shown can be configured in the settings.
+
+<img src="media/MinimalUI-HowTo.gif" width=280px>
+
 ## Download
 
 You can directly download the latest version [here][latest-release] or choose a specific version to download [here][releases].
+
+After you downloaded the Zip-Archive (you only need `RatScanner.zip`) extract it anywhere on your PC and run `RatScanner.exe`.
+
+Once it has launched, go into the settings menu (bottom right corner) and check that your resolution is set properly (default is FullHD).
 
 **Important:** If the tool does not seem to start, make sure you have the [.Net Core Runtime][net-core-download] installed.
 
