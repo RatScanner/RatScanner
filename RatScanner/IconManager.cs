@@ -221,6 +221,26 @@ namespace RatScanner
 			}
 		}
 
+		private static string ReadCorrelationData(int tryIndex)
+		{
+			try
+			{
+				return File.ReadAllText(RatConfig.DynamicCorrelationPath);
+			}
+			catch (IOException ex)
+			{
+				Logger.LogError(
+					"Can't read '" + RatConfig.DynamicCorrelationPath + "'. Perhaps it's locked by EFT, retrying(" + tryIndex +
+					")...", ex);
+				return ReadCorrelationData(tryIndex + 1);
+			}
+		}
+
+		private static string ReadCorrelationData()
+		{
+			return ReadCorrelationData(1);
+		}
+
 		private static void LoadDynamicCorrelationData()
 		{
 			Logger.LogInfo("Loading dynamic correlation data...");
@@ -230,8 +250,7 @@ namespace RatScanner
 				Logger.LogError("Could not find dynamic correlation data at: " + RatConfig.DynamicCorrelationPath);
 			}
 
-			var json = File.ReadAllText(RatConfig.DynamicCorrelationPath);
-			var correlations = JObject.Parse(json);
+			var correlations = JObject.Parse(ReadCorrelationData());
 
 			foreach (var correlation in correlations.Properties())
 			{
