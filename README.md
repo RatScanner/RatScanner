@@ -16,7 +16,7 @@ Rat Scanner is a open source tool for [Escape from Tarkov][escape-from-tarkov].
 
 Please consider [supporting](#Support-the-project) the project to help finance the backend server as well as the [API][tarkov-market].
 
-[Tutorial / Demo Video][demo-video]
+[Tutorial / Demo Video][demo-video] - [Frequently asked Questions][faq-page]
 
 <br/>
 
@@ -101,6 +101,8 @@ After you downloaded the Zip-Archive (you only need `RatScanner.zip`) extract it
 
 Once it has launched, go into the settings menu (bottom right corner) and check that your resolution is set properly (default is FullHD).
 
+If you have any problems with the process please checkout the [FAQ][faq-page] or join the [Discord][discord] if you need further help.
+
 **Important:** If the tool does not seem to start, make sure you have the **x64 Version** of [.Net Core Runtime][net-core-download] installed.
 
 <br/>
@@ -141,3 +143,5 @@ This will help to pay for the backend server as well as the [API][tarkov-market]
 [releases]: https://github.com/Blightbuster/RatScanner/releases/
 [net-core-download]: https://dotnet.microsoft.com/download/dotnet-core/current/runtime
 [demo-video]: https://www.youtube.com/watch?v=tXoIkgXFmdA
+[faq-page]: FAQ.md
+[discord]: https://discord.com/invite/aHZf7aP
