@@ -57,9 +57,9 @@ namespace RatScanner
 			internal static bool Enable = true;
 			internal static float ConfWarnThreshold = 0.95f;
 			internal static bool ScanRotatedIcons = true;
-			internal static int ScanPadding = 10;
-			internal static int ScanWidth = 640;
-			internal static int ScanHeight = 896;
+			internal static int ScanPadding => (int)(GetScreenScaleFactor() * 10);
+			internal static int ScanWidth => (int)(GetScreenScaleFactor() * 640);
+			internal static int ScanHeight => (int)(GetScreenScaleFactor() * 896);
 			internal static int ItemSlotSize = 63;
 			internal static int ModifierKeyCode = 160; // SHIFT = 160, CTRL = 162, ALT = 164
 			internal static bool UseCachedIcons = true;
