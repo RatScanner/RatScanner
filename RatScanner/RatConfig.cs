@@ -90,7 +90,7 @@ namespace RatScanner
 		// Other
 		internal static bool LogDebug = false;
 		internal static bool MinimizeToTray = false;
-		internal static bool AlwaysOnTop = false;
+		internal static bool AlwaysOnTop = true;
 
 		private static Resolution screenResolution = Resolution.FHD;
 		internal static Resolution ScreenResolution
