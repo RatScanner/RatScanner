@@ -20,6 +20,8 @@ namespace RatScanner
 		private static PageSwitcher _instance;
 		public static PageSwitcher Instance => _instance ??= new PageSwitcher();
 
+		private UserControl activeControl;
+
 		public PageSwitcher()
 		{
 			try
@@ -49,20 +51,24 @@ namespace RatScanner
 			MaxWidth = WindowWidth;
 		}
 
-		internal void Navigate(UserControl nextPage)
+		internal void Navigate(UserControl nextControl, object state = null)
 		{
-			ContentControl.Content = nextPage;
-		}
-
-		internal void Navigate(UserControl nextPage, object state)
-		{
-			ContentControl.Content = nextPage;
-
-			if (nextPage is ISwitchable s) s.UtilizeState(state);
-			else
+			if (!(nextControl is ISwitchable))
 			{
-				throw new ArgumentException("NextPage is not ISwitchable! " + nextPage.Name);
+				throw new ArgumentException("NextPage is not ISwitchable! " + nextControl.Name);
 			}
+
+			if (activeControl != null)
+			{
+				var activeControlSwitchable = (ISwitchable)activeControl;
+				activeControlSwitchable.OnClose();
+			}
+
+			ContentControl.Content = nextControl;
+			activeControl = nextControl;
+
+			var nextControlSwitchable = (ISwitchable)nextControl;
+			if (state != null) nextControlSwitchable.UtilizeState(state);
 		}
 
 		protected override void OnStateChanged(EventArgs e)

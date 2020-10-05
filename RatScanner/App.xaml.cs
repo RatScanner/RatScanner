@@ -42,7 +42,7 @@ namespace RatScanner
 			try
 			{
 				var assemblyName = System.Reflection.Assembly.GetExecutingAssembly().GetName();
-				message = $"Unhandled exception in {assemblyName.Name} v{assemblyName.Version}";
+				message = $"Unhandled exception in {assemblyName.Name} {RatConfig.Version}";
 			}
 			catch (Exception ex)
 			{

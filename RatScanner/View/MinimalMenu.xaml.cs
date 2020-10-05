@@ -49,5 +49,7 @@ namespace RatScanner.View
 		{
 			throw new System.NotImplementedException();
 		}
+
+		public void OnClose() { }
 	}
 }
