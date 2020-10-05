@@ -107,9 +107,9 @@ If you have any problems with the process please checkout the [FAQ][faq-page] or
 
 <br/>
 
-## Setting up the repository
+## Setting up the repository for development
 
-1. Clone the repo
+1. Clone the repository
 2. Copy the `name` folder and the `correlation.json` from the [EfT-Icons][eft-icons-repo] repository inside `RatScanner\Data\`
 
 ### Compiling
