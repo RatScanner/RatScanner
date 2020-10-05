@@ -16,6 +16,8 @@ Rat Scanner is a open source tool for [Escape from Tarkov][escape-from-tarkov].
 
 Please consider [supporting](#Support-the-project) the project to help finance the backend server as well as the [API][tarkov-market].
 
+[Tutorial / Demo Video][demo-video] - [Frequently asked Questions][faq-page]
+
 <br/>
 
 ## What it does
@@ -36,7 +38,7 @@ Instead, when you want to scan a item, a screenshot is taken and image processin
 
 ## How to use
 
-Your game has to be in either `Borderless` or `Windowed` mode for the overlay to work!
+Your game may need to be in either `Borderless` or `Windowed` mode for the overlay to work.
 
 There are currently two types of item scan methods
 
@@ -64,6 +66,7 @@ Limitations
 
 - Uses / durability is always assumed at 100%
 - Items which share a icon with other items (especially keys) will result in a uncertain match
+- There will be missmatches when scanning icons in the top left of the item stash since the bright light (top center of the screen) interferes with it
 
 Notes
 
@@ -98,7 +101,9 @@ After you downloaded the Zip-Archive (you only need `RatScanner.zip`) extract it
 
 Once it has launched, go into the settings menu (bottom right corner) and check that your resolution is set properly (default is FullHD).
 
-**Important:** If the tool does not seem to start, make sure you have the [.Net Core Runtime][net-core-download] installed.
+If you have any problems with the process please checkout the [FAQ][faq-page] or join the [Discord][discord] if you need further help.
+
+**Important:** If the tool does not seem to start, make sure you have the **x64 Version** of [.Net Core Runtime][net-core-download] installed.
 
 <br/>
 
@@ -129,7 +134,7 @@ Please read `CONTRIBUTING.md` before contributing.
 This will help to pay for the backend server as well as the [API][tarkov-market] which provides the backend with data.
 
 [![Patreon](https://img.shields.io/badge/dynamic/json?color=%23e85b46&label=Patreon&query=data.attributes.patron_count&suffix=%20patrons&url=https%3A%2F%2Fwww.patreon.com%2Fapi%2Fcampaigns%2F4117180&style=for-the-badge&logo=patreon)](https://patreon.com/RatScanner)
-[![Patreon](https://img.shields.io/static/v1?&label=PayPal&message=Donate&color=0079C1&style=for-the-badge&logo=paypal)](https://paypal.me/mscheve)
+[![PayPal](https://img.shields.io/static/v1?&label=PayPal&message=Donate&color=0079C1&style=for-the-badge&logo=paypal)](https://paypal.me/mscheve)
 
 [escape-from-tarkov]: https://www.escapefromtarkov.com/
 [tarkov-market]: https://tarkov-market.com/
@@ -137,3 +142,6 @@ This will help to pay for the backend server as well as the [API][tarkov-market]
 [latest-release]: https://github.com/Blightbuster/RatScanner/releases/latest/download/RatScanner.zip
 [releases]: https://github.com/Blightbuster/RatScanner/releases/
 [net-core-download]: https://dotnet.microsoft.com/download/dotnet-core/current/runtime
+[demo-video]: https://www.youtube.com/watch?v=tXoIkgXFmdA
+[faq-page]: FAQ.md
+[discord]: https://discord.com/invite/aHZf7aP
