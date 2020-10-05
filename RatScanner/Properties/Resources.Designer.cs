@@ -73,9 +73,29 @@ namespace RatScanner.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap markerHDPlus {
+            get {
+                object obj = ResourceManager.GetObject("markerHDPlus", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap markerQHD {
             get {
                 object obj = ResourceManager.GetObject("markerQHD", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap markerR1440x1080 {
+            get {
+                object obj = ResourceManager.GetObject("markerR1440x1080", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -116,6 +136,26 @@ namespace RatScanner.Properties {
         internal static System.Drawing.Bitmap markerUHD {
             get {
                 object obj = ResourceManager.GetObject("markerUHD", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap markerWXGA {
+            get {
+                object obj = ResourceManager.GetObject("markerWXGA", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap markerWXGAPlus {
+            get {
+                object obj = ResourceManager.GetObject("markerWXGAPlus", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

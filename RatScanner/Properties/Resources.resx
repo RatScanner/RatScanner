@@ -121,8 +121,14 @@
   <data name="markerFHD" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\markerfhd.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="markerHDPlus" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\markerHDPlus.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="markerQHD" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\markerqhd.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="markerR1440x1080" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\markerR1440x1080.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="markerShortFHD" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\markershortfhd.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -135,6 +141,12 @@
   </data>
   <data name="markerUHD" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\resources\markeruhd.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="markerWXGA" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\markerWXGA.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="markerWXGAPlus" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\markerWXGAPlus.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="RatLogoMedium" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\RatLogoMedium.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

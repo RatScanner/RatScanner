@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -16,11 +17,20 @@ namespace RatScanner
 			R1440x1080, // 1440x1080
 			HDPlus,     // 1600x900
 			FHD,        // 1920x1080
-			UWFHD,      // 2560x1080
 			QHD,        // 2560x1440
-			UWQHD,      // 3440x1440
 			UHD,        // 3840x2160
 		}
+
+		internal static Dictionary<Resolution, Vector2> ResolutionDict = new Dictionary<Resolution, Vector2>()
+		{
+			{Resolution.WXGA, new Vector2(1366, 768)},
+			{Resolution.WXGAPlus, new Vector2(1440, 900)},
+			{Resolution.R1440x1080, new Vector2(1440, 1080)},
+			{Resolution.HDPlus, new Vector2(1600, 900)},
+			{Resolution.FHD, new Vector2(1920, 1080)},
+			{Resolution.QHD, new Vector2(2560, 1440)},
+			{Resolution.UHD, new Vector2(3840, 2160)},
+		};
 
 		// Version
 		internal static string Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
@@ -111,88 +121,82 @@ namespace RatScanner
 					case Resolution.R1440x1080: LoadR1440x1080(); break;
 					case Resolution.HDPlus: LoadHDPlus(); break;
 					case Resolution.FHD: LoadFHD(); break;
-					case Resolution.UWFHD: LoadUWFHD(); break;
 					case Resolution.QHD: LoadQHD(); break;
-					case Resolution.UWQHD: LoadUWQHD(); break;
 					case Resolution.UHD: LoadUHD(); break;
 					default: throw new ArgumentOutOfRangeException(nameof(value), "Unknown screen resolution");
 				}
+
+				UpdateResolutionSettings();
 			}
+		}
+
+		private static void UpdateResolutionSettings()
+		{
+			var marker = NameScan.Marker;
+			NameScan.MarkerScanSize = Math.Max(marker.Width, marker.Height) * 3;
+			NameScan.TextHorizontalOffset = (int)(marker.Width * 1.2f);
+			NameScan.TextHeight = marker.Height;
+
+			var screenDimension = ResolutionDict[ScreenResolution];
+			var textWidth1 = (int)((screenDimension.X / 1920f) * 600f);
+			var textWidth2 = (int)((screenDimension.Y / 1080f) * 600f);
+			NameScan.TextWidth = Math.Min(textWidth1, textWidth2);
 		}
 
 		#region Resolution presets
 		private static void LoadWXGA()
 		{
-			throw new NotImplementedException("No WXGA preset defined");
+			NameScan.Marker = Resources.markerWXGA;
+			// TODO NameScan.MarkerShort = ...;
+			IconScan.ItemSlotSize = 45;
+			ToolTip.HeightOffset = -1;
 		}
 
 		private static void LoadWXGAPlus()
 		{
-			throw new NotImplementedException("No WXGAPlus preset defined");
+			NameScan.Marker = Resources.markerWXGAPlus;
+			// TODO NameScan.MarkerShort = ...;
+			IconScan.ItemSlotSize = 49;
+			ToolTip.HeightOffset = 0;
 		}
 
 		private static void LoadR1440x1080()
 		{
-			throw new NotImplementedException("No R1440x1080 preset defined");
+			NameScan.Marker = Resources.markerR1440x1080;
+			// TODO NameScan.MarkerShort = ...;
+			IconScan.ItemSlotSize = 47;
+			ToolTip.HeightOffset = 0;
 		}
 
 		private static void LoadHDPlus()
 		{
-			throw new NotImplementedException("No HDPlus preset defined");
+			NameScan.Marker = Resources.markerHDPlus;
+			// TODO NameScan.MarkerShort = ...;
+			IconScan.ItemSlotSize = 51;
+			ToolTip.HeightOffset = 2;
 		}
 
 		private static void LoadFHD()
 		{
 			NameScan.Marker = Resources.markerFHD;
 			NameScan.MarkerShort = Resources.markerShortFHD;
-			NameScan.MarkerScanSize = 50;
-			NameScan.MarkerThreshold = 0.9f;
-			NameScan.TextHorizontalOffset = 21;
-			NameScan.TextWidth = 500;
-			NameScan.TextHeight = 17;
-
 			IconScan.ItemSlotSize = 63;
-
 			ToolTip.HeightOffset = 5;
-		}
-
-		private static void LoadUWFHD()
-		{
-			throw new NotImplementedException("No UWFHD preset defined");
 		}
 
 		private static void LoadQHD()
 		{
 			NameScan.Marker = Resources.markerQHD;
 			NameScan.MarkerShort = Resources.markerShortQHD;
-			NameScan.MarkerScanSize = 75;
-			NameScan.MarkerThreshold = 0.9f;
-			NameScan.TextHorizontalOffset = 28;
-			NameScan.TextWidth = 750;
-			NameScan.TextHeight = 23;
-
 			IconScan.ItemSlotSize = 84;
-
-			ToolTip.HeightOffset = 8;
-		}
-
-		private static void LoadUWQHD()
-		{
-			throw new NotImplementedException("No UWQHD preset defined");
+			ToolTip.HeightOffset = 11;
 		}
 
 		private static void LoadUHD()
 		{
 			NameScan.Marker = Resources.markerUHD;
 			NameScan.MarkerShort = Resources.markerShortUHD;
-			NameScan.MarkerScanSize = 100;
-			NameScan.MarkerThreshold = 0.9f;
-			NameScan.TextHorizontalOffset = 40;
-			NameScan.TextWidth = 1000;
-			NameScan.TextHeight = 34;
-
 			IconScan.ItemSlotSize = 126;
-
 			ToolTip.HeightOffset = 10;
 		}
 		#endregion
@@ -203,12 +207,10 @@ namespace RatScanner
 			{
 				Resolution.WXGA => 768f / 1080f,
 				Resolution.WXGAPlus => 900f / 1080f,
-				Resolution.R1440x1080 => 1080f / 1080f,
+				Resolution.R1440x1080 => 1440f / 1920f,
 				Resolution.HDPlus => 900f / 1080f,
 				Resolution.FHD => 1080f / 1080f,
-				Resolution.UWFHD => 1080f / 1080f,
 				Resolution.QHD => 1440f / 1080f,
-				Resolution.UWQHD => 1440f / 1080f,
 				Resolution.UHD => 2160f / 1080f,
 				_ => throw new InvalidOperationException("Unknown ScreenResolution"),
 			};

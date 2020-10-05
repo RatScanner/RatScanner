@@ -119,8 +119,8 @@ namespace RatScanner.Scan
 			using (var res = new Mat(refMat.Rows - tplMat.Rows + 1, refMat.Cols - tplMat.Cols + 1, MatType.CV_32FC1))
 			{
 				//Convert input images to gray
-				var gref = refMat.CvtColor(ColorConversionCodes.BGR2GRAY);
-				var gtpl = tplMat.CvtColor(ColorConversionCodes.BGR2GRAY);
+				var gref = refMat.Channels() == 3 ? refMat.CvtColor(ColorConversionCodes.BGR2GRAY) : refMat;
+				var gtpl = tplMat.Channels() == 3 ? tplMat.CvtColor(ColorConversionCodes.BGR2GRAY) : tplMat;
 
 				Cv2.MatchTemplate(gref, gtpl, res, TemplateMatchModes.CCoeffNormed);
 				Cv2.Threshold(res, res, 0.8, 1.0, ThresholdTypes.Tozero);

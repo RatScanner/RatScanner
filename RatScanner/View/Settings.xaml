@@ -37,23 +37,50 @@
 							<TextBlock>
 								The resolution of your game. Adjust this to<LineBreak />
 								make sure both Name Scan and Icon Scan will work.<LineBreak />
-								WXGA = 1366x768<LineBreak />
-								FHD = 1920x1080<LineBreak />
-								QHD = 2560x1440<LineBreak />
-								UHD = 3840x2160</TextBlock>
+								<LineBreak />
+								<Bold>[UW]</Bold>
+								: Works as well for ultra wide screens.<LineBreak />
+								<LineBreak />
+								<Grid>
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="Auto" />
+										<ColumnDefinition Width="5" />
+										<ColumnDefinition Width="*" />
+									</Grid.ColumnDefinitions>
+									<TextBlock Grid.Column="0">
+										WXGA<LineBreak />
+										WXGAPlus<LineBreak />
+										1440x1080<LineBreak />
+										HDPlus<LineBreak />
+										FHD [UW]<LineBreak />
+										QHD [UW]<LineBreak />
+										UHD</TextBlock>
+									<TextBlock Grid.Column="2">
+										= 1366 x  768<LineBreak />
+										= 1440 x  900<LineBreak />
+										= 1440 x 1080<LineBreak />
+										= 1600 x  900<LineBreak />
+										= 1920 x 1080<LineBreak />
+										= 2560 x 1440<LineBreak />
+										= 3840 x 2160</TextBlock>
+								</Grid>
+							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0" Content="Resolution" />
 						<ComboBox
 							Grid.Column="1"
-							Width="64"
+							Width="100"
 							Margin="5,0"
 							VerticalAlignment="Center"
 							SelectedValue="{Binding ScreenResolution}"
 							SelectedValuePath="Tag">
 							<ComboBoxItem Content="WXGA" Tag="0" />
-							<ComboBoxItem Content="FHD" Tag="1" />
-							<ComboBoxItem Content="QHD" Tag="2" />
-							<ComboBoxItem Content="UHD" Tag="3" />
+							<ComboBoxItem Content="WXGA+" Tag="1" />
+							<ComboBoxItem Content="1440x1080" Tag="2" />
+							<ComboBoxItem Content="HD+" Tag="3" />
+							<ComboBoxItem Content="FHD" Tag="4" />
+							<ComboBoxItem Content="QHD" Tag="5" />
+							<ComboBoxItem Content="UHD" Tag="6" />
 						</ComboBox>
 
 						<Grid.ColumnDefinitions>

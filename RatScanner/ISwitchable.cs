@@ -3,5 +3,7 @@
 	internal interface ISwitchable
 	{
 		void UtilizeState(object state);
+
+		void OnClose();
 	}
 }
