@@ -11,10 +11,15 @@ namespace RatScanner
 	{
 		internal enum Resolution
 		{
-			WXGA,   // 1366x768
-			FHD,    // 1920x1080
-			QHD,    // 2560x1440
-			UHD,    // 3840x2160
+			WXGA,       // 1366x768
+			WXGAPlus,   // 1440x900
+			R1440x1080, // 1440x1080
+			HDPlus,     // 1600x900
+			FHD,        // 1920x1080
+			UWFHD,      // 2560x1080
+			QHD,        // 2560x1440
+			UWQHD,      // 3440x1440
+			UHD,        // 3840x2160
 		}
 
 		// Version
@@ -102,17 +107,38 @@ namespace RatScanner
 				switch (screenResolution)
 				{
 					case Resolution.WXGA: LoadWXGA(); break;
+					case Resolution.WXGAPlus: LoadWXGAPlus(); break;
+					case Resolution.R1440x1080: LoadR1440x1080(); break;
+					case Resolution.HDPlus: LoadHDPlus(); break;
 					case Resolution.FHD: LoadFHD(); break;
+					case Resolution.UWFHD: LoadUWFHD(); break;
 					case Resolution.QHD: LoadQHD(); break;
+					case Resolution.UWQHD: LoadUWQHD(); break;
 					case Resolution.UHD: LoadUHD(); break;
 					default: throw new ArgumentOutOfRangeException(nameof(value), "Unknown screen resolution");
 				}
 			}
 		}
 
+		#region Resolution presets
 		private static void LoadWXGA()
 		{
 			throw new NotImplementedException("No WXGA preset defined");
+		}
+
+		private static void LoadWXGAPlus()
+		{
+			throw new NotImplementedException("No WXGAPlus preset defined");
+		}
+
+		private static void LoadR1440x1080()
+		{
+			throw new NotImplementedException("No R1440x1080 preset defined");
+		}
+
+		private static void LoadHDPlus()
+		{
+			throw new NotImplementedException("No HDPlus preset defined");
 		}
 
 		private static void LoadFHD()
@@ -130,6 +156,11 @@ namespace RatScanner
 			ToolTip.HeightOffset = 5;
 		}
 
+		private static void LoadUWFHD()
+		{
+			throw new NotImplementedException("No UWFHD preset defined");
+		}
+
 		private static void LoadQHD()
 		{
 			NameScan.Marker = Resources.markerQHD;
@@ -143,6 +174,11 @@ namespace RatScanner
 			IconScan.ItemSlotSize = 84;
 
 			ToolTip.HeightOffset = 8;
+		}
+
+		private static void LoadUWQHD()
+		{
+			throw new NotImplementedException("No UWQHD preset defined");
 		}
 
 		private static void LoadUHD()
@@ -159,15 +195,21 @@ namespace RatScanner
 
 			ToolTip.HeightOffset = 10;
 		}
+		#endregion
 
 		internal static float GetScreenScaleFactor()
 		{
 			return ScreenResolution switch
 			{
 				Resolution.WXGA => 768f / 1080f,
-				Resolution.FHD => 1f,
+				Resolution.WXGAPlus => 900f / 1080f,
+				Resolution.R1440x1080 => 1080f / 1080f,
+				Resolution.HDPlus => 900f / 1080f,
+				Resolution.FHD => 1080f / 1080f,
+				Resolution.UWFHD => 1080f / 1080f,
 				Resolution.QHD => 1440f / 1080f,
-				Resolution.UHD => 2f,
+				Resolution.UWQHD => 1440f / 1080f,
+				Resolution.UHD => 2160f / 1080f,
 				_ => throw new InvalidOperationException("Unknown ScreenResolution"),
 			};
 		}
