@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -55,6 +56,14 @@ namespace RatScanner
 			}
 		}
 
+		internal static void LogDebugBitmap(Bitmap bitmap, string fileName = "bitmap")
+		{
+			if (RatConfig.LogDebug)
+			{
+				bitmap.Save(GetUniquePath(RatConfig.Paths.Debug, fileName, ".png"));
+			}
+		}
+
 		internal static void LogDebug(string message)
 		{
 			if (RatConfig.LogDebug) AppendToLog("[Debug] " + message);
@@ -102,7 +111,7 @@ namespace RatScanner
 
 		internal static void ClearDebugMats()
 		{
-			if(!Directory.Exists(RatConfig.Paths.Debug)) return;
+			if (!Directory.Exists(RatConfig.Paths.Debug)) return;
 
 			var files = Directory.GetFiles(RatConfig.Paths.Debug, "*.png");
 			foreach (var file in files)

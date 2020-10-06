@@ -135,6 +135,7 @@ namespace RatScanner
 
 		private bool IconScan(Vector2 mouseVector2)
 		{
+			Logger.LogDebug("Icon scanning at: " + mouseVector2);
 			if (ScanLock) return false;
 			ScanLock = true;
 

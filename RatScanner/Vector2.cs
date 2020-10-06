@@ -79,5 +79,10 @@ namespace RatScanner
 		{
 			return new Vector2(a.X / b, a.Y / b);
 		}
+
+		public override string ToString()
+		{
+			return $"({X}, {Y})";
+		}
 	}
 }

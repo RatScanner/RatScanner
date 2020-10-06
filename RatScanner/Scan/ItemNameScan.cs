@@ -46,6 +46,7 @@ namespace RatScanner.Scan
 
 		internal ItemNameScan(Bitmap capture, Vector2 mouseVector2)
 		{
+			Logger.LogDebug("Name scanning at: " + mouseVector2);
 			Capture = capture;
 			MousePos = mouseVector2;
 
@@ -66,6 +67,8 @@ namespace RatScanner.Scan
 			// No marker matched so we can stop the scan
 			// ContainsMarker => LocalMarkerPos != null;
 			if (!ContainsMarker) return;
+			Logger.LogDebug("Marker found! IsShortName: " + IsShortName);
+			Logger.ClearDebugMats();
 
 			// Calculate global marker position
 			MarkerPos = MousePos;
@@ -136,8 +139,11 @@ namespace RatScanner.Scan
 		// Convert image to text
 		private string OCR(Bitmap image)
 		{
+			Logger.LogDebugBitmap(image, "textSection");
+
 			// Resize bitmap
 			// We double the size to make the text fit the scale of our training data
+			Logger.LogDebug("Scaling image...");
 			var resizedImage = new Bitmap(image.Width * 2, image.Height * 2);
 
 			using (var gr = Graphics.FromImage(resizedImage))
@@ -150,6 +156,7 @@ namespace RatScanner.Scan
 				var srcRect = new Rectangle(0, 0, image.Width, image.Height);
 				gr.DrawImage(image, destRect, srcRect, GraphicsUnit.Pixel);
 			}
+			Logger.LogDebugBitmap(resizedImage, "resizedTextSection");
 
 			// Setup tesseract
 			string text;
@@ -157,15 +164,19 @@ namespace RatScanner.Scan
 			using (var mat = resizedImage.ToMat())
 			{
 				// Gray scale image
+				Logger.LogDebug("Gray scaling...");
 				var cvu83 = mat.CvtColor(ColorConversionCodes.BGR2GRAY, 1);
 
 				// Binarize image
+				Logger.LogDebug("Binarizing...");
 				cvu83 = cvu83.Threshold(120, 255, ThresholdTypes.BinaryInv);
 
 				// OCR
+				Logger.LogDebug("Applying OCR...");
 				ocrTesseractInstance.Run(cvu83, out text, out _, out _, out _, ComponentLevels.TextLine);
 			}
 
+			Logger.LogDebug("Read: " + text);
 			return text;
 		}
 
