@@ -76,9 +76,14 @@ namespace RatScanner
 			var index = 0;
 			var uniquePath = Path.Combine(basePath, fileName + index + extension);
 
-			while (File.Exists(uniquePath)) index += 1;
+			while (File.Exists(uniquePath))
+			{
+				index += 1;
+				uniquePath = Path.Combine(basePath, fileName + index + extension);
+			}
 
-			return Path.Combine(RatConfig.Paths.Debug, fileName + index + extension);
+			Directory.CreateDirectory(Path.GetDirectoryName(uniquePath));
+			return uniquePath;
 		}
 
 		private static void AppendToLog(string content)
