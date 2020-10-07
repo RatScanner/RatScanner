@@ -10,7 +10,7 @@ using System.Windows;
 
 namespace RatScanner
 {
-	internal class Logger
+	internal static class Logger
 	{
 		private const string LogFile = "Log.txt";
 		private static List<string> backlog = new List<string>();
