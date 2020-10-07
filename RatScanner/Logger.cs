@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Windows;
 
 namespace RatScanner
@@ -11,7 +13,7 @@ namespace RatScanner
 	internal class Logger
 	{
 		private const string LogFile = "Log.txt";
-		private static bool writeMutex = false;
+		private static List<string> backlog = new List<string>();
 
 		internal static void LogInfo(string message)
 		{
@@ -88,16 +90,45 @@ namespace RatScanner
 
 		private static void AppendToLog(string content)
 		{
+			ProcessBacklog();
+
 			var text = "[" + DateTime.UtcNow.ToUniversalTime().TimeOfDay + "] > " + content + "\n";
 
-			Debug.WriteLine(text);
-
-			if (!writeMutex)
+			try
 			{
-				writeMutex = true;
-				File.AppendAllText(LogFile, text, Encoding.UTF8);
-				writeMutex = false;
+				AppendToLogRaw(text);
 			}
+			catch (Exception e)
+			{
+				backlog.Add(text);
+				Thread.Sleep(250);
+				ProcessBacklog();
+			}
+		}
+
+		private static void ProcessBacklog()
+		{
+			var newBacklog = new List<string>();
+
+			foreach (var text in backlog)
+			{
+				try
+				{
+					AppendToLogRaw(text);
+				}
+				catch (Exception e)
+				{
+					newBacklog.Add(text);
+				}
+			}
+
+			backlog = newBacklog;
+		}
+
+		private static void AppendToLogRaw(string text)
+		{
+			Debug.WriteLine(text);
+			File.AppendAllText(LogFile, text, Encoding.UTF8);
 		}
 
 		internal static void Clear()
