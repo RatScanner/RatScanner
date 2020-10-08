@@ -49,7 +49,14 @@ namespace RatScanner.View
 
 			var settingsVM = (SettingsVM)DataContext;
 
+			// Pre saving stuff
+
+			var updateMarketDB = settingsVM.NameScanLanguage != (int)RatConfig.NameScan.Language;
+
+			// Save settings
+
 			RatConfig.NameScan.Enable = settingsVM.EnableNameScan;
+			RatConfig.NameScan.Language = (ApiManager.Language)settingsVM.NameScanLanguage;
 
 			RatConfig.IconScan.Enable = settingsVM.EnableIconScan;
 			RatConfig.IconScan.ScanRotatedIcons = settingsVM.ScanRotatedIcons;
@@ -77,6 +84,7 @@ namespace RatScanner.View
 
 			// Apply config
 			PageSwitcher.Instance.Topmost = RatConfig.AlwaysOnTop;
+			if (updateMarketDB) RatScannerMain.Instance.MarketDB.Init();
 
 			// Switch back to main menu
 			PageSwitcher.Instance.Navigate(new MainMenu());

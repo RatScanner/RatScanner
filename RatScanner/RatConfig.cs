@@ -56,6 +56,7 @@ namespace RatScanner
 		internal static class NameScan
 		{
 			internal static bool Enable = true;
+			internal static ApiManager.Language Language = ApiManager.Language.English;
 			internal static Bitmap Marker = Resources.markerFHD;
 			internal static Bitmap MarkerShort = Resources.markerShortFHD;
 			internal static float ConfWarnThreshold = 0.90f;
@@ -227,6 +228,7 @@ namespace RatScanner
 
 			var config = new SimpleConfig(Paths.ConfigFile);
 			NameScan.Enable = config.ReadBool(nameof(NameScan.Enable), true);
+			NameScan.Language = (ApiManager.Language)config.ReadInt(nameof(NameScan.Language), (int)ApiManager.Language.English);
 
 			IconScan.Enable = config.ReadBool(nameof(IconScan.Enable), true);
 			IconScan.ScanRotatedIcons = config.ReadBool(nameof(IconScan.ScanRotatedIcons), true);
@@ -245,7 +247,7 @@ namespace RatScanner
 			MinimalUi.ShowUpdated = config.ReadBool(nameof(MinimalUi.ShowUpdated), true);
 			MinimalUi.Opacity = config.ReadInt(nameof(MinimalUi.Opacity), 50);
 
-			ScreenResolution = (Resolution)config.ReadInt(nameof(ScreenResolution), 1);
+			ScreenResolution = (Resolution)config.ReadInt(nameof(ScreenResolution), (int)Resolution.FHD);
 			MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), false);
 			AlwaysOnTop = config.ReadBool(nameof(AlwaysOnTop), false);
 			LogDebug = config.ReadBool(nameof(LogDebug), false);
@@ -255,6 +257,7 @@ namespace RatScanner
 		{
 			var config = new SimpleConfig(Paths.ConfigFile);
 			config.WriteBool(nameof(NameScan.Enable), NameScan.Enable);
+			config.WriteInt(nameof(NameScan.Language), (int)NameScan.Language);
 
 			config.WriteBool(nameof(IconScan.Enable), IconScan.Enable);
 			config.WriteBool(nameof(IconScan.ScanRotatedIcons), IconScan.ScanRotatedIcons);

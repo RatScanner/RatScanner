@@ -11,7 +11,7 @@ namespace RatScanner
 
 		public void Init()
 		{
-			_items = ApiManager.GetMarketDB();
+			_items = ApiManager.GetMarketDB(RatConfig.NameScan.Language);
 		}
 
 		public MarketItem GetItemByUid(string uid)

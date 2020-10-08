@@ -172,6 +172,33 @@
 						</Grid.ColumnDefinitions>
 					</Grid>
 
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								Set the language according to your<LineBreak />
+								Escape from Tarkov language setting.</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0" Content="Name Scan Language" />
+						<ComboBox
+							Grid.Column="1"
+							Width="80"
+							Margin="5,0"
+							VerticalAlignment="Center"
+							SelectedValue="{Binding NameScanLanguage}"
+							SelectedValuePath="Tag">
+							<ComboBoxItem Content="English" Tag="0" />
+							<ComboBoxItem Content="Russian" Tag="1" />
+							<ComboBoxItem Content="German" Tag="2" />
+							<ComboBoxItem Content="French" Tag="3" />
+							<ComboBoxItem Content="Spanish" Tag="4" />
+							<ComboBoxItem Content="Chinese" Tag="5" />
+						</ComboBox>
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
 					<Separator />
 					<Grid>
 						<Grid.ToolTip>

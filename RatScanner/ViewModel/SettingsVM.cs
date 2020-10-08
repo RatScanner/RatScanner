@@ -5,6 +5,7 @@ namespace RatScanner.ViewModel
 	internal class SettingsVM : INotifyPropertyChanged
 	{
 		public bool EnableNameScan { get; set; }
+		public int NameScanLanguage { get; set; }
 
 		public bool EnableIconScan { get; set; }
 		public bool ScanRotatedIcons { get; set; }
@@ -31,6 +32,7 @@ namespace RatScanner.ViewModel
 		internal SettingsVM()
 		{
 			EnableNameScan = RatConfig.NameScan.Enable;
+			NameScanLanguage = (int)RatConfig.NameScan.Language;
 
 			EnableIconScan = RatConfig.IconScan.Enable;
 			ScanRotatedIcons = RatConfig.IconScan.ScanRotatedIcons;
