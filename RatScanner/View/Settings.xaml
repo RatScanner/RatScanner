@@ -4,8 +4,9 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	d:DesignHeight="400"
-	d:DesignWidth="300"
+	xmlns:ratScanner="clr-namespace:RatScanner"
+	d:DesignHeight="390"
+	d:DesignWidth="280"
 	x:ClassModifier="internal"
 	Background="#444444"
 	mc:Ignorable="d">
@@ -487,6 +488,53 @@
 							<ColumnDefinition Width="Auto" />
 						</Grid.ColumnDefinitions>
 					</Grid>
+				</StackPanel>
+			</TabItem>
+
+			<TabItem Header="Info">
+				<StackPanel>
+					<Grid>
+						<Label Grid.Column="0" Content="Rat Scanner" />
+						<Label Grid.Column="1" Content="{x:Static ratScanner:RatConfig.Version}" />
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+
+					<Separator />
+
+					<Label HorizontalAlignment="Center" Content="Attributions" />
+
+					<Separator />
+
+					<Label>
+						<Hyperlink NavigateUri="https://tarkov-market.com/" RequestNavigate="HyperlinkRequestNavigate">
+							<Underline>Tarkov Market</Underline>
+						</Hyperlink>
+					</Label>
+					<TextBlock Margin="5,0,5,5">API for flea market price data</TextBlock>
+
+					<Label>
+						<Hyperlink NavigateUri="https://github.com/shimat/opencvsharp" RequestNavigate="HyperlinkRequestNavigate">
+							<Underline>OpenCvSharp</Underline>
+						</Hyperlink>
+					</Label>
+					<TextBlock Margin="5,0,5,5">.Net wrapper for OpenCV</TextBlock>
+
+					<Label>
+						<Hyperlink NavigateUri="https://www.newtonsoft.com/json" RequestNavigate="HyperlinkRequestNavigate">
+							<Underline>Json.NET</Underline>
+						</Hyperlink>
+					</Label>
+					<TextBlock Margin="5,0,5,5">High-performance JSON framework for .NET</TextBlock>
+
+					<Separator />
+
+					<TextBlock Margin="5" TextWrapping="WrapWithOverflow">
+						Huge thanks to all Patrons who help me to make this project possible and keep it alive.
+					</TextBlock>
 				</StackPanel>
 			</TabItem>
 		</TabControl>

@@ -33,7 +33,7 @@ namespace RatScanner
 		};
 
 		// Version
-		internal static string Version = Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
+		public static string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
 
 		// Paths
 		internal static class Paths

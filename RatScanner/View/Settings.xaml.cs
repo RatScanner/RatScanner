@@ -1,7 +1,9 @@
-﻿using System.Threading;
+﻿using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Navigation;
 using RatScanner.ViewModel;
 
 namespace RatScanner.View
@@ -25,6 +27,12 @@ namespace RatScanner.View
 				while (RatScannerMain.Instance.ScanLock) Thread.Sleep(25);
 				RatScannerMain.Instance.ScanLock = true;
 			});
+		}
+
+		private void HyperlinkRequestNavigate(object sender, RequestNavigateEventArgs e)
+		{
+			Process.Start("explorer.exe", e.Uri.ToString());
+			e.Handled = true;
 		}
 
 		private void ClearIconCache(object sender, RoutedEventArgs e)
