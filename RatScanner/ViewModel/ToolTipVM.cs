@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Globalization;
+using System.Windows;
 using System.Windows.Media;
 using RatScanner.FetchModels;
 using RatScanner.Scan;
@@ -38,7 +39,7 @@ namespace RatScanner.ViewModel
 
 		public int IconAngle => DataSource is ItemIconScan scan && scan.Rotated ? 90 : 0;
 
-		public float ScaleFactor => RatConfig.GetScreenScaleFactor();
+		public float ScaleFactor => RatConfig.GetScreenScaleFactor() / GetScalingFactor();
 
 		public Brush WarningBrush
 		{
@@ -85,6 +86,14 @@ namespace RatScanner.ViewModel
 			var text = $"{value:n0}";
 			var numberGroupSeparator = NumberFormatInfo.CurrentInfo.NumberGroupSeparator;
 			return text.Replace(numberGroupSeparator, RatConfig.ToolTip.DigitGroupingSymbol);
+		}
+
+		// TODO improve reliability
+		private static float GetScalingFactor()
+		{
+			var virtualHeight = SystemParameters.VirtualScreenHeight;
+			var physicalHeight = SystemParameters.PrimaryScreenHeight;
+			return (float)virtualHeight / (float)physicalHeight;
 		}
 	}
 }
