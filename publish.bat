@@ -16,9 +16,9 @@ if "%isPresent%"=="F" (
 echo Removing old publish folder...
 rmdir /s /q publish
 
-:: Publish the solution
-echo Publishing the solution...
-dotnet publish -c Release -o publish --runtime win-x64 --self-contained false
+:: Publish RatScanner project
+echo Publishing RatScanner project...
+dotnet publish RatScanner/RatScanner.csproj -c Release -o publish --runtime win-x64 --self-contained false
 
 :: Copy data folder to publish directory
 echo Copying data folder to publish directory...
@@ -56,6 +56,14 @@ for /F "skip=2 delims=[] tokens=1,*" %%I in ('find /v /n "" "%SRC_FILE%"') do (
 del publish\RatScanner.deps.json
 
 rename publish\RatScanner.deps.json.tmp RatScanner.deps.json
+
+:: Build updater
+echo Building updater...
+MSBuild Updater/Updater.vcxproj /p:Configuration=Release /p:Platform=x64
+
+:: Copy updater binary to publish directory
+echo Copying updater binary into publish directory
+xcopy "Updater\build\x64\Release\Updater.exe" "publish\" /y /e /s /q
 
 :: Finalize publish
 echo Done^^!
