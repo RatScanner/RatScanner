@@ -51,7 +51,7 @@ namespace RatScanner
 
 		private static readonly Dictionary<ResourceType, string> ResCache = new Dictionary<ResourceType, string>();
 
-		private const string BaseUrl = "http://108.61.151.169:8080/api/v2";
+		private const string BaseUrl = "http://ratscanner.com:8080/api/v2";
 
 		public static MarketItem[] GetMarketDB(Language language = Language.English)
 		{
