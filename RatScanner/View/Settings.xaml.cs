@@ -1,7 +1,9 @@
-﻿using System.Threading;
+﻿using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Navigation;
 using RatScanner.ViewModel;
 
 namespace RatScanner.View
@@ -27,6 +29,12 @@ namespace RatScanner.View
 			});
 		}
 
+		private void HyperlinkRequestNavigate(object sender, RequestNavigateEventArgs e)
+		{
+			Process.Start("explorer.exe", e.Uri.ToString());
+			e.Handled = true;
+		}
+
 		private void ClearIconCache(object sender, RoutedEventArgs e)
 		{
 			IconManager.ClearIconCache();
@@ -49,7 +57,14 @@ namespace RatScanner.View
 
 			var settingsVM = (SettingsVM)DataContext;
 
+			// Pre saving stuff
+
+			var updateMarketDB = settingsVM.NameScanLanguage != (int)RatConfig.NameScan.Language;
+
+			// Save settings
+
 			RatConfig.NameScan.Enable = settingsVM.EnableNameScan;
+			RatConfig.NameScan.Language = (ApiManager.Language)settingsVM.NameScanLanguage;
 
 			RatConfig.IconScan.Enable = settingsVM.EnableIconScan;
 			RatConfig.IconScan.ScanRotatedIcons = settingsVM.ScanRotatedIcons;
@@ -77,6 +92,7 @@ namespace RatScanner.View
 
 			// Apply config
 			PageSwitcher.Instance.Topmost = RatConfig.AlwaysOnTop;
+			if (updateMarketDB) RatScannerMain.Instance.MarketDB.Init();
 
 			// Switch back to main menu
 			PageSwitcher.Instance.Navigate(new MainMenu());

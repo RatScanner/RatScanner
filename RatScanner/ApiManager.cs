@@ -11,6 +11,26 @@ namespace RatScanner
 {
 	public static class ApiManager
 	{
+		public enum Language
+		{
+			English,
+			Russian,
+			German,
+			French,
+			Spanish,
+			Chinese,
+		}
+
+		private static readonly Dictionary<Language, string> LanguageMapping = new Dictionary<Language, string>()
+		{
+			{Language.English, "en" },
+			{Language.Russian, "ru" },
+			{Language.German, "de" },
+			{Language.French, "fr" },
+			{Language.Spanish, "es" },
+			{Language.Chinese, "cn" },
+		};
+
 		public enum ResourceType
 		{
 			ClientVersion,
@@ -31,15 +51,16 @@ namespace RatScanner
 
 		private static readonly Dictionary<ResourceType, string> ResCache = new Dictionary<ResourceType, string>();
 
-		private const string BaseUrl = "http://108.61.151.169:8080/api/v2";
+		private const string BaseUrl = "http://ratscanner.com:8080/api/v2";
 
-		public static MarketItem[] GetMarketDB()
+		public static MarketItem[] GetMarketDB(Language language = Language.English)
 		{
 			try
 			{
 				using (var client = new WebClient())
 				{
-					var jsonGzipData = client.DownloadData(BaseUrl + "/all");
+					var langString = LanguageMapping[language];
+					var jsonGzipData = client.DownloadData($"{BaseUrl}/all?lang={langString}");
 					var json = ExtractGZip(jsonGzipData);
 
 					return JsonConvert.DeserializeObject<MarketItem[]>(json);

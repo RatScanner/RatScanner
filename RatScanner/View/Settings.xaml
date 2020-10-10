@@ -4,8 +4,9 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	d:DesignHeight="400"
-	d:DesignWidth="300"
+	xmlns:ratScanner="clr-namespace:RatScanner"
+	d:DesignHeight="390"
+	d:DesignWidth="280"
 	x:ClassModifier="internal"
 	Background="#444444"
 	mc:Ignorable="d">
@@ -74,13 +75,18 @@
 							VerticalAlignment="Center"
 							SelectedValue="{Binding ScreenResolution}"
 							SelectedValuePath="Tag">
-							<ComboBoxItem Content="WXGA" Tag="0" />
-							<ComboBoxItem Content="WXGA+" Tag="1" />
-							<ComboBoxItem Content="1440x1080" Tag="2" />
-							<ComboBoxItem Content="HD+" Tag="3" />
-							<ComboBoxItem Content="FHD" Tag="4" />
-							<ComboBoxItem Content="QHD" Tag="5" />
-							<ComboBoxItem Content="UHD" Tag="6" />
+							<ComboBoxItem Content="1366 x 768" Tag="0" />
+							<ComboBoxItem Content="1440 x 900" Tag="1" />
+							<ComboBoxItem Content="1440 x 1080" Tag="2" />
+							<ComboBoxItem Content="1600 x 900" Tag="3" />
+							<ComboBoxItem Content="1920 x 1080" Tag="4" />
+							<ComboBoxItem Content="2560 x 1080" Tag="7" />
+							<ComboBoxItem Content="3840 x 1080" Tag="8" />
+							<ComboBoxItem Content="2560 x 1440" Tag="5" />
+							<ComboBoxItem Content="3440 x 1440" Tag="9" />
+							<ComboBoxItem Content="5120 x 1440" Tag="10" />
+							<ComboBoxItem Content="3840 x 2160" Tag="6" />
+
 						</ComboBox>
 
 						<Grid.ColumnDefinitions>
@@ -172,6 +178,33 @@
 						</Grid.ColumnDefinitions>
 					</Grid>
 
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								Set the language according to your<LineBreak />
+								Escape from Tarkov language setting.</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0" Content="Name Scan Language" />
+						<ComboBox
+							Grid.Column="1"
+							Width="80"
+							Margin="5,0"
+							VerticalAlignment="Center"
+							SelectedValue="{Binding NameScanLanguage}"
+							SelectedValuePath="Tag">
+							<ComboBoxItem Content="English" Tag="0" />
+							<ComboBoxItem Content="Russian" Tag="1" />
+							<ComboBoxItem Content="German" Tag="2" />
+							<ComboBoxItem Content="French" Tag="3" />
+							<ComboBoxItem Content="Spanish" Tag="4" />
+							<ComboBoxItem Content="Chinese" Tag="5" />
+						</ComboBox>
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
 					<Separator />
 					<Grid>
 						<Grid.ToolTip>
@@ -460,6 +493,53 @@
 							<ColumnDefinition Width="Auto" />
 						</Grid.ColumnDefinitions>
 					</Grid>
+				</StackPanel>
+			</TabItem>
+
+			<TabItem Header="Info">
+				<StackPanel>
+					<Grid>
+						<Label Grid.Column="0" Content="Rat Scanner" />
+						<Label Grid.Column="1" Content="{x:Static ratScanner:RatConfig.Version}" />
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+
+					<Separator />
+
+					<Label HorizontalAlignment="Center" Content="Attributions" />
+
+					<Separator />
+
+					<Label>
+						<Hyperlink NavigateUri="https://tarkov-market.com/" RequestNavigate="HyperlinkRequestNavigate">
+							<Underline>Tarkov Market</Underline>
+						</Hyperlink>
+					</Label>
+					<TextBlock Margin="5,0,5,5">API for flea market price data</TextBlock>
+
+					<Label>
+						<Hyperlink NavigateUri="https://github.com/shimat/opencvsharp" RequestNavigate="HyperlinkRequestNavigate">
+							<Underline>OpenCvSharp</Underline>
+						</Hyperlink>
+					</Label>
+					<TextBlock Margin="5,0,5,5">.Net wrapper for OpenCV</TextBlock>
+
+					<Label>
+						<Hyperlink NavigateUri="https://www.newtonsoft.com/json" RequestNavigate="HyperlinkRequestNavigate">
+							<Underline>Json.NET</Underline>
+						</Hyperlink>
+					</Label>
+					<TextBlock Margin="5,0,5,5">High-performance JSON framework for .NET</TextBlock>
+
+					<Separator />
+
+					<TextBlock Margin="5" TextWrapping="WrapWithOverflow">
+						Huge thanks to all Patrons who help me to make this project possible and keep it alive.
+					</TextBlock>
 				</StackPanel>
 			</TabItem>
 		</TabControl>

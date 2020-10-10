@@ -1,7 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -88,12 +90,23 @@ namespace RatScanner
 			var mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ClientVersion);
 			if (RatConfig.Version != mostRecentVersion)
 			{
-				var message = "Version " + mostRecentVersion + " is available!\n";
-				message += "Get it from GitHub or join our Discord.\n\n";
-				message += "You are using: " + RatConfig.Version;
-				MessageBox.Show(message, "Rat Scanner Updater");
 				Logger.LogInfo("A new version is available: " + mostRecentVersion);
+
+				var message = "Version " + mostRecentVersion + " is available!\n";
+				message += "You are using: " + RatConfig.Version + "\n\n";
+				message += "Do you want to install it now?";
+				var result = MessageBox.Show(message, "Rat Scanner Updater", MessageBoxButtons.YesNo);
+				if (result == DialogResult.Yes) UpdateRatScanner();
 			}
+		}
+
+		private void UpdateRatScanner()
+		{
+			if (!File.Exists("Updater.exe")) Logger.LogError("Could not find Updater.exe! Please update manually.");
+			var startInfo = new ProcessStartInfo("Updater.exe");
+			startInfo.UseShellExecute = true;
+			Process.Start(startInfo);
+			Environment.Exit(0);
 		}
 
 		private void OnMouseEvent(object sender, MouseEventArgs e)
@@ -135,6 +148,7 @@ namespace RatScanner
 
 		private bool IconScan(Vector2 mouseVector2)
 		{
+			Logger.LogDebug("Icon scanning at: " + mouseVector2);
 			if (ScanLock) return false;
 			ScanLock = true;
 

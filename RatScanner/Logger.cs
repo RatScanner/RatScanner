@@ -1,16 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Windows;
 
 namespace RatScanner
 {
-	internal class Logger
+	internal static class Logger
 	{
 		private const string LogFile = "Log.txt";
-		private static bool writeMutex = false;
+		private static List<string> backlog = new List<string>();
 
 		internal static void LogInfo(string message)
 		{
@@ -55,6 +58,14 @@ namespace RatScanner
 			}
 		}
 
+		internal static void LogDebugBitmap(Bitmap bitmap, string fileName = "bitmap")
+		{
+			if (RatConfig.LogDebug)
+			{
+				bitmap.Save(GetUniquePath(RatConfig.Paths.Debug, fileName, ".png"));
+			}
+		}
+
 		internal static void LogDebug(string message)
 		{
 			if (RatConfig.LogDebug) AppendToLog("[Debug] " + message);
@@ -67,23 +78,57 @@ namespace RatScanner
 			var index = 0;
 			var uniquePath = Path.Combine(basePath, fileName + index + extension);
 
-			while (File.Exists(uniquePath)) index += 1;
+			while (File.Exists(uniquePath))
+			{
+				index += 1;
+				uniquePath = Path.Combine(basePath, fileName + index + extension);
+			}
 
-			return Path.Combine(RatConfig.Paths.Debug, fileName + index + extension);
+			Directory.CreateDirectory(Path.GetDirectoryName(uniquePath));
+			return uniquePath;
 		}
 
 		private static void AppendToLog(string content)
 		{
+			ProcessBacklog();
+
 			var text = "[" + DateTime.UtcNow.ToUniversalTime().TimeOfDay + "] > " + content + "\n";
 
-			Debug.WriteLine(text);
-
-			if (!writeMutex)
+			try
 			{
-				writeMutex = true;
-				File.AppendAllText(LogFile, text, Encoding.UTF8);
-				writeMutex = false;
+				AppendToLogRaw(text);
 			}
+			catch (Exception e)
+			{
+				backlog.Add(text);
+				Thread.Sleep(250);
+				ProcessBacklog();
+			}
+		}
+
+		private static void ProcessBacklog()
+		{
+			var newBacklog = new List<string>();
+
+			foreach (var text in backlog)
+			{
+				try
+				{
+					AppendToLogRaw(text);
+				}
+				catch (Exception e)
+				{
+					newBacklog.Add(text);
+				}
+			}
+
+			backlog = newBacklog;
+		}
+
+		private static void AppendToLogRaw(string text)
+		{
+			Debug.WriteLine(text);
+			File.AppendAllText(LogFile, text, Encoding.UTF8);
 		}
 
 		internal static void Clear()
@@ -102,7 +147,7 @@ namespace RatScanner
 
 		internal static void ClearDebugMats()
 		{
-			if(!Directory.Exists(RatConfig.Paths.Debug)) return;
+			if (!Directory.Exists(RatConfig.Paths.Debug)) return;
 
 			var files = Directory.GetFiles(RatConfig.Paths.Debug, "*.png");
 			foreach (var file in files)

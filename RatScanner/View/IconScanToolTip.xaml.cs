@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.Windows.Interop;
 using RatScanner.Scan;
 using RatScanner.ViewModel;
+using Point = System.Windows.Point;
 
 namespace RatScanner.View
 {
@@ -22,7 +23,7 @@ namespace RatScanner.View
 
 		private static ItemScan itemScan;
 
-		private static Vector2 vector2;
+		private static Vector2 position;
 
 		private static bool forceUpdate;
 
@@ -31,7 +32,7 @@ namespace RatScanner.View
 		internal static void ScheduleShow(ItemScan sItem, Vector2 pos, int duration)
 		{
 			itemScan = sItem;
-			vector2 = pos;
+			position = pos;
 
 			var timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds();
 			hideAfter = timestamp + duration;
@@ -63,8 +64,9 @@ namespace RatScanner.View
 			forceUpdate = false;
 
 			DataContext = new ToolTipVM(itemScan);
-			Left = vector2.X;
-			Top = vector2.Y;
+			var devicePosition = FromDevicePixels(position);
+			Left = devicePosition.X;
+			Top = devicePosition.Y;
 
 			Show();
 		}
@@ -74,6 +76,15 @@ namespace RatScanner.View
 			base.OnSourceInitialized(e);
 			var hwnd = new WindowInteropHelper(this).Handle;
 			WindowsServices.SetWindowExTransparent(hwnd);
+		}
+
+		private Vector2 FromDevicePixels(Vector2 size)
+		{
+			var source = PresentationSource.FromVisual(this);
+			var transformMatrix = source.CompositionTarget.TransformFromDevice;
+
+			var pixels = transformMatrix.Transform(new Point(size.X, size.Y));
+			return new Vector2((int)pixels.X, (int)pixels.Y);
 		}
 	}
 }
