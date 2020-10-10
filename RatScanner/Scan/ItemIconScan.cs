@@ -70,7 +70,7 @@ namespace RatScanner.Scan
 			Logger.LogDebugMat(croppedIcon, "cropped_icon");
 
 			// Rescale captured icon if resolution is not FHD
-			if (RatConfig.ScreenResolution != RatConfig.Resolution.FHD)
+			if (RatConfig.ScreenResolution != RatConfig.Resolution.R1920x1080)
 			{
 				var invSSF = RatConfig.GetInverseScreenScaleFactor();
 				var croppedSize = new Size(croppedIcon.Width * invSSF, croppedIcon.Height * invSSF);

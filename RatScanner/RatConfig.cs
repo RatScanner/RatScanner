@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Windows.Forms;
 using RatScanner.Properties;
 
 namespace RatScanner
@@ -12,24 +13,32 @@ namespace RatScanner
 	{
 		internal enum Resolution
 		{
-			WXGA,       // 1366x768
-			WXGAPlus,   // 1440x900
-			R1440x1080, // 1440x1080
-			HDPlus,     // 1600x900
-			FHD,        // 1920x1080
-			QHD,        // 2560x1440
-			UHD,        // 3840x2160
+			R1366x768  = 0,
+			R1440x900  = 1,
+			R1440x1080 = 2,
+			R1600x900  = 3,
+			R1920x1080 = 4,
+			R2560x1440 = 5,
+			R3840x2160 = 6,
+			R2560x1080 = 7,
+			R3840x1080 = 8,
+			R3440x1440 = 9,
+			R5120x1440 = 10
 		}
 
 		internal static Dictionary<Resolution, Vector2> ResolutionDict = new Dictionary<Resolution, Vector2>()
 		{
-			{Resolution.WXGA, new Vector2(1366, 768)},
-			{Resolution.WXGAPlus, new Vector2(1440, 900)},
+			{Resolution.R1366x768, new Vector2(1366,  768)},
+			{Resolution.R1440x900, new Vector2(1440,  900)},
 			{Resolution.R1440x1080, new Vector2(1440, 1080)},
-			{Resolution.HDPlus, new Vector2(1600, 900)},
-			{Resolution.FHD, new Vector2(1920, 1080)},
-			{Resolution.QHD, new Vector2(2560, 1440)},
-			{Resolution.UHD, new Vector2(3840, 2160)},
+			{Resolution.R1600x900, new Vector2(1600,  900)},
+			{Resolution.R1920x1080, new Vector2(1920, 1080)},
+			{Resolution.R2560x1440, new Vector2(2560, 1440)},
+			{Resolution.R3840x2160, new Vector2(3840, 2160)},
+			{Resolution.R2560x1080, new Vector2(2560, 1080)},
+			{Resolution.R3840x1080, new Vector2(3840, 1080)},
+			{Resolution.R3440x1440, new Vector2(3440, 1440)},
+			{Resolution.R5120x1440, new Vector2(5210, 1440)},
 		};
 
 		// Version
@@ -108,7 +117,7 @@ namespace RatScanner
 		internal static bool MinimizeToTray = false;
 		internal static bool AlwaysOnTop = true;
 
-		private static Resolution screenResolution = Resolution.FHD;
+		private static Resolution screenResolution = Resolution.R1920x1080;
 		internal static Resolution ScreenResolution
 		{
 			get => screenResolution;
@@ -117,13 +126,17 @@ namespace RatScanner
 				screenResolution = value;
 				switch (screenResolution)
 				{
-					case Resolution.WXGA: LoadWXGA(); break;
-					case Resolution.WXGAPlus: LoadWXGAPlus(); break;
+					case Resolution.R1366x768:  LoadWXGA(); break;
+					case Resolution.R1440x900:  LoadWXGAPlus(); break;
 					case Resolution.R1440x1080: LoadR1440x1080(); break;
-					case Resolution.HDPlus: LoadHDPlus(); break;
-					case Resolution.FHD: LoadFHD(); break;
-					case Resolution.QHD: LoadQHD(); break;
-					case Resolution.UHD: LoadUHD(); break;
+					case Resolution.R1600x900:  LoadHDPlus(); break;
+					case Resolution.R1920x1080: LoadFHD(); break;
+					case Resolution.R2560x1080: LoadFHD(); break;
+					case Resolution.R3840x1080: LoadFHD(); break;
+					case Resolution.R2560x1440: LoadQHD(); break;
+					case Resolution.R3440x1440: LoadQHD(); break;
+					case Resolution.R5120x1440: LoadQHD(); break;
+					case Resolution.R3840x2160: LoadUHD(); break;
 					default: throw new ArgumentOutOfRangeException(nameof(value), "Unknown screen resolution");
 				}
 
@@ -206,14 +219,14 @@ namespace RatScanner
 		{
 			return ScreenResolution switch
 			{
-				Resolution.WXGA => 768f / 1080f,
-				Resolution.WXGAPlus => 900f / 1080f,
-				Resolution.R1440x1080 => 1440f / 1920f,
-				Resolution.HDPlus => 900f / 1080f,
-				Resolution.FHD => 1080f / 1080f,
-				Resolution.QHD => 1440f / 1080f,
-				Resolution.UHD => 2160f / 1080f,
-				_ => throw new InvalidOperationException("Unknown ScreenResolution"),
+		       Resolution.R1366x768  => 768f  / 1080f,
+		       Resolution.R1440x900  => 900f  / 1080f,
+		       Resolution.R1440x1080 => 1440f / 1920f,
+		       Resolution.R1600x900  => 900f  / 1080f,
+		       Resolution.R1920x1080 => 1080f / 1080f,
+		       Resolution.R2560x1440 => 1440f / 1080f,
+		       Resolution.R3840x2160 => 2160f / 1080f,
+		       _                     => throw new InvalidOperationException("Unknown ScreenResolution"),
 			};
 		}
 
@@ -224,7 +237,11 @@ namespace RatScanner
 
 		internal static void LoadConfig()
 		{
-			if (!File.Exists(Paths.ConfigFile)) SaveConfig();
+			if (!File.Exists(Paths.ConfigFile))
+			{
+				TrySetScreenResolution();
+				SaveConfig();
+			}
 
 			var config = new SimpleConfig(Paths.ConfigFile);
 			NameScan.Enable = config.ReadBool(nameof(NameScan.Enable), true);
@@ -247,7 +264,7 @@ namespace RatScanner
 			MinimalUi.ShowUpdated = config.ReadBool(nameof(MinimalUi.ShowUpdated), true);
 			MinimalUi.Opacity = config.ReadInt(nameof(MinimalUi.Opacity), 50);
 
-			ScreenResolution = (Resolution)config.ReadInt(nameof(ScreenResolution), (int)Resolution.FHD);
+			ScreenResolution = (Resolution)config.ReadInt(nameof(ScreenResolution), (int)Resolution.R1920x1080);
 			MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), false);
 			AlwaysOnTop = config.ReadBool(nameof(AlwaysOnTop), false);
 			LogDebug = config.ReadBool(nameof(LogDebug), false);
@@ -280,6 +297,20 @@ namespace RatScanner
 			config.WriteBool(nameof(MinimizeToTray), MinimizeToTray);
 			config.WriteBool(nameof(AlwaysOnTop), AlwaysOnTop);
 			config.WriteBool(nameof(LogDebug), LogDebug);
+		}
+
+		/// <summary>
+		/// Converts PrimaryScreen resolution to Resolution enum, sets screenResolution if a match is found
+		/// </summary>
+		internal static void TrySetScreenResolution()
+		{
+			var boundsRectangle = Screen.PrimaryScreen.Bounds;
+			var resolutionString = $"R{boundsRectangle.Width}x{boundsRectangle.Height}";
+			Enum.TryParse(typeof(Resolution), resolutionString, out var matchingResolution);
+			if (matchingResolution != null)
+			{
+				screenResolution = (Resolution) matchingResolution;
+			}
 		}
 	}
 }
