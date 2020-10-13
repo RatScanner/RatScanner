@@ -150,11 +150,7 @@ namespace RatScanner
 			NameScan.MarkerScanSize = Math.Max(marker.Width, marker.Height) * 3;
 			NameScan.TextHorizontalOffset = (int)(marker.Width * 1.2f);
 			NameScan.TextHeight = marker.Height;
-
-			var screenDimension = ResolutionDict[ScreenResolution];
-			var textWidth1 = (int)((screenDimension.X / 1920f) * 600f);
-			var textWidth2 = (int)((screenDimension.Y / 1080f) * 600f);
-			NameScan.TextWidth = Math.Min(textWidth1, textWidth2);
+			NameScan.TextWidth = (int)(GetScreenScaleFactor() * 600f);
 		}
 
 		#region Resolution presets
@@ -217,17 +213,12 @@ namespace RatScanner
 
 		internal static float GetScreenScaleFactor()
 		{
-			return ScreenResolution switch
-			{
-		       Resolution.R1366x768  => 768f  / 1080f,
-		       Resolution.R1440x900  => 900f  / 1080f,
-		       Resolution.R1440x1080 => 1440f / 1920f,
-		       Resolution.R1600x900  => 900f  / 1080f,
-		       Resolution.R1920x1080 => 1080f / 1080f,
-		       Resolution.R2560x1440 => 1440f / 1080f,
-		       Resolution.R3840x2160 => 2160f / 1080f,
-		       _                     => throw new InvalidOperationException("Unknown ScreenResolution"),
-			};
+			var screenDimension = ResolutionDict[ScreenResolution];
+
+			var screenScaleFactor1 = screenDimension.X / 1920f;
+			var screenScaleFactor2 = screenDimension.Y / 1080f;
+
+			return Math.Min(screenScaleFactor1, screenScaleFactor2);
 		}
 
 		internal static float GetInverseScreenScaleFactor()

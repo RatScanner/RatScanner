@@ -163,7 +163,7 @@ int main(int argc, char* argv[])
 
 	// Extract new files
 	std::cout << "Extracting files..." << std::endl;
-	auto ret_code = system("7za.exe x RatScanner.zip");
+	auto ret_code = system("7za.exe -aos x RatScanner.zip");
 
 	if (ret_code != 0)
 	{
