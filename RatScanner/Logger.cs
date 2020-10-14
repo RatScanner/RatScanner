@@ -12,7 +12,6 @@ namespace RatScanner
 {
 	internal static class Logger
 	{
-		private const string LogFile = "Log.txt";
 		private static List<string> backlog = new List<string>();
 
 		internal static void LogInfo(string message)
@@ -128,12 +127,12 @@ namespace RatScanner
 		private static void AppendToLogRaw(string text)
 		{
 			Debug.WriteLine(text);
-			File.AppendAllText(LogFile, text, Encoding.UTF8);
+			File.AppendAllText(RatConfig.Paths.LogFile, text, Encoding.UTF8);
 		}
 
 		internal static void Clear()
 		{
-			File.Delete(LogFile);
+			File.Delete(RatConfig.Paths.LogFile);
 		}
 
 		internal static void ClearMats(string pattern = "*.png")
@@ -182,7 +181,7 @@ namespace RatScanner
 
 		private static string ReadAll()
 		{
-			return File.ReadAllText(LogFile, Encoding.UTF8);
+			return File.ReadAllText(RatConfig.Paths.LogFile, Encoding.UTF8);
 		}
 	}
 }
