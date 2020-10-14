@@ -94,6 +94,15 @@ std::string get_resource(std::string resource)
 	return nlohmann::json::parse(body)["value"];
 }
 
+void disable_quick_edit()
+{
+	HANDLE hInput;
+	DWORD prev_mode;
+	hInput = GetStdHandle(STD_INPUT_HANDLE);
+	GetConsoleMode(hInput, &prev_mode);
+	SetConsoleMode(hInput, prev_mode & ENABLE_EXTENDED_FLAGS);
+}
+
 int main(int argc, char* argv[])
 {
 	// Check arguments
@@ -117,6 +126,9 @@ int main(int argc, char* argv[])
 		getchar();
 		return ERROR_BAD_ARGUMENTS;
 	}
+
+	// Disable quick edit mode to prevent blocking
+	disable_quick_edit();
 
 	// Get executing path
 	auto executing_path = ((fs::path)argv[0]).remove_filename();
