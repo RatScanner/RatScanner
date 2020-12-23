@@ -245,5 +245,8 @@ namespace RatScanner
 		{
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		}
+
+		
 	}
+
 }

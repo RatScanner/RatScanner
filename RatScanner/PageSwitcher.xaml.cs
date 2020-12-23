@@ -13,7 +13,7 @@ namespace RatScanner
 	public partial class PageSwitcher : Window
 	{
 		private const int WindowWidth = 280;
-		private const int WindowHeight = 390;
+		private const int WindowHeight = 410;
 
 		private NotifyIcon _notifyIcon;
 
@@ -140,6 +140,6 @@ namespace RatScanner
 		internal void SetBackgroundOpacity(float opacity)
 		{
 			Background.Opacity = Math.Clamp(opacity, (1f / 510f), 1f);
-		}
+		}		
 	}
 }

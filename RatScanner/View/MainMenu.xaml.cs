@@ -33,6 +33,26 @@ namespace RatScanner.View
 			throw new System.NotImplementedException();
 		}
 
+		private void CheckLanguage()
+		{
+			switch (lgCombo.SelectedItem)
+			{
+				default:
+					 lgCombo.Tag = 0;
+				break;					
+				case "FR":
+						TranslateFR();
+				break;
+			}
+		}
+
+		private void TranslateFR()
+		{
+
+		}
+
+
 		public void OnClose() { }
+
 	}
 }
