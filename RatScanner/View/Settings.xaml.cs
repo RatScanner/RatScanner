@@ -14,6 +14,7 @@ namespace RatScanner.View
 	internal partial class Settings : UserControl, ISwitchable
 	{
 		private readonly Task scanLockTask;
+		public int returnLg;
 
 		internal Settings(int lgIndex)
 		{
@@ -32,12 +33,15 @@ namespace RatScanner.View
 			{
 				default:
 					lgIndex = 0;
+					returnLg = 0;
 				break;
 				case 0:
 					TranslateEN();
+					returnLg = 0;
 					break;
 				case 3:
 					TranslateFR();
+					returnLg = 3;
 					break;
 
 			}
@@ -47,6 +51,7 @@ namespace RatScanner.View
 		{
 			Process.Start("explorer.exe", e.Uri.ToString());
 			e.Handled = true;
+			
 		}
 
 		private void ClearIconCache(object sender, RoutedEventArgs e)
@@ -58,7 +63,7 @@ namespace RatScanner.View
 		private void CloseSettings(object sender, RoutedEventArgs e)
 		{
 			// Switch back to main menu
-			PageSwitcher.Instance.Navigate(new MainMenu());
+			PageSwitcher.Instance.Navigate(new MainMenu(returnLg));
 		}
 
 		private void SaveSettings(object sender, RoutedEventArgs e)
@@ -109,7 +114,7 @@ namespace RatScanner.View
 			if (updateMarketDB) RatScannerMain.Instance.MarketDB.Init();
 
 			// Switch back to main menu
-			PageSwitcher.Instance.Navigate(new MainMenu());
+			PageSwitcher.Instance.Navigate(new MainMenu(returnLg));
 		}
 
 		public void UtilizeState(object state)

@@ -11,13 +11,14 @@ namespace RatScanner.View
 	/// </summary>
 	internal partial class MainMenu : UserControl, ISwitchable
 	{
-		internal MainMenu()
+		internal MainMenu(int lgIndex)
 		{
 			InitializeComponent();
+			lgCombo.SelectedIndex = lgIndex;
 			CheckLanguage();
-
+			
 			DataContext = new MainWindowVM(RatScannerMain.Instance);			
-			//lgCombo.SelectedIndex = 0;
+			
 		}
 
 		private void HyperlinkRequestNavigate(object sender, RequestNavigateEventArgs e)
