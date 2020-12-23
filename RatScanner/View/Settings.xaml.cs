@@ -15,7 +15,7 @@ namespace RatScanner.View
 	{
 		private readonly Task scanLockTask;
 
-		internal Settings()
+		internal Settings(int lgIndex)
 		{
 			InitializeComponent();
 			DataContext = new SettingsVM();
@@ -27,6 +27,20 @@ namespace RatScanner.View
 				while (RatScannerMain.Instance.ScanLock) Thread.Sleep(25);
 				RatScannerMain.Instance.ScanLock = true;
 			});
+
+			switch (lgIndex)
+			{
+				default:
+					lgIndex = 0;
+				break;
+				case 0:
+					TranslateEN();
+					break;
+				case 3:
+					TranslateFR();
+					break;
+
+			}
 		}
 
 		private void HyperlinkRequestNavigate(object sender, RequestNavigateEventArgs e)
@@ -113,5 +127,32 @@ namespace RatScanner.View
 			// Release scan lock
 			RatScannerMain.Instance.ScanLock = false;
 		}
+
+		private void TranslateEN()
+		{
+			// General
+			GeneralHeader.Content = "General";
+
+			ToolTipDurationLabel.Content = "ToolTip Duration";
+			ResolutionLabel.Content = "Resolution";
+			MinimizeToTrayLabel.Content = "Minimize to Tray";
+			AlwaysOnTopLabel.Content = "Always on Top";
+			LogDebugInfoLabel.Content = "Log Debug Info";
+		}
+
+		private void TranslateFR()
+		{
+			// General
+			GeneralHeader.Content = "Général";
+
+			ToolTipDurationLabel.Content = "Durée du ToolTip";
+			ResolutionLabel.Content = "Résolution";
+			MinimizeToTrayLabel.Content = "Réduire dans le systray";
+			AlwaysOnTopLabel.Content = "Toujours Visible";
+			LogDebugInfoLabel.Content = "Garder les infos de debug";
+		}
+
+
+
 	}
 }

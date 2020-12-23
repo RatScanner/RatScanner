@@ -28,7 +28,32 @@ namespace RatScanner.View
 
 		private void OpenSettingsWindow(object sender, RoutedEventArgs e)
 		{
-			PageSwitcher.Instance.Navigate(new Settings());
+			switch (lgCombo.SelectedIndex)
+			{
+				default:
+					lgCombo.SelectedIndex = 0;
+					break;
+				case 0:
+					PageSwitcher.Instance.Navigate(new Settings(0));
+					break;
+				case 1:
+					PageSwitcher.Instance.Navigate(new Settings(1));
+					break;
+				case 2:
+					PageSwitcher.Instance.Navigate(new Settings(2));
+					break;
+				case 3:
+					PageSwitcher.Instance.Navigate(new Settings(3));
+					break;
+				case 4:
+					PageSwitcher.Instance.Navigate(new Settings(4));
+					break;
+				case 5:
+					PageSwitcher.Instance.Navigate(new Settings(5));
+					break;
+			}
+			
+			
 		}
 
 		public void UtilizeState(object state)
@@ -43,15 +68,35 @@ namespace RatScanner.View
 				default:
 					lgCombo.SelectedIndex = 0;
 					break;
+				case 0:
+					TranslateEN();
+					break;
 				case 3:
 					TranslateFR();
 				break;
 			}
 		}
 
+		private void TranslateEN()
+		{
+			///MainMenu
+			PriceLabel.Content = "Price";
+			AvgDayPriceLabel.Content = "Average Day Price";
+			AvgWeekPriceLabel.Content = "Average Week Price";
+			PricePerSlotLabel.Content = "Price per Slot";
+
+			TraderLabel.Content = "Trader";
+			BuyPriceLabel.Content = "Buy Price";
+
+			LinksLabel.Content = "Links";
+
+			UpdatedLabel.Content = "Updated";
+			LanguageLabel.Content = "Language";
+		}
+
 		private void TranslateFR()
 		{
-			/// MainMenu
+			// MainMenu
 			PriceLabel.Content = "Prix";
 			AvgDayPriceLabel.Content = "Prix Moyen - Journée";
 			AvgWeekPriceLabel.Content = "Prix Moyen - Semaine";
@@ -65,15 +110,18 @@ namespace RatScanner.View
 			UpdatedLabel.Content = "Dernière MaJ";
 			LanguageLabel.Content = "Langue";
 
+			//Settings
 			
 		}
-
-		public void OnClose() { }
 
 		private void lgCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			CheckLanguage();
 			
 		}
+
+		public void OnClose() { }
+
+	
 	}
 }
