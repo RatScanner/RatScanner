@@ -30,7 +30,7 @@ namespace RatScanner
 
 				InitializeComponent();
 				ResetWindowSize();
-				Navigate(new MainMenu());
+				Navigate(new MainMenu(0));
 				AddTrayIcon();
 
 				Topmost = RatConfig.AlwaysOnTop;

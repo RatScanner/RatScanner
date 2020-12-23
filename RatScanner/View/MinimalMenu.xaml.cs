@@ -39,7 +39,7 @@ namespace RatScanner.View
 
 		private void OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
-			PageSwitcher.Instance.Navigate(new MainMenu());
+			PageSwitcher.Instance.Navigate(new MainMenu(0));
 			PageSwitcher.Instance.ShowTitleBar();
 			PageSwitcher.Instance.ResetWindowSize();
 			PageSwitcher.Instance.SetBackgroundOpacity(1);
