@@ -14,6 +14,7 @@ namespace RatScanner.View
 		internal MainMenu()
 		{
 			InitializeComponent();
+			CheckLanguage();
 			DataContext = new MainWindowVM(RatScannerMain.Instance);
 		}
 
@@ -33,6 +34,41 @@ namespace RatScanner.View
 			throw new System.NotImplementedException();
 		}
 
+		public void CheckLanguage()
+		{
+			switch (lgCombo.SelectedItem)
+			{
+				default:
+					lgCombo.SelectedItem = "EN";
+					break;
+				case "FR":
+					TranslateFR();
+				break;
+			}
+		}
+
+		private void TranslateFR()
+		{
+			/// MainMenu
+			PriceLabel.Content = "Prix";
+			AvgDayPriceLabel.Content = "Prix Moyen - Journée";
+			AvgWeekPriceLabel.Content = "Prix Moyen - Semaine";
+			PricePerSlotLabel.Content = "Prix par Case";
+
+			TraderLabel.Content = "Marchand";
+			BuyPriceLabel.Content = "Prix d'achat";
+
+			LinksLabel.Content = "Liens";
+
+			UpdatedLabel.Content = "Dernière MaJ";
+			LanguageLabel.Content = "Langue";
+		}
+
 		public void OnClose() { }
+
+		private void lgCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			CheckLanguage();
+		}
 	}
 }

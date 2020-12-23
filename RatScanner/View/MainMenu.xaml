@@ -82,7 +82,7 @@
 			<StackPanel>
 				<Separator />
 				<Grid Margin="0,5,0,0">
-					<Label Grid.Column="0" Content="Price" />
+					<Label Grid.Column="0" Content="Price" Name="PriceLabel" />
 					<Label Grid.Column="1" Content="{Binding Price}" />
 
 					<Grid.ColumnDefinitions>
@@ -92,7 +92,7 @@
 				</Grid>
 
 				<Grid>
-					<Label Grid.Column="0" Content="Average Day Price" />
+					<Label Grid.Column="0" Content="Average Day Price" Name="AvgDayPriceLabel" />
 					<Label
 						Grid.Column="1"
 						Content="{Binding Diff24h}"
@@ -120,7 +120,7 @@
 				</Grid>
 
 				<Grid>
-					<Label Grid.Column="0" Content="Average Week Price" />
+					<Label Grid.Column="0" Content="Average Week Price" Name="AvgWeekPriceLabel" />
 					<Label
 						Grid.Column="1"
 						Content="{Binding Diff7d}"
@@ -148,7 +148,7 @@
 				</Grid>
 
 				<Grid Margin="0,5">
-					<Label Grid.Column="0" Content="Price per Slot" />
+					<Label Grid.Column="0" Content="Price per Slot" Name="PricePerSlotLabel" />
 					<Label Grid.Column="1" Content="{Binding PricePerSlot}" />
 
 					<Grid.ColumnDefinitions>
@@ -161,7 +161,7 @@
 			<StackPanel>
 				<Separator />
 				<Grid Margin="0,5,0,0">
-					<Label Grid.Column="0" Content="Trader" />
+					<Label Grid.Column="0" Content="Trader" Name="TraderLabel" />
 					<Label Grid.Column="1" Content="{Binding TraderName}" />
 
 					<Grid.ColumnDefinitions>
@@ -171,7 +171,7 @@
 				</Grid>
 
 				<Grid Margin="0,0,0,5">
-					<Label Grid.Column="0" Content="Buy Price" />
+					<Label Grid.Column="0" Content="Buy Price" Name="BuyPriceLabel" />
 					<Label Grid.Column="1" Content="{Binding TraderPrice}" />
 
 					<Grid.ColumnDefinitions>
@@ -195,7 +195,7 @@
 				<Separator />
 
 				<Grid Margin="0,5">
-					<Label Grid.Column="0" Content="Links" />
+					<Label Grid.Column="0" Content="Links" Name="LinksLabel" />
 					<TextBlock
 						Grid.Column="1"
 						Margin="0,0,5,0"
@@ -218,16 +218,42 @@
 					<Label
 						Grid.Column="0"
 						Content="Updated"
-						FontSize="10" />
+						FontSize="10"
+						Name="UpdatedLabel"					/>
 					<Label
 						Grid.Column="1"
 						Content="{Binding Updated}"
 						FontSize="10" />
+					<Label
+						Grid.Row="1"
+						Content="Language"
+						Name="LanguageLabel"					
+						FontSize="10"/>
+					<ComboBox
+											Width="80"
+											SelectionChanged="lgCombo_SelectionChanged"
+											Name="lgCombo"
+											Grid.Row="1"
+											Grid.Column="1">
+						<ComboBoxItem Content="EN" Tag="0" />
+						<ComboBoxItem Content="RU" Tag="1" />
+						<ComboBoxItem Content="DE" Tag="2" />
+						<ComboBoxItem Content="FR" Tag="3" />
+						<ComboBoxItem Content="ES" Tag="4" />
+						<ComboBoxItem Content="ZH" Tag="5" />
+					</ComboBox>
 
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*" />
 						<ColumnDefinition Width="Auto" />
 					</Grid.ColumnDefinitions>
+
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+					</Grid.RowDefinitions>
+
+					
 				</Grid>
 			</StackPanel>
 		</StackPanel>
