@@ -471,10 +471,10 @@
                 </StackPanel>
             </TabItem>
 
-            <TabItem Header="Info">
+            <TabItem Header="Info" Name="InfoHeader">
                 <StackPanel>
                     <Grid>
-                        <Label Grid.Column="0" Content="Rat Scanner" />
+                        <Label Grid.Column="0" Content="Rat Scanner" Name="AppNameLabel"/>
                         <Label Grid.Column="1" Content="{x:Static ratScanner:RatConfig.Version}" />
 
                         <Grid.ColumnDefinitions>
@@ -485,7 +485,7 @@
 
                     <Separator />
 
-                    <Label HorizontalAlignment="Center" Content="Attributions" />
+                    <Label HorizontalAlignment="Center" Content="Attributions" Name="AttributionsLabel" />
 
                     <Separator />
 
@@ -494,25 +494,25 @@
                             <Underline>Tarkov Market</Underline>
                         </Hyperlink>
                     </Label>
-                    <TextBlock Margin="5,0,5,5">API for flea market price data</TextBlock>
+                    <TextBlock Name="APIText" Margin="5,0,5,5">API for flea market price data</TextBlock>
 
                     <Label>
                         <Hyperlink NavigateUri="https://github.com/shimat/opencvsharp" RequestNavigate="HyperlinkRequestNavigate">
                             <Underline>OpenCvSharp</Underline>
                         </Hyperlink>
                     </Label>
-                    <TextBlock Margin="5,0,5,5">.Net wrapper for OpenCV</TextBlock>
+                    <TextBlock Name="OpenCvText" Margin="5,0,5,5">.Net wrapper for OpenCV</TextBlock>
 
                     <Label>
                         <Hyperlink NavigateUri="https://www.newtonsoft.com/json" RequestNavigate="HyperlinkRequestNavigate">
                             <Underline>Json.NET</Underline>
                         </Hyperlink>
                     </Label>
-                    <TextBlock Margin="5,0,5,5">High-performance JSON framework for .NET</TextBlock>
+                    <TextBlock Name="JsonText" Margin="5,0,5,5">High-performance JSON framework for .NET</TextBlock>
 
                     <Separator />
 
-                    <TextBlock Margin="5" TextWrapping="WrapWithOverflow">
+                    <TextBlock Name="ThxText" Margin="5" TextWrapping="WrapWithOverflow">
 						Huge thanks to all Patrons who help me to make this project possible and keep it alive.
                     </TextBlock>
                 </StackPanel>

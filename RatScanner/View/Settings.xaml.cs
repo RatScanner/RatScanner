@@ -165,7 +165,17 @@ namespace RatScanner.View
 
 			OpacityLabel.Content = "Opacity";
 
-			
+			// Info
+			InfoHeader.Header = "Info";
+
+			AppNameLabel.Content = "Rat Scanner";
+			AttributionsLabel.Content = "Attributions";
+
+			APIText.Text = "API for flea market price data";
+			OpenCvText.Text = ".Net wrapper for OpenCV";
+			JsonText.Text = "High-performance JSON framework for .NET";
+
+			ThxText.Text = "Huge thanks to all Patrons who help me to make this project possible and keep it alive.";
 		}
 
 		private void TranslateFR()
@@ -204,6 +214,18 @@ namespace RatScanner.View
 			ShowUpdatedLabel.Content = "Montrer la dernière MaJ";
 
 			OpacityLabel.Content = "Opacité";
+
+			// Info
+			InfoHeader.Header = "Infos";
+
+			AppNameLabel.Content = "Rat Scanner";
+			AttributionsLabel.Content = "Attributions";
+
+			APIText.Text = "API pour les prix du marché";
+			OpenCvText.Text = "Wrapper .Net pour OpenCV";
+			JsonText.Text = "JSON framework haute-performance pour .NET";
+
+			ThxText.Text = "Un grand merci à tous les Patrons qui m'aident à faire que ce projet soit possible et le maintiennent en vie"; 
 
 
 		}
