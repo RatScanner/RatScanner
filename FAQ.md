@@ -20,7 +20,6 @@
 - [Nothing happends when scanning](#nothing-happends-when-scanning)
 - [Could not find icon cache folder at: ...](#could-not-find-icon-cache-folder-at-)
 - [Could not find dynamic correlation data at: ...](#could-not-find-dynamic-correlation-data-at-)
-- [The type initializer for 'OpenCvSharp.NativeMethods' threw an exception.](#the-type-initializer-for-opencvsharpnativemethods-threw-an-exception)
 
 ### Scanning issues
 - [Icon scanning gets a lot of wrong matches](#icon-scanning-gets-a-lot-of-wrong-matches)
@@ -47,22 +46,13 @@ Make sure you have the **x64 Version** of the [.Net Core Runtime][net-core-downl
 - Try to run RatScanner as administrator
 
 ## Could not find icon cache folder at: ...
-Please have a look at [the question below](#could-not-find-dynamic-correlation-data-at-).
+Please have a look at [the below question](#could-not-find-dynamic-correlation-data-at-).
 
 ## Could not find dynamic correlation data at: ...
 1. Close RatScanner
 2. Start Escape From Tarkov
 3. Go to Mechanics trading screen and wait for all icons to load (no spinning circles)
 4. Start RatScanner.exe
-
-## The type initializer for 'OpenCvSharp.NativeMethods' threw an exception.
-This probably means you are missing the Windows Media Features.
-
-There are two ways to install the Media Feature Pack:
-- Navigate to **Settings** > **Apps** > **Apps and features** > **Optional features** > **Add a feature**, and then locate **Media Feature Pack** in the list of available optional features.
-- Download the pack installer for your Windows version from [here][windows-media-pack] and run it.
-
-After the installation has finished, restart your computer to make sure the changes are applied.
 
 <br/>
 
@@ -79,4 +69,3 @@ Also, when in the stash, the light bright in the top center of the screen interf
 
 [net-core-download]: https://dotnet.microsoft.com/download/dotnet-core/current/runtime
 [download-section]: https://github.com/Blightbuster/RatScanner#download
-[windows-media-pack]: https://www.microsoft.com/en-us/software-download/mediafeaturepack

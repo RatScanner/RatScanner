@@ -156,8 +156,8 @@
 								Set the language according to your<LineBreak />
 								Escape from Tarkov language setting.</TextBlock>
 						</Grid.ToolTip>
-						<Label Grid.Column="0" Content="Scan Info Language" />
-						<ComboBox						
+						<Label Grid.Column="0" Content="Name Scan Language" />
+						<ComboBox
 							Grid.Column="1"
 							Width="80"
 							Margin="5,0"
@@ -167,7 +167,7 @@
 							<ComboBoxItem Content="English" Tag="0" />
 							<ComboBoxItem Content="Russian" Tag="1" />
 							<ComboBoxItem Content="German" Tag="2" />
-							<ComboBoxItem Content="French" Name="lgFR" Tag="3" />
+							<ComboBoxItem Content="French" Tag="3" />
 							<ComboBoxItem Content="Spanish" Tag="4" />
 							<ComboBoxItem Content="Chinese" Tag="5" />
 						</ComboBox>
