@@ -129,7 +129,7 @@
                 </StackPanel>
             </TabItem>
 
-            <TabItem Header="Scanning">
+            <TabItem Header="Scanning" Name="ScanningHeader">
                 <StackPanel>
                     <Grid>
                         <Grid.ToolTip>
@@ -138,7 +138,7 @@
 								the magnifier glass in the top left corner of<LineBreak />
 								the inspection window.</TextBlock>
                         </Grid.ToolTip>
-                        <Label Grid.Column="0" Content="Enable Name Scan" />
+                        <Label Grid.Column="0" Content="Enable Name Scan" Name="EnableNameScanLabel" />
                         <CheckBox
 							Grid.Column="1"
 							Margin="5,0"
@@ -157,7 +157,7 @@
 								Set the language according to your<LineBreak />
 								Escape from Tarkov language setting.</TextBlock>
                         </Grid.ToolTip>
-                        <Label Grid.Column="0" Content="Name Scan Language" />
+                        <Label Grid.Column="0" Content="Name Scan Language" Name="NameScanLanguageLabel" />
                         <ComboBox
 							Grid.Column="1"
 							Width="80"
@@ -185,7 +185,7 @@
 								A icon scan is executed when holding the modifier key<LineBreak />
 								and left clicking on a icon of a item.</TextBlock>
                         </Grid.ToolTip>
-                        <Label Grid.Column="0" Content="Enable Icon Scan" />
+                        <Label Grid.Column="0" Content="Enable Icon Scan" Name="EnableIconScanLabel" />
                         <CheckBox
 							Grid.Column="1"
 							Margin="5,0"
@@ -205,7 +205,7 @@
 								Scanning for rotated icons will make the<LineBreak />
 								total scan time take twice as long.</TextBlock>
                         </Grid.ToolTip>
-                        <Label Grid.Column="0" Content="Scan Rotated Icons" />
+                        <Label Grid.Column="0" Content="Scan Rotated Icons" Name="ScanRotatedIconsLabel"/>
                         <CheckBox
 							Grid.Column="1"
 							Margin="5,0"
@@ -228,7 +228,7 @@
                                 <TextBlock FontWeight="Bold" TextAlignment="Center">-  Requires restart  -</TextBlock>
                             </StackPanel>
                         </Grid.ToolTip>
-                        <Label Grid.Column="0" Content="Use Cached Icons" />
+                        <Label Grid.Column="0" Content="Use Cached Icons" Name="UseCachedIconsLabel"/>
                         <CheckBox
 							Grid.Column="1"
 							Margin="5,0"
@@ -252,7 +252,7 @@
                             </StackPanel>
                         </Grid.ToolTip>
                         <WrapPanel Grid.Column="0">
-                            <Label Content="Icon Cache Folder" />
+                            <Label Content="Icon Cache Folder" Name="IconCacheFolderLabel" />
                             <Label
 								Padding="0"
 								VerticalAlignment="Center"
@@ -289,7 +289,7 @@
 								The key you have to hold down in addition to<LineBreak />
 								left clicking on the icon you want to scan.</TextBlock>
                         </Grid.ToolTip>
-                        <Label Grid.Column="0" Content="Icon Scan Modifier" />
+                        <Label Grid.Column="0" Content="Icon Scan Modifier" Name="IconScanModifierLabel"/>
                         <ComboBox
 							Grid.Column="1"
 							Width="64"

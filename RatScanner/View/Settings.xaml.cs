@@ -138,6 +138,18 @@ namespace RatScanner.View
 			MinimizeToTrayLabel.Content = "Minimize to Tray";
 			AlwaysOnTopLabel.Content = "Always on Top";
 			LogDebugInfoLabel.Content = "Log Debug Info";
+
+			// Scanning
+			ScanningHeader.Content = "Scanning";
+
+			EnableNameScanLabel.Content = "Enable Name Scan";
+			NameScanLanguageLabel.Content = "Name Scan Language";
+
+			EnableIconScanLabel.Content = "Enable Icon Scan";
+			ScanRotatedIconsLabel.Content = "Scan Rotated Icons";
+			UseCachedIconsLabel.Content = "Use Cached Icons";
+			IconCacheFolderLabel.Content = "Icon Cache Folder";
+			IconScanModifierLabel.Content = "Icon Scan Modifier";
 		}
 
 		private void TranslateFR()
@@ -150,6 +162,18 @@ namespace RatScanner.View
 			MinimizeToTrayLabel.Content = "Réduire dans le systray";
 			AlwaysOnTopLabel.Content = "Toujours Visible";
 			LogDebugInfoLabel.Content = "Garder les infos de debug";
+
+			// Scanning
+			ScanningHeader.Content = "Scan";
+
+			EnableNameScanLabel.Content = "Activer le scan du nom";
+			NameScanLanguageLabel.Content = "Langue du scan du nom";
+
+			EnableIconScanLabel.Content = "Activer le scan de l'icône";
+			ScanRotatedIconsLabel.Content = "Scanner les icônes en rotation";
+			UseCachedIconsLabel.Content = "Utiliser les icônes en cache";
+			IconCacheFolderLabel.Content = "Fichier cache des icônes";
+			IconScanModifierLabel.Content = "Touche de scan : Clic Gauche + ";
 		}
 
 
