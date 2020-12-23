@@ -40,6 +40,7 @@
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="*" />
 					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition	Width="Auto"/>
 				</Grid.ColumnDefinitions>
 
 				<StackPanel Grid.Column="0" Orientation="Horizontal">
@@ -68,7 +69,7 @@
 				</StackPanel>
 
 				<StackPanel
-					Grid.Column="1"
+					Grid.Column="2"
 					Margin="0,0,0,1"
 					Orientation="Horizontal">
 					<Button
@@ -107,6 +108,21 @@
 							StrokeThickness="1" />
 					</Button>
 				</StackPanel>
+
+				<ComboBox
+											Width="50"
+											SelectionChanged="lgCombo_SelectionChanged"
+											Name="lgCombo"
+											Grid.Row="1"
+											Grid.Column="1" Margin="10,0,0,0">
+					<ComboBoxItem Content="EN" Tag="0" />
+					<ComboBoxItem Content="RU" Tag="1" />
+					<ComboBoxItem Content="DE" Tag="2" />
+					<ComboBoxItem Content="FR" Tag="3" />
+					<ComboBoxItem Content="ES" Tag="4" />
+					<ComboBoxItem Content="ZH" Tag="5" />
+				</ComboBox>
+
 			</Grid>
 		</Border>
 
