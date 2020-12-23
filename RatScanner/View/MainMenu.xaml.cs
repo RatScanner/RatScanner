@@ -15,7 +15,9 @@ namespace RatScanner.View
 		{
 			InitializeComponent();
 			CheckLanguage();
-			DataContext = new MainWindowVM(RatScannerMain.Instance);
+
+			DataContext = new MainWindowVM(RatScannerMain.Instance);			
+			//lgCombo.SelectedIndex = 0;
 		}
 
 		private void HyperlinkRequestNavigate(object sender, RequestNavigateEventArgs e)
@@ -36,12 +38,12 @@ namespace RatScanner.View
 
 		public void CheckLanguage()
 		{
-			switch (lgCombo.SelectedItem)
+			switch (lgCombo.SelectedIndex)
 			{
 				default:
-					lgCombo.SelectedItem = "EN";
+					lgCombo.SelectedIndex = 0;
 					break;
-				case "FR":
+				case 3:
 					TranslateFR();
 				break;
 			}
@@ -62,6 +64,8 @@ namespace RatScanner.View
 
 			UpdatedLabel.Content = "Dernière MaJ";
 			LanguageLabel.Content = "Langue";
+
+			
 		}
 
 		public void OnClose() { }
@@ -69,6 +73,7 @@ namespace RatScanner.View
 		private void lgCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
 		{
 			CheckLanguage();
+			
 		}
 	}
 }
