@@ -58,6 +58,7 @@
 					</WrapPanel.Style>
 				</WrapPanel>
 				<Label
+					Name="MinNameLabel"				
 					Padding="0"
 					VerticalAlignment="Center"
 					Content="{Binding Name}" />
@@ -67,7 +68,7 @@
 
 		<StackPanel>
 			<Grid x:Name="PriceDisplay" Margin="0,5,0,0">
-				<Label Grid.Column="0" Content="Price" />
+				<Label Grid.Column="0" Content="Price" Name="MinPriceLabel" />
 				<Label Grid.Column="1" Content="{Binding Price}" />
 
 				<Grid.ColumnDefinitions>
@@ -77,7 +78,7 @@
 			</Grid>
 
 			<Grid x:Name="AvgDayPriceDisplay">
-				<Label Grid.Column="0" Content="Avg. Day Price" />
+				<Label Grid.Column="0" Content="Avg. Day Price" Name="MinAvgDayPriceLabel" />
 				<Label
 					Grid.Column="1"
 					Content="{Binding Diff24h}"
@@ -105,7 +106,7 @@
 			</Grid>
 
 			<Grid x:Name="AvgWeekPriceDisplay">
-				<Label Grid.Column="0" Content="Avg. Week Price" />
+				<Label Grid.Column="0" Content="Avg. Week Price" Name="MinAvgWeekPriceLabel"/>
 				<Label
 					Grid.Column="1"
 					Content="{Binding Diff7d}"
@@ -133,7 +134,7 @@
 			</Grid>
 
 			<Grid x:Name="PricePerSlotDisplay">
-				<Label Grid.Column="0" Content="Price per Slot" />
+				<Label Grid.Column="0" Content="Price per Slot" Name="MinPPSLabel" />
 				<Label Grid.Column="1" Content="{Binding PricePerSlot}" />
 
 				<Grid.ColumnDefinitions>
@@ -172,6 +173,7 @@
 				<Label
 					Grid.Column="0"
 					Content="Updated"
+					Name="MinUpdatedLabel"				
 					FontSize="10" />
 				<Label
 					Grid.Column="1"

@@ -527,11 +527,13 @@
 				Grid.Column="0"
 				Background="#3EDE69"
 				Click="SaveSettings"
-				Content="Save" />
+				Name="SaveButtonContent"
+				Content="Save" Cursor="Hand" />
             <Button
 				Grid.Column="2"
 				Background="#F05454"
 				Click="CloseSettings"
+				Name="CancelButtonContent"
 				Content="Cancel" />
 
             <Grid.ColumnDefinitions>

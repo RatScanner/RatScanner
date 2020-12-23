@@ -12,9 +12,10 @@ namespace RatScanner
 	/// </summary>
 	public partial class PageSwitcher : Window
 	{
-		private const int WindowWidth = 280;
-		private const int WindowHeight = 410;
-
+		private const int WindowWidth = 300;
+		private const int WindowHeight = 380;
+	
+		public int lgIndex;
 		private NotifyIcon _notifyIcon;
 
 		private static PageSwitcher _instance;
@@ -22,16 +23,22 @@ namespace RatScanner
 
 		private UserControl activeControl;
 
+		
+
 		public PageSwitcher()
-		{
+		{			
 			try
 			{
+				
 				_instance = this;
 
 				InitializeComponent();
+				CheckLanguage();
 				ResetWindowSize();
-				Navigate(new MainMenu(0));
+				Navigate(new MainMenu(lgIndex));
 				AddTrayIcon();
+				
+				
 
 				Topmost = RatConfig.AlwaysOnTop;
 			}
@@ -39,6 +46,24 @@ namespace RatScanner
 			{
 				Logger.LogError(e.Message, e);
 			}
+		}
+
+		public void CheckLanguage()
+		{
+			switch (lgCombo.SelectedIndex)
+			{
+				default:
+					lgCombo.SelectedIndex = 0;
+					break;
+				case 0:
+					lgIndex = 0;					
+					break;
+				case 3:
+					lgIndex = 3;
+					break;
+			}
+
+			Navigate(new MainMenu(lgIndex));
 		}
 
 		internal void ResetWindowSize()
@@ -119,7 +144,7 @@ namespace RatScanner
 			CollapseTitleBar();
 			SizeToContent = SizeToContent.WidthAndHeight;
 			SetBackgroundOpacity(RatConfig.MinimalUi.Opacity / 100f);
-			Navigate(new MinimalMenu());
+			Navigate(new MinimalMenu(lgIndex));
 		}
 
 		private void OnTitleBarClose(object sender, RoutedEventArgs e)
@@ -140,6 +165,11 @@ namespace RatScanner
 		internal void SetBackgroundOpacity(float opacity)
 		{
 			Background.Opacity = Math.Clamp(opacity, (1f / 510f), 1f);
+		}
+
+		private void lgCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+		{
+			CheckLanguage();
 		}
 	}
 }

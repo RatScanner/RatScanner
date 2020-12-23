@@ -11,13 +11,26 @@ namespace RatScanner.View
 	/// </summary>
 	internal partial class MainMenu : UserControl, ISwitchable
 	{
+		
+		public int lgInt;
 		internal MainMenu(int lgIndex)
 		{
 			InitializeComponent();
-			lgCombo.SelectedIndex = lgIndex;
-			CheckLanguage();
-			
-			DataContext = new MainWindowVM(RatScannerMain.Instance);			
+			lgInt = lgIndex;
+			DataContext = new MainWindowVM(RatScannerMain.Instance);
+
+			switch (lgInt)
+			{
+				default:
+					lgInt = 0;
+					break;
+				case 0:
+					TranslateEN();
+					break;
+				case 3:
+					TranslateFR();
+					break;
+			}
 			
 		}
 
@@ -29,32 +42,7 @@ namespace RatScanner.View
 
 		private void OpenSettingsWindow(object sender, RoutedEventArgs e)
 		{
-			switch (lgCombo.SelectedIndex)
-			{
-				default:
-					lgCombo.SelectedIndex = 0;
-					break;
-				case 0:
-					PageSwitcher.Instance.Navigate(new Settings(0));
-					break;
-				case 1:
-					PageSwitcher.Instance.Navigate(new Settings(1));
-					break;
-				case 2:
-					PageSwitcher.Instance.Navigate(new Settings(2));
-					break;
-				case 3:
-					PageSwitcher.Instance.Navigate(new Settings(3));
-					break;
-				case 4:
-					PageSwitcher.Instance.Navigate(new Settings(4));
-					break;
-				case 5:
-					PageSwitcher.Instance.Navigate(new Settings(5));
-					break;
-			}
-			
-			
+			PageSwitcher.Instance.Navigate(new Settings(lgInt));
 		}
 
 		public void UtilizeState(object state)
@@ -62,25 +50,10 @@ namespace RatScanner.View
 			throw new System.NotImplementedException();
 		}
 
-		public void CheckLanguage()
-		{
-			switch (lgCombo.SelectedIndex)
-			{
-				default:
-					lgCombo.SelectedIndex = 0;
-					break;
-				case 0:
-					TranslateEN();
-					break;
-				case 3:
-					TranslateFR();
-				break;
-			}
-		}
+		
 
 		private void TranslateEN()
 		{
-			///MainMenu
 			PriceLabel.Content = "Price";
 			AvgDayPriceLabel.Content = "Average Day Price";
 			AvgWeekPriceLabel.Content = "Average Week Price";
@@ -91,35 +64,24 @@ namespace RatScanner.View
 
 			LinksLabel.Content = "Links";
 
-			UpdatedLabel.Content = "Updated";
-			LanguageLabel.Content = "Language";
+			UpdatedLabel.Content = "Updated"; 
 		}
 
 		private void TranslateFR()
 		{
-			// MainMenu
 			PriceLabel.Content = "Prix";
 			AvgDayPriceLabel.Content = "Prix moyen - Journée";
 			AvgWeekPriceLabel.Content = "Prix moyen - Semaine";
 			PricePerSlotLabel.Content = "Prix par case";
 
-			TraderLabel.Content = "Marchand";
+			TraderLabel.Content = "Marchand"; 
 			BuyPriceLabel.Content = "Prix d'achat";
 
 			LinksLabel.Content = "Liens";
 
 			UpdatedLabel.Content = "Dernière MaJ";
-			LanguageLabel.Content = "Langue";
-
-			//Settings
-			
 		}
 
-		private void lgCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-		{
-			CheckLanguage();
-			
-		}
 
 		public void OnClose() { }
 

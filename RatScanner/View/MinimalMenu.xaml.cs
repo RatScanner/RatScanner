@@ -11,9 +11,25 @@ namespace RatScanner.View
 	/// </summary>
 	public partial class MinimalMenu : UserControl, ISwitchable
 	{
-		internal MinimalMenu()
+		public int lgInt;
+		internal MinimalMenu(int lgIndex)
 		{
 			InitializeComponent();
+			lgInt = lgIndex;
+
+			switch (lgInt)
+			{
+				default:
+					lgInt = 0;
+					break;
+				case 0:
+					TranslateEN();
+					break;
+				case 3:
+					TranslateFR();
+					break;
+			}
+
 			DataContext = new MainWindowVM(RatScannerMain.Instance);
 			UpdateElements();
 		}
@@ -39,7 +55,7 @@ namespace RatScanner.View
 
 		private void OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
-			PageSwitcher.Instance.Navigate(new MainMenu(0));
+			PageSwitcher.Instance.Navigate(new MainMenu(lgInt));
 			PageSwitcher.Instance.ShowTitleBar();
 			PageSwitcher.Instance.ResetWindowSize();
 			PageSwitcher.Instance.SetBackgroundOpacity(1);
@@ -49,6 +65,30 @@ namespace RatScanner.View
 		{
 			throw new System.NotImplementedException();
 		}
+
+		private void TranslateEN()
+		{
+			MinNameLabel.Content = "Name";
+			MinPriceLabel.Content = "Price";
+			MinAvgDayPriceLabel.Content = "Avg. Day Price";
+			MinAvgWeekPriceLabel.Content = "Avg. Week Price";
+			MinPPSLabel.Content = "Price per Slot";
+
+			MinUpdatedLabel.Content = "Updated";
+		}
+
+		private void TranslateFR()
+		{
+			MinNameLabel.Content = "Nom";
+			MinPriceLabel.Content = "Prix";
+			MinAvgDayPriceLabel.Content = "Prix moy. - Ajd";
+			MinAvgWeekPriceLabel.Content = "Prix moy. - Sem";
+			MinPPSLabel.Content = "Prix par case";
+
+			MinUpdatedLabel.Content = "Dernière MaJ";
+		}
+
+		
 
 		public void OnClose() { }
 	}

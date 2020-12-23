@@ -29,6 +29,7 @@ namespace RatScanner.View
 				RatScannerMain.Instance.ScanLock = true;
 			});
 
+			//Check Language
 			switch (lgIndex)
 			{
 				default:
@@ -144,6 +145,9 @@ namespace RatScanner.View
 			AlwaysOnTopLabel.Content = "Always on Top";
 			LogDebugInfoLabel.Content = "Log Debug Info";
 
+			SaveButtonContent.Content = "Save";
+			CancelButtonContent.Content = "Cancel";
+
 			// Scanning
 			ScanningHeader.Header = "Scanning";
 
@@ -193,6 +197,9 @@ namespace RatScanner.View
 			MinimizeToTrayLabel.Content = "Réduire dans le systray";
 			AlwaysOnTopLabel.Content = "Toujours Visible";
 			LogDebugInfoLabel.Content = "Garder les infos de debug";
+
+			SaveButtonContent.Content = "Sauvegarder";
+			CancelButtonContent.Content = "Annuler";
 
 			// Scanning
 			ScanningHeader.Header = "Scan";
