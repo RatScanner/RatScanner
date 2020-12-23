@@ -131,7 +131,7 @@ namespace RatScanner.View
 		private void TranslateEN()
 		{
 			// General
-			GeneralHeader.Content = "General";
+			GeneralHeader.Header = "General";
 
 			ToolTipDurationLabel.Content = "ToolTip Duration";
 			ResolutionLabel.Content = "Resolution";
@@ -140,7 +140,7 @@ namespace RatScanner.View
 			LogDebugInfoLabel.Content = "Log Debug Info";
 
 			// Scanning
-			ScanningHeader.Content = "Scanning";
+			ScanningHeader.Header = "Scanning";
 
 			EnableNameScanLabel.Content = "Enable Name Scan";
 			NameScanLanguageLabel.Content = "Name Scan Language";
@@ -153,7 +153,7 @@ namespace RatScanner.View
 			IconScanModifierLabel.Content = "Icon Scan Modifier";
 
 			// Minimal UI
-			MinimalUIHeader.Content = "Minimal UI";
+			MinimalUIHeader.Header = "Minimal UI";
 
 			ShowNameLabel.Content = "Show Name";
 			ShowPriceLabel.Content = "Show Price";
@@ -171,7 +171,7 @@ namespace RatScanner.View
 		private void TranslateFR()
 		{
 			// General
-			GeneralHeader.Content = "Général";
+			GeneralHeader.Header = "Général";
 
 			ToolTipDurationLabel.Content = "Durée du ToolTip";
 			ResolutionLabel.Content = "Résolution";
@@ -180,7 +180,7 @@ namespace RatScanner.View
 			LogDebugInfoLabel.Content = "Garder les infos de debug";
 
 			// Scanning
-			ScanningHeader.Content = "Scan";
+			ScanningHeader.Header = "Scan";
 
 			EnableNameScanLabel.Content = "Activer le scan du nom";
 			NameScanLanguageLabel.Content = "Langue du scan du nom";
@@ -188,12 +188,12 @@ namespace RatScanner.View
 			EnableIconScanLabel.Content = "Activer le scan de l'icône";
 			ScanRotatedIconsLabel.Content = "Scanner les icônes en rotation";
 			UseCachedIconsLabel.Content = "Utiliser les icônes en cache";
-			IconCacheFolderLabel.Content = "Fichier cache des icônes";
+			IconCacheFolderLabel.Content = "Fichier cache - Icônes";
 			ClearIconCacheButton.Content = "Vider";
-			IconScanModifierLabel.Content = "Scan : Maintenir la touche enfoncée";
+			IconScanModifierLabel.Content = "Touche de scan";
 
 			// Minimal UI
-			MinimalUIHeader.Content = "Mini-interface";
+			MinimalUIHeader.Header = "Mini-interface";
 
 			ShowNameLabel.Content = "Montrer le nom";
 			ShowPriceLabel.Content = "Montrer le prix";
