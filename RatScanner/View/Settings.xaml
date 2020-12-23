@@ -275,6 +275,7 @@
 							Height="21"
 							Margin="0,0,5,0"
 							Click="ClearIconCache"
+							Name="ClearIconCacheButton"						
 							Content="Clear" />
 
                         <Grid.ColumnDefinitions>
@@ -310,7 +311,7 @@
                 </StackPanel>
             </TabItem>
 
-            <TabItem Header="Minimal UI">
+            <TabItem Header="Minimal UI" Name="MinimalUIHeader">
                 <StackPanel>
                     <Grid>
                         <Grid.ToolTip>
@@ -318,7 +319,7 @@
 								Show the name of the item
                             </TextBlock>
                         </Grid.ToolTip>
-                        <Label Grid.Column="0" Content="Show Name" />
+                        <Label Grid.Column="0" Content="Show Name" Name="ShowNameLabel"/>
                         <CheckBox
 							Grid.Column="1"
 							Margin="5,0"
@@ -336,7 +337,7 @@
 								Show the price of the item
                             </TextBlock>
                         </Grid.ToolTip>
-                        <Label Grid.Column="0" Content="Show Price" />
+                        <Label Grid.Column="0" Content="Show Price" Name="ShowPriceLabel" />
                         <CheckBox
 							Grid.Column="1"
 							Margin="5,0"
@@ -354,7 +355,7 @@
 								Show the daily average price of the item
                             </TextBlock>
                         </Grid.ToolTip>
-                        <Label Grid.Column="0" Content="Show Average Day Price" />
+                        <Label Grid.Column="0" Content="Show Average Day Price" Name="ShowAvgDayPriceLabel"/>
                         <CheckBox
 							Grid.Column="1"
 							Margin="5,0"
@@ -372,7 +373,7 @@
 								Show the weekly average price of the item
                             </TextBlock>
                         </Grid.ToolTip>
-                        <Label Grid.Column="0" Content="Show Average Week Price" />
+                        <Label Grid.Column="0" Content="Show Average Week Price" Name="ShowAvgWeekPriceLabel"/>
                         <CheckBox
 							Grid.Column="1"
 							Margin="5,0"
@@ -390,7 +391,7 @@
 								Show the price per slot of the item
                             </TextBlock>
                         </Grid.ToolTip>
-                        <Label Grid.Column="0" Content="Show Price per Slot" />
+                        <Label Grid.Column="0" Content="Show Price per Slot" Name="ShowPPSLabel"/>
                         <CheckBox
 							Grid.Column="1"
 							Margin="5,0"
@@ -408,15 +409,16 @@
 								Show the price which the trader offers for this item
                             </TextBlock>
                         </Grid.ToolTip>
-                        <Label Grid.Column="0" Content="Show Trader Price" />
+                        <Label Grid.Column="0" Content="Show Trader Price" Name="ShowTraderPriceLabel" Grid.ColumnSpan="2" />
                         <CheckBox
-							Grid.Column="1"
-							Margin="5,0"
+							Grid.Column="2"
+							Margin="5,0,5,0"
 							VerticalAlignment="Center"
 							IsChecked="{Binding ShowTraderPrice}" />
 
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="8*" />
+                            <ColumnDefinition Width="31*"/>
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                     </Grid>
@@ -426,7 +428,7 @@
 								Show when the data was last updated
                             </TextBlock>
                         </Grid.ToolTip>
-                        <Label Grid.Column="0" Content="Show Updated" />
+                        <Label Grid.Column="0" Content="Show Updated" Name="ShowUpdatedLabel"/>
                         <CheckBox
 							Grid.Column="1"
 							Margin="5,0"
@@ -445,7 +447,7 @@
 								Adjust the background opacity
                             </TextBlock>
                         </Grid.ToolTip>
-                        <Label Grid.Column="0" Content="Opacity" />
+                        <Label Grid.Column="0" Content="Opacity" Name="OpacityLabel" />
                         <StackPanel Grid.Column="1" Orientation="Horizontal">
                             <Slider
 								x:Name="opacitySlider"

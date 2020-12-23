@@ -149,7 +149,23 @@ namespace RatScanner.View
 			ScanRotatedIconsLabel.Content = "Scan Rotated Icons";
 			UseCachedIconsLabel.Content = "Use Cached Icons";
 			IconCacheFolderLabel.Content = "Icon Cache Folder";
+			ClearIconCacheButton.Content = "Clear";
 			IconScanModifierLabel.Content = "Icon Scan Modifier";
+
+			// Minimal UI
+			MinimalUIHeader.Content = "Minimal UI";
+
+			ShowNameLabel.Content = "Show Name";
+			ShowPriceLabel.Content = "Show Price";
+			ShowAvgDayPriceLabel.Content = "Show Average Day Price";
+			ShowAvgWeekPriceLabel.Content = "Show Average Week Price";
+			ShowPPSLabel.Content = "Show Price per Slot";
+			ShowTraderPriceLabel.Content = "Show Trader Price";
+			ShowUpdatedLabel.Content = "Show Updated";
+
+			OpacityLabel.Content = "Opacity";
+
+			
 		}
 
 		private void TranslateFR()
@@ -173,7 +189,23 @@ namespace RatScanner.View
 			ScanRotatedIconsLabel.Content = "Scanner les icônes en rotation";
 			UseCachedIconsLabel.Content = "Utiliser les icônes en cache";
 			IconCacheFolderLabel.Content = "Fichier cache des icônes";
-			IconScanModifierLabel.Content = "Touche de scan : Clic Gauche + ";
+			ClearIconCacheButton.Content = "Vider";
+			IconScanModifierLabel.Content = "Scan : Maintenir la touche enfoncée";
+
+			// Minimal UI
+			MinimalUIHeader.Content = "Mini-interface";
+
+			ShowNameLabel.Content = "Montrer le nom";
+			ShowPriceLabel.Content = "Montrer le prix";
+			ShowAvgDayPriceLabel.Content = "Montrer le prix moyen - Journée";
+			ShowAvgWeekPriceLabel.Content = "Montrer le prix moyen - Semaine";
+			ShowPPSLabel.Content = "Montrer le prix par case";
+			ShowTraderPriceLabel.Content = "Montrer le prix du marchand";
+			ShowUpdatedLabel.Content = "Montrer la dernière MaJ";
+
+			OpacityLabel.Content = "Opacité";
+
+
 		}
 
 

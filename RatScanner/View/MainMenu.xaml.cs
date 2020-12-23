@@ -98,9 +98,9 @@ namespace RatScanner.View
 		{
 			// MainMenu
 			PriceLabel.Content = "Prix";
-			AvgDayPriceLabel.Content = "Prix Moyen - Journée";
-			AvgWeekPriceLabel.Content = "Prix Moyen - Semaine";
-			PricePerSlotLabel.Content = "Prix par Case";
+			AvgDayPriceLabel.Content = "Prix moyen - Journée";
+			AvgWeekPriceLabel.Content = "Prix moyen - Semaine";
+			PricePerSlotLabel.Content = "Prix par case";
 
 			TraderLabel.Content = "Marchand";
 			BuyPriceLabel.Content = "Prix d'achat";
