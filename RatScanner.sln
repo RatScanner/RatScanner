@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.29503.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RatScanner", "RatScanner\RatScanner.csproj", "{6C9373BE-454F-4A4A-850E-17AC27C76992}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Updater", "Updater\Updater.vcxproj", "{07554E41-23A2-4319-A6BE-00BF8B30B286}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,18 +27,6 @@ Global
 		{6C9373BE-454F-4A4A-850E-17AC27C76992}.Release|x64.Build.0 = Release|Any CPU
 		{6C9373BE-454F-4A4A-850E-17AC27C76992}.Release|x86.ActiveCfg = Release|Any CPU
 		{6C9373BE-454F-4A4A-850E-17AC27C76992}.Release|x86.Build.0 = Release|Any CPU
-		{07554E41-23A2-4319-A6BE-00BF8B30B286}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{07554E41-23A2-4319-A6BE-00BF8B30B286}.Debug|Any CPU.Build.0 = Debug|x64
-		{07554E41-23A2-4319-A6BE-00BF8B30B286}.Debug|x64.ActiveCfg = Debug|x64
-		{07554E41-23A2-4319-A6BE-00BF8B30B286}.Debug|x64.Build.0 = Debug|x64
-		{07554E41-23A2-4319-A6BE-00BF8B30B286}.Debug|x86.ActiveCfg = Debug|Win32
-		{07554E41-23A2-4319-A6BE-00BF8B30B286}.Debug|x86.Build.0 = Debug|Win32
-		{07554E41-23A2-4319-A6BE-00BF8B30B286}.Release|Any CPU.ActiveCfg = Release|x64
-		{07554E41-23A2-4319-A6BE-00BF8B30B286}.Release|Any CPU.Build.0 = Release|x64
-		{07554E41-23A2-4319-A6BE-00BF8B30B286}.Release|x64.ActiveCfg = Release|x64
-		{07554E41-23A2-4319-A6BE-00BF8B30B286}.Release|x64.Build.0 = Release|x64
-		{07554E41-23A2-4319-A6BE-00BF8B30B286}.Release|x86.ActiveCfg = Release|Win32
-		{07554E41-23A2-4319-A6BE-00BF8B30B286}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
