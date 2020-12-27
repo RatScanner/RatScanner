@@ -84,9 +84,14 @@ namespace RatScanner
 			activityHook.KeyDown += OnKeyDown;
 			activityHook.KeyUp += OnKeyUp;
 
-			Logger.LogInfo("Ready!");
+			Logger.LogInfo("Checking for new updates...");
+			CheckForUpdates();
 
-			// Check for new versions
+			Logger.LogInfo("Ready!");
+		}
+
+		private void CheckForUpdates()
+		{
 			var mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ClientVersion);
 			if (RatConfig.Version != mostRecentVersion)
 			{
@@ -102,8 +107,11 @@ namespace RatScanner
 
 		private void UpdateRatScanner()
 		{
-			if (!File.Exists("Updater.exe")) Logger.LogError("Could not find Updater.exe! Please update manually.");
-			var startInfo = new ProcessStartInfo("Updater.exe");
+			if (!File.Exists(RatConfig.Paths.Updater))
+			{
+				Logger.LogError(RatConfig.Paths.Updater + " could not be found! Please update manually.");
+			}
+			var startInfo = new ProcessStartInfo(RatConfig.Paths.Updater);
 			startInfo.UseShellExecute = true;
 			startInfo.ArgumentList.Add("--start");
 			startInfo.ArgumentList.Add("--update");
