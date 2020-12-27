@@ -4,8 +4,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Net;
-using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -88,16 +86,7 @@ namespace RatScanner
 
 			Logger.LogInfo("Ready!");
 
-			// Check for new updater version
-			CheckUpdaterVersion();
-
-			// Check for new rat scanner version
-			CheckRatScannerVersion();
-		}
-
-		#region Updating
-		private void CheckRatScannerVersion()
-		{
+			// Check for new versions
 			var mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ClientVersion);
 			if (RatConfig.Version != mostRecentVersion)
 			{
@@ -113,57 +102,14 @@ namespace RatScanner
 
 		private void UpdateRatScanner()
 		{
-			var updaterPath = RatConfig.Paths.Updater;
-			if (!File.Exists(updaterPath)) Logger.LogError("Could not find Updater at: " + updaterPath);
-			var startInfo = new ProcessStartInfo(updaterPath);
+			if (!File.Exists("Updater.exe")) Logger.LogError("Could not find Updater.exe! Please update manually.");
+			var startInfo = new ProcessStartInfo("Updater.exe");
 			startInfo.UseShellExecute = true;
 			startInfo.ArgumentList.Add("--start");
 			startInfo.ArgumentList.Add("--update");
 			Process.Start(startInfo);
 			Environment.Exit(0);
 		}
-
-		private void CheckUpdaterVersion()
-		{
-			if (!File.Exists(RatConfig.Paths.Updater))
-			{
-				Logger.LogInfo("No updater found");
-				UpdateUpdater();
-				return;
-			}
-
-			var updaterHashCurrent = GetHashMD5(RatConfig.Paths.Updater);
-			var updaterHashLatest = ApiManager.GetResource(ApiManager.ResourceType.UpdaterHashMD5);
-
-			if (updaterHashCurrent != updaterHashLatest)
-			{
-				Logger.LogInfo("New updater available!");
-				Logger.LogInfo("Current Hash: " + updaterHashCurrent);
-				Logger.LogInfo("Latest Hash:  " + updaterHashLatest);
-
-				Logger.LogInfo("Deleting current updater...");
-				try { File.Delete(RatConfig.Paths.Updater); }
-				catch (Exception e)
-				{
-					Logger.LogWarning("Could not delete updater. Try updating later", e);
-					return;
-				}
-				UpdateUpdater();
-			}
-		}
-
-		private void UpdateUpdater()
-		{
-			Logger.LogInfo("Downloading updater...");
-			var updaterDownload = ApiManager.GetResource(ApiManager.ResourceType.UpdaterDownload);
-
-			using var client = new WebClient();
-			var updaterBytes = client.DownloadData(updaterDownload);
-			File.WriteAllBytes(RatConfig.Paths.Updater, updaterBytes);
-
-			Logger.LogInfo("Successfully updated the updater!");
-		}
-		#endregion
 
 		private void OnMouseEvent(object sender, MouseEventArgs e)
 		{
@@ -295,19 +241,6 @@ namespace RatScanner
 
 			if (itemScan is ItemNameScan) NameScanToolTip.ScheduleShow(itemScan, pos, RatConfig.ToolTip.Duration);
 			if (itemScan is ItemIconScan) IconScanToolTip.ScheduleShow(itemScan, pos, RatConfig.ToolTip.Duration);
-		}
-
-		/// <summary>
-		/// Compute the md5 hash of a file
-		/// </summary>
-		/// <param name="path">The path of the file to be hashed</param>
-		/// <returns>MD5 hash as hex string</returns>
-		private static string GetHashMD5(string path)
-		{
-			using var md5 = MD5.Create();
-			using var stream = File.OpenRead(path);
-			var hash = md5.ComputeHash(stream);
-			return BitConverter.ToString(hash).Replace("-", "");
 		}
 
 		protected virtual void OnPropertyChanged(string propertyName = null)

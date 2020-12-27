@@ -38,8 +38,6 @@ namespace RatScanner
 			Patreon,
 			Github,
 			Discord,
-			UpdaterDownload,
-			UpdaterHashMD5,
 		}
 
 		private static readonly Dictionary<ResourceType, string> ResMapping = new Dictionary<ResourceType, string>
@@ -49,8 +47,6 @@ namespace RatScanner
 			{ ResourceType.Patreon, "RSPatreon" },
 			{ ResourceType.Github, "RSGithub" },
 			{ ResourceType.Discord, "RSDiscord" },
-			{ ResourceType.UpdaterDownload, "RSUpdaterDownload" },
-			{ ResourceType.UpdaterHashMD5, "RSUpdaterHashMD5" }
 		};
 
 		private static readonly Dictionary<ResourceType, string> ResCache = new Dictionary<ResourceType, string>();
