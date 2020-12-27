@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Globalization;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Media;
 using RatScanner.FetchModels;
 using RatScanner.Scan;
@@ -88,12 +89,16 @@ namespace RatScanner.ViewModel
 			return text.Replace(numberGroupSeparator, RatConfig.ToolTip.DigitGroupingSymbol);
 		}
 
-		// TODO improve reliability
+		/// <summary>
+		/// Compute the scaling factor used for the primary screen
+		/// </summary>
+		/// <returns>How many physical pixels are used for a virtual pixel</returns>
 		private static float GetScalingFactor()
 		{
-			var virtualHeight = SystemParameters.VirtualScreenHeight;
-			var physicalHeight = SystemParameters.PrimaryScreenHeight;
-			return (float)virtualHeight / (float)physicalHeight;
+			var physicalHeight = Screen.PrimaryScreen.Bounds.Height;	// Virtual Height
+			var virtualHeight = SystemParameters.PrimaryScreenHeight;	// Physical Height
+			var scaleFactor = physicalHeight / virtualHeight;
+			return (float)scaleFactor;
 		}
 	}
 }

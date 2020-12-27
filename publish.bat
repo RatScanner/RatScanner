@@ -58,12 +58,12 @@ del publish\RatScanner.deps.json
 rename publish\RatScanner.deps.json.tmp RatScanner.deps.json
 
 :: Build updater
-echo Building updater...
-MSBuild Updater/Updater.vcxproj /p:Configuration=Release /p:Platform=x64
+:: echo Building updater...
+:: MSBuild Updater/Updater.vcxproj /p:Configuration=Release /p:Platform=x64
 
 :: Copy updater binary to publish directory
-echo Copying updater binary into publish directory
-xcopy "Updater\build\x64\Release\Updater.exe" "publish\" /y /e /s /q
+:: echo Copying updater binary into publish directory
+:: xcopy "Updater\build\x64\Release\Updater.exe" "publish\" /y /e /s /q
 
 :: Finalize publish
 echo Done^^!
