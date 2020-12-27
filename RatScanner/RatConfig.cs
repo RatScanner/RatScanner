@@ -59,7 +59,7 @@ namespace RatScanner
 			internal static string UnknownIcon = Path.Combine(Data, "unknown.png");
 			internal static string ConfigFile = Path.Combine(Base, "config.cfg");
 			internal static string Debug = Path.Combine(Base, "Debug");
-			internal static string Updater = Path.Combine(Base, "Updater.exe");
+			internal static string Updater = Path.Combine(Base, "RatUpdater.exe");
 			internal static string LogFile = Path.Combine(Base, "Log.txt");
 		}
 

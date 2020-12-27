@@ -117,6 +117,8 @@ namespace RatScanner
 			if (!File.Exists(updaterPath)) Logger.LogError("Could not find Updater at: " + updaterPath);
 			var startInfo = new ProcessStartInfo(updaterPath);
 			startInfo.UseShellExecute = true;
+			startInfo.ArgumentList.Add("--start");
+			startInfo.ArgumentList.Add("--update");
 			Process.Start(startInfo);
 			Environment.Exit(0);
 		}
