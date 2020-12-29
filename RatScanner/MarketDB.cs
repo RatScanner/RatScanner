@@ -30,6 +30,7 @@ namespace RatScanner
 					{
 						item.Quest = true;
 						item.QuestCount = (int)qi.Count;
+						break;
 					}
 				}
 			}
