@@ -12,6 +12,7 @@ namespace RatScanner
 	{
 		public string Uid;
 		public float Count;
+		public Boolean inRaid;
 	}
 	public class MarketDB
 	{
@@ -20,6 +21,7 @@ namespace RatScanner
 		public void Init()
 		{
 			_items = ApiManager.GetMarketDB(RatConfig.NameScan.Language);
+
 			var _questItems = LoadQuestJson();
 // Behold; my inability to properly use lists!
 			foreach(var item in _items)
@@ -30,13 +32,14 @@ namespace RatScanner
 					{
 						item.Quest = true;
 						item.QuestCount = (int)qi.Count;
+						item.QuestInRaid = qi.inRaid;
 						break;
 					}
 				}
 			}
 		}
 
-		public QuestItem[] LoadQuestJson()
+		private QuestItem[] LoadQuestJson()
 		{
 			using StreamReader r = new StreamReader(RatConfig.Paths.QuestItemPath);
 			string json = r.ReadToEnd();

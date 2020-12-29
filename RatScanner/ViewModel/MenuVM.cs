@@ -80,6 +80,7 @@ namespace RatScanner.ViewModel
 		}
 
 		public string QuestCount => ""+MatchedItems[0].QuestCount;
+		public string QuestInRaid => "" + MatchedItems[0].QuestInRaid;
 
 		public string DiscordLink => ApiManager.GetResource(ApiManager.ResourceType.Discord);
 

@@ -170,7 +170,7 @@
 					</Grid.ColumnDefinitions>
 				</Grid>
 
-				<Grid Margin="0,5,0,0">
+				<Grid Margin="0,5,0,5">
 					<Label Grid.Column="0" Content="Buy Price" />
 					<Label Grid.Column="1" Content="{Binding TraderPrice}" />
 
@@ -180,9 +180,21 @@
 					</Grid.ColumnDefinitions>
 				</Grid>
 
+				<Separator />
+				
+				<Grid Margin="0,5,0,0">
+					<Label Grid.Column="0" Content="Quest Count" />
+					<Label Grid.Column="2" Content="{Binding QuestCount}" />
+
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" />
+						<ColumnDefinition Width="Auto" />
+					</Grid.ColumnDefinitions>
+				</Grid>
+
 				<Grid Margin="0,0,0,5">
-					<Label Grid.Column="0" Content="Quest Item" />
-					<Label Grid.Column="1" Content="{Binding QuestCount}" />
+					<Label Grid.Column="0" Content="Raid Only" />
+					<Label Grid.Column="1" Content="{Binding QuestInRaid}" />
 
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*" />

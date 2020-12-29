@@ -18,6 +18,8 @@ namespace RatScanner.FetchModels
 		public Boolean Quest { get; set; } = false;
 		public int QuestCount { get; set; } = -1;
 
+		public Boolean QuestInRaid { get; set; } = false;
+
 		// Price data
 		public int Price { get; set; } = 0;
 
