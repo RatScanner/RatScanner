@@ -55,6 +55,7 @@ namespace RatScanner
 			private static readonly string EftTemp = Path.Combine(Path.GetTempPath(), EftTempDir);
 			internal static string DynamicIcon = Path.Combine(EftTemp, "Icon Cache");
 			internal static string StaticCorrelation = Path.Combine(Data, "correlation.json");
+			internal static string QuestItemPath = Path.Combine(Data, "questItems.json");
 			internal static string DynamicCorrelation = Path.Combine(DynamicIcon, "index.json");
 			internal static string UnknownIcon = Path.Combine(Data, "unknown.png");
 			internal static string ConfigFile = Path.Combine(Base, "config.cfg");

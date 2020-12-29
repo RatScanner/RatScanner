@@ -1,10 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 using RatScanner.FetchModels;
 
 namespace RatScanner
 {
+	public class QuestItem
+	{
+		public string Uid;
+		public float Count;
+	}
 	public class MarketDB
 	{
 		private MarketItem[] _items;
@@ -12,7 +20,29 @@ namespace RatScanner
 		public void Init()
 		{
 			_items = ApiManager.GetMarketDB(RatConfig.NameScan.Language);
+			var _questItems = LoadQuestJson();
+// Behold; my inability to properly use lists!
+			foreach(var item in _items)
+			{
+				foreach(var qi in _questItems)
+				{
+					if(qi.Uid == item.Uid)
+					{
+						item.Quest = true;
+						item.QuestCount = (int)qi.Count;
+					}
+				}
+			}
 		}
+
+		public QuestItem[] LoadQuestJson()
+		{
+			using StreamReader r = new StreamReader(RatConfig.Paths.QuestItemPath);
+			string json = r.ReadToEnd();
+			return JsonConvert.DeserializeObject<QuestItem[]>(json);
+		}
+
+		
 
 		public MarketItem GetItemByUid(string uid)
 		{
