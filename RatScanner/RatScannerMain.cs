@@ -42,7 +42,7 @@ namespace RatScanner
 			}
 		}
 
-		internal RatScannerMain()
+		private RatScannerMain()
 		{
 			_instance = this;
 

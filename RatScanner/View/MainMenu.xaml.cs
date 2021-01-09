@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
@@ -14,7 +15,6 @@ namespace RatScanner.View
 		internal MainMenu()
 		{
 			InitializeComponent();
-			DataContext = new MainWindowVM(RatScannerMain.Instance);
 		}
 
 		private void HyperlinkRequestNavigate(object sender, RequestNavigateEventArgs e)
@@ -31,6 +31,11 @@ namespace RatScanner.View
 		public void UtilizeState(object state)
 		{
 			throw new System.NotImplementedException();
+		}
+
+		private void OnLoaded(object sender, RoutedEventArgs e)
+		{
+			DataContext = new MainWindowVM(RatScannerMain.Instance);
 		}
 
 		public void OnClose() { }
