@@ -34,11 +34,18 @@ namespace RatScanner
 			else logMessage += $"\n {divider} \n {Environment.StackTrace}";
 			AppendToLog(logMessage);
 
-			// Ask for git issue creation
+			// Setup info box
 			var title = "RatScanner " + RatConfig.Version;
-			var msgBoxMessage = message + "\n\nWould you like to report this on GitHub?";
-			var msgBoxResult = MessageBox.Show(msgBoxMessage, title, MessageBoxButton.YesNo, MessageBoxImage.Error, MessageBoxResult.No, MessageBoxOptions.DefaultDesktopOnly);
-			if (msgBoxResult == MessageBoxResult.Yes) CreateGitHubIssue(message, e);
+
+			// Ask to open FAQ
+			var faqBoxMessage = message + "\n\nThe FAQ will probably help with that.\nDo you want to open it now?";
+			var faqBoxResult = MessageBox.Show(faqBoxMessage, title, MessageBoxButton.YesNo, MessageBoxImage.Error);
+			if (faqBoxResult == MessageBoxResult.Yes) OpenFAQ(message);
+
+			// Ask for git issue creation
+			var gitBoxMessage = "Would you like to create a issue on GitHub?";
+			var gitBoxResult = MessageBox.Show(gitBoxMessage, title, MessageBoxButton.YesNo, MessageBoxImage.Question);
+			if (gitBoxResult == MessageBoxResult.Yes) CreateGitHubIssue(message, e);
 
 			// Exit after error is handled
 			Environment.Exit(0);
@@ -155,6 +162,15 @@ namespace RatScanner
 			}
 		}
 
+		private static void OpenFAQ(string message)
+		{
+			// Remove everything after ':' which is commonly a path
+			message = message.Split(':')[0];
+			var url = ApiManager.GetResource(ApiManager.ResourceType.FAQ);
+			url += "#:~:text=" + WebUtility.HtmlEncode(message);
+			OpenURL(url);
+		}
+
 		private static void CreateGitHubIssue(string message, Exception e)
 		{
 			var body = "**Error**\n" + message + "\n";
@@ -171,6 +187,21 @@ namespace RatScanner
 			url += "&title=" + WebUtility.UrlEncode(title);
 			url += "&labels=" + WebUtility.UrlEncode(labels);
 
+			var psi = new ProcessStartInfo
+			{
+				FileName = url,
+				UseShellExecute = true
+			};
+			Process.Start(psi);
+		}
+
+		private static string LimitLength(string input, int length)
+		{
+			return input.Substring(0, input.Length > length ? length : input.Length);
+		}
+
+		private static void OpenURL(string url)
+		{
 			var psi = new ProcessStartInfo
 			{
 				FileName = url,
