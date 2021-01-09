@@ -174,8 +174,14 @@ namespace RatScanner
 		private static void CreateGitHubIssue(string message, Exception e)
 		{
 			var body = "**Error**\n" + message + "\n";
-			if (e != null) body += "```\n" + e + "\n```\n";
-			body += "<details>\n<summary>Log</summary>\n\n```\n" + ReadAll() + "```\n</details>";
+			if (e != null)
+			{
+				body += "```\n" + LimitLength(e.ToString(), 1000) + "\n```\n";
+			}
+
+			body += "<details>\n<summary>Log</summary>\n\n```\n";
+			body += LimitLength(ReadAll(), 3000);
+			body += "\n```\n</details>";
 
 			var title = message;
 
@@ -187,12 +193,7 @@ namespace RatScanner
 			url += "&title=" + WebUtility.UrlEncode(title);
 			url += "&labels=" + WebUtility.UrlEncode(labels);
 
-			var psi = new ProcessStartInfo
-			{
-				FileName = url,
-				UseShellExecute = true
-			};
-			Process.Start(psi);
+			OpenURL(url);
 		}
 
 		private static string LimitLength(string input, int length)
