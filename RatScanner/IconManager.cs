@@ -306,12 +306,18 @@ namespace RatScanner
 
 		private static ItemInfo ParseUidString(string uidString)
 		{
+			uidString = uidString.Trim();
+
 			var pairs = uidString.Split(',').Select(s => s.Trim()).ToArray();
 			pairs = pairs.Where(pair => !string.IsNullOrEmpty(pair)).ToArray();
 
 			// Remove and store leading base uid
-			var baseUid = pairs[0].Split(' ', 2)[0].Trim();
-			pairs[0] = pairs[0].Split(' ', 2)[1].Trim();
+			var spaceIndex = pairs[0].IndexOf(' ');
+			var baseUid = spaceIndex > -1 ? pairs[0].Substring(0, spaceIndex) : pairs[0];
+			pairs[0] = spaceIndex > -1 ? pairs[0].Substring(spaceIndex + 1) : "";
+
+			// Found item without any extra info
+			if (string.IsNullOrWhiteSpace(pairs[0])) return new ItemInfo(baseUid);
 
 			var mods = pairs.Select(s => new KeyValuePair<string, string>(s.Split(':', 2)[0], s.Split(':', 2)[1]));
 
