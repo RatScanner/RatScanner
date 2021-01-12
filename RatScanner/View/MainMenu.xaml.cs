@@ -1,4 +1,3 @@
-﻿using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,7 +18,12 @@ namespace RatScanner.View
 
 		private void HyperlinkRequestNavigate(object sender, RequestNavigateEventArgs e)
 		{
-			Process.Start("explorer.exe", e.Uri.ToString());
+			var psi = new ProcessStartInfo
+			{
+				FileName = e.Uri.ToString(),
+				UseShellExecute = true
+			};
+			Process.Start(psi);
 			e.Handled = true;
 		}
 
