@@ -256,7 +256,10 @@ namespace RatScanner
 
 			try
 			{
-				var json = File.ReadAllText(RCPaths.DynamicCorrelation);
+				// Since the EFT client is actively using the same file, we need to use FileShare.ReadWrite permissions to keep it from being locked.
+				using var fileStream = File.Open(RCPaths.DynamicCorrelation, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+				using var textReader = new StreamReader(fileStream);
+				var json = textReader.ReadToEnd();
 
 				// Check if we already parsed this
 				var hashCode = json.GetHashCode();
