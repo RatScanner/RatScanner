@@ -237,17 +237,22 @@ namespace RatScanner
 			}
 
 			var config = new SimpleConfig(Paths.ConfigFile);
+
+			config.Section = nameof(NameScan);
 			NameScan.Enable = config.ReadBool(nameof(NameScan.Enable), true);
 			NameScan.Language = (ApiManager.Language)config.ReadInt(nameof(NameScan.Language), (int)ApiManager.Language.English);
 
+			config.Section = nameof(IconScan);
 			IconScan.Enable = config.ReadBool(nameof(IconScan.Enable), true);
 			IconScan.ScanRotatedIcons = config.ReadBool(nameof(IconScan.ScanRotatedIcons), true);
 			IconScan.ModifierKeyCode = config.ReadInt(nameof(IconScan.ModifierKeyCode), 160);
 			IconScan.UseCachedIcons = config.ReadBool(nameof(IconScan.UseCachedIcons), true);
 
+			config.Section = nameof(ToolTip);
 			ToolTip.Duration = config.ReadInt(nameof(ToolTip.Duration), 1500);
 			ToolTip.DigitGroupingSymbol = config.ReadString(nameof(ToolTip.DigitGroupingSymbol), NumberFormatInfo.CurrentInfo.NumberGroupSeparator);
 
+			config.Section = nameof(MinimalUi);
 			MinimalUi.ShowName = config.ReadBool(nameof(MinimalUi.ShowName), true);
 			MinimalUi.ShowPrice = config.ReadBool(nameof(MinimalUi.ShowPrice), true);
 			MinimalUi.ShowAvgDayPrice = config.ReadBool(nameof(MinimalUi.ShowAvgDayPrice), true);
@@ -257,6 +262,7 @@ namespace RatScanner
 			MinimalUi.ShowUpdated = config.ReadBool(nameof(MinimalUi.ShowUpdated), true);
 			MinimalUi.Opacity = config.ReadInt(nameof(MinimalUi.Opacity), 50);
 
+			config.Section = "Other";
 			ScreenResolution = (Resolution)config.ReadInt(nameof(ScreenResolution), (int)Resolution.R1920x1080);
 			MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), false);
 			AlwaysOnTop = config.ReadBool(nameof(AlwaysOnTop), false);
@@ -266,17 +272,22 @@ namespace RatScanner
 		internal static void SaveConfig()
 		{
 			var config = new SimpleConfig(Paths.ConfigFile);
+
+			config.Section = nameof(NameScan);
 			config.WriteBool(nameof(NameScan.Enable), NameScan.Enable);
 			config.WriteInt(nameof(NameScan.Language), (int)NameScan.Language);
 
+			config.Section = nameof(IconScan);
 			config.WriteBool(nameof(IconScan.Enable), IconScan.Enable);
 			config.WriteBool(nameof(IconScan.ScanRotatedIcons), IconScan.ScanRotatedIcons);
 			config.WriteInt(nameof(IconScan.ModifierKeyCode), IconScan.ModifierKeyCode);
 			config.WriteBool(nameof(IconScan.UseCachedIcons), IconScan.UseCachedIcons);
 
+			config.Section = nameof(ToolTip);
 			config.WriteInt(nameof(ToolTip.Duration), ToolTip.Duration);
 			config.WriteString(nameof(ToolTip.DigitGroupingSymbol), ToolTip.DigitGroupingSymbol);
 
+			config.Section = nameof(MinimalUi);
 			config.WriteBool(nameof(MinimalUi.ShowName), MinimalUi.ShowName);
 			config.WriteBool(nameof(MinimalUi.ShowPrice), MinimalUi.ShowPrice);
 			config.WriteBool(nameof(MinimalUi.ShowAvgDayPrice), MinimalUi.ShowAvgDayPrice);
@@ -286,6 +297,7 @@ namespace RatScanner
 			config.WriteBool(nameof(MinimalUi.ShowUpdated), MinimalUi.ShowUpdated);
 			config.WriteInt(nameof(MinimalUi.Opacity), MinimalUi.Opacity);
 
+			config.Section = "Other";
 			config.WriteInt(nameof(ScreenResolution), (int)ScreenResolution);
 			config.WriteBool(nameof(MinimizeToTray), MinimizeToTray);
 			config.WriteBool(nameof(AlwaysOnTop), AlwaysOnTop);
