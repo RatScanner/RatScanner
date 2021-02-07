@@ -121,6 +121,7 @@ namespace RatScanner
 		internal static bool LogDebug = false;
 		internal static bool MinimizeToTray = false;
 		internal static bool AlwaysOnTop = true;
+		private static int ConfigVersion => 1;
 
 		private static Resolution screenResolution = Resolution.R1920x1080;
 		internal static Resolution ScreenResolution
@@ -231,10 +232,33 @@ namespace RatScanner
 			return 1 / GetScreenScaleFactor();
 		}
 
+		private static bool IsSupportedConfigVersion()
+		{
+			var config = new SimpleConfig(Paths.ConfigFile, "Other");
+			var readConfigVersion = config.ReadInt(nameof(ConfigVersion), -1);
+			var isSupportedConfigVersion = ConfigVersion == readConfigVersion;
+			if (!isSupportedConfigVersion)
+			{
+				Logger.LogWarning("Config version (" + readConfigVersion + ") is not supported!");
+			}
+			return isSupportedConfigVersion;
+		}
+
 		internal static void LoadConfig()
 		{
-			if (!File.Exists(Paths.ConfigFile))
+			var configFileExists = File.Exists(Paths.ConfigFile);
+			var isSupportedConfigVersion = IsSupportedConfigVersion();
+			if (!configFileExists || !isSupportedConfigVersion)
 			{
+				if (configFileExists) File.Delete(Paths.ConfigFile);
+				if (!isSupportedConfigVersion)
+				{
+					var message = "Old config version detected!\n\n";
+					message += "It will be removed and replaced with a new config file.\n";
+					message += "Please make sure to reconfigure your settings.";
+					Logger.ShowMessage(message);
+				}
+
 				TrySetScreenResolution();
 				SaveConfig();
 			}
@@ -308,6 +332,7 @@ namespace RatScanner
 			config.WriteBool(nameof(MinimizeToTray), MinimizeToTray);
 			config.WriteBool(nameof(AlwaysOnTop), AlwaysOnTop);
 			config.WriteBool(nameof(LogDebug), LogDebug);
+			config.WriteInt(nameof(ConfigVersion), ConfigVersion);
 		}
 
 		/// <summary>

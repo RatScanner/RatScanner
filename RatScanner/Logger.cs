@@ -79,6 +79,11 @@ namespace RatScanner
 			if (RatConfig.LogDebug) AppendToLog("[Debug] " + message);
 		}
 
+		internal static void ShowMessage(string message, string title = null)
+		{
+			MessageBox.Show(message, title ?? "Rat Scanner " + RatConfig.Version, MessageBoxButton.OK, MessageBoxImage.Information);
+		}
+
 		private static string GetUniquePath(string basePath, string fileName, string extension)
 		{
 			fileName = fileName.Replace(' ', '_');
