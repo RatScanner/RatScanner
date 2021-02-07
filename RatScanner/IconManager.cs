@@ -317,7 +317,7 @@ namespace RatScanner
 			// Remove and store leading base uid
 			var spaceIndex = pairs[0].IndexOf(' ');
 			var baseUid = spaceIndex > -1 ? pairs[0].Substring(0, spaceIndex) : pairs[0];
-			pairs[0] = spaceIndex > -1 ? pairs[0].Substring(spaceIndex + 1) : "";
+			pairs[0] = spaceIndex > -1 ? pairs[0][(spaceIndex + 1)..] : "";
 
 			// Found item without any extra info
 			if (string.IsNullOrWhiteSpace(pairs[0])) return new ItemInfo(baseUid);
