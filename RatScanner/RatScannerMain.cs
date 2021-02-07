@@ -5,8 +5,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+using System.Windows;
 using RatScanner.Scan;
 using RatScanner.View;
 using Size = System.Drawing.Size;
@@ -18,17 +17,31 @@ namespace RatScanner
 		private static RatScannerMain _instance = null;
 		internal static RatScannerMain Instance => _instance ??= new RatScannerMain();
 
-		private UserActivityHook activityHook;
+		internal readonly HotkeyManager HotkeyManager;
 
 		private readonly NameScanToolTip _nameScanToolTip;
 		private readonly IconScanToolTip _iconScanToolTip;
 
 		private ItemScan _currentItemScan;
-		internal bool ScanLock = false;
+
+		internal bool ScanLock
+		{
+			get => NameScanLock || IconScanLock;
+			set
+			{
+				if (NameScanLock == value || IconScanLock == value)
+				{
+					throw new ArgumentException("Lock was not correctly acquired / released.");
+				}
+				NameScanLock = value;
+				IconScanLock = value;
+			}
+		}
+
+		internal bool NameScanLock = false;
+		internal bool IconScanLock = false;
 
 		internal MarketDB MarketDB;
-
-		internal bool ModifierDown;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
@@ -78,11 +91,8 @@ namespace RatScanner
 			_iconScanToolTip = new IconScanToolTip();
 			_iconScanToolTip.Show();
 
-			Logger.LogInfo("Registering mouse and keyboard hooks...");
-			activityHook = new UserActivityHook();
-			activityHook.OnMouseActivity += OnMouseEvent;
-			activityHook.KeyDown += OnKeyDown;
-			activityHook.KeyUp += OnKeyUp;
+			Logger.LogInfo("Initializing hotkey manager...");
+			HotkeyManager = new HotkeyManager();
 
 			Logger.LogInfo("Checking for new updates...");
 			CheckForUpdates();
@@ -100,8 +110,8 @@ namespace RatScanner
 				var message = "Version " + mostRecentVersion + " is available!\n";
 				message += "You are using: " + RatConfig.Version + "\n\n";
 				message += "Do you want to install it now?";
-				var result = MessageBox.Show(message, "Rat Scanner Updater", MessageBoxButtons.YesNo);
-				if (result == DialogResult.Yes) UpdateRatScanner();
+				var result = MessageBox.Show(message, "Rat Scanner Updater", MessageBoxButton.YesNo);
+				if (result == MessageBoxResult.Yes) UpdateRatScanner();
 			}
 		}
 
@@ -119,48 +129,20 @@ namespace RatScanner
 			Environment.Exit(0);
 		}
 
-		private void OnMouseEvent(object sender, MouseEventArgs e)
+		/// <summary>
+		/// Perform a icon scan at the given position
+		/// </summary>
+		/// <param name="position">Position on the screen at which to perform the scan</param>
+		/// <returns><see langword="true"/> if a item was scanned successfully</returns>
+		internal bool IconScan(Vector2 position)
 		{
-			if ((e.Button & MouseButtons.Left) == 0) return;
-
-			try
+			Logger.LogDebug("Icon scanning at: " + position);
+			if (IconScanLock)
 			{
-				if (ModifierDown)
-				{
-					Task.Run(delegate
-					{
-						if (RatConfig.IconScan.Enable) IconScan(new Vector2(e.Location));
-					});
-				}
-				else
-				{
-					Task.Run(delegate
-					{
-						if (RatConfig.NameScan.Enable) NameScan(new Vector2(e.Location));
-					});
-				}
+				Logger.LogWarning("IconScanLock active!");
+				return false;
 			}
-			catch (Exception ex)
-			{
-				Logger.LogError(ex.Message, ex);
-			}
-		}
-
-		private void OnKeyDown(object sender, KeyEventArgs e)
-		{
-			if ((int)e.KeyCode == RatConfig.IconScan.ModifierKeyCode) ModifierDown = true;
-		}
-
-		private void OnKeyUp(object sender, KeyEventArgs e)
-		{
-			if ((int)e.KeyCode == RatConfig.IconScan.ModifierKeyCode) ModifierDown = false;
-		}
-
-		private bool IconScan(Vector2 mouseVector2)
-		{
-			Logger.LogDebug("Icon scanning at: " + mouseVector2);
-			if (ScanLock) return false;
-			ScanLock = true;
+			IconScanLock = true;
 
 			_iconScanToolTip.Dispatcher.Invoke(() =>
 			{
@@ -168,32 +150,42 @@ namespace RatScanner
 				_iconScanToolTip.Hide();    // Hide it instantly
 			});
 
-			var x = mouseVector2.X - (RatConfig.IconScan.ScanWidth / 2);
-			var y = mouseVector2.Y - (RatConfig.IconScan.ScanHeight / 2);
+			var x = position.X - (RatConfig.IconScan.ScanWidth / 2);
+			var y = position.Y - (RatConfig.IconScan.ScanHeight / 2);
 
-			var position = new Vector2(x, y);
+			var screenshotPosition = new Vector2(x, y);
 			var size = new Size(RatConfig.IconScan.ScanWidth, RatConfig.IconScan.ScanHeight);
-			var screenshot = GetScreenshot(position, size);
+			var screenshot = GetScreenshot(screenshotPosition, size);
 
-			var itemIconScan = new ItemIconScan(screenshot, mouseVector2);
+			var itemIconScan = new ItemIconScan(screenshot, position);
 
 			if (!itemIconScan.ValidItem)
 			{
-				ScanLock = false;
+				IconScanLock = false;
 				return false;
 			}
 			CurrentItemScan = itemIconScan;
 
 			ShowToolTip(itemIconScan);
 
-			ScanLock = false;
+			IconScanLock = false;
 			return true;
 		}
 
-		private bool NameScan(Vector2 mouseVector2)
+		/// <summary>
+		/// Perform a name scan at the give position
+		/// </summary>
+		/// <param name="position">Position on the screen at which to perform the scan</param>
+		/// <returns></returns>
+		internal bool NameScan(Vector2 position)
 		{
-			if (ScanLock) return false;
-			ScanLock = true;
+			Logger.LogDebug("Name scanning at: " + position);
+			if (NameScanLock)
+			{
+				Logger.LogWarning("NameScanLock active!");
+				return false;
+			}
+			NameScanLock = true;
 
 			_nameScanToolTip.Dispatcher.Invoke(() =>
 			{
@@ -206,25 +198,25 @@ namespace RatScanner
 
 			// Get raw screenshot which includes the icon and text
 			var markerScanSize = RatConfig.NameScan.MarkerScanSize;
-			var positionX = mouseVector2.X - (markerScanSize / 2);
-			var positionY = mouseVector2.Y - (markerScanSize / 2);
+			var screenshotPosX = position.X - (markerScanSize / 2);
+			var screenshotPosY = position.Y - (markerScanSize / 2);
 			var sizeWidth = markerScanSize + RatConfig.NameScan.TextWidth + RatConfig.NameScan.TextHorizontalOffset;
 			var sizeHeight = markerScanSize;
-			var screenshot = GetScreenshot(new Vector2(positionX, positionY), new Size(sizeWidth, sizeHeight));
+			var screenshot = GetScreenshot(new Vector2(screenshotPosX, screenshotPosY), new Size(sizeWidth, sizeHeight));
 
 			// Scan the item
-			var itemNameScan = new ItemNameScan(screenshot, mouseVector2);
+			var itemNameScan = new ItemNameScan(screenshot, position);
 
 			if (!itemNameScan.ValidItem)
 			{
-				ScanLock = false;
+				NameScanLock = false;
 				return false;
 			}
 			CurrentItemScan = itemNameScan;
 
 			ShowToolTip(itemNameScan);
 
-			ScanLock = false;
+			NameScanLock = false;
 			return true;
 		}
 

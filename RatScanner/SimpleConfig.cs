@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -9,6 +11,7 @@ namespace RatScanner
 	{
 		internal string Path;
 		internal string Section;
+		internal string EnumerableSeparator = ";";
 
 		[DllImport("kernel32")]
 		private static extern long WritePrivateProfileString(string section, string key, string val, string filePath);
@@ -41,12 +44,17 @@ namespace RatScanner
 			WriteString(key, value.ToString());
 		}
 
+		internal void WriteEnumerableEnum<T>(string key, IEnumerable<T> value) where T : struct, IConvertible
+		{
+			WriteString(key, string.Join(EnumerableSeparator, value));
+		}
+
 		internal string ReadString(string key, string defaultValue = "")
 		{
 			try
 			{
 				var temp = new StringBuilder(255);
-				GetPrivateProfileString(Section, key.ToLower(), defaultValue, temp, 255, Path);
+				GetPrivateProfileString(Section, key.ToLower(), defaultValue, temp, short.MaxValue, Path);
 				return temp.ToString();
 			}
 			catch (Exception)
@@ -84,6 +92,20 @@ namespace RatScanner
 			try
 			{
 				return bool.Parse(ReadString(key));
+			}
+			catch (Exception)
+			{
+				return defaultValue;
+			}
+		}
+
+		internal IEnumerable<TEnum> ReadEnumerableEnum<TEnum>(string key, IEnumerable<TEnum> defaultValue = null) where TEnum : struct, Enum
+		{
+			try
+			{
+				var readStrings = ReadString(key).Split(EnumerableSeparator);
+				if (readStrings.Length == 1 && readStrings[0] == "") return new TEnum[0];
+				return readStrings.Select(Enum.Parse<TEnum>);
 			}
 			catch (Exception)
 			{
