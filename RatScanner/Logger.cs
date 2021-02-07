@@ -5,14 +5,16 @@ using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace RatScanner
 {
 	internal static class Logger
 	{
-		private static List<string> backlog = new List<string>();
+		private static readonly object SyncObject = new object();
+
+		private static readonly Queue<string> Backlog = new Queue<string>();
 
 		internal static void LogInfo(string message)
 		{
@@ -22,7 +24,7 @@ namespace RatScanner
 		internal static void LogWarning(string message, Exception e = null)
 		{
 			AppendToLog("[Warning] " + message);
-			AppendToLog(e == null ? Environment.StackTrace : e.ToString());
+			if (e != null) AppendToLog(e.ToString());
 		}
 
 		internal static void LogError(string message, Exception e = null)
@@ -96,45 +98,26 @@ namespace RatScanner
 
 		private static void AppendToLog(string content)
 		{
-			ProcessBacklog();
-
 			var text = "[" + DateTime.UtcNow.ToUniversalTime().TimeOfDay + "] > " + content + "\n";
-
-			try
-			{
-				AppendToLogRaw(text);
-			}
-			catch (Exception e)
-			{
-				backlog.Add(text);
-				Thread.Sleep(250);
-				ProcessBacklog();
-			}
-		}
-
-		private static void ProcessBacklog()
-		{
-			var newBacklog = new List<string>();
-
-			foreach (var text in backlog)
-			{
-				try
-				{
-					AppendToLogRaw(text);
-				}
-				catch (Exception e)
-				{
-					newBacklog.Add(text);
-				}
-			}
-
-			backlog = newBacklog;
+			Backlog.Enqueue(text);
+			Task.Run((() => ProcessBacklog()));
 		}
 
 		private static void AppendToLogRaw(string text)
 		{
 			Debug.WriteLine(text);
 			File.AppendAllText(RatConfig.Paths.LogFile, text, Encoding.UTF8);
+		}
+
+		private static void ProcessBacklog()
+		{
+			lock (SyncObject)
+			{
+				for (var i = 0; i < Backlog.Count; i++)
+				{
+					AppendToLogRaw(Backlog.Dequeue());
+				}
+			}
 		}
 
 		internal static void Clear()
@@ -158,7 +141,14 @@ namespace RatScanner
 			var files = Directory.GetFiles(RatConfig.Paths.Debug, "*.png");
 			foreach (var file in files)
 			{
-				File.Delete(file);
+				try
+				{
+					File.Delete(file);
+				}
+				catch (Exception)
+				{
+					Logger.LogDebug("Exception while deleting debug mats.");
+				}
 			}
 		}
 
