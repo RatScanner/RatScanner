@@ -46,7 +46,6 @@ namespace RatScanner.Scan
 
 		internal ItemNameScan(Bitmap capture, Vector2 mouseVector2)
 		{
-			Logger.LogDebug("Name scanning at: " + mouseVector2);
 			Capture = capture;
 			MousePos = mouseVector2;
 

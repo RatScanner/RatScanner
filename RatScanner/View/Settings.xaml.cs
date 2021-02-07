@@ -69,7 +69,7 @@ namespace RatScanner.View
 			RatConfig.IconScan.Enable = settingsVM.EnableIconScan;
 			RatConfig.IconScan.ScanRotatedIcons = settingsVM.ScanRotatedIcons;
 			RatConfig.IconScan.UseCachedIcons = settingsVM.UseCachedIcons;
-			RatConfig.IconScan.ModifierKeyCode = settingsVM.IconScanModifier;
+			RatConfig.IconScan.Hotkey = settingsVM.IconScanHotkey;
 
 			RatConfig.ToolTip.Duration = int.TryParse(settingsVM.ToolTipDuration, out var i) ? i : 0;
 
@@ -93,6 +93,7 @@ namespace RatScanner.View
 			// Apply config
 			PageSwitcher.Instance.Topmost = RatConfig.AlwaysOnTop;
 			if (updateMarketDB) RatScannerMain.Instance.MarketDB.Init();
+			RatScannerMain.Instance.HotkeyManager.RegisterHotkeys();
 
 			// Switch back to main menu
 			PageSwitcher.Instance.Navigate(new MainMenu());

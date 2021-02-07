@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using RatScanner.Controls;
 
 namespace RatScanner.ViewModel
 {
@@ -9,9 +10,9 @@ namespace RatScanner.ViewModel
 
 		public bool EnableIconScan { get; set; }
 		public bool ScanRotatedIcons { get; set; }
-		public int IconScanModifier { get; set; }
 		public bool UseCachedIcons { get; set; }
 		public int IconCacheSize => IconManager.GetIconCacheSize();
+		public Hotkey IconScanHotkey { get; set; }
 
 		public string ToolTipDuration { get; set; }
 
@@ -36,8 +37,8 @@ namespace RatScanner.ViewModel
 
 			EnableIconScan = RatConfig.IconScan.Enable;
 			ScanRotatedIcons = RatConfig.IconScan.ScanRotatedIcons;
-			IconScanModifier = RatConfig.IconScan.ModifierKeyCode;
 			UseCachedIcons = RatConfig.IconScan.UseCachedIcons;
+			IconScanHotkey = RatConfig.IconScan.Hotkey;
 
 			ToolTipDuration = RatConfig.ToolTip.Duration.ToString();
 

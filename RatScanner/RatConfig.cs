@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using System.Windows.Input;
+using RatScanner.Controls;
 using RatScanner.Properties;
 
 namespace RatScanner
@@ -13,10 +16,10 @@ namespace RatScanner
 	{
 		internal enum Resolution
 		{
-			R1366x768  = 0,
-			R1440x900  = 1,
+			R1366x768 = 0,
+			R1440x900 = 1,
 			R1440x1080 = 2,
-			R1600x900  = 3,
+			R1600x900 = 3,
 			R1920x1080 = 4,
 			R2560x1440 = 5,
 			R3840x2160 = 6,
@@ -88,7 +91,7 @@ namespace RatScanner
 			internal static int ScanWidth => (int)(GetScreenScaleFactor() * 640);
 			internal static int ScanHeight => (int)(GetScreenScaleFactor() * 896);
 			internal static int ItemSlotSize = 63;
-			internal static int ModifierKeyCode = 160; // SHIFT = 160, CTRL = 162, ALT = 164
+			internal static Hotkey Hotkey = new Hotkey(new[] { Key.LeftShift }.ToList(), new[] { MouseButton.Left });
 			internal static bool UseCachedIcons = true;
 		}
 
@@ -128,10 +131,10 @@ namespace RatScanner
 				screenResolution = value;
 				switch (screenResolution)
 				{
-					case Resolution.R1366x768:  LoadWXGA(); break;
-					case Resolution.R1440x900:  LoadWXGAPlus(); break;
+					case Resolution.R1366x768: LoadWXGA(); break;
+					case Resolution.R1440x900: LoadWXGAPlus(); break;
 					case Resolution.R1440x1080: LoadR1440x1080(); break;
-					case Resolution.R1600x900:  LoadHDPlus(); break;
+					case Resolution.R1600x900: LoadHDPlus(); break;
 					case Resolution.R1920x1080: LoadFHD(); break;
 					case Resolution.R2560x1080: LoadFHD(); break;
 					case Resolution.R3840x1080: LoadFHD(); break;
@@ -245,7 +248,9 @@ namespace RatScanner
 			config.Section = nameof(IconScan);
 			IconScan.Enable = config.ReadBool(nameof(IconScan.Enable), true);
 			IconScan.ScanRotatedIcons = config.ReadBool(nameof(IconScan.ScanRotatedIcons), true);
-			IconScan.ModifierKeyCode = config.ReadInt(nameof(IconScan.ModifierKeyCode), 160);
+			var keyboardKeys = config.ReadEnumerableEnum(nameof(IconScan.Hotkey) + "Keyboard", new[] { Key.LeftShift });
+			var mouseButtons = config.ReadEnumerableEnum(nameof(IconScan.Hotkey) + "Mouse", new[] { MouseButton.Left });
+			IconScan.Hotkey = new Hotkey(keyboardKeys.ToList(), mouseButtons.ToList());
 			IconScan.UseCachedIcons = config.ReadBool(nameof(IconScan.UseCachedIcons), true);
 
 			config.Section = nameof(ToolTip);
@@ -280,7 +285,8 @@ namespace RatScanner
 			config.Section = nameof(IconScan);
 			config.WriteBool(nameof(IconScan.Enable), IconScan.Enable);
 			config.WriteBool(nameof(IconScan.ScanRotatedIcons), IconScan.ScanRotatedIcons);
-			config.WriteInt(nameof(IconScan.ModifierKeyCode), IconScan.ModifierKeyCode);
+			config.WriteEnumerableEnum(nameof(IconScan.Hotkey) + "Keyboard", IconScan.Hotkey.KeyboardKeys);
+			config.WriteEnumerableEnum(nameof(IconScan.Hotkey) + "Mouse", IconScan.Hotkey.MouseButtons);
 			config.WriteBool(nameof(IconScan.UseCachedIcons), IconScan.UseCachedIcons);
 
 			config.Section = nameof(ToolTip);
@@ -314,7 +320,7 @@ namespace RatScanner
 			Enum.TryParse(typeof(Resolution), resolutionString, out var matchingResolution);
 			if (matchingResolution != null)
 			{
-				screenResolution = (Resolution) matchingResolution;
+				screenResolution = (Resolution)matchingResolution;
 			}
 		}
 	}
