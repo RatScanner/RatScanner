@@ -379,36 +379,32 @@ namespace RatScanner
 			Logger.LogDebug("Dynamic correlation data changed");
 			if (!RatConfig.IconScan.UseCachedIcons) return;
 
-			// Wait if currently scanning a item
-			while (RatScannerMain.Instance.ScanLock) await Task.Delay(25);
+			lock (RatScannerMain.NameScanLock)
+				lock (RatScannerMain.IconScanLock)
+				{
 
-			// Try to load new dynamic correlation data
-			var newDynamicCorrelationData = LoadDynamicCorrelationData();
-			if (newDynamicCorrelationData == null) return;
+					// Try to load new dynamic correlation data
+					var newDynamicCorrelationData = LoadDynamicCorrelationData();
+					if (newDynamicCorrelationData == null) return;
 
-			// Try to load new dynamic icons
-			var newDynamicIcons = LoadDynamicIcons();
-			if (newDynamicIcons == null) return;
+					// Try to load new dynamic icons
+					var newDynamicIcons = LoadDynamicIcons();
+					if (newDynamicIcons == null) return;
 
-			// All data loaded successfully at this point so we can begin swapping the data
+					// All data loaded successfully at this point so we can begin swapping the data
 
-			// Acquire the lock
-			RatScannerMain.Instance.ScanLock = true;
+					// Replace old with new dynamic icons
+					DynamicIcons = newDynamicIcons;
 
-			// Replace old with new dynamic icons
-			DynamicIcons = newDynamicIcons;
+					// Replace old with new dynamic correlation data
+					foreach (var (key, value) in newDynamicCorrelationData)
+					{
+						CorrelationData[key] = value;
+					}
 
-			// Replace old with new dynamic correlation data
-			foreach (var (key, value) in newDynamicCorrelationData)
-			{
-				CorrelationData[key] = value;
-			}
-
-			// Update inverse correlation data
-			InverseCorrelationData();
-
-			// Release the lock
-			RatScannerMain.Instance.ScanLock = false;
+					// Update inverse correlation data
+					InverseCorrelationData();
+				}
 		}
 
 		/// <summary>
