@@ -18,25 +18,39 @@ namespace RatScanner
 
 		~HotkeyManager()
 		{
+			UnregisterHotkeys();
 			UserActivityHelper.Stop(true, true, false);
 		}
 
 		/// <summary>
-		/// Register the hotkeys so the event handlers receive hotkey presses
+		/// Register hotkeys so the event handlers receive hotkey presses
 		/// </summary>
 		/// <remarks>
 		/// Called by the constructor
 		/// </remarks>
-		internal void RegisterHotkeys()
+		private void RegisterHotkeys()
 		{
-			// Destroy old active hotkeys to prevent duplicated hotkey
-			NameScanHotkey?.Dispose();
-			IconScanHotkey?.Dispose();
-
-			// Register new hotkeys
 			var nameScanHotkey = new Hotkey(null, new[] { MouseButton.Left });
 			NameScanHotkey = new ActiveHotkey(nameScanHotkey, OnNameScanHotkey, ref NameScan.Enable);
 			IconScanHotkey = new ActiveHotkey(IconScan.Hotkey, OnIconScanHotkey, ref IconScan.Enable);
+		}
+
+		/// <summary>
+		/// Unregister hotkeys
+		/// </summary>
+		private void UnregisterHotkeys()
+		{
+			NameScanHotkey?.Dispose();
+			IconScanHotkey?.Dispose();
+		}
+
+		/// <summary>
+		/// Unregisters and then re-registers hotkeys
+		/// </summary>
+		internal void UpdateHotkeys()
+		{
+			UnregisterHotkeys();
+			RegisterHotkeys();
 		}
 
 		private static void Wrap<T>(Func<T> func)

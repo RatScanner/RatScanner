@@ -93,7 +93,7 @@ namespace RatScanner.View
 			// Apply config
 			PageSwitcher.Instance.Topmost = RatConfig.AlwaysOnTop;
 			if (updateMarketDB) RatScannerMain.Instance.MarketDB.Init();
-			RatScannerMain.Instance.HotkeyManager.RegisterHotkeys();
+			RatScannerMain.Instance.HotkeyManager.UpdateHotkeys();
 
 			// Switch back to main menu
 			PageSwitcher.Instance.Navigate(new MainMenu());
