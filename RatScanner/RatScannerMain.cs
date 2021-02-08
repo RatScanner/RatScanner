@@ -24,22 +24,21 @@ namespace RatScanner
 
 		private ItemScan _currentItemScan;
 
-		internal bool ScanLock
-		{
-			get => NameScanLock || IconScanLock;
-			set
-			{
-				if (NameScanLock == value || IconScanLock == value)
-				{
-					throw new ArgumentException("Lock was not correctly acquired / released.");
-				}
-				NameScanLock = value;
-				IconScanLock = value;
-			}
-		}
+		/// <summary>
+		/// Lock for name scanning
+		/// </summary>
+		/// <remarks>
+		/// Lock order: 0
+		/// </remarks>
+		internal static object NameScanLock = new object();
 
-		internal bool NameScanLock = false;
-		internal bool IconScanLock = false;
+		/// <summary>
+		/// Lock for icon scanning
+		/// </summary>
+		/// <remarks>
+		/// Lock order: 1
+		/// </remarks>
+		internal static object IconScanLock = new object();
 
 		internal MarketDB MarketDB;
 
@@ -137,38 +136,30 @@ namespace RatScanner
 		internal bool IconScan(Vector2 position)
 		{
 			Logger.LogDebug("Icon scanning at: " + position);
-			if (IconScanLock)
+			lock (IconScanLock)
 			{
-				Logger.LogWarning("IconScanLock active!");
-				return false;
+
+				_iconScanToolTip.Dispatcher.Invoke(() =>
+				{
+					IconScanToolTip.ScheduleHide();
+					_iconScanToolTip.Hide(); // Hide it instantly
+				});
+
+				var x = position.X - (RatConfig.IconScan.ScanWidth / 2);
+				var y = position.Y - (RatConfig.IconScan.ScanHeight / 2);
+
+				var screenshotPosition = new Vector2(x, y);
+				var size = new Size(RatConfig.IconScan.ScanWidth, RatConfig.IconScan.ScanHeight);
+				var screenshot = GetScreenshot(screenshotPosition, size);
+
+				var itemIconScan = new ItemIconScan(screenshot, position);
+
+				if (!itemIconScan.ValidItem) return false;
+
+				CurrentItemScan = itemIconScan;
+
+				ShowToolTip(itemIconScan);
 			}
-			IconScanLock = true;
-
-			_iconScanToolTip.Dispatcher.Invoke(() =>
-			{
-				IconScanToolTip.ScheduleHide();
-				_iconScanToolTip.Hide();    // Hide it instantly
-			});
-
-			var x = position.X - (RatConfig.IconScan.ScanWidth / 2);
-			var y = position.Y - (RatConfig.IconScan.ScanHeight / 2);
-
-			var screenshotPosition = new Vector2(x, y);
-			var size = new Size(RatConfig.IconScan.ScanWidth, RatConfig.IconScan.ScanHeight);
-			var screenshot = GetScreenshot(screenshotPosition, size);
-
-			var itemIconScan = new ItemIconScan(screenshot, position);
-
-			if (!itemIconScan.ValidItem)
-			{
-				IconScanLock = false;
-				return false;
-			}
-			CurrentItemScan = itemIconScan;
-
-			ShowToolTip(itemIconScan);
-
-			IconScanLock = false;
 			return true;
 		}
 
@@ -180,43 +171,34 @@ namespace RatScanner
 		internal bool NameScan(Vector2 position)
 		{
 			Logger.LogDebug("Name scanning at: " + position);
-			if (NameScanLock)
+			lock (NameScanLock)
 			{
-				Logger.LogWarning("NameScanLock active!");
-				return false;
+
+				_nameScanToolTip.Dispatcher.Invoke(() =>
+				{
+					NameScanToolTip.ScheduleHide();
+					_nameScanToolTip.Hide();    // Hide it instantly
+				});
+
+				// Wait for game ui to update the click
+				Thread.Sleep(50);
+
+				// Get raw screenshot which includes the icon and text
+				var markerScanSize = RatConfig.NameScan.MarkerScanSize;
+				var screenshotPosX = position.X - (markerScanSize / 2);
+				var screenshotPosY = position.Y - (markerScanSize / 2);
+				var sizeWidth = markerScanSize + RatConfig.NameScan.TextWidth + RatConfig.NameScan.TextHorizontalOffset;
+				var sizeHeight = markerScanSize;
+				var screenshot = GetScreenshot(new Vector2(screenshotPosX, screenshotPosY), new Size(sizeWidth, sizeHeight));
+
+				// Scan the item
+				var itemNameScan = new ItemNameScan(screenshot, position);
+
+				if (!itemNameScan.ValidItem) return false;
+				CurrentItemScan = itemNameScan;
+
+				ShowToolTip(itemNameScan);
 			}
-			NameScanLock = true;
-
-			_nameScanToolTip.Dispatcher.Invoke(() =>
-			{
-				NameScanToolTip.ScheduleHide();
-				_nameScanToolTip.Hide();    // Hide it instantly
-			});
-
-			// Wait for game ui to update the click
-			Thread.Sleep(50);
-
-			// Get raw screenshot which includes the icon and text
-			var markerScanSize = RatConfig.NameScan.MarkerScanSize;
-			var screenshotPosX = position.X - (markerScanSize / 2);
-			var screenshotPosY = position.Y - (markerScanSize / 2);
-			var sizeWidth = markerScanSize + RatConfig.NameScan.TextWidth + RatConfig.NameScan.TextHorizontalOffset;
-			var sizeHeight = markerScanSize;
-			var screenshot = GetScreenshot(new Vector2(screenshotPosX, screenshotPosY), new Size(sizeWidth, sizeHeight));
-
-			// Scan the item
-			var itemNameScan = new ItemNameScan(screenshot, position);
-
-			if (!itemNameScan.ValidItem)
-			{
-				NameScanLock = false;
-				return false;
-			}
-			CurrentItemScan = itemNameScan;
-
-			ShowToolTip(itemNameScan);
-
-			NameScanLock = false;
 			return true;
 		}
 
