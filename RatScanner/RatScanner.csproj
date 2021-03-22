@@ -1,5 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
-
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop" ToolsVersion="Current">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -8,8 +7,10 @@
     <ApplicationIcon>Resources\RatLogoSmall.ico</ApplicationIcon>
     <StartupObject>RatScanner.App</StartupObject>
     <Version>2.5.2</Version>
+    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <UpgradeBackupLocation>C:\Users\Dima\Documents\GitHub\RatScanner\Backup2\</UpgradeBackupLocation>
+    <OldToolsVersion>Current</OldToolsVersion>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
@@ -17,27 +18,22 @@
     <DefineConstants>TRACE</DefineConstants>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="Resources\iconMods.png" />
     <None Remove="Resources\RatLogoMedium.png" />
     <None Remove="Resources\settings.png" />
   </ItemGroup>
-
   <ItemGroup>
     <Resource Include="Resources\iconMods.png" />
     <Resource Include="Resources\settings.png" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="OpenCvSharp4.Windows" Version="4.3.0.20200524" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -45,28 +41,26 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-
   <ItemGroup>
-    <Page Include="App.xaml" />
+    <Page Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
-
   <ItemGroup>
     <SplashScreen Include="Resources\RatLogoMedium.png" />
   </ItemGroup>
-
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy &quot;$(ProjectDir)Data\*&quot; &quot;$(TargetDir)\Data\&quot; /y /e /s /q" />
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DebugType>None</DebugType>
-    <DebugSymbols>false</DebugSymbols>
-  </PropertyGroup>
-
-</Target>
+      <DebugType>None</DebugType>
+      <DebugSymbols>false</DebugSymbols>
+    </PropertyGroup>
+  </Target>
 </Project>

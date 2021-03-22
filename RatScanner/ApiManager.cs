@@ -64,8 +64,27 @@ namespace RatScanner
 					var langString = LanguageMapping[language];
 					var jsonGzipData = client.DownloadData($"{BaseUrl}/all?lang={langString}");
 					var json = ExtractGZip(jsonGzipData);
+					var marketItems = JsonConvert.DeserializeObject<MarketItem[]>(json);
 
-					return JsonConvert.DeserializeObject<MarketItem[]>(json);
+					var questItems = LoadQuestItems();
+					var hideoutItems = LoadHideoutItems();
+					foreach (MarketItem item in marketItems)
+					{
+						var lowerCaseName = item.Name.ToLower();
+						if (questItems.ContainsKey(lowerCaseName))
+						{
+							var questData = questItems[lowerCaseName];
+							item.RequiredQuestCount = questData.ContainsKey("count") ? (int)(long)questData["count"] : 0;
+							item.RequiredQuestFIRCount = questData.ContainsKey("fir_count") ? (int)(long)questData["fir_count"] : 0;
+						}
+						if (hideoutItems.ContainsKey(lowerCaseName))
+						{
+							var hideoutData = hideoutItems[lowerCaseName];
+							item.RequiredHideoutCount = hideoutData.ContainsKey("count") ? (int)(long)hideoutData["count"] : 0;
+						}
+					}
+
+					return marketItems;
 				}
 			}
 			catch (Exception e)
@@ -128,6 +147,20 @@ namespace RatScanner
 				Logger.LogError("Could not extract data.\n" + e);
 				return "";
 			}
+		}
+
+		private static Dictionary<string, Dictionary<string, object>> LoadQuestItems()
+		{
+			using StreamReader r = new StreamReader(RatConfig.Paths.QuestItems);
+			string json = r.ReadToEnd();
+			return JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, object>>>(json);
+		}
+
+		private static Dictionary<string, Dictionary<string, object>> LoadHideoutItems()
+		{
+			using StreamReader r = new StreamReader(RatConfig.Paths.HideoutItems);
+			string json = r.ReadToEnd();
+			return JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, object>>>(json);
 		}
 	}
 }

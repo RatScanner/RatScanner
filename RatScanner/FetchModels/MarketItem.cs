@@ -46,6 +46,10 @@ namespace RatScanner.FetchModels
 		/// </summary>
 		public string Meta { get; set; }
 
+		public int RequiredHideoutCount { get; set; } = 0;
+		public int RequiredQuestCount { get; set; } = 0;
+		public int RequiredQuestFIRCount { get; set; } = 0;
+
 		public bool HasMods => Mods?.Length > 0;
 
 		public MarketItem(string uid)

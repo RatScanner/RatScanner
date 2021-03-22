@@ -4,7 +4,7 @@
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-	d:DesignHeight="390"
+	d:DesignHeight="475"
 	d:DesignWidth="280"
 	x:ClassModifier="internal"
 	Background="#444444"
@@ -185,6 +185,79 @@
 					<Style TargetType="StackPanel">
 						<Style.Triggers>
 							<DataTrigger Binding="{Binding TraderName}" Value="">
+								<Setter Property="Height" Value="0" />
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</StackPanel.Style>
+			</StackPanel>
+
+			<StackPanel>
+				<Separator />
+				<Grid Margin="0,5,0,0">
+					<Label Grid.Column="0" Content="Quests" />
+					<Label Grid.Column="1" Content="{Binding RequiredQuestCount}" />
+
+					<Grid.Style>
+						<Style TargetType="Grid">
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding RequiredQuestCount}" Value="0">
+									<Setter Property="Height" Value="0" />
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</Grid.Style>
+
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" />
+						<ColumnDefinition Width="Auto" />
+					</Grid.ColumnDefinitions>
+				</Grid>
+
+				<Grid>
+					<Label Grid.Column="0" Content="Quests(FiR) " />
+					<Label Grid.Column="1" Content="{Binding RequiredQuestFIRCount}" />
+
+					<Grid.Style>
+						<Style TargetType="Grid">
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding RequiredQuestFIRCount}" Value="0">
+									<Setter Property="Height" Value="0" />
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</Grid.Style>
+
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" />
+						<ColumnDefinition Width="Auto" />
+					</Grid.ColumnDefinitions>
+				</Grid>
+
+				<Grid Margin="0,0,0,5">
+					<Label Grid.Column="0" Content="Hideout " />
+					<Label Grid.Column="1" Content="{Binding RequiredHideoutCount}" />
+
+					<Grid.Style>
+						<Style TargetType="Grid">
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding RequiredHideoutCount}" Value="0">
+									<Setter Property="Height" Value="0" />
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</Grid.Style>
+
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" />
+						<ColumnDefinition Width="Auto" />
+					</Grid.ColumnDefinitions>
+				</Grid>
+
+				<StackPanel.Style>
+					<Style TargetType="StackPanel">
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding HasRequiredCounts}" Value='false'>
 								<Setter Property="Height" Value="0" />
 							</DataTrigger>
 						</Style.Triggers>

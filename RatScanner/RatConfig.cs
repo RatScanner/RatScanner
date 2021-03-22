@@ -59,6 +59,8 @@ namespace RatScanner
 			internal static string DynamicIcon = Path.Combine(EftTemp, "Icon Cache");
 			internal static string StaticCorrelation = Path.Combine(Data, "correlation.json");
 			internal static string DynamicCorrelation = Path.Combine(DynamicIcon, "index.json");
+			internal static string QuestItems = Path.Combine(Data, "quest.json");
+			internal static string HideoutItems = Path.Combine(Data, "hideout.json");
 			internal static string UnknownIcon = Path.Combine(Data, "unknown.png");
 			internal static string ConfigFile = Path.Combine(Base, "config.cfg");
 			internal static string Debug = Path.Combine(Base, "Debug");
