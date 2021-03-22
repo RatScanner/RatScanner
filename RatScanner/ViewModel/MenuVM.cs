@@ -35,12 +35,6 @@ namespace RatScanner.ViewModel
 
 		public int RequiredQuestCount => MatchedItems[0].RequiredQuestCount;
 
-		public int RequiredQuestFIRCount => MatchedItems[0].RequiredQuestFIRCount;
-
-		public int RequiredHideoutCount => MatchedItems[0].RequiredHideoutCount;
-
-		public bool HasRequiredCounts => RequiredQuestCount + RequiredQuestFIRCount + RequiredHideoutCount > 0;
-
 		public string Price => PriceToString(GetPrice());
 
 		private int GetPrice()

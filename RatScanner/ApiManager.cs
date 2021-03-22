@@ -5,6 +5,7 @@ using System.IO.Compression;
 using System.Net;
 using System.Text;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RatScanner.FetchModels;
 
 namespace RatScanner
@@ -55,6 +56,10 @@ namespace RatScanner
 
 		private const string BaseUrl = "https://api.ratscanner.com/v2";
 
+		private const string GraphQLUrl = "https://tarkov-tools.com/graphql";
+
+		private const string QuestInfoGraphQLQuery = "{\"query\":\"{quests {objectives {type targetItem {id} number}}}\"}";
+
 		public static MarketItem[] GetMarketDB(Language language = Language.English)
 		{
 			try
@@ -66,21 +71,12 @@ namespace RatScanner
 					var json = ExtractGZip(jsonGzipData);
 					var marketItems = JsonConvert.DeserializeObject<MarketItem[]>(json);
 
-					var questItems = LoadQuestItems();
-					var hideoutItems = LoadHideoutItems();
+					var questItems = ParseQuestItems(client.UploadString(GraphQLUrl, QuestInfoGraphQLQuery));
 					foreach (MarketItem item in marketItems)
 					{
-						var lowerCaseName = item.Name.ToLower();
-						if (questItems.ContainsKey(lowerCaseName))
+						if (questItems.ContainsKey(item.Uid))
 						{
-							var questData = questItems[lowerCaseName];
-							item.RequiredQuestCount = questData.ContainsKey("count") ? (int)(long)questData["count"] : 0;
-							item.RequiredQuestFIRCount = questData.ContainsKey("fir_count") ? (int)(long)questData["fir_count"] : 0;
-						}
-						if (hideoutItems.ContainsKey(lowerCaseName))
-						{
-							var hideoutData = hideoutItems[lowerCaseName];
-							item.RequiredHideoutCount = hideoutData.ContainsKey("count") ? (int)(long)hideoutData["count"] : 0;
+							item.RequiredQuestCount = questItems[item.Uid];
 						}
 					}
 
@@ -149,18 +145,53 @@ namespace RatScanner
 			}
 		}
 
-		private static Dictionary<string, Dictionary<string, object>> LoadQuestItems()
+		private static Dictionary<string, int> ParseQuestItems(string json)
 		{
-			using StreamReader r = new StreamReader(RatConfig.Paths.QuestItems);
-			string json = r.ReadToEnd();
-			return JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, object>>>(json);
-		}
+			var questDict = new Dictionary<string, int>();
+			try
+			{
+				var deserialized = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+				if (deserialized.ContainsKey("data"))
+				{
+					var dataDict = (deserialized["data"] as JObject).ToObject<Dictionary<string, object>>();
+					if (dataDict.ContainsKey("quests"))
+					{
+						var questList = (dataDict["quests"] as JArray).ToObject<List<Dictionary<string, object>>>();
+						foreach (Dictionary<string, object> quest in questList)
+						{
+							if (quest.ContainsKey("objectives"))
+							{
+								var objectives = (quest["objectives"] as JArray).ToObject<List<Dictionary<string, object>>>(); ;
+								foreach (Dictionary<string, object> objective in objectives)
+								{
+									if (objective.ContainsKey("type") && objective.ContainsKey("number") && objective.ContainsKey("targetItem"))
+									{
+										if ((string)objective["type"] == "find")
+										{
+											var targetItemNumber = (int)(long)objective["number"];
+											var targetItem = (objective["targetItem"] as JObject).ToObject<Dictionary<string, string>>();
+											if (targetItem.ContainsKey("id"))
+											{
+												var targetItemId = targetItem["id"];
 
-		private static Dictionary<string, Dictionary<string, object>> LoadHideoutItems()
-		{
-			using StreamReader r = new StreamReader(RatConfig.Paths.HideoutItems);
-			string json = r.ReadToEnd();
-			return JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, object>>>(json);
+												var total = questDict.GetValueOrDefault(targetItemId, 0);
+												total += targetItemNumber;
+												questDict[targetItemId] = total;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				Logger.LogError("Failed to deserialize quest data", e);
+			}
+
+			return questDict;
 		}
 	}
 }
