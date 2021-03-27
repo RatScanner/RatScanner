@@ -166,6 +166,29 @@
 			</StackPanel.Style>
 		</StackPanel>
 
+		<StackPanel x:Name="FindInRaidDisplay">
+			<Separator />
+			<Grid>
+				<Label Grid.Column="0" Content="Find in Raid" />
+				<Label Grid.Column="1" Content="{Binding RequiredQuestCount}" />
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
+			</Grid>
+
+			<StackPanel.Style>
+				<Style TargetType="StackPanel">
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding RequiredQuestCount}" Value="0">
+							<Setter Property="Height" Value="0" />
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</StackPanel.Style>
+		</StackPanel>
+
 		<StackPanel x:Name="UpdatedDisplay">
 			<Separator />
 			<Grid Margin="0,5,0,0">

@@ -22,6 +22,7 @@ namespace RatScanner.ViewModel
 		public bool ShowAvgWeekPrice { get; set; }
 		public bool ShowPricePerSlot { get; set; }
 		public bool ShowTraderPrice { get; set; }
+		public bool ShowRequiredQuestCount { get; set; }
 		public bool ShowUpdated { get; set; }
 		public int Opacity { get; set; }
 
@@ -48,6 +49,7 @@ namespace RatScanner.ViewModel
 			ShowAvgWeekPrice = RatConfig.MinimalUi.ShowAvgWeekPrice;
 			ShowPricePerSlot = RatConfig.MinimalUi.ShowPricePerSlot;
 			ShowTraderPrice = RatConfig.MinimalUi.ShowTraderPrice;
+			ShowRequiredQuestCount = RatConfig.MinimalUi.ShowRequiredQuestCount;
 			ShowUpdated = RatConfig.MinimalUi.ShowUpdated;
 			Opacity = RatConfig.MinimalUi.Opacity;
 

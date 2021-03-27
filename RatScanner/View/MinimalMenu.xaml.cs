@@ -29,6 +29,7 @@ namespace RatScanner.View
 			AvgWeekPriceDisplay.Visibility = RCMinUi.ShowAvgWeekPrice ? v : c;
 			PricePerSlotDisplay.Visibility = RCMinUi.ShowPricePerSlot ? v : c;
 			TraderPriceDisplay.Visibility = RCMinUi.ShowTraderPrice ? v : c;
+			FindInRaidDisplay.Visibility = RCMinUi.ShowRequiredQuestCount ? v : c;
 			UpdatedDisplay.Visibility = RCMinUi.ShowUpdated ? v : c;
 		}
 

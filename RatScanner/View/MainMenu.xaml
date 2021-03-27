@@ -195,7 +195,7 @@
 			<StackPanel>
 				<Separator />
 				<Grid Margin="0,5">
-					<Label Grid.Column="0" Content="# for Quests" />
+					<Label Grid.Column="0" Content="Find in Raid (Quests)" />
 					<Label Grid.Column="1" Content="{Binding RequiredQuestCount}" />
 
 					<Grid.ColumnDefinitions>

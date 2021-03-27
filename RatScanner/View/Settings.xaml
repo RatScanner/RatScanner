@@ -436,6 +436,24 @@
 					<Grid>
 						<Grid.ToolTip>
 							<TextBlock>
+								Show the "find in raid" amount required for quests
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0"
+									 Content="Show Find in Raid (Quests)" />
+						<CheckBox Grid.Column="1"
+											Margin="5,0"
+											VerticalAlignment="Center"
+											IsChecked="{Binding ShowRequiredQuestCount}" />
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
 								Show when the data was last updated
 							</TextBlock>
 						</Grid.ToolTip>

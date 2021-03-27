@@ -113,6 +113,7 @@ namespace RatScanner
 			internal static bool ShowAvgWeekPrice = true;
 			internal static bool ShowPricePerSlot = true;
 			internal static bool ShowTraderPrice = true;
+			internal static bool ShowRequiredQuestCount = true;
 			internal static bool ShowUpdated = true;
 			internal static int Opacity = 50;
 		}
@@ -288,6 +289,7 @@ namespace RatScanner
 			MinimalUi.ShowAvgWeekPrice = config.ReadBool(nameof(MinimalUi.ShowAvgWeekPrice), true);
 			MinimalUi.ShowPricePerSlot = config.ReadBool(nameof(MinimalUi.ShowPricePerSlot), true);
 			MinimalUi.ShowTraderPrice = config.ReadBool(nameof(MinimalUi.ShowTraderPrice), true);
+			MinimalUi.ShowRequiredQuestCount = config.ReadBool(nameof(MinimalUi.ShowRequiredQuestCount), true);
 			MinimalUi.ShowUpdated = config.ReadBool(nameof(MinimalUi.ShowUpdated), true);
 			MinimalUi.Opacity = config.ReadInt(nameof(MinimalUi.Opacity), 50);
 
@@ -324,6 +326,7 @@ namespace RatScanner
 			config.WriteBool(nameof(MinimalUi.ShowAvgWeekPrice), MinimalUi.ShowAvgWeekPrice);
 			config.WriteBool(nameof(MinimalUi.ShowPricePerSlot), MinimalUi.ShowPricePerSlot);
 			config.WriteBool(nameof(MinimalUi.ShowTraderPrice), MinimalUi.ShowTraderPrice);
+			config.WriteBool(nameof(MinimalUi.ShowRequiredQuestCount), MinimalUi.ShowRequiredQuestCount);
 			config.WriteBool(nameof(MinimalUi.ShowUpdated), MinimalUi.ShowUpdated);
 			config.WriteInt(nameof(MinimalUi.Opacity), MinimalUi.Opacity);
 
