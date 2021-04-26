@@ -248,17 +248,19 @@ namespace RatScanner
 		{
 			var configFileExists = File.Exists(Paths.ConfigFile);
 			var isSupportedConfigVersion = IsSupportedConfigVersion();
-			if (!configFileExists || !isSupportedConfigVersion)
+			if (configFileExists && !isSupportedConfigVersion)
 			{
-				if (configFileExists) File.Delete(Paths.ConfigFile);
-				if (!isSupportedConfigVersion)
-				{
-					var message = "Old config version detected!\n\n";
-					message += "It will be removed and replaced with a new config file.\n";
-					message += "Please make sure to reconfigure your settings.";
-					Logger.ShowMessage(message);
-				}
+				var message = "Old config version detected!\n\n";
+				message += "It will be removed and replaced with a new config file.\n";
+				message += "Please make sure to reconfigure your settings after.";
+				Logger.ShowMessage(message);
 
+				File.Delete(Paths.ConfigFile);
+				TrySetScreenResolution();
+				SaveConfig();
+			}
+			else if (!configFileExists)
+			{
 				TrySetScreenResolution();
 				SaveConfig();
 			}
