@@ -119,7 +119,7 @@ namespace RatScanner.Scan
 			var itemInfos = IconManager.GetItemInfo(matchResult.iconKey);
 			if (!(itemInfos?.Length > 0)) return;
 
-			MatchedItems = Array.ConvertAll(itemInfos, itemInfo => itemInfo.GetMarketItem());
+			MatchedItems = Array.ConvertAll(itemInfos, itemInfo => itemInfo.GetItem());
 			if (MatchedItems?.Length > 0) MatchedItems = MatchedItems.Where(item => item != null).ToArray();
 			if (MatchedItems?.Length > 0) ValidItem = true;
 		}
