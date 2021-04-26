@@ -41,7 +41,7 @@ namespace RatScanner.Scan
 
 		internal ItemNameScan()
 		{
-			MatchedItems = new[] { RatScannerMain.Instance.MarketDB.GetItemByName("", false, out var _) };
+			MatchedItems = new[] { RatScannerMain.Instance.ItemDB.GetItem("57347baf24597738002c6178") };
 		}
 
 		internal ItemNameScan(Bitmap capture, Vector2 mouseVector2)
@@ -100,8 +100,25 @@ namespace RatScanner.Scan
 			ScannedText = ScannedText.Trim();
 
 			// Get market item from detected text
-			const string regexFilter = @"[^A-Za-z0-9]+"; // Filter out everything which is not alphanumerical
-			MatchedItems = new[] { RatScannerMain.Instance.MarketDB.GetItemByName(ScannedText, IsShortName, out Confidence, regexFilter, false) };
+			MatchedItems = new[] { RatScannerMain.Instance.ItemDB.GetItem(item =>
+			{
+				if(IsShortName) return -LevenshteinDistance(item.ShortName, ScannedText);
+				return -LevenshteinDistance(item.Name, ScannedText);
+			}) };
+
+			// Calculate confidence
+			if (IsShortName)
+			{
+				var match = MatchedItems[0].ShortName.Replace(" ", "");
+				var dist = LevenshteinDistance(match, ScannedText);
+				Confidence = 1 - dist / (float)match.Length;
+			}
+			else
+			{
+				var match = MatchedItems[0].Name.Replace(" ", "");
+				var dist = LevenshteinDistance(match, ScannedText);
+				Confidence = 1 - dist / (float)match.Length;
+			}
 
 			if (Confidence < RCNameScan.ConfWarnThreshold)
 			{
@@ -185,6 +202,49 @@ namespace RatScanner.Scan
 			position += new Vector2(0, Resources.markerFHD.Height);
 			position += new Vector2(RatConfig.ToolTip.WidthOffset, RatConfig.ToolTip.HeightOffset);
 			return position;
+		}
+
+		private static int LevenshteinDistance(string target, string value)
+		{
+			if (target.Length > value.Length) target = target.Substring(0, value.Length);
+
+			if (target.Length == 0) return value.Length;
+			if (value.Length == 0) return target.Length;
+
+			var costs = new int[target.Length];
+
+			// Add indexing for insertion to first row
+			for (var i = 0; i < costs.Length;) costs[i] = ++i;
+
+			for (var i = 0; i < value.Length; i++)
+			{
+				// Cost of the first index
+				var cost = i;
+				var additionCost = i;
+
+				// Cache value for inner loop to avoid index lookup and bonds checking, profiled this is quicker
+				var value2Char = value[i];
+
+				for (var j = 0; j < target.Length; j++)
+				{
+					var insertionCost = cost;
+					cost = additionCost;
+
+					// Assigning this here reduces the array reads we do
+					additionCost = costs[j];
+
+					if (value2Char != target[j])
+					{
+						if (insertionCost < cost) cost = insertionCost;
+						if (additionCost < cost) cost = additionCost;
+						++cost;
+					}
+
+					costs[j] = cost;
+				}
+			}
+
+			return costs[^1];
 		}
 	}
 }

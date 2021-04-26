@@ -24,11 +24,10 @@ namespace RatScanner.View
 			const Visibility c = Visibility.Collapsed;
 
 			NameDisplay.Visibility = RCMinUi.ShowName ? v : c;
-			PriceDisplay.Visibility = RCMinUi.ShowPrice ? v : c;
 			AvgDayPriceDisplay.Visibility = RCMinUi.ShowAvgDayPrice ? v : c;
-			AvgWeekPriceDisplay.Visibility = RCMinUi.ShowAvgWeekPrice ? v : c;
 			PricePerSlotDisplay.Visibility = RCMinUi.ShowPricePerSlot ? v : c;
 			TraderPriceDisplay.Visibility = RCMinUi.ShowTraderPrice ? v : c;
+			TraderMaxPriceDisplay.Visibility = RCMinUi.ShowTraderMaxPrice ? v : c;
 			UpdatedDisplay.Visibility = RCMinUi.ShowUpdated ? v : c;
 		}
 

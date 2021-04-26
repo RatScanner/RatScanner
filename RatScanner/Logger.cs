@@ -161,7 +161,7 @@ namespace RatScanner
 		{
 			// Remove everything after ':' which is commonly a path
 			message = message.Split(':')[0];
-			var url = ApiManager.GetResource(ApiManager.ResourceType.FAQ);
+			var url = ApiManager.GetResource(ApiManager.ResourceType.FAQLink);
 			url += "#:~:text=" + WebUtility.HtmlEncode(message);
 			OpenURL(url);
 		}
@@ -182,7 +182,7 @@ namespace RatScanner
 
 			var labels = "bug";
 
-			var url = ApiManager.GetResource(ApiManager.ResourceType.Github);
+			var url = ApiManager.GetResource(ApiManager.ResourceType.GithubLink);
 			url += "/issues/new";
 			url += "?body=" + WebUtility.UrlEncode(body);
 			url += "&title=" + WebUtility.UrlEncode(title);

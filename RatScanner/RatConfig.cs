@@ -59,6 +59,7 @@ namespace RatScanner
 			internal static string DynamicIcon = Path.Combine(EftTemp, "Icon Cache");
 			internal static string StaticCorrelation = Path.Combine(Data, "correlation.json");
 			internal static string DynamicCorrelation = Path.Combine(DynamicIcon, "index.json");
+			internal static string ItemData = Path.Combine(Data, "items.json");
 			internal static string UnknownIcon = Path.Combine(Data, "unknown.png");
 			internal static string ConfigFile = Path.Combine(Base, "config.cfg");
 			internal static string Debug = Path.Combine(Base, "Debug");
@@ -73,7 +74,7 @@ namespace RatScanner
 			internal static ApiManager.Language Language = ApiManager.Language.English;
 			internal static Bitmap Marker = Resources.markerFHD;
 			internal static Bitmap MarkerShort = Resources.markerShortFHD;
-			internal static float ConfWarnThreshold = 0.90f;
+			internal static float ConfWarnThreshold = 0.85f;
 			internal static int MarkerScanSize = 50;
 			internal static float MarkerThreshold = 0.9f;
 			internal static int TextHorizontalOffset = 21;
@@ -108,13 +109,12 @@ namespace RatScanner
 		internal static class MinimalUi
 		{
 			internal static bool ShowName = true;
-			internal static bool ShowPrice = true;
 			internal static bool ShowAvgDayPrice = true;
-			internal static bool ShowAvgWeekPrice = true;
 			internal static bool ShowPricePerSlot = true;
 			internal static bool ShowTraderPrice = true;
-			internal static bool ShowUpdated = true;
-			internal static int Opacity = 50;
+			internal static bool ShowTraderMaxPrice = false;
+			internal static bool ShowUpdated = false;
+			internal static int Opacity = 10;
 		}
 
 		// Other
@@ -248,17 +248,19 @@ namespace RatScanner
 		{
 			var configFileExists = File.Exists(Paths.ConfigFile);
 			var isSupportedConfigVersion = IsSupportedConfigVersion();
-			if (!configFileExists || !isSupportedConfigVersion)
+			if (configFileExists && !isSupportedConfigVersion)
 			{
-				if (configFileExists) File.Delete(Paths.ConfigFile);
-				if (!isSupportedConfigVersion)
-				{
-					var message = "Old config version detected!\n\n";
-					message += "It will be removed and replaced with a new config file.\n";
-					message += "Please make sure to reconfigure your settings.";
-					Logger.ShowMessage(message);
-				}
+				var message = "Old config version detected!\n\n";
+				message += "It will be removed and replaced with a new config file.\n";
+				message += "Please make sure to reconfigure your settings after.";
+				Logger.ShowMessage(message);
 
+				File.Delete(Paths.ConfigFile);
+				TrySetScreenResolution();
+				SaveConfig();
+			}
+			else if (!configFileExists)
+			{
 				TrySetScreenResolution();
 				SaveConfig();
 			}
@@ -283,11 +285,10 @@ namespace RatScanner
 
 			config.Section = nameof(MinimalUi);
 			MinimalUi.ShowName = config.ReadBool(nameof(MinimalUi.ShowName), true);
-			MinimalUi.ShowPrice = config.ReadBool(nameof(MinimalUi.ShowPrice), true);
 			MinimalUi.ShowAvgDayPrice = config.ReadBool(nameof(MinimalUi.ShowAvgDayPrice), true);
-			MinimalUi.ShowAvgWeekPrice = config.ReadBool(nameof(MinimalUi.ShowAvgWeekPrice), true);
 			MinimalUi.ShowPricePerSlot = config.ReadBool(nameof(MinimalUi.ShowPricePerSlot), true);
 			MinimalUi.ShowTraderPrice = config.ReadBool(nameof(MinimalUi.ShowTraderPrice), true);
+			MinimalUi.ShowTraderMaxPrice = config.ReadBool(nameof(MinimalUi.ShowTraderMaxPrice), true);
 			MinimalUi.ShowUpdated = config.ReadBool(nameof(MinimalUi.ShowUpdated), true);
 			MinimalUi.Opacity = config.ReadInt(nameof(MinimalUi.Opacity), 50);
 
@@ -319,11 +320,10 @@ namespace RatScanner
 
 			config.Section = nameof(MinimalUi);
 			config.WriteBool(nameof(MinimalUi.ShowName), MinimalUi.ShowName);
-			config.WriteBool(nameof(MinimalUi.ShowPrice), MinimalUi.ShowPrice);
 			config.WriteBool(nameof(MinimalUi.ShowAvgDayPrice), MinimalUi.ShowAvgDayPrice);
-			config.WriteBool(nameof(MinimalUi.ShowAvgWeekPrice), MinimalUi.ShowAvgWeekPrice);
 			config.WriteBool(nameof(MinimalUi.ShowPricePerSlot), MinimalUi.ShowPricePerSlot);
 			config.WriteBool(nameof(MinimalUi.ShowTraderPrice), MinimalUi.ShowTraderPrice);
+			config.WriteBool(nameof(MinimalUi.ShowTraderMaxPrice), MinimalUi.ShowTraderMaxPrice);
 			config.WriteBool(nameof(MinimalUi.ShowUpdated), MinimalUi.ShowUpdated);
 			config.WriteInt(nameof(MinimalUi.Opacity), MinimalUi.Opacity);
 

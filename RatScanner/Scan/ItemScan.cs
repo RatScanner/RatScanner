@@ -1,5 +1,5 @@
 ﻿using System.Drawing;
-using RatScanner.FetchModels;
+using RatStash;
 
 namespace RatScanner.Scan
 {
@@ -9,7 +9,7 @@ namespace RatScanner.Scan
 
 		// This is an array since we can match multiple
 		// identical looking items, when using icon scan
-		internal MarketItem[] MatchedItems;
+		internal Item[] MatchedItems;
 
 		internal Bitmap Capture;
 
