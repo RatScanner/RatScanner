@@ -36,6 +36,7 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="OpenCvSharp4.Windows" Version="4.3.0.20200524" />
+    <PackageReference Include="RatStash" Version="1.2.0" />
   </ItemGroup>
 
   <ItemGroup>

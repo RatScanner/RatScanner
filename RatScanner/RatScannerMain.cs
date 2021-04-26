@@ -8,6 +8,7 @@ using System.Threading;
 using System.Windows;
 using RatScanner.Scan;
 using RatScanner.View;
+using RatStash;
 using Size = System.Drawing.Size;
 
 namespace RatScanner
@@ -41,6 +42,7 @@ namespace RatScanner
 		internal static object IconScanLock = new object();
 
 		internal MarketDB MarketDB;
+		internal RatStash.Database ItemDB;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
@@ -66,6 +68,9 @@ namespace RatScanner
 
 			Logger.LogInfo("Loading config...");
 			RatConfig.LoadConfig();
+
+			Logger.LogInfo("Loading item data...");
+			LoadItemDatabase();
 
 			Logger.LogInfo("Loading price data...");
 			MarketDB = new MarketDB();
@@ -126,6 +131,13 @@ namespace RatScanner
 			startInfo.ArgumentList.Add("--update");
 			Process.Start(startInfo);
 			Environment.Exit(0);
+		}
+
+		private void LoadItemDatabase()
+		{
+			var itemDataLink = ApiManager.GetResource(ApiManager.ResourceType.ItemDataLink);
+			ApiManager.DownloadFile(itemDataLink, RatConfig.Paths.ItemData);
+			ItemDB = Database.FromFile(RatConfig.Paths.ItemData);
 		}
 
 		/// <summary>

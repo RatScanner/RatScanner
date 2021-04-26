@@ -346,24 +346,6 @@
 					<Grid>
 						<Grid.ToolTip>
 							<TextBlock>
-								Show the price of the item
-							</TextBlock>
-						</Grid.ToolTip>
-						<Label Grid.Column="0"
-									 Content="Show Price" />
-						<CheckBox Grid.Column="1"
-											Margin="5,0"
-											VerticalAlignment="Center"
-											IsChecked="{Binding ShowPrice}" />
-
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*" />
-							<ColumnDefinition Width="Auto" />
-						</Grid.ColumnDefinitions>
-					</Grid>
-					<Grid>
-						<Grid.ToolTip>
-							<TextBlock>
 								Show the daily average price of the item
 							</TextBlock>
 						</Grid.ToolTip>
@@ -373,24 +355,6 @@
 											Margin="5,0"
 											VerticalAlignment="Center"
 											IsChecked="{Binding ShowAvgDayPrice}" />
-
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*" />
-							<ColumnDefinition Width="Auto" />
-						</Grid.ColumnDefinitions>
-					</Grid>
-					<Grid>
-						<Grid.ToolTip>
-							<TextBlock>
-								Show the weekly average price of the item
-							</TextBlock>
-						</Grid.ToolTip>
-						<Label Grid.Column="0"
-									 Content="Show Average Week Price" />
-						<CheckBox Grid.Column="1"
-											Margin="5,0"
-											VerticalAlignment="Center"
-											IsChecked="{Binding ShowAvgWeekPrice}" />
 
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="*" />
@@ -427,6 +391,24 @@
 											Margin="5,0"
 											VerticalAlignment="Center"
 											IsChecked="{Binding ShowTraderPrice}" />
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								Show the summed price of all item parts sold individually to their best trader
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0"
+									 Content="Show Max Trader Price" />
+						<CheckBox Grid.Column="1"
+											Margin="5,0"
+											VerticalAlignment="Center"
+											IsChecked="{Binding ShowTraderMaxPrice}" />
 
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="*" />
@@ -506,12 +488,12 @@
 					<Separator />
 
 					<Label>
-						<Hyperlink NavigateUri="https://tarkov-market.com/"
+						<Hyperlink NavigateUri="https://tarkov-tools.com/"
 											 RequestNavigate="HyperlinkRequestNavigate">
-							<Underline>Tarkov Market</Underline>
+							<Underline>Tarkov Tools</Underline>
 						</Hyperlink>
 					</Label>
-					<TextBlock Margin="5,0,5,5">API for flea market price data</TextBlock>
+					<TextBlock Margin="5,0,5,5">Amazing API for flea market price data</TextBlock>
 
 					<Label>
 						<Hyperlink NavigateUri="https://github.com/shimat/opencvsharp"

@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using RatScanner.FetchModels;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Net;
 using System.Text;
-using Newtonsoft.Json;
-using RatScanner.FetchModels;
 
 namespace RatScanner
 {
@@ -23,54 +22,53 @@ namespace RatScanner
 
 		private static readonly Dictionary<Language, string> LanguageMapping = new Dictionary<Language, string>()
 		{
-			{Language.English, "en" },
-			{Language.Russian, "ru" },
-			{Language.German, "de" },
-			{Language.French, "fr" },
-			{Language.Spanish, "es" },
-			{Language.Chinese, "cn" },
+			{ Language.English, "en" },
+			{ Language.Russian, "ru" },
+			{ Language.German, "de" },
+			{ Language.French, "fr" },
+			{ Language.Spanish, "es" },
+			{ Language.Chinese, "cn" },
 		};
 
 		public enum ResourceType
 		{
 			ClientVersion,
-			Download,
-			Patreon,
-			Github,
-			Discord,
-			FAQ,
+			DownloadLink,
+			PatreonLink,
+			GithubLink,
+			DiscordLink,
+			FAQLink,
+			ItemDataLink,
+			ItemDataVersion,
 		}
 
 		private static readonly Dictionary<ResourceType, string> ResMapping = new Dictionary<ResourceType, string>
 		{
 			{ ResourceType.ClientVersion, "RSClientVersion" },
-			{ ResourceType.Download, "RSDownload" },
-			{ ResourceType.Patreon, "RSPatreon" },
-			{ ResourceType.Github, "RSGithub" },
-			{ ResourceType.Discord, "RSDiscord" },
-			{ResourceType.FAQ, "RSFAQ"}
+			{ ResourceType.DownloadLink, "RSDownloadLink" },
+			{ ResourceType.PatreonLink, "RSPatreonLink" },
+			{ ResourceType.GithubLink, "RSGithubLink" },
+			{ ResourceType.DiscordLink, "RSDiscordLink" },
+			{ ResourceType.FAQLink, "RSFAQLink" },
+			{ ResourceType.ItemDataLink, "RSItemDataLink" },
+			{ ResourceType.ItemDataVersion, "RSItemDataVersion" },
 		};
 
 		private static readonly Dictionary<ResourceType, string> ResCache = new Dictionary<ResourceType, string>();
 
-		private const string BaseUrl = "https://api.ratscanner.com/v2";
+		private const string BaseUrl = "https://api.ratscanner.com/v3";
 
 		public static MarketItem[] GetMarketDB(Language language = Language.English)
 		{
 			try
 			{
-				using (var client = new WebClient())
-				{
-					var langString = LanguageMapping[language];
-					var jsonGzipData = client.DownloadData($"{BaseUrl}/all?lang={langString}");
-					var json = ExtractGZip(jsonGzipData);
-
-					return JsonConvert.DeserializeObject<MarketItem[]>(json);
-				}
+				var langString = LanguageMapping[language];
+				var json = Get($"{BaseUrl}/all?lang={langString}");
+				return JsonConvert.DeserializeObject<MarketItem[]>(json);
 			}
 			catch (Exception e)
 			{
-				Logger.LogError("Loading of DB failed.\n" + e);
+				Logger.LogError($"Loading of market data failed.\n{e}");
 				return null;
 			}
 		}
@@ -81,53 +79,53 @@ namespace RatScanner
 
 			if (!ResMapping.ContainsKey(resource))
 			{
-				Logger.LogError("Could not find resource mapping for: " + resource);
+				Logger.LogError($"Could not find resource mapping for: {resource}");
 			}
 			var resPath = ResMapping[resource];
 
 			try
 			{
-				Logger.LogInfo("Loading resource \"" + resPath + "\"...");
-
-				using (var client = new WebClient())
-				{
-					var jsonBytes = client.DownloadData(BaseUrl + "/res/" + resPath);
-					var json = Encoding.UTF8.GetString(jsonBytes, 0, jsonBytes.Length);
-
-					var value = JsonConvert.DeserializeObject<Resource>(json).Value;
-					ResCache.Add(resource, value);
-					return value;
-				}
+				Logger.LogInfo($"Loading resource \"{resPath}\"...");
+				var json = Get($"{BaseUrl}/res/{resPath}");
+				var value = JsonConvert.DeserializeObject<Resource>(json).Value;
+				ResCache.Add(resource, value);
+				return value;
 			}
 			catch (Exception e)
 			{
-				Logger.LogError("Loading of resource \"" + resPath + "\" failed.", e);
+				Logger.LogError($"Loading of resource \"{resPath}\" failed.", e);
 				return "[Loading failed]";
 			}
 		}
 
-		private static string ExtractGZip(byte[] gzip)
+		public static void DownloadFile(string url, string destination)
 		{
 			try
 			{
-				using (var outStream = new MemoryStream())
-				using (var fSource = new MemoryStream(gzip))
-				using (var csStream = new GZipStream(fSource, CompressionMode.Decompress))
-				{
-					var buffer = new byte[1024];
-					int nRead;
-					while ((nRead = csStream.Read(buffer, 0, buffer.Length)) > 0)
-					{
-						outStream.Write(buffer, 0, nRead);
-					}
-					return Encoding.UTF8.GetString(outStream.ToArray());
-				}
+				Logger.LogInfo($"Downloading file \"{url}\"...");
+				var contents = Get(url);
+				File.WriteAllText(destination, contents);
 			}
 			catch (Exception e)
 			{
-				Logger.LogError("Could not extract data.\n" + e);
-				return "";
+				Logger.LogError($"Downloading of file \"{url}\" failed.", e);
 			}
+		}
+
+		private static string Get(string url)
+		{
+			var request = WebRequest.CreateHttp(url);
+			request.Method = WebRequestMethods.Http.Get;
+			request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+			request.UserAgent = $"Rat Scanner Client {RatConfig.Version}";
+
+			using var response = (HttpWebResponse)request.GetResponse();
+			using var stream = response.GetResponseStream();
+
+			var noEncoding = string.IsNullOrEmpty(response.CharacterSet);
+			var encoding = noEncoding ? Encoding.UTF8 : Encoding.GetEncoding(response.CharacterSet);
+			var reader = new StreamReader(stream, encoding);
+			return reader.ReadToEnd();
 		}
 	}
 }

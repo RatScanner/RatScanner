@@ -3,8 +3,8 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media;
-using RatScanner.FetchModels;
 using RatScanner.Scan;
+using RatStash;
 using Brush = System.Windows.Media.Brush;
 using Color = System.Windows.Media.Color;
 
@@ -24,16 +24,13 @@ namespace RatScanner.ViewModel
 			}
 		}
 
-		private MarketItem[] MatchedItems => DataSource.MatchedItems;
+		private Item[] MatchedItems => DataSource.MatchedItems;
 
 		// https://youtrack.jetbrains.com/issue/RSRP-468572
 		// ReSharper disable InconsistentNaming
 		public string Avg24hPrice => PriceToString(GetAvg24hPrice());
 
-		private int GetAvg24hPrice()
-		{
-			return MatchedItems[0].SumMods(item => item.Avg24hPrice);
-		}
+		private int GetAvg24hPrice() => MatchedItems[0].GetAvg24hMarketPrice();
 		// ReSharper restore InconsistentNaming
 
 		public string IconPath => IconManager.GetIconPath(DataSource.MatchedItems[0]);
@@ -95,8 +92,8 @@ namespace RatScanner.ViewModel
 		/// <returns>How many physical pixels are used for a virtual pixel</returns>
 		private static float GetScalingFactor()
 		{
-			var physicalHeight = Screen.PrimaryScreen.Bounds.Height;	// Virtual Height
-			var virtualHeight = SystemParameters.PrimaryScreenHeight;	// Physical Height
+			var physicalHeight = Screen.PrimaryScreen.Bounds.Height;    // Virtual Height
+			var virtualHeight = SystemParameters.PrimaryScreenHeight;   // Physical Height
 			var scaleFactor = physicalHeight / virtualHeight;
 			return (float)scaleFactor;
 		}

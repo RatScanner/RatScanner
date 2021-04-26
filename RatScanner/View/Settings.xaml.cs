@@ -1,6 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
@@ -61,11 +59,10 @@ namespace RatScanner.View
 			RatConfig.ToolTip.Duration = int.TryParse(settingsVM.ToolTipDuration, out var i) ? i : 0;
 
 			RatConfig.MinimalUi.ShowName = settingsVM.ShowName;
-			RatConfig.MinimalUi.ShowPrice = settingsVM.ShowPrice;
 			RatConfig.MinimalUi.ShowAvgDayPrice = settingsVM.ShowAvgDayPrice;
-			RatConfig.MinimalUi.ShowAvgWeekPrice = settingsVM.ShowAvgWeekPrice;
 			RatConfig.MinimalUi.ShowPricePerSlot = settingsVM.ShowPricePerSlot;
 			RatConfig.MinimalUi.ShowTraderPrice = settingsVM.ShowTraderPrice;
+			RatConfig.MinimalUi.ShowTraderMaxPrice = settingsVM.ShowTraderMaxPrice;
 			RatConfig.MinimalUi.ShowUpdated = settingsVM.ShowUpdated;
 			RatConfig.MinimalUi.Opacity = settingsVM.Opacity;
 

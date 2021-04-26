@@ -495,7 +495,7 @@ namespace RatScanner
 
 			if (!File.Exists(path))
 			{
-				Logger.LogWarning("Could not find icon for: " + itemInfo.Uid + "\nat: " + path);
+				Logger.LogWarning("Could not find icon for: " + itemInfo.Id + "\nat: " + path);
 				return RCPaths.UnknownIcon;
 			}
 

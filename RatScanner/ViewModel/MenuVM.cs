@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Globalization;
 using RatScanner.FetchModels;
 using RatScanner.Scan;
+using RatStash;
 
 namespace RatScanner.ViewModel
 {
@@ -25,129 +26,50 @@ namespace RatScanner.ViewModel
 
 		private ItemScan CurrentItemScan => DataSource?.CurrentItemScan;
 
-		private MarketItem[] MatchedItems => CurrentItemScan?.MatchedItems;
+		private Item[] MatchedItems => CurrentItemScan?.MatchedItems;
 
 		public string IconPath => IconManager.GetIconPath(MatchedItems[0]);
 
 		public string Name => MatchedItems[0].Name;
 
-		public bool HasMods => MatchedItems[0].HasMods;
-
-		public string Price => PriceToString(GetPrice());
-
-		private int GetPrice()
-		{
-			return MatchedItems[0].SumMods(item => item.Price);
-		}
+		public bool HasMods => MatchedItems[0] is CompoundItem itemC && itemC.Slots.Count > 0;
 
 		// https://youtrack.jetbrains.com/issue/RSRP-468572
 		// ReSharper disable InconsistentNaming
 		public string Avg24hPrice => PriceToString(GetAvg24hPrice());
 
-		private int GetAvg24hPrice()
-		{
-			return MatchedItems[0].SumMods(item => item.Avg24hPrice);
-		}
+		private int GetAvg24hPrice() => MatchedItems[0].GetAvg24hMarketPrice();
 		// ReSharper restore InconsistentNaming
 
-		// https://youtrack.jetbrains.com/issue/RSRP-468572
-		// ReSharper disable InconsistentNaming
-		public string Avg7dPrice => PriceToString(GetAvg24hPrice());
+		public string PricePerSlot => PriceToString(GetAvg24hPrice() / (MatchedItems[0].Width * MatchedItems[0].Height));
 
-		private int GetAvg7dPrice()
-		{
-			return MatchedItems[0].SumMods(item => item.Avg7dPrice);
-		}
-		// ReSharper restore InconsistentNaming
+		public string TraderName => TraderPrice.GetTraderName(GetBestTrader().traderId);
 
-		public string PricePerSlot => PriceToString(GetAvg24hPrice() / MatchedItems[0].Slots);
+		public string BestTraderPrice => IntToGroupedString(GetBestTrader().price) + " ₽";
 
-		public string TraderName => MatchedItems[0].TraderName;
+		private (string traderId, int price) GetBestTrader() => MatchedItems[0].GetBestTrader();
 
-		public string TraderPrice
-		{
-			get
-			{
-				var currency = CurrentItemScan.MatchedItems[0].TraderCurrency;
-				return IntToGroupedString(GetTraderPrice()) + " " + currency;
-			}
-		}
+		public string MaxTraderPrice => IntToGroupedString(GetMaxTraderPrice()) + " ₽";
 
-		private int GetTraderPrice()
-		{
-			// TODO do not mix currency's
-			return MatchedItems[0].SumMods(item => item.TraderPrice);
-		}
+		private int GetMaxTraderPrice() => MatchedItems[0].GetMaxTraderPrice();
 
-		public string DiscordLink => ApiManager.GetResource(ApiManager.ResourceType.Discord);
+		public string DiscordLink => ApiManager.GetResource(ApiManager.ResourceType.DiscordLink);
 
-		public string GithubLink => ApiManager.GetResource(ApiManager.ResourceType.Github);
+		public string GithubLink => ApiManager.GetResource(ApiManager.ResourceType.GithubLink);
 
-		public string PatreonLink => ApiManager.GetResource(ApiManager.ResourceType.Patreon);
+		public string PatreonLink => ApiManager.GetResource(ApiManager.ResourceType.PatreonLink);
 
 		public string Updated
 		{
 			get
 			{
 				var dt = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-				var min = MatchedItems[0].MinMods(item => item.Timestamp);
+				var min = MatchedItems[0].GetMarketItem().Timestamp;
 				return dt.AddSeconds(min).ToLocalTime().ToString(CultureInfo.CurrentCulture);
 			}
 		}
 
-		// https://youtrack.jetbrains.com/issue/RSRP-468572
-		// ReSharper disable once InconsistentNaming
-		public string Diff24h
-		{
-			get
-			{
-				var indicator = Diff24hPositive ? UpSymbol : DownSymbol;
-				var diff = (double)(GetAvg24hPrice() - GetAvg24hAgo()) / GetAvg24hAgo();
-				return diff.ToString("N2") + " " + indicator;
-			}
-		}
-
-		// https://youtrack.jetbrains.com/issue/RSRP-468572
-		// ReSharper disable InconsistentNaming
-		public string Avg24hAgo => PriceToString(GetAvg24hAgo());
-
-		private int GetAvg24hAgo()
-		{
-			return MatchedItems[0].SumMods(item => item.Avg24hAgo);
-		}
-		// ReSharper restore InconsistentNaming
-
-		// https://youtrack.jetbrains.com/issue/RSRP-468572
-		// ReSharper disable once InconsistentNaming
-		public bool Diff24hPositive => GetAvg24hPrice() - GetAvg24hAgo() >= 0;
-
-		// https://youtrack.jetbrains.com/issue/RSRP-468572
-		// ReSharper disable once InconsistentNaming
-		public string Diff7d
-		{
-			get
-			{
-				var indicator = Diff7dPositive ? UpSymbol : DownSymbol;
-				var diff = (double)(GetAvg24hPrice() - GetAvg7dAgo()) / GetAvg7dAgo();
-				return diff.ToString("N2") + " " + indicator;
-			}
-		}
-
-		// https://youtrack.jetbrains.com/issue/RSRP-468572
-		// ReSharper disable InconsistentNaming
-		public string Avg7dAgo => PriceToString(GetAvg7dAgo());
-
-		private int GetAvg7dAgo()
-		{
-			return MatchedItems[0].SumMods(item => item.Avg7dAgo);
-		}
-		// ReSharper restore InconsistentNaming
-
-		// https://youtrack.jetbrains.com/issue/RSRP-468572
-		// ReSharper disable once InconsistentNaming
-		public bool Diff7dPositive => GetAvg7dPrice() - GetAvg7dAgo() >= 0;
-
-		public string WikiLink => MatchedItems[0].WikiLink;
+		public string WikiLink => MatchedItems[0].GetMarketItem().WikiLink;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
