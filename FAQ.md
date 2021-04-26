@@ -14,6 +14,9 @@
 
 ## Table of Contents
 
+### General
+- [Can I get banned for using Rat Scanner?](#can-i-get-banned-for-using-rat-scanner)
+
 ### Program issues
 - [There is no RatScanner.exe file](#there-is-no-ratscannerexe-file)
 - [Rat Scanner is not starting](#rat-scanner-is-not-starting)
@@ -24,6 +27,17 @@
 
 ### Scanning issues
 - [Icon scanning gets a lot of wrong matches](#icon-scanning-gets-a-lot-of-wrong-matches)
+
+<br/>
+
+---
+
+<br/>
+
+# General
+
+## Can I get banned for using Rat Scanner?
+There is no official response yet from BSG. No one ever got banned for using it though.
 
 <br/>
 
