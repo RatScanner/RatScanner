@@ -91,6 +91,6 @@ Icon scanning still has some known issues, some which are not possible to fix.
 This currently leads to items like keys and small attachments matching wrong due to their simularity to other items.
 Also, when in the stash, the light bright in the top center of the screen interferes with the top left section of the stash which results in extremly bad results.
 
-[net-core-download]: https://dotnet.microsoft.com/download/dotnet-core/current/runtime
+[net-core-download]: https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-3.1.14-windows-x64-installer
 [download-section]: https://github.com/Blightbuster/RatScanner#download
 [windows-media-pack]: https://www.microsoft.com/en-us/software-download/mediafeaturepack
