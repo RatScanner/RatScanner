@@ -137,7 +137,8 @@ namespace RatScanner
 		{
 			var itemDataLink = ApiManager.GetResource(ApiManager.ResourceType.ItemDataLink);
 			ApiManager.DownloadFile(itemDataLink, RatConfig.Paths.ItemData);
-			ItemDB = Database.FromFile(RatConfig.Paths.ItemData);
+			var itemDB = Database.FromFile(RatConfig.Paths.ItemData);
+			ItemDB = itemDB.Filter(item => !item.QuestItem);
 		}
 
 		/// <summary>
