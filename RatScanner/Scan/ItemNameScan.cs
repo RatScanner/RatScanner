@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
+using System.Text;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using OpenCvSharp.Text;
@@ -97,32 +99,27 @@ namespace RatScanner.Scan
 				if (index > 0) ScannedText = ScannedText.Substring(0, index.Value);
 			}
 
+			// Clean scanned text
 			ScannedText = ScannedText.Trim();
+			ScannedText = RemoveSpecialCharacters(ScannedText);
 
 			// Get market item from detected text
 			MatchedItems = new[] { RatScannerMain.Instance.ItemDB.GetItem(item =>
 			{
-				if(IsShortName) return -LevenshteinDistance(item.ShortName, ScannedText);
-				return -LevenshteinDistance(item.Name, ScannedText);
+				if(IsShortName) return -LevenshteinDistance(RemoveSpecialCharacters(item.ShortName), ScannedText);
+				return -LevenshteinDistance(RemoveSpecialCharacters(item.Name), ScannedText);
 			}) };
 
 			// Calculate confidence
-			if (IsShortName)
-			{
-				var match = MatchedItems[0].ShortName.Replace(" ", "");
-				var dist = LevenshteinDistance(match, ScannedText);
-				Confidence = 1 - dist / (float)match.Length;
-			}
-			else
-			{
-				var match = MatchedItems[0].Name.Replace(" ", "");
-				var dist = LevenshteinDistance(match, ScannedText);
-				Confidence = 1 - dist / (float)match.Length;
-			}
+			var match = IsShortName ? MatchedItems[0].ShortName : MatchedItems[0].Name;
+			var matchClean = RemoveSpecialCharacters(match);
+			var dist = LevenshteinDistance(matchClean, ScannedText);
+			Confidence = 1 - dist / (float)matchClean.Length;
+			Logger.LogDebug($"Scanned: {ScannedText} | Matched: {matchClean} | Confidence: {Confidence}");
 
 			if (Confidence < RCNameScan.ConfWarnThreshold)
 			{
-				var tmp = "OCR:\"" + ScannedText + "\" Matched:\"" + MatchedItems[0].Name + "\"";
+				var tmp = $"OCR:\"{ScannedText}\" Matched:\"{MatchedItems[0].Name}\"";
 				Logger.LogWarning("Item below threshold. Perhaps a new item? " + tmp);
 			}
 
@@ -204,9 +201,20 @@ namespace RatScanner.Scan
 			return position;
 		}
 
+		private static string RemoveSpecialCharacters(string str)
+		{
+			var sb = new StringBuilder();
+			foreach (var c in str.Where(c =>
+				(c >= '0' && c <= '9') ||
+				(c >= 'A' && c <= 'Z') ||
+				(c >= 'a' && c <= 'z'))) sb.Append(c);
+
+			return sb.ToString();
+		}
+
 		private static int LevenshteinDistance(string target, string value)
 		{
-			if (target.Length > value.Length) target = target.Substring(0, value.Length);
+			//if (target.Length > value.Length) target = target.Substring(0, value.Length);
 
 			if (target.Length == 0) return value.Length;
 			if (value.Length == 0) return target.Length;
