@@ -117,7 +117,7 @@ namespace RatScanner
 			var request = WebRequest.CreateHttp(url);
 			request.Method = WebRequestMethods.Http.Get;
 			request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-			request.UserAgent = $"Rat Scanner Client {RatConfig.Version}";
+			request.UserAgent = $"RatScanner-Client/{RatConfig.Version}";
 
 			using var response = (HttpWebResponse)request.GetResponse();
 			using var stream = response.GetResponseStream();
