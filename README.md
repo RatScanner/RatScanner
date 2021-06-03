@@ -144,9 +144,9 @@ This will help to finance the backend server as well as the [API][tarkov-tools] 
 
 [escape-from-tarkov]: https://www.escapefromtarkov.com/
 [tarkov-tools]: https://tarkov-tools.com/
-[eft-icons-repo]: https://github.com/Blightbuster/EfTIcons
-[latest-release]: https://github.com/Blightbuster/RatScanner/releases/latest/download/RatScanner.zip
-[releases]: https://github.com/Blightbuster/RatScanner/releases/
+[eft-icons-repo]: https://github.com/RatScanner/EfTIcons
+[latest-release]: https://github.com/RatScanner/RatScanner/releases/latest/download/RatScanner.zip
+[releases]: https://github.com/RatScanner/RatScanner/releases/
 [net-core-download]: https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-3.1.14-windows-x64-installer
 [demo-video]: https://www.youtube.com/watch?v=tXoIkgXFmdA
 [faq-page]: FAQ.md
