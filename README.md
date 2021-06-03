@@ -14,9 +14,15 @@
 
 Rat Scanner is a open source tool for [Escape from Tarkov][escape-from-tarkov].
 
-Please consider [supporting](#Support-the-project) the project to help finance the backend server as well as the [API][tarkov-market].
+Please consider [supporting](#Support-the-project) the project to help finance the backend server as well as the [API][tarkov-tools].
 
 [Tutorial / Demo Video][demo-video] - [Frequently asked Questions][faq-page]
+
+<br/>
+
+## Can I get banned for using Rat Scanner?
+
+Have a look [here][faq-page-can-i-get-banned] to see BSG's official response to that question.
 
 <br/>
 
@@ -24,7 +30,7 @@ Please consider [supporting](#Support-the-project) the project to help finance t
 
 Rat Scanner allows you to scan items in the game and provides you with data about items (average price, value per slot, ...).
 
-The information is taken from a [third-party API][tarkov-market] which takes the data directly from the game.
+The information is taken from a [third-party API][tarkov-tools] which takes the data directly from the game.
 
 <br/>
 
@@ -131,17 +137,18 @@ Please read `CONTRIBUTING.md` before contributing.
 
 ## Support the project
 
-This will help to pay for the backend server as well as the [API][tarkov-market] which provides the backend with data.
+This will help to finance the backend server as well as the [API][tarkov-tools] which provides the backend with data.
 
 [![Patreon](https://img.shields.io/badge/dynamic/json?color=%23e85b46&label=Patreon&query=data.attributes.patron_count&suffix=%20patrons&url=https%3A%2F%2Fwww.patreon.com%2Fapi%2Fcampaigns%2F4117180&style=for-the-badge&logo=patreon)](https://patreon.com/RatScanner)
 [![PayPal](https://img.shields.io/static/v1?&label=PayPal&message=Donate&color=0079C1&style=for-the-badge&logo=paypal)](https://paypal.me/mscheve)
 
 [escape-from-tarkov]: https://www.escapefromtarkov.com/
-[tarkov-market]: https://tarkov-market.com/
+[tarkov-tools]: https://tarkov-tools.com/
 [eft-icons-repo]: https://github.com/Blightbuster/EfTIcons
 [latest-release]: https://github.com/Blightbuster/RatScanner/releases/latest/download/RatScanner.zip
 [releases]: https://github.com/Blightbuster/RatScanner/releases/
 [net-core-download]: https://dotnet.microsoft.com/download/dotnet-core/current/runtime
 [demo-video]: https://www.youtube.com/watch?v=tXoIkgXFmdA
 [faq-page]: FAQ.md
+[faq-page-can-i-get-banned]: FAQ.md#can-i-get-banned-for-using-rat-scanner
 [discord]: https://discord.com/invite/aHZf7aP
