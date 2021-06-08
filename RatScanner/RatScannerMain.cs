@@ -220,9 +220,14 @@ namespace RatScanner
 		{
 			var bmp = new Bitmap(size.Width, size.Height, PixelFormat.Format24bppRgb);
 
-			using (var gfx = Graphics.FromImage(bmp))
+			try
 			{
+				using var gfx = Graphics.FromImage(bmp);
 				gfx.CopyFromScreen(vector2.X, vector2.Y, 0, 0, size, CopyPixelOperation.SourceCopy);
+			}
+			catch (Exception e)
+			{
+				Logger.LogWarning("Unable to capture screenshot", e);
 			}
 
 			return bmp;
