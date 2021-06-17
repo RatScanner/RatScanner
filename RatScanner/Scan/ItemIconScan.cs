@@ -27,6 +27,15 @@ namespace RatScanner.Scan
 		private static readonly byte borderColor = 0xFF;
 		private Mat _grid;
 		private Mat _highlight;
+		private readonly List<(int, int)> _searchOrder = new List<(int, int)> { ( -1, 0 ), ( 1, 0 ), ( 0, -1 ), ( 0, 1 ) };
+
+		private const double GridSearchAvgScoreStop = 0.9;
+		private const double GridSearchEarlyMinScore = 0.25;
+		private const double GridDistanceScalingRate = 0.95;
+		private const int GridSearchMaxIterations = 20;
+		private const int GridSearchMinIterations = 6;
+		private const int GridSearchEarlySearchIterations = 2;
+		private const double GridSearchPerfectScore = 0.95;
 
 		private readonly object _matchLock = new object();
 
@@ -213,10 +222,6 @@ namespace RatScanner.Scan
 
 		private (int, int, int, int) FindGridEdgeDistances(Vector2 center)
 		{
-			// The order that the searches will progress
-			//var searchOrder = new List<(int, int)> { ( 0, -1 ), ( 0, 1 ), ( -1, 0 ), ( 1, 0 ) };
-			var searchOrder = new List<(int, int)> { ( -1, 0 ), ( 1, 0 ), ( 0, -1 ), ( 0, 1 ) };
-
 			// Set up loop values
 			var orderIdx = 0;
 			var lLimit = RatConfig.IconScan.ItemSlotSize / 2; // Initial edge searches will search 1 grid in each direction
@@ -230,7 +235,7 @@ namespace RatScanner.Scan
 			while ( keepTrying  )
 			{
 				// Get the next direction to search
-				var direction = searchOrder[ orderIdx ];
+				var direction = _searchOrder[ orderIdx ];
 
 				// Find the edge limits to use on this search based on direction
 				var plus = direction.Item1 == 0 ? uLimit : rLimit;
@@ -243,7 +248,7 @@ namespace RatScanner.Scan
 				// first bound rather than the best bound
 				var (step, score) = FindGridEdgeDistance( direction.Item1, direction.Item2, center.X, center.Y,
 					GetSteps( direction.Item1, direction.Item2, center ),
-					plus, minus, numIters >= 2, numIters < 6 ? 0.25 : lastScores[ orderIdx ] );
+					plus, minus, numIters >= GridSearchEarlySearchIterations, numIters < GridSearchMinIterations ? GridSearchEarlyMinScore : lastScores[ orderIdx ] );
 
 				// Update scores and limits based on results
 				lastScores[ orderIdx ] = score;
@@ -312,19 +317,19 @@ namespace RatScanner.Scan
 				// Loop housekeeping
 				numIters++;
 				orderIdx++;
-				if ( orderIdx >= searchOrder.Count )
+				if ( orderIdx >= _searchOrder.Count )
 				{
 					orderIdx = 0;
 				}
 
 				var avgScore = lastScores.Sum() / lastScores.Length;
-				keepTrying = avgScore < .9;
-				if ( numIters <= 6 )
+				keepTrying = avgScore < GridSearchAvgScoreStop;
+				if ( numIters <= GridSearchMinIterations )
 				{
 					keepTrying = true;
 				}
 				// If we haven't found suitable limits in x iterations give up
-				else if ( numIters > 20 )
+				else if ( numIters > GridSearchMaxIterations )
 				{
 					Logger.LogDebug( "Hit maximum number of iterations..." );
 					keepTrying = false;
@@ -354,7 +359,7 @@ namespace RatScanner.Scan
 					var score = IsGridEdge( x, y, plus, minus, horizontalEdge );
 
 					var numGrids = i / Math.Floor( RatConfig.IconScan.ItemSlotSize / 2.0 );
-					var scaler = Math.Pow( .95, numGrids );
+					var scaler = Math.Pow( GridDistanceScalingRate, numGrids );
 					score *= scaler;
 
 					if ( score > bestScore )
@@ -364,7 +369,7 @@ namespace RatScanner.Scan
 						Logger.LogDebug($"New Best Edge confirmed {i} with score {score};" );
 					}
 
-					if ( score > minScore && !findBest || score > 0.95 )
+					if ( score > minScore && !findBest || score > GridSearchPerfectScore )
 					{
 						Logger.LogDebug(
 							$"Found Edge! Up: {up}; Right: {right}; Steps: {steps}; Plus: {plus}; Minus: {minus}; Dist: {i}; Score: {score}" );
