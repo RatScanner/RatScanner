@@ -209,18 +209,18 @@ namespace RatScanner.Scan
 			Cv2.BitwiseAnd(_grid, mask, _grid);
 			Logger.LogDebugMat(_grid, "in_range_and_canny_edge_dilate");
 
-			var (lBorderDist, rBorderDist, tBorderDist, bBorderDist) =
+			var (lBorderDist, rBorderDist, tBorderDist, bBorderDist, center) =
 				FindGridEdgeDistances( new Vector2( _grid.Width / 2 - 1, _grid.Height / 2 - 1 ) );
 
-			var positionX = (RatConfig.IconScan.ScanWidth / 2) - lBorderDist;
-			var positionY = (RatConfig.IconScan.ScanHeight / 2) - bBorderDist;
+			var positionX = center.X - lBorderDist;
+			var positionY = center.Y - bBorderDist;
 			var position = new Vector2(positionX, positionY);
 
 			var size = new Vector2(rBorderDist + lBorderDist, tBorderDist + bBorderDist);
 			return (position, size);
 		}
 
-		private (int, int, int, int) FindGridEdgeDistances(Vector2 center)
+		private (int, int, int, int, Vector2) FindGridEdgeDistances(Vector2 center)
 		{
 			// Set up loop values
 			var orderIdx = 0;
@@ -341,7 +341,7 @@ namespace RatScanner.Scan
 				}
 			}
 
-			return ( lLimit, rLimit, uLimit, dLimit );
+			return ( lLimit, rLimit, uLimit, dLimit, center );
 		}
 
 		private (int, double) FindGridEdgeDistance(int up, int right, int x, int y, int steps, int plus, int minus, bool findBest = false, double minScore = 0.6)
