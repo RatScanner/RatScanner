@@ -42,6 +42,7 @@ namespace RatScanner
 		internal static object IconScanLock = new object();
 
 		internal MarketDB MarketDB;
+		internal ProgressDB ProgressDB;
 		internal RatStash.Database ItemDB;
 
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -71,6 +72,11 @@ namespace RatScanner
 
 			Logger.LogInfo("Loading item data...");
 			LoadItemDatabase();
+
+			// Grab quest and hideout requirements from tarkovdata
+			Logger.LogInfo("Loading progress data...");
+			ProgressDB = new ProgressDB();
+			ProgressDB.Init();
 
 			Logger.LogInfo("Loading price data...");
 			MarketDB = new MarketDB();

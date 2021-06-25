@@ -56,7 +56,11 @@ namespace RatScanner
 
 		private static readonly Dictionary<ResourceType, string> ResCache = new Dictionary<ResourceType, string>();
 
+		// Official RatScanner API URL
 		private const string BaseUrl = "https://api.ratscanner.com/v3";
+
+		// GitHub page for the tarkovdata repository, serves the master branch
+		private const string TarkovDataUrl = "https://tarkovtracker.github.io/tarkovdata/";
 
 		public static MarketItem[] GetMarketDB(Language language = Language.English)
 		{
@@ -69,6 +73,34 @@ namespace RatScanner
 			catch (Exception e)
 			{
 				Logger.LogError($"Loading of market data failed.\n{e}");
+				return null;
+			}
+		}
+
+		// Pulls the whole quest data file from tarkovdata for processing
+		public static dynamic GetProgressDataQuest()
+		{
+			try
+			{
+				return Get($"{TarkovDataUrl}/quests.json");
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"Loading of quest data failed.\n{e}");
+				return null;
+			}
+		}
+
+		// Pulls the whole hideout file form tarkovdata for processing
+		public static dynamic GetProgressDataHideout()
+		{
+			try
+			{
+				return Get($"{TarkovDataUrl}/hideout.json");
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"Loading of hideout data failed.\n{e}");
 				return null;
 			}
 		}

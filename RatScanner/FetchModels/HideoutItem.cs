@@ -1,0 +1,15 @@
+﻿using System;
+
+namespace RatScanner.FetchModels
+{
+	[Serializable]
+	public class HideoutItem
+	{
+		// Item data
+		public string Id { get; set; }
+		public int Needed { get; set; }
+		public int StationId { get; set; }
+		public int ModuleLevel { get; set; }
+
+	}
+}
