@@ -89,7 +89,7 @@ namespace RatScanner
 			internal static float ConfWarnThreshold = 0.95f;
 			internal static bool ScanRotatedIcons = true;
 			internal static int ScanPadding => (int)(GetScreenScaleFactor() * 10);
-			internal static int ScanWidth => (int)(GetScreenScaleFactor() * 640);
+			internal static int ScanWidth => (int)(GetScreenScaleFactor() * 896);
 			internal static int ScanHeight => (int)(GetScreenScaleFactor() * 896);
 			internal static int ItemSlotSize = 63;
 			internal static Hotkey Hotkey = new Hotkey(new[] { Key.LeftShift }.ToList(), new[] { MouseButton.Left });

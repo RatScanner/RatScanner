@@ -30,7 +30,7 @@ namespace RatScanner.Scan
 		private const double GridSearchAvgScoreStop = 0.9;
 		private const double GridSearchEarlyMinScore = 0.25;
 		private const double GridDistanceScalingRate = 0.95;
-		private const int GridSearchMaxIterations = 20;
+		private const int GridSearchMaxIterations = 30;
 		private const int GridSearchMinIterations = 6;
 		private const int GridSearchEarlySearchIterations = 2;
 		private const double GridSearchPerfectScore = 0.95;
@@ -219,7 +219,7 @@ namespace RatScanner.Scan
 			return (position, size);
 		}
 
-		private (int, int, int, int, Vector2) FindGridEdgeDistances(Vector2 center)
+		private (int, int, int, int, Vector2) FindGridEdgeDistances(Vector2 center, int numIters = 0)
 		{
 			// Set up loop values
 			var orderIdx = 0;
@@ -229,7 +229,7 @@ namespace RatScanner.Scan
 			var downLimit = leftLimit;
 			var lastScores = new[] { 0.0, 0.0, 0.0, 0.0 };
 			var foundNewEdge = new[] { false, false, false, false };
-			var numIters = 0;
+			var myIters = 0;
 			var keepTrying = true;
 
 			while (keepTrying)
@@ -250,7 +250,7 @@ namespace RatScanner.Scan
 				var minScore = numIters < GridSearchMinIterations ? GridSearchEarlyMinScore : lastScores[orderIdx];
 				var (step, score) = FindGridEdgeDistance(direction.Item1, direction.Item2, center.X, center.Y,
 					GetSteps(direction.Item1, direction.Item2, center),
-					plus, minus, numIters >= GridSearchEarlySearchIterations, minScore);
+					plus, minus, myIters >= GridSearchEarlySearchIterations, minScore);
 
 				// Update scores and limits based on results
 				lastScores[orderIdx] = score;
@@ -290,7 +290,7 @@ namespace RatScanner.Scan
 
 					var newCenter = new Vector2(newX, center.Y);
 					Logger.LogDebug($"On Vertical Edge... Old Center: {center.X}, {center.Y}; New Center: {newCenter.X}, {newCenter.Y};");
-					return FindGridEdgeDistances(newCenter);
+					return FindGridEdgeDistances(newCenter, numIters);
 				}
 
 				if (upLimit == 0 && downLimit == 0)
@@ -301,7 +301,7 @@ namespace RatScanner.Scan
 
 					var newCenter = new Vector2(center.X, newY);
 					Logger.LogDebug($"On Horizontal Edge... Old Center: {center.X}, {center.Y}; New Center: {newCenter.X}, {newCenter.Y};");
-					return FindGridEdgeDistances(newCenter);
+					return FindGridEdgeDistances(newCenter, numIters);
 				}
 
 				// Log the current bounds if logging debug
@@ -318,6 +318,7 @@ namespace RatScanner.Scan
 
 				// Loop housekeeping
 				numIters++;
+				myIters++;
 				orderIdx = (orderIdx + 1) % _searchOrder.Count;
 
 				var avgScore = lastScores.Sum() / lastScores.Length;
