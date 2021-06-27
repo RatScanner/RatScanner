@@ -60,7 +60,10 @@ namespace RatScanner
 		private const string BaseUrl = "https://api.ratscanner.com/v3";
 
 		// GitHub page for the tarkovdata repository, serves the master branch
-		private const string TarkovDataUrl = "https://tarkovtracker.github.io/tarkovdata/";
+		private const string TarkovDataUrl = "https://tarkovtracker.github.io/tarkovdata";
+
+		// Base URL for the TarkovTracker URL
+		private const string TarkovTrackerUrl = "https://tarkovtracker.io/api/v1";
 
 		public static MarketItem[] GetMarketDB(Language language = Language.English)
 		{
@@ -77,8 +80,65 @@ namespace RatScanner
 			}
 		}
 
+		// Checks the token metadata endpoint for TarkovTracker
+		public static string? GetTarkovTrackerToken()
+		{
+			try
+			{
+				return Get($"{TarkovTrackerUrl}/token", RatConfig.Tracking.TarkovTracker.Token);
+			}
+			catch (WebException e)
+			{
+				HttpStatusCode? status = (e.Response as HttpWebResponse)?.StatusCode;
+				if(status != null && status == HttpStatusCode.Unauthorized)
+				{
+					// We can work with a 401
+					return null;
+				}
+				else
+				{
+					// Unknown error, continue throwing
+					Logger.LogError($"Retrieving token metadata failed.\n{e}");
+					throw e;
+				}
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"Retrieving token metadata failed.\n{e}");
+				throw e;
+			}
+		}
+
+		// Checks the token metadata endpoint for TarkovTracker
+		public static string GetTarkovTrackerTeam()
+		{
+			try
+			{
+				return Get($"{TarkovTrackerUrl}/team/progress", RatConfig.Tracking.TarkovTracker.Token);
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"Retrieving TarkovTracker team data failed.\n{e}");
+				return null;
+			}
+		}
+
+		// Checks the token metadata endpoint for TarkovTracker
+		public static string GetTarkovTrackerSolo()
+		{
+			try
+			{
+				return Get($"{TarkovTrackerUrl}/progress", RatConfig.Tracking.TarkovTracker.Token);
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"Retrieving TarkovTracker progress data failed.\n{e}");
+				return null;
+			}
+		}
+
 		// Pulls the whole quest data file from tarkovdata for processing
-		public static dynamic GetProgressDataQuest()
+		public static string GetProgressDataQuest()
 		{
 			try
 			{
@@ -92,7 +152,7 @@ namespace RatScanner
 		}
 
 		// Pulls the whole hideout file form tarkovdata for processing
-		public static dynamic GetProgressDataHideout()
+		public static string GetProgressDataHideout()
 		{
 			try
 			{
@@ -144,12 +204,16 @@ namespace RatScanner
 			}
 		}
 
-		private static string Get(string url)
+		private static string Get(string url, string bearerToken = null)
 		{
 			var request = WebRequest.CreateHttp(url);
 			request.Method = WebRequestMethods.Http.Get;
 			request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 			request.UserAgent = $"RatScanner-Client/{RatConfig.Version}";
+			if (bearerToken != null)
+			{
+				request.Headers.Add("Authorization", "Bearer " + bearerToken);
+			}
 
 			using var response = (HttpWebResponse)request.GetResponse();
 			using var stream = response.GetResponseStream();

@@ -578,6 +578,8 @@
 						</Grid.ColumnDefinitions>
 					</Grid>
 					<Separator />
+					<Label HorizontalAlignment="Center"
+								 Content="TarkovTracker" />
 					<Grid>
 						<Grid.ToolTip>
 							<TextBlock>
@@ -587,10 +589,29 @@
 								permissions</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
-									 Content="ToolTip Duration" />
+									 Content="API Token" />
 						<TextBox Grid.Column="1"
-										 Width="64"
-										 Text="{Binding ToolTipDuration}" />
+										 Width="128"
+										 Text="{Binding TarkovTrackerToken}" />
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								Show items needed by teammates
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0"
+									 Content="Show Team Needs"
+									 Margin="0,0"/>
+						<CheckBox Grid.Column="1"
+											Margin="5,0"
+											VerticalAlignment="Center"
+											IsChecked="{Binding ShowTarkovTrackerTeam}" />
 
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="*" />

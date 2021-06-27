@@ -43,6 +43,7 @@ namespace RatScanner
 
 		internal MarketDB MarketDB;
 		internal ProgressDB ProgressDB;
+		internal TarkovTrackerDB TarkovTrackerDB;
 		internal RatStash.Database ItemDB;
 
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -77,6 +78,10 @@ namespace RatScanner
 			Logger.LogInfo("Loading progress data...");
 			ProgressDB = new ProgressDB();
 			ProgressDB.Init();
+
+			Logger.LogInfo("Loading TarkovTracker...");
+			TarkovTrackerDB = new TarkovTrackerDB();
+			TarkovTrackerDB.Init();
 
 			Logger.LogInfo("Loading price data...");
 			MarketDB = new MarketDB();

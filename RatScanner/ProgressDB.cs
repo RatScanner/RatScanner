@@ -12,7 +12,6 @@ namespace RatScanner
 	{
 		private static readonly String[] _questObjectiveItemTypes = { "collect", "find", "mark", "key" };
 
-
 		// Items required for quests, including tools, handover items, and found-in-raid
 		private List<QuestItem> _questItems = new List<QuestItem>();
 

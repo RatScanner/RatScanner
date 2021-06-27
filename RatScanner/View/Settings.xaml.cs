@@ -66,6 +66,13 @@ namespace RatScanner.View
 			RatConfig.MinimalUi.ShowUpdated = settingsVM.ShowUpdated;
 			RatConfig.MinimalUi.Opacity = settingsVM.Opacity;
 
+			RatConfig.Tracking.ShowQuestNeeds = settingsVM.ShowQuestNeeds;
+			RatConfig.Tracking.ShowQuestHandoverNeeds = settingsVM.ShowQuestHandoverNeeds;
+			RatConfig.Tracking.ShowHideoutNeeds = settingsVM.ShowHideoutNeeds;
+
+			RatConfig.Tracking.TarkovTracker.Token = settingsVM.TarkovTrackerToken;
+			RatConfig.Tracking.TarkovTracker.ShowTeam = settingsVM.ShowTarkovTrackerTeam;
+
 			RatConfig.ScreenResolution = (RatConfig.Resolution)settingsVM.ScreenResolution;
 			RatConfig.MinimizeToTray = settingsVM.MinimizeToTray;
 			RatConfig.AlwaysOnTop = settingsVM.AlwaysOnTop;
@@ -93,5 +100,6 @@ namespace RatScanner.View
 		{
 			RatScannerMain.Instance.HotkeyManager.RegisterHotkeys();
 		}
+
 	}
 }
