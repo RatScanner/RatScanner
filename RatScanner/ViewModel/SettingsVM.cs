@@ -29,6 +29,16 @@ namespace RatScanner.ViewModel
 		public bool AlwaysOnTop { get; set; }
 		public bool LogDebug { get; set; }
 
+		// Progress Tracking Settings
+		public bool ShowQuestNeeds { get; set; }
+		public bool ShowQuestHandoverNeeds { get; set; }
+		public bool ShowHideoutNeeds { get; set; }
+
+		// TarkovTracker Specific Tracking Settings
+		public string TarkovTrackerToken { get; set; }
+		public bool ShowTarkovTrackerTeam { get; set; }
+
+
 		internal SettingsVM()
 		{
 			EnableNameScan = RatConfig.NameScan.Enable;
@@ -53,6 +63,13 @@ namespace RatScanner.ViewModel
 			MinimizeToTray = RatConfig.MinimizeToTray;
 			AlwaysOnTop = RatConfig.AlwaysOnTop;
 			LogDebug = RatConfig.LogDebug;
+
+			ShowQuestNeeds = RatConfig.Tracking.ShowQuestNeeds;
+			ShowQuestHandoverNeeds = RatConfig.Tracking.ShowQuestHandoverNeeds;
+			ShowHideoutNeeds = RatConfig.Tracking.ShowHideoutNeeds;
+
+			TarkovTrackerToken = RatConfig.Tracking.TarkovTracker.Token;
+			ShowTarkovTrackerTeam = RatConfig.Tracking.TarkovTracker.ShowTeam;
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;

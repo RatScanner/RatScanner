@@ -519,7 +519,87 @@
 					</TextBlock>
 				</StackPanel>
 			</TabItem>
-		</TabControl>
+      <TabItem Header="Tracking">
+				<StackPanel>
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								Show items needed for quests
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0"
+									 Content="Show Quest Needs" />
+						<CheckBox Grid.Column="1"
+											Margin="5,0"
+											VerticalAlignment="Center"
+											IsChecked="{Binding ShowQuestNeeds}" />
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								Show items that aren't found-in-raid required for Quests
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0"
+									 Content="Show Non-FIR Needs"
+									 Margin="15,0"/>
+						<CheckBox Grid.Column="1"
+											Margin="5,0"
+											VerticalAlignment="Center"
+											IsChecked="{Binding ShowQuestHandoverNeeds}" />
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+					<Grid Margin="0,10">
+						<Grid.ToolTip>
+							<TextBlock>
+								Show items needed for Hideout Upgrades
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0"
+									 Content="Show Hideout Needs"
+									 Margin="0,0"/>
+						<CheckBox Grid.Column="1"
+											Margin="5,0"
+											VerticalAlignment="Center"
+											IsChecked="{Binding ShowQuestHandoverNeeds}" />
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+					<Separator />
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								A TarkovTracker API Token from your<LineBreak />
+								TarkovTracker settings. Requires<LineBreak />
+								Get Progression or Get Team Progression<LineBreak />
+								permissions</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0"
+									 Content="ToolTip Duration" />
+						<TextBox Grid.Column="1"
+										 Width="64"
+										 Text="{Binding ToolTipDuration}" />
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+				</StackPanel>
+			</TabItem>
+    </TabControl>
 
 		<Grid Grid.Row="1"
 					Height="30"

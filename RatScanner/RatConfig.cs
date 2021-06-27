@@ -117,6 +117,19 @@ namespace RatScanner
 			internal static int Opacity = 10;
 		}
 
+		// Progress Tracking options
+		internal static class Tracking
+		{
+			internal static bool ShowQuestNeeds = true;
+			internal static bool ShowQuestHandoverNeeds = false;
+			internal static bool ShowHideoutNeeds = false;
+			internal static class TarkovTracker
+			{
+				internal static string Token = "";
+				internal static bool ShowTeam = true;
+			}
+		}
+
 		// Other
 		internal static bool LogDebug = false;
 		internal static bool MinimizeToTray = false;
@@ -292,6 +305,15 @@ namespace RatScanner
 			MinimalUi.ShowUpdated = config.ReadBool(nameof(MinimalUi.ShowUpdated), true);
 			MinimalUi.Opacity = config.ReadInt(nameof(MinimalUi.Opacity), 50);
 
+			config.Section = nameof(Tracking);
+			Tracking.ShowQuestNeeds = config.ReadBool(nameof(Tracking.ShowQuestNeeds), true);
+			Tracking.ShowQuestHandoverNeeds = config.ReadBool(nameof(Tracking.ShowQuestHandoverNeeds), false);
+			Tracking.ShowHideoutNeeds = config.ReadBool(nameof(Tracking.ShowHideoutNeeds), false);
+
+			config.Section = nameof(Tracking.TarkovTracker);
+			Tracking.TarkovTracker.Token = config.ReadString(nameof(Tracking.TarkovTracker.Token), "");
+			Tracking.TarkovTracker.ShowTeam = config.ReadBool(nameof(Tracking.TarkovTracker.ShowTeam), true);
+
 			config.Section = "Other";
 			ScreenResolution = (Resolution)config.ReadInt(nameof(ScreenResolution), (int)Resolution.R1920x1080);
 			MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), false);
@@ -326,6 +348,15 @@ namespace RatScanner
 			config.WriteBool(nameof(MinimalUi.ShowTraderMaxPrice), MinimalUi.ShowTraderMaxPrice);
 			config.WriteBool(nameof(MinimalUi.ShowUpdated), MinimalUi.ShowUpdated);
 			config.WriteInt(nameof(MinimalUi.Opacity), MinimalUi.Opacity);
+
+			config.Section = nameof(Tracking);
+			config.WriteBool(nameof(Tracking.ShowQuestNeeds), Tracking.ShowQuestNeeds);
+			config.WriteBool(nameof(Tracking.ShowQuestHandoverNeeds), Tracking.ShowQuestHandoverNeeds);
+			config.WriteBool(nameof(Tracking.ShowHideoutNeeds), Tracking.ShowHideoutNeeds);
+
+			config.Section = nameof(Tracking.TarkovTracker);
+			config.WriteString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);
+			config.WriteBool(nameof(Tracking.TarkovTracker.ShowTeam), Tracking.TarkovTracker.ShowTeam);
 
 			config.Section = "Other";
 			config.WriteInt(nameof(ScreenResolution), (int)ScreenResolution);
