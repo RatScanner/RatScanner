@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using RatScanner.FetchModels;
@@ -52,6 +53,8 @@ namespace RatScanner.ViewModel
 		public string MaxTraderPrice => IntToGroupedString(GetMaxTraderPrice()) + " ₽";
 
 		private int GetMaxTraderPrice() => MatchedItems[0].GetMaxTraderPrice();
+
+		public Dictionary<string, NeededItem> TrackingNeeds => MatchedItems[0].GetTrackingNeeds();
 
 		public string DiscordLink => ApiManager.GetResource(ApiManager.ResourceType.DiscordLink);
 

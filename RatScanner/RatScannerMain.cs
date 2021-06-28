@@ -74,14 +74,15 @@ namespace RatScanner
 			Logger.LogInfo("Loading item data...");
 			LoadItemDatabase();
 
+			// Check for TarkovTracker data
+			Logger.LogInfo("Loading TarkovTracker...");
+			TarkovTrackerDB = new TarkovTrackerDB();
+			TarkovTrackerDB.Init();
+
 			// Grab quest and hideout requirements from tarkovdata
 			Logger.LogInfo("Loading progress data...");
 			ProgressDB = new ProgressDB();
 			ProgressDB.Init();
-
-			Logger.LogInfo("Loading TarkovTracker...");
-			TarkovTrackerDB = new TarkovTrackerDB();
-			TarkovTrackerDB.Init();
 
 			Logger.LogInfo("Loading price data...");
 			MarketDB = new MarketDB();

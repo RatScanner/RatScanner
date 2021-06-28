@@ -42,7 +42,7 @@ namespace RatScanner
 						// Some objectives can have array of targets (one-of-keys are currently only example), so add each
 						foreach (String item in objective.Target)
 						{
-							_questItems.Add(new QuestItem { Id = item, QuestId = quest.Id, Needed = objective.Number, FIR = (objective.Type == "find") });
+							_questItems.Add(new QuestItem { Id = item, QuestId = quest.Id, Needed = objective.Number, QuestObjectiveId = objective.Id, FIR = (objective.Type == "find") });
 						}
 					}
 				}
@@ -57,7 +57,7 @@ namespace RatScanner
 					// If its an item requirement, add it to the list
 					if (requirement.Type == "item")
 					{
-						_hideoutItems.Add(new HideoutItem { Id = requirement.Name, StationId = module.StationId, ModuleLevel = module.Level, Needed = requirement.Quantity });
+						_hideoutItems.Add(new HideoutItem { Id = requirement.Name, StationId = module.StationId, ModuleLevel = module.Level, HideoutObjectiveId = requirement.Id, Needed = requirement.Quantity });
 					}
 				}
 			}
@@ -105,7 +105,7 @@ namespace RatScanner
 		}
 
 		// Return all the instances where this item is needed for quests
-		public List<QuestItem> GetQuestNeedsById(string uid)
+		public List<QuestItem> GetQuestRequiredById(string uid)
 		{
 			if (uid?.Length > 0)
 			{
@@ -116,7 +116,7 @@ namespace RatScanner
 		}
 
 		// Return all the instances where this item is needed for hideout upgrades
-		public List<HideoutItem> GetHideoutNeedsById(string uid)
+		public List<HideoutItem> GetHideoutRequiredById(string uid)
 		{
 			if (uid?.Length > 0)
 			{

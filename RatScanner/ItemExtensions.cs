@@ -2,6 +2,7 @@
 using RatScanner.FetchModels;
 using System.Collections.Generic;
 using RatStash;
+using RatScanner.FetchModels.TarkovTracker;
 
 namespace RatScanner
 {
@@ -24,16 +25,60 @@ namespace RatScanner
 			return RatScannerMain.Instance.ProgressDB.IsHideoutItem(item.Id);
 		}
 
-		public static List<QuestItem> GetQuestNeeds(this Item item)
+		public static List<QuestItem> GetQuestRequired(this Item item)
 		{
-			return RatScannerMain.Instance.ProgressDB.GetQuestNeedsById(item.Id);
+			return RatScannerMain.Instance.ProgressDB.GetQuestRequiredById(item.Id);
 		}
 
-		public static List<HideoutItem> GetHideoutNeeds(this Item item)
+		public static List<HideoutItem> GetHideoutRequired(this Item item)
 		{
-			return RatScannerMain.Instance.ProgressDB.GetHideoutNeedsById(item.Id);
+			return RatScannerMain.Instance.ProgressDB.GetHideoutRequiredById(item.Id);
 		}
 
+		public static Dictionary<string, NeededItem> GetTrackingNeeds(this Item item)
+		{
+			// Get the latest progression and tracker data
+			List<QuestItem> requiredQ = item.GetQuestRequired();
+			List<HideoutItem> requiredH = item.GetHideoutRequired();
+			List<Progress> team = RatScannerMain.Instance.TarkovTrackerDB.GetProgress();
+
+			// Create our team dictionary
+			Dictionary<string, NeededItem> trackedNeeds = new Dictionary<string, NeededItem>();
+			foreach (Progress teammate in team)
+			{
+				// Create the needed item for this player
+				NeededItem neededItem = new NeededItem(item.Id);
+
+				// Add up all the quest requirements
+				foreach (QuestItem need in requiredQ)
+				{
+					// Update FIR flag to true if any quest is FIR
+					if (need.FIR) neededItem.FIR = true;
+
+					// Check if we have completed this quest need
+					if (teammate.QuestObjectives[need.QuestObjectiveId.ToString()].Complete != true)
+					{
+						neededItem.QuestNeeded += need.Needed;
+						neededItem.QuestHave += teammate.QuestObjectives[need.QuestObjectiveId.ToString()].Have.GetValueOrDefault();
+					}
+				}
+
+				// Add up all the hideout requirements
+				foreach (HideoutItem need in requiredH)
+				{
+					// Check if we have completed this hideout need
+					if (teammate.HideoutObjectives[need.HideoutObjectiveId.ToString()].Complete != true)
+					{
+						neededItem.HideoutNeeded += need.Needed;
+						neededItem.HideoutHave += teammate.HideoutObjectives[need.HideoutObjectiveId.ToString()].Have.GetValueOrDefault();
+					}
+				}
+
+				// Add to our team dictionary
+				trackedNeeds.Add(teammate.DisplayName, neededItem);
+			}
+			return trackedNeeds;
+		}
 
 		public static MarketItem GetMarketItem(this Item item)
 		{

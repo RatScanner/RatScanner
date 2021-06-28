@@ -3,7 +3,7 @@
 						 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 						 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 						 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-						 d:DesignHeight="390"
+						 d:DesignHeight="406.788"
 						 d:DesignWidth="280"
 						 x:ClassModifier="internal"
 						 Background="#444444"
@@ -209,6 +209,43 @@
 						<ColumnDefinition Width="*" />
 						<ColumnDefinition Width="Auto" />
 					</Grid.ColumnDefinitions>
+				</Grid>
+				<Grid>
+					<ListView Width="260"   
+										 Margin="0,0,0,0"   
+										 HorizontalAlignment="Center"   
+										 ItemsSource="{Binding TrackingNeeds}"
+										 Background="{x:Null}" BorderBrush="{x:Null}" SelectionMode="Single" Foreground="White">
+						<ListView.ItemContainerStyle>
+							<Style TargetType="ListViewItem">
+								<Style.Triggers>
+									<Trigger Property="IsMouseOver" Value="True">
+										<Setter Property="Background" Value="Transparent" />
+										<Setter Property="BorderThickness" Value="0" />
+									</Trigger>
+								</Style.Triggers>
+							</Style>
+						</ListView.ItemContainerStyle>
+						<ListView.View>
+							<GridView>
+								<GridView.ColumnHeaderContainerStyle>
+									<Style TargetType="{x:Type GridViewColumnHeader}">
+										<!-- Set any properties you want to set -->
+										<Setter Property="Background" Value="Transparent" />
+										<Setter Property="Foreground" Value="White" />
+										<Setter Property="FontWeight" Value="Normal" />
+									</Style>
+								</GridView.ColumnHeaderContainerStyle>
+								<GridViewColumn Header="Teammate" 
+																		DisplayMemberBinding="{Binding Path=Key}" />
+								<GridViewColumn Header="# Needed Quest" 
+																		DisplayMemberBinding="{Binding Path=Value}" />
+								<GridViewColumn Header="# Needed Hideout" 
+																		DisplayMemberBinding="{Binding Path=Value}" />
+
+							</GridView>
+						</ListView.View>
+					</ListView>
 				</Grid>
 			</StackPanel>
 		</StackPanel>
