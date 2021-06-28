@@ -1,0 +1,35 @@
+name: Draft Release
+
+on:
+  push:
+    tags:
+      - v*
+  pull_request:
+    tags:
+      - v*
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.x
+    - name: Restore Dependencies
+      run: dotnet restore
+    - name: Publish
+      run: dotnet publish RatScanner/RatScanner.csproj -c Release -o publish --runtime win-x64 --self-contained false
+    - name: Include Updater
+      run: curl -L "https://github.com/RatScanner/RatUpdater/releases/latest/download/RatUpdater.exe" --output "publish/RatUpdater.exe"
+    - name: Zip Content
+      run: 7z a -r RatScanner.zip ./publish/*
+    - name: Draft Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: RatScanner.zip
+        draft: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
