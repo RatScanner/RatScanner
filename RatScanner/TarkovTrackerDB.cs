@@ -111,7 +111,9 @@ namespace RatScanner
 					// We have permission to get individual progress
 					else if (SoloProgressAvailable())
 					{
-						_progress = JsonConvert.DeserializeObject<List<Progress>>(ApiManager.GetTarkovTrackerSolo());
+						var soloProgress = JsonConvert.DeserializeObject<Progress>(ApiManager.GetTarkovTrackerSolo());
+						_progress = new List<Progress>();
+						_progress.Add(soloProgress);
 						_lastUpdate = DateTime.Now;
 						updateDisplayNames();
 					}

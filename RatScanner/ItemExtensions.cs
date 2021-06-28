@@ -37,9 +37,17 @@ namespace RatScanner
 
 		public static Dictionary<string, NeededItem> GetTrackingNeeds(this Item item)
 		{
+			// Check if we are able to connect to TarkovTracker
+			if (!RatScannerMain.Instance.TarkovTrackerDB.ValidToken())
+			{
+				// Our token is invalid/missing
+				return null;
+			}
+
 			// Get the latest progression and tracker data
 			List<QuestItem> requiredQ = item.GetQuestRequired();
 			List<HideoutItem> requiredH = item.GetHideoutRequired();
+
 			List<Progress> team = RatScannerMain.Instance.TarkovTrackerDB.GetProgress();
 
 			// Create our team dictionary
