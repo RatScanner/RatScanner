@@ -24,6 +24,8 @@ namespace RatScanner.FetchModels
 		public int HideoutHave { get; set; } = 0;
 		// If any of the quest requirements outstanding are Found in raid required
 		public bool FIR { get; set; } = false;
+		// If this item is for ourselves, or someone else
+		public bool Self { get; set; } = false;
 
 		// Returns total remaining needed
 		public int Remaining

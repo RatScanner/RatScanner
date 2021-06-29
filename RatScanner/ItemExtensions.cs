@@ -57,46 +57,68 @@ namespace RatScanner
 				// Create the needed item for this player
 				NeededItem neededItem = new NeededItem(item.Id);
 
-				// Add up all the quest requirements
-				foreach (QuestItem requirement in requiredQ)
-				{
-					// Update FIR flag to true if any quest is FIR
-					if (requirement.FIR) neededItem.FIR = true;
+				// Set this item as for ourselves if this was our token
+				if (teammate.Self.GetValueOrDefault()) neededItem.Self = true;
 
-					// If the progress data doesn't have this requirement, then it should be a needed item
-					if (!teammate.QuestObjectives.ContainsKey(requirement.QuestObjectiveId.ToString()))
+				// Do our settings say to show quest needs?
+				if(RatConfig.Tracking.ShowQuestNeeds)
+				{
+					// Add up all the quest requirements
+					foreach (QuestItem requirement in requiredQ)
 					{
-						neededItem.QuestNeeded += requirement.Needed;
-					}
-					// Else if we have the requirement in our progress data but its not complete, it might have metadata
-					else if (teammate.QuestObjectives[requirement.QuestObjectiveId.ToString()].Complete != true)
-					{
-						// Check if we have completed this quest need
-						neededItem.QuestNeeded += requirement.Needed;
-						neededItem.QuestHave += teammate.QuestObjectives[requirement.QuestObjectiveId.ToString()].Have ?? 0;
+						// Don't add the item to needs if its not a FIR requirement and we aren't showing non-FIR according to settings
+						if (!(!RatConfig.Tracking.ShowQuestHandoverNeeds && !requirement.FIR))
+						{
+							// Update FIR flag to true if any quest is FIR
+							if (requirement.FIR) neededItem.FIR = true;
+
+							// If the progress data doesn't have this requirement, then it should be a needed item
+							if (!teammate.QuestObjectives.ContainsKey(requirement.QuestObjectiveId.ToString()))
+							{
+								neededItem.QuestNeeded += requirement.Needed;
+							}
+							// Else if we have the requirement in our progress data but its not complete, it might have metadata
+							else if (teammate.QuestObjectives[requirement.QuestObjectiveId.ToString()].Complete != true)
+							{
+								// Check if we have completed this quest need
+								neededItem.QuestNeeded += requirement.Needed;
+								neededItem.QuestHave += teammate.QuestObjectives[requirement.QuestObjectiveId.ToString()].Have ?? 0;
+							}
+						}
 					}
 				}
 
-				// Add up all the hideout requirements
-				foreach (HideoutItem requirement in requiredH)
+				// Do our settings say to show hideout needs?
+				if(RatConfig.Tracking.ShowHideoutNeeds)
 				{
-					// If the progress data doesn't have this requirement, then it should be a needed item
-					if (!teammate.HideoutObjectives.ContainsKey(requirement.HideoutObjectiveId.ToString()))
+					// Add up all the hideout requirements
+					foreach (HideoutItem requirement in requiredH)
 					{
-						neededItem.HideoutNeeded += requirement.Needed;
-					}
-					// Else if we have the requirement in our progress data but its not complete, it might have metadata
-					else if (teammate.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Complete != true)
-					{
-						// Check if we have completed this hideout need
-						neededItem.HideoutNeeded += requirement.Needed;
-						neededItem.HideoutHave += teammate.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Have ?? 0;
+						// If the progress data doesn't have this requirement, then it should be a needed item
+						if (!teammate.HideoutObjectives.ContainsKey(requirement.HideoutObjectiveId.ToString()))
+						{
+							neededItem.HideoutNeeded += requirement.Needed;
+						}
+						// Else if we have the requirement in our progress data but its not complete, it might have metadata
+						else if (teammate.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Complete != true)
+						{
+							// Check if we have completed this hideout need
+							neededItem.HideoutNeeded += requirement.Needed;
+							neededItem.HideoutHave += teammate.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Have ?? 0;
+						}
 					}
 				}
 
 				// Add to our team dictionary
 				trackedNeeds.Add(teammate.DisplayName, neededItem);
 			}
+
+			// Only show ourself if ShowTeam is unchecked
+			if (!RatConfig.Tracking.TarkovTracker.ShowTeam)
+			{
+				trackedNeeds = trackedNeeds.Where(teammate => teammate.Value.Self).ToDictionary(teammate => teammate.Key, teammate => teammate.Value);
+			}
+
 			return trackedNeeds;
 		}
 

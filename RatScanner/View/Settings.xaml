@@ -570,7 +570,7 @@
 						<CheckBox Grid.Column="1"
 											Margin="5,0"
 											VerticalAlignment="Center"
-											IsChecked="{Binding ShowQuestHandoverNeeds}" />
+											IsChecked="{Binding ShowHideoutNeeds}" />
 
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="*" />
