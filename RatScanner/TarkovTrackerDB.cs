@@ -57,16 +57,23 @@ namespace RatScanner
 		private void updateToken()
 		{
 			// Attempt to verify the token
-			var response = ApiManager.GetTarkovTrackerToken();
-			if (response != null)
+			try
 			{
-				// We have a valid token
-				_token = JsonConvert.DeserializeObject<Token>(response);
-				_badToken = false;
+				var response = ApiManager.GetTarkovTrackerToken();
+				if (response != null)
+				{
+					// We have a valid token
+					_token = JsonConvert.DeserializeObject<Token>(response);
+					_badToken = false;
+				}
 			}
-			else
+			catch (RateLimitExceededException e)
 			{
-				// We have a token that doesn't work, mark it as such
+				// We hit a rate limit issue, this doesn't mean our token is bad, but we have to wait until we try again
+			}
+			catch (UnauthorizedTokenException e)
+			{
+				// We have an unauthorized token, retrying won't help until we change it
 				_badToken = true;
 				_token = new Token { Id = RatConfig.Tracking.TarkovTracker.Token };
 			}
@@ -104,18 +111,40 @@ namespace RatScanner
 					// We have access to team progression
 					if (TeamProgressAvailable())
 					{
-						_progress = JsonConvert.DeserializeObject<List<Progress>>(ApiManager.GetTarkovTrackerTeam());
-						_lastUpdate = DateTime.Now;
-						updateDisplayNames();
+						try
+						{
+							_progress = JsonConvert.DeserializeObject<List<Progress>>(ApiManager.GetTarkovTrackerTeam());
+							_lastUpdate = DateTime.Now;
+							updateDisplayNames();
+						}
+						catch (FetchModels.TarkovTracker.RateLimitExceededException e)
+						{
+							// We hit a rate limit issue, this doesn't mean our token is bad, but we have to wait until we try again
+						}
+						catch (FetchModels.TarkovTracker.UnauthorizedTokenException e)
+						{
+							// We have an unauthorized token exception, it could be that we don't have permissions for this call
+						}
 					}
 					// We have permission to get individual progress
 					else if (SoloProgressAvailable())
 					{
-						var soloProgress = JsonConvert.DeserializeObject<Progress>(ApiManager.GetTarkovTrackerSolo());
-						_progress = new List<Progress>();
-						_progress.Add(soloProgress);
-						_lastUpdate = DateTime.Now;
-						updateDisplayNames();
+						try
+						{
+							var soloProgress = JsonConvert.DeserializeObject<Progress>(ApiManager.GetTarkovTrackerSolo());
+							_progress = new List<Progress>();
+							_progress.Add(soloProgress);
+							_lastUpdate = DateTime.Now;
+							updateDisplayNames();
+						}
+						catch (FetchModels.TarkovTracker.RateLimitExceededException e)
+						{
+							// We hit a rate limit issue, this doesn't mean our token is bad, but we have to wait until we try again
+						}
+						catch (FetchModels.TarkovTracker.UnauthorizedTokenException e)
+						{
+							// We have an unauthorized token exception, it could be that we don't have permissions for this call
+						}
 					}
 					else
 					{

@@ -93,7 +93,11 @@ namespace RatScanner
 				if(status != null && status == HttpStatusCode.Unauthorized)
 				{
 					// We can work with a 401
-					return null;
+					throw new FetchModels.TarkovTracker.UnauthorizedTokenException("Token was rejected by the API", e);
+				}
+				else if(status != null && status == HttpStatusCode.TooManyRequests)
+				{
+					throw new FetchModels.TarkovTracker.RateLimitExceededException("Rate Limiting reached for token", e);
 				}
 				else
 				{
@@ -116,6 +120,20 @@ namespace RatScanner
 			{
 				return Get($"{TarkovTrackerUrl}/team/progress", RatConfig.Tracking.TarkovTracker.Token);
 			}
+			catch (WebException e)
+			{
+				HttpStatusCode? status = (e.Response as HttpWebResponse)?.StatusCode;
+				if (status != null && status == HttpStatusCode.TooManyRequests)
+				{
+					throw new FetchModels.TarkovTracker.RateLimitExceededException("Rate Limiting reached for token", e);
+				}
+				else
+				{
+					// Unknown error, continue throwing
+					Logger.LogError($"Retrieving TarkovTracker team data failed.\n{e}");
+					throw e;
+				}
+			}
 			catch (Exception e)
 			{
 				Logger.LogError($"Retrieving TarkovTracker team data failed.\n{e}");
@@ -129,6 +147,20 @@ namespace RatScanner
 			try
 			{
 				return Get($"{TarkovTrackerUrl}/progress", RatConfig.Tracking.TarkovTracker.Token);
+			}
+			catch (WebException e)
+			{
+				HttpStatusCode? status = (e.Response as HttpWebResponse)?.StatusCode;
+				if (status != null && status == HttpStatusCode.TooManyRequests)
+				{
+					throw new FetchModels.TarkovTracker.RateLimitExceededException("Rate Limiting reached for token", e);
+				}
+				else
+				{
+					// Unknown error, continue throwing
+					Logger.LogError($"Retrieving TarkovTracker progress data failed.\n{e}");
+					throw e;
+				}
 			}
 			catch (Exception e)
 			{
