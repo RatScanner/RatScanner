@@ -3,7 +3,7 @@
 						 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 						 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 						 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-						 d:DesignHeight="406.788"
+						 d:DesignHeight="390"
 						 d:DesignWidth="280"
 						 x:ClassModifier="internal"
 						 Background="#444444"
@@ -11,37 +11,140 @@
 						 Loaded="OnLoaded">
 
 	<Grid Margin="10,0">
-		<StackPanel Grid.Row="0">
-			<Grid Margin="0,10,0,10">
-				<StackPanel Grid.Column="0"
-										VerticalAlignment="Center"
-										Orientation="Horizontal">
-					<WrapPanel VerticalAlignment="Center">
-						<Rectangle Width="20"
-											 Height="20"
-											 Margin="5,0,0,0">
-							<Rectangle.Fill>
-								<SolidColorBrush Color="#EEEEEE" />
-							</Rectangle.Fill>
-							<Rectangle.OpacityMask>
-								<ImageBrush ImageSource="../Resources/iconMods.png" />
-							</Rectangle.OpacityMask>
-						</Rectangle>
+		<Grid>
+			<StackPanel Grid.Row="0">
+				<Grid Margin="0,10,0,10">
+					<StackPanel Grid.Column="0"
+											VerticalAlignment="Center"
+											Orientation="Horizontal">
+						<WrapPanel VerticalAlignment="Center">
+							<Rectangle Width="20"
+												 Height="20"
+												 Margin="5,0,0,0">
+								<Rectangle.Fill>
+									<SolidColorBrush Color="#EEEEEE" />
+								</Rectangle.Fill>
+								<Rectangle.OpacityMask>
+									<ImageBrush ImageSource="../Resources/iconMods.png" />
+								</Rectangle.OpacityMask>
+							</Rectangle>
 
-						<Separator Margin="1,1,3,1">
-							<Separator.LayoutTransform>
-								<RotateTransform Angle="90" />
-							</Separator.LayoutTransform>
-						</Separator>
+							<Separator Margin="1,1,3,1">
+								<Separator.LayoutTransform>
+									<RotateTransform Angle="90" />
+								</Separator.LayoutTransform>
+							</Separator>
 
-						<WrapPanel.ToolTip>
-							<TextBlock>
+							<WrapPanel.ToolTip>
+								<TextBlock>
 								Prices include attached mods
-							</TextBlock>
-						</WrapPanel.ToolTip>
+								</TextBlock>
+							</WrapPanel.ToolTip>
 
-						<WrapPanel.Style>
-							<Style TargetType="WrapPanel">
+							<WrapPanel.Style>
+								<Style TargetType="WrapPanel">
+									<Style.Triggers>
+										<DataTrigger Binding="{Binding Path=HasMods}"
+																 Value="True">
+											<Setter Property="Visibility"
+															Value="Visible" />
+										</DataTrigger>
+										<DataTrigger Binding="{Binding Path=HasMods}"
+																 Value="False">
+											<Setter Property="Visibility"
+															Value="Collapsed" />
+										</DataTrigger>
+									</Style.Triggers>
+								</Style>
+							</WrapPanel.Style>
+						</WrapPanel>
+						<Label Padding="0"
+									 VerticalAlignment="Center"
+									 Content="{Binding Name}" />
+					</StackPanel>
+
+					<Border Grid.Column="1"
+									HorizontalAlignment="Right"
+									Background="#EEEEEE"
+									CornerRadius="3">
+						<Image Height="32"
+									 MinWidth="32"
+									 MaxWidth="96"
+									 Source="{Binding IconPath}" />
+					</Border>
+
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" />
+						<ColumnDefinition Width="Auto" />
+					</Grid.ColumnDefinitions>
+				</Grid>
+
+				<StackPanel>
+					<Separator Margin="5, 0" />
+					<Grid>
+						<Label Grid.Column="0"
+									 Content="Average Day Price" />
+						<Label Grid.Column="1"
+									 Content="{Binding Avg24hPrice}" />
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+
+					<Grid>
+						<Label Grid.Column="0"
+									 Content="Price per Slot" />
+						<Label Grid.Column="1"
+									 Content="{Binding PricePerSlot}" />
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+				</StackPanel>
+
+				<StackPanel>
+					<Separator />
+					<Grid>
+						<Label Grid.Column="0"
+									 Content="Trader" />
+						<Label Grid.Column="1"
+									 Content="{Binding TraderName}" />
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+
+					<Grid>
+						<Label Grid.Column="0"
+									 Content="Buy Price" />
+						<Label Grid.Column="1"
+									 Content="{Binding BestTraderPrice}" />
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+
+					<Grid>
+						<Label Grid.Column="0"
+									 Content="Max Buy Price" />
+						<Label Grid.Column="1"
+									 Content="{Binding MaxTraderPrice}" />
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+
+						<Grid.Style>
+							<Style TargetType="Grid">
 								<Style.Triggers>
 									<DataTrigger Binding="{Binding Path=HasMods}"
 															 Value="True">
@@ -55,149 +158,114 @@
 									</DataTrigger>
 								</Style.Triggers>
 							</Style>
-						</WrapPanel.Style>
-					</WrapPanel>
-					<Label Padding="0"
-								 VerticalAlignment="Center"
-								 Content="{Binding Name}" />
-				</StackPanel>
+						</Grid.Style>
+					</Grid>
 
-				<Border Grid.Column="1"
-								HorizontalAlignment="Right"
-								Background="#EEEEEE"
-								CornerRadius="3">
-					<Image Height="32"
-								 MinWidth="32"
-								 MaxWidth="96"
-								 Source="{Binding IconPath}" />
-				</Border>
-
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="*" />
-					<ColumnDefinition Width="Auto" />
-				</Grid.ColumnDefinitions>
-			</Grid>
-
-			<StackPanel>
-				<Separator Margin="5, 0, 0, 0" />
-				<Grid>
-					<Label Grid.Column="0"
-								 Content="Average Day Price" />
-					<Label Grid.Column="1"
-								 Content="{Binding Avg24hPrice}" />
-
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="*" />
-						<ColumnDefinition Width="Auto" />
-					</Grid.ColumnDefinitions>
-				</Grid>
-
-				<Grid Margin="0,5">
-					<Label Grid.Column="0"
-								 Content="Price per Slot" />
-					<Label Grid.Column="1"
-								 Content="{Binding PricePerSlot}" />
-
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="*" />
-						<ColumnDefinition Width="Auto" />
-					</Grid.ColumnDefinitions>
-				</Grid>
-			</StackPanel>
-
-			<StackPanel>
-				<Separator />
-				<Grid Margin="0,5,0,0">
-					<Label Grid.Column="0"
-								 Content="Trader" />
-					<Label Grid.Column="1"
-								 Content="{Binding TraderName}" />
-
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="*" />
-						<ColumnDefinition Width="Auto" />
-					</Grid.ColumnDefinitions>
-				</Grid>
-
-				<Grid Margin="0,0,0,5">
-					<Label Grid.Column="0"
-								 Content="Buy Price" />
-					<Label Grid.Column="1"
-								 Content="{Binding BestTraderPrice}" />
-
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="*" />
-						<ColumnDefinition Width="Auto" />
-					</Grid.ColumnDefinitions>
-				</Grid>
-
-				<Grid Margin="0,0,0,5">
-					<Label Grid.Column="0"
-								 Content="Max Buy Price" />
-					<Label Grid.Column="1"
-								 Content="{Binding MaxTraderPrice}" />
-
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="*" />
-						<ColumnDefinition Width="Auto" />
-					</Grid.ColumnDefinitions>
-
-					<Grid.Style>
-						<Style TargetType="Grid">
+					<StackPanel.Style>
+						<Style TargetType="StackPanel">
 							<Style.Triggers>
-								<DataTrigger Binding="{Binding Path=HasMods}"
-														 Value="True">
-									<Setter Property="Visibility"
-													Value="Visible" />
-								</DataTrigger>
-								<DataTrigger Binding="{Binding Path=HasMods}"
-														 Value="False">
-									<Setter Property="Visibility"
-													Value="Collapsed" />
+								<DataTrigger Binding="{Binding TraderName}"
+														 Value="">
+									<Setter Property="Height"
+													Value="0" />
 								</DataTrigger>
 							</Style.Triggers>
 						</Style>
-					</Grid.Style>
-				</Grid>
+					</StackPanel.Style>
+				</StackPanel>
 
-				<StackPanel.Style>
-					<Style TargetType="StackPanel">
-						<Style.Triggers>
-							<DataTrigger Binding="{Binding TraderName}"
-													 Value="">
-								<Setter Property="Height"
-												Value="0" />
-							</DataTrigger>
-						</Style.Triggers>
-					</Style>
-				</StackPanel.Style>
-			</StackPanel>
+				<StackPanel>
+					<Separator />
 
-			<StackPanel>
-				<Separator />
-
-				<Grid Margin="0,5">
-					<Label Grid.Column="0"
-								 Content="Links" />
-					<TextBlock Grid.Column="1"
-										 Margin="0,0,5,0"
-										 VerticalAlignment="Center">
+					<Grid>
+						<Label Grid.Column="0"
+									 Content="Links" />
+						<TextBlock Grid.Column="1"
+											 Margin="0,0,5,0"
+											 VerticalAlignment="Center">
 						<Hyperlink NavigateUri="{Binding WikiLink}"
 											 RequestNavigate="HyperlinkRequestNavigate">
 							<Underline>Wiki</Underline>
 						</Hyperlink>
-					</TextBlock>
+						</TextBlock>
 
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="*" />
-						<ColumnDefinition Width="Auto" />
-					</Grid.ColumnDefinitions>
-				</Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+				</StackPanel>
+
+				<StackPanel>
+					<Separator />
+
+					<Grid>
+						<Label Grid.Column="0"
+									 Content="Teammate"
+									 FontWeight="Medium"
+									 HorizontalAlignment="Left" />
+						<Label Grid.Column="1"
+									 Content="Quest"
+									 FontWeight="Medium"
+									 HorizontalAlignment="Center" />
+						<Label Grid.Column="2"
+									 Content="Hideout"
+									 FontWeight="Medium"
+									 HorizontalAlignment="Center" />
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="2*" />
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="*" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+
+					<ListView ItemsSource="{Binding TrackingNeeds}"
+										Background="Transparent"
+										BorderThickness="0">
+						<ListView.ItemContainerStyle>
+							<Style TargetType="ListViewItem">
+								<Setter Property="HorizontalContentAlignment"
+												Value="Stretch" />
+							</Style>
+						</ListView.ItemContainerStyle>
+
+						<ListView.ItemTemplate>
+							<DataTemplate>
+								<Grid>
+									<Grid.Resources>
+										<Style TargetType="Label"
+													 BasedOn="{StaticResource {x:Type Label}}">
+											<Setter Property="Margin"
+															Value="0" />
+											<Setter Property="Padding"
+															Value="0" />
+											<Setter Property="HorizontalAlignment"
+															Value="Center" />
+										</Style>
+									</Grid.Resources>
+									<Label Grid.Column="0"
+												 HorizontalAlignment="Left"
+												 Content="{Binding Key}" />
+									<Label Grid.Column="1"
+												 Content="{Binding Value.QuestNeeded}" />
+									<Label Grid.Column="2"
+												 Content="{Binding Value.HideoutNeeded}" />
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="2*" />
+										<ColumnDefinition Width="*" />
+										<ColumnDefinition Width="*" />
+									</Grid.ColumnDefinitions>
+								</Grid>
+							</DataTemplate>
+						</ListView.ItemTemplate>
+					</ListView>
+				</StackPanel>
 			</StackPanel>
 
-			<StackPanel>
+			<StackPanel Grid.Row="1">
 				<Separator />
-				<Grid Margin="0,5,0,0">
+
+				<Grid>
 					<Label Grid.Column="0"
 								 Content="Updated"
 								 FontSize="10" />
@@ -210,45 +278,12 @@
 						<ColumnDefinition Width="Auto" />
 					</Grid.ColumnDefinitions>
 				</Grid>
-				<Grid>
-					<ListView Width="260"   
-										 Margin="0,0,0,0"   
-										 HorizontalAlignment="Center"   
-										 ItemsSource="{Binding TrackingNeeds}"
-										 Background="{x:Null}" BorderBrush="{x:Null}" SelectionMode="Single" Foreground="White">
-						<ListView.ItemContainerStyle>
-							<Style TargetType="ListViewItem">
-								<Style.Triggers>
-									<Trigger Property="IsMouseOver" Value="True">
-										<Setter Property="Background" Value="Transparent" />
-										<Setter Property="BorderThickness" Value="0" />
-									</Trigger>
-								</Style.Triggers>
-							</Style>
-						</ListView.ItemContainerStyle>
-						<ListView.View>
-							<GridView>
-								<GridView.ColumnHeaderContainerStyle>
-									<Style TargetType="{x:Type GridViewColumnHeader}">
-										<!-- Set any properties you want to set -->
-										<Setter Property="Background" Value="Transparent" />
-										<Setter Property="Foreground" Value="White" />
-										<Setter Property="FontWeight" Value="Normal" />
-									</Style>
-								</GridView.ColumnHeaderContainerStyle>
-								<GridViewColumn Header="Teammate" 
-																		DisplayMemberBinding="{Binding Path=Key}" />
-								<GridViewColumn Header="# Needed Quest" 
-																		DisplayMemberBinding="{Binding Path=Value}" />
-								<GridViewColumn Header="# Needed Hideout" 
-																		DisplayMemberBinding="{Binding Path=Value}" />
-
-							</GridView>
-						</ListView.View>
-					</ListView>
-				</Grid>
 			</StackPanel>
-		</StackPanel>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="*" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+		</Grid>
 
 		<Grid Grid.Row="1"
 					Margin="-5,10">
