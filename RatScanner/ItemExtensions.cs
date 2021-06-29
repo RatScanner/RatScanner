@@ -58,35 +58,39 @@ namespace RatScanner
 				NeededItem neededItem = new NeededItem(item.Id);
 
 				// Add up all the quest requirements
-				foreach (QuestItem need in requiredQ)
+				foreach (QuestItem requirement in requiredQ)
 				{
 					// Update FIR flag to true if any quest is FIR
-					if (need.FIR) neededItem.FIR = true;
+					if (requirement.FIR) neededItem.FIR = true;
 
-					if (!teammate.QuestObjectives.ContainsKey(need.QuestObjectiveId.ToString()))
+					// If the progress data doesn't have this requirement, then it should be a needed item
+					if (!teammate.QuestObjectives.ContainsKey(requirement.QuestObjectiveId.ToString()))
 					{
-						neededItem.QuestNeeded += need.Needed;
+						neededItem.QuestNeeded += requirement.Needed;
 					}
-					else if (teammate.QuestObjectives[need.QuestObjectiveId.ToString()].Complete != true)
+					// Else if we have the requirement in our progress data but its not complete, it might have metadata
+					else if (teammate.QuestObjectives[requirement.QuestObjectiveId.ToString()].Complete != true)
 					{
 						// Check if we have completed this quest need
-						neededItem.QuestNeeded += need.Needed;
-						neededItem.QuestHave += teammate.QuestObjectives[need.QuestObjectiveId.ToString()].Have ?? 0;
+						neededItem.QuestNeeded += requirement.Needed;
+						neededItem.QuestHave += teammate.QuestObjectives[requirement.QuestObjectiveId.ToString()].Have ?? 0;
 					}
 				}
 
 				// Add up all the hideout requirements
-				foreach (HideoutItem need in requiredH)
+				foreach (HideoutItem requirement in requiredH)
 				{
-					if (!teammate.HideoutObjectives.ContainsKey(need.HideoutObjectiveId.ToString()))
+					// If the progress data doesn't have this requirement, then it should be a needed item
+					if (!teammate.HideoutObjectives.ContainsKey(requirement.HideoutObjectiveId.ToString()))
 					{
-						neededItem.HideoutNeeded += need.Needed;
+						neededItem.HideoutNeeded += requirement.Needed;
 					}
-					else if (teammate.HideoutObjectives[need.HideoutObjectiveId.ToString()].Complete != true)
+					// Else if we have the requirement in our progress data but its not complete, it might have metadata
+					else if (teammate.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Complete != true)
 					{
 						// Check if we have completed this hideout need
-						neededItem.HideoutNeeded += need.Needed;
-						neededItem.HideoutHave += teammate.HideoutObjectives[need.HideoutObjectiveId.ToString()].Have ?? 0;
+						neededItem.HideoutNeeded += requirement.Needed;
+						neededItem.HideoutHave += teammate.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Have ?? 0;
 					}
 				}
 
