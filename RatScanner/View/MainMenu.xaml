@@ -247,9 +247,9 @@
 												 HorizontalAlignment="Left"
 												 Content="{Binding Key}" />
 									<Label Grid.Column="1"
-												 Content="{Binding Value.QuestNeeded}" />
+												 Content="{Binding Value.QuestRemaining}" />
 									<Label Grid.Column="2"
-												 Content="{Binding Value.HideoutNeeded}" />
+												 Content="{Binding Value.HideoutRemaining}" />
 									<Grid.ColumnDefinitions>
 										<ColumnDefinition Width="2*" />
 										<ColumnDefinition Width="*" />

@@ -91,6 +91,24 @@ namespace RatScanner
 			}
 		}
 
+		// Return how many instances of progress we have
+		public int TeammateCount
+		{
+			get
+			{
+				// Are we set to utilize teams?
+				if (RatConfig.Tracking.TarkovTracker.ShowTeam)
+				{
+					return _progress.Count;
+				}
+				else
+				{
+					// We are only supposed to show solo, so just count 1 if we have any progress
+					return _progress.Count > 0 ? 1 : 0;
+				}
+			}
+		}
+
 		public bool TeamProgressAvailable()
 		{
 			return _token.Permissions.Contains("TP");
