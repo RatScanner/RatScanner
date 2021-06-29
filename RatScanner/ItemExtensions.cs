@@ -63,22 +63,30 @@ namespace RatScanner
 					// Update FIR flag to true if any quest is FIR
 					if (need.FIR) neededItem.FIR = true;
 
-					// Check if we have completed this quest need
-					if (teammate.QuestObjectives[need.QuestObjectiveId.ToString()].Complete != true)
+					if (!teammate.QuestObjectives.ContainsKey(need.QuestObjectiveId.ToString()))
 					{
 						neededItem.QuestNeeded += need.Needed;
-						neededItem.QuestHave += teammate.QuestObjectives[need.QuestObjectiveId.ToString()].Have.GetValueOrDefault();
+					}
+					else if (teammate.QuestObjectives[need.QuestObjectiveId.ToString()].Complete != true)
+					{
+						// Check if we have completed this quest need
+						neededItem.QuestNeeded += need.Needed;
+						neededItem.QuestHave += teammate.QuestObjectives[need.QuestObjectiveId.ToString()].Have ?? 0;
 					}
 				}
 
 				// Add up all the hideout requirements
 				foreach (HideoutItem need in requiredH)
 				{
-					// Check if we have completed this hideout need
-					if (teammate.HideoutObjectives[need.HideoutObjectiveId.ToString()].Complete != true)
+					if (!teammate.HideoutObjectives.ContainsKey(need.HideoutObjectiveId.ToString()))
 					{
 						neededItem.HideoutNeeded += need.Needed;
-						neededItem.HideoutHave += teammate.HideoutObjectives[need.HideoutObjectiveId.ToString()].Have.GetValueOrDefault();
+					}
+					else if (teammate.HideoutObjectives[need.HideoutObjectiveId.ToString()].Complete != true)
+					{
+						// Check if we have completed this hideout need
+						neededItem.HideoutNeeded += need.Needed;
+						neededItem.HideoutHave += teammate.HideoutObjectives[need.HideoutObjectiveId.ToString()].Have ?? 0;
 					}
 				}
 
