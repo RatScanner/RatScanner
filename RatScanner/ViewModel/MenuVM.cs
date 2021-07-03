@@ -128,7 +128,7 @@ namespace RatScanner.ViewModel
 		{
 			get
 			{
-				return decreaseAmountCommand ?? new RelayCommand(() => DecreaseAmount());
+				return decreaseAmountCommand ?? new RelayCommand(() => DecreaseAmount(), (wa) => WishlistAmount != 0);
 			}
 		}
 		#endregion
