@@ -36,10 +36,10 @@ namespace RatScanner
 		public void Execute(object parameter)
 		{
 			IsExecuting = true;
-
 			action();
-
 			IsExecuting = false;
+
+			RaiseCanExecuteChanged();
 		}
 
 		public void RaiseCanExecuteChanged()

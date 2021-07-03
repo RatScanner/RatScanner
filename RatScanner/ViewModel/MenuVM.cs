@@ -138,7 +138,9 @@ namespace RatScanner.ViewModel
 		{
 			CurrentItem.SetWishlistAmount(WishlistAmount + 1);
 			wishlistChanged = true;
+
 			OnPropertyChanged("WishlistAmount");
+			OnPropertyChanged("DecreaseAmountCommand");
 		}
 
 		private void DecreaseAmount()
