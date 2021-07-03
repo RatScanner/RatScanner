@@ -2,7 +2,8 @@
 						 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 						 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 						 xmlns:controls="clr-namespace:RatScanner.Controls"
-						 StartupUri="PageSwitcher.xaml">
+						 StartupUri="PageSwitcher.xaml"
+						 Exit="Application_Exit">
 	<Application.Resources>
 		<Style x:Key="FocusVisual">
 			<Setter Property="Control.Template">

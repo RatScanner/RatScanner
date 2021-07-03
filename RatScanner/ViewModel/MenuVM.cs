@@ -9,8 +9,8 @@ namespace RatScanner.ViewModel
 {
 	internal class MainWindowVM : INotifyPropertyChanged
 	{
-		private const string UpSymbol = "▲";
-		private const string DownSymbol = "▼";
+		public const string UpSymbol = "▲";
+		public const string DownSymbol = "▼";
 
 		private RatScannerMain _dataSource;
 
@@ -24,34 +24,56 @@ namespace RatScanner.ViewModel
 			}
 		}
 
+		private bool wishlistChanged;
+
 		private ItemScan CurrentItemScan => DataSource?.CurrentItemScan;
 
 		private Item[] MatchedItems => CurrentItemScan?.MatchedItems;
 
-		public string IconPath => IconManager.GetIconPath(MatchedItems[0]);
+		private Item currentItem;
+		private Item CurrentItem
+		{
+			get
+			{
+				if (currentItem != MatchedItems[0])
+				{
+					if (wishlistChanged)
+					{
+						RatScannerMain.Instance.SaveWishlist();
+					}
 
-		public string Name => MatchedItems[0].Name;
+					currentItem = MatchedItems[0];
+					wishlistChanged = false;
+				}
 
-		public bool HasMods => MatchedItems[0] is CompoundItem itemC && itemC.Slots.Count > 0;
+				return currentItem;
+			}
+		}
+
+		public string IconPath => IconManager.GetIconPath(CurrentItem);
+
+		public string Name => CurrentItem.Name;
+
+		public bool HasMods => CurrentItem is CompoundItem itemC && itemC.Slots.Count > 0;
 
 		// https://youtrack.jetbrains.com/issue/RSRP-468572
 		// ReSharper disable InconsistentNaming
 		public string Avg24hPrice => PriceToString(GetAvg24hPrice());
 
-		private int GetAvg24hPrice() => MatchedItems[0].GetAvg24hMarketPrice();
+		private int GetAvg24hPrice() => CurrentItem.GetAvg24hMarketPrice();
 		// ReSharper restore InconsistentNaming
 
-		public string PricePerSlot => PriceToString(GetAvg24hPrice() / (MatchedItems[0].Width * MatchedItems[0].Height));
+		public string PricePerSlot => PriceToString(GetAvg24hPrice() / (CurrentItem.Width * CurrentItem.Height));
 
 		public string TraderName => TraderPrice.GetTraderName(GetBestTrader().traderId);
 
 		public string BestTraderPrice => IntToGroupedString(GetBestTrader().price) + " ₽";
 
-		private (string traderId, int price) GetBestTrader() => MatchedItems[0].GetBestTrader();
+		private (string traderId, int price) GetBestTrader() => CurrentItem.GetBestTrader();
 
 		public string MaxTraderPrice => IntToGroupedString(GetMaxTraderPrice()) + " ₽";
 
-		private int GetMaxTraderPrice() => MatchedItems[0].GetMaxTraderPrice();
+		private int GetMaxTraderPrice() => CurrentItem.GetMaxTraderPrice();
 
 		public string DiscordLink => ApiManager.GetResource(ApiManager.ResourceType.DiscordLink);
 
@@ -64,12 +86,14 @@ namespace RatScanner.ViewModel
 			get
 			{
 				var dt = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-				var min = MatchedItems[0].GetMarketItem().Timestamp;
+				var min = CurrentItem.GetMarketItem().Timestamp;
 				return dt.AddSeconds(min).ToLocalTime().ToString(CultureInfo.CurrentCulture);
 			}
 		}
 
-		public string WikiLink => MatchedItems[0].GetMarketItem().WikiLink;
+		public int WishlistAmount => CurrentItem.GetWishlistAmount();
+
+		public string WikiLink => CurrentItem.GetMarketItem().WikiLink;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
@@ -88,6 +112,42 @@ namespace RatScanner.ViewModel
 		{
 			OnPropertyChanged();
 		}
+
+		#region Commands
+		private readonly RelayCommand increaseAmountCommand;
+		public RelayCommand IncreaseAmountCommand
+		{
+			get
+			{
+				return increaseAmountCommand ?? new RelayCommand(() => IncreaseAmount());
+			}
+		}
+
+		private readonly RelayCommand decreaseAmountCommand;
+		public RelayCommand DecreaseAmountCommand
+		{
+			get
+			{
+				return decreaseAmountCommand ?? new RelayCommand(() => DecreaseAmount());
+			}
+		}
+		#endregion
+
+		#region Methods
+		private void IncreaseAmount()
+		{
+			CurrentItem.SetWishlistAmount(WishlistAmount + 1);
+			wishlistChanged = true;
+			OnPropertyChanged("WishlistAmount");
+		}
+
+		private void DecreaseAmount()
+		{
+			CurrentItem.SetWishlistAmount(WishlistAmount - 1);
+			wishlistChanged = true;
+			OnPropertyChanged("WishlistAmount");
+		}
+		#endregion
 
 		private string PriceToString(int price)
 		{

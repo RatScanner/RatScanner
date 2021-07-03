@@ -53,5 +53,10 @@ namespace RatScanner
 				Logger.LogError(message, exception);
 			}
 		}
+
+		private async void Application_Exit(object sender, ExitEventArgs e)
+		{
+			await RatScannerMain.Instance.SaveWishlist();
+		}
 	}
 }

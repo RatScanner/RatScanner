@@ -65,6 +65,7 @@ namespace RatScanner
 			internal static string Debug = Path.Combine(Base, "Debug");
 			internal static string Updater = Path.Combine(Base, "RatUpdater.exe");
 			internal static string LogFile = Path.Combine(Base, "Log.txt");
+			internal static string Wishlist = Path.Combine(Data, "Wishlist.json");
 		}
 
 		// Name Scan options
