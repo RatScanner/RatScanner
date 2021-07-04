@@ -5,5 +5,7 @@
 		void UtilizeState(object state);
 
 		void OnClose();
+
+		void OnOpen();
 	}
 }

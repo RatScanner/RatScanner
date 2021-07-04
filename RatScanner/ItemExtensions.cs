@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using RatScanner.FetchModels;
 using System.Collections.Generic;
 using RatStash;
@@ -35,91 +36,138 @@ namespace RatScanner
 			return RatScannerMain.Instance.ProgressDB.GetHideoutRequiredById(item.Id);
 		}
 
-		public static Dictionary<string, NeededItem> GetTrackingNeeds(this Item item)
+		public static NeededItem GetTrackingNeeds(this Item item)
 		{
-			// Check if we are able to connect to TarkovTracker
-			if (!RatScannerMain.Instance.TarkovTrackerDB.ValidToken())
+			var requiredQuest = item.GetQuestRequired();
+			var requiredHideout = item.GetHideoutRequired();
+
+			var neededItem = new NeededItem(item.Id);
+
+			Progress progress = null;
+			if (RatConfig.Tracking.TarkovTracker.Enable)
 			{
-				// Our token is invalid/missing
-				return null;
+				var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
+				progress = teamProgress.First(x => x.Self ?? false);
 			}
 
-			// Get the latest progression and tracker data
-			List<QuestItem> requiredQ = item.GetQuestRequired();
-			List<HideoutItem> requiredH = item.GetHideoutRequired();
+			// Set this item as for ourselves if this was our token
+			neededItem.Self = true;
 
-			List<Progress> team = RatScannerMain.Instance.TarkovTrackerDB.GetProgress();
+			var (questNeeded, questHave, fir) = GetQuestRequired(requiredQuest, progress);
+			neededItem.QuestNeeded += questNeeded;
+			neededItem.QuestHave += questHave;
+			neededItem.FIR = fir;
 
-			// Create our team dictionary
-			Dictionary<string, NeededItem> trackedNeeds = new Dictionary<string, NeededItem>();
-			foreach (Progress teammate in team)
+			var (hideoutNeeded, hideoutHave) = GetHideoutRequired(requiredHideout, progress);
+			neededItem.HideoutNeeded += hideoutNeeded;
+			neededItem.HideoutHave += hideoutHave;
+			return neededItem;
+		}
+
+		public static List<KeyValuePair<string, NeededItem>> GetTrackingTeamNeeds(this Item item)
+		{
+			if (!RatConfig.Tracking.TarkovTracker.Enable) return null;
+
+			var requiredQuest = item.GetQuestRequired();
+			var requiredHideout = item.GetHideoutRequired();
+
+			var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress.Where(x => !(x.Self ?? false)).ToList();
+
+			var trackedNeeds = new Dictionary<string, NeededItem>();
+
+			foreach (var memberProgress in teamProgress)
 			{
-				// Create the needed item for this player
-				NeededItem neededItem = new NeededItem(item.Id);
+				var neededItem = new NeededItem(item.Id);
+				var (questNeeded, questHave, fir) = GetQuestRequired(requiredQuest, memberProgress);
+				neededItem.QuestNeeded += questNeeded;
+				neededItem.QuestHave += questHave;
+				neededItem.FIR = fir;
 
-				// Set this item as for ourselves if this was our token
-				if (teammate.Self.GetValueOrDefault()) neededItem.Self = true;
+				var (hideoutNeeded, hideoutHave) = GetHideoutRequired(requiredHideout, memberProgress);
+				neededItem.HideoutNeeded += hideoutNeeded;
+				neededItem.HideoutHave += hideoutHave;
 
-				// Do our settings say to show quest needs?
-				if(RatConfig.Tracking.ShowQuestNeeds)
+				var name = memberProgress.DisplayName ?? "Unknown";
+				for (var i = 2; i < 99; i++)
 				{
-					// Add up all the quest requirements
-					foreach (QuestItem requirement in requiredQ)
-					{
-						// Don't add the item to needs if its not a FIR requirement and we aren't showing non-FIR according to settings
-						if (!(!RatConfig.Tracking.ShowQuestHandoverNeeds && !requirement.FIR))
-						{
-							// Update FIR flag to true if any quest is FIR
-							if (requirement.FIR) neededItem.FIR = true;
-
-							// If the progress data doesn't have this requirement, then it should be a needed item
-							if (!teammate.QuestObjectives.ContainsKey(requirement.QuestObjectiveId.ToString()))
-							{
-								neededItem.QuestNeeded += requirement.Needed;
-							}
-							// Else if we have the requirement in our progress data but its not complete, it might have metadata
-							else if (teammate.QuestObjectives[requirement.QuestObjectiveId.ToString()].Complete != true)
-							{
-								// Check if we have completed this quest need
-								neededItem.QuestNeeded += requirement.Needed;
-								neededItem.QuestHave += teammate.QuestObjectives[requirement.QuestObjectiveId.ToString()].Have ?? 0;
-							}
-						}
-					}
+					if (!trackedNeeds.ContainsKey(name)) break;
+					name = $"{memberProgress.DisplayName} #{i}";
 				}
 
-				// Do our settings say to show hideout needs?
-				if(RatConfig.Tracking.ShowHideoutNeeds)
+				trackedNeeds.Add(name, neededItem);
+			}
+
+			return trackedNeeds.OrderBy(x => -x.Value.Remaining).ToList();
+		}
+
+		private static (int need, int have, bool FIR) GetQuestRequired(IEnumerable<QuestItem> requiredQuestItems, Progress progress)
+		{
+			var need = 0;
+			var have = 0;
+			var fir = false;
+
+			// Add up all the quest requirements
+			foreach (var requirement in requiredQuestItems)
+			{
+				// Add the item if its FIR or we want to show non FIR
+				if (requirement.FIR || RatConfig.Tracking.ShowNonFIRNeeds)
 				{
-					// Add up all the hideout requirements
-					foreach (HideoutItem requirement in requiredH)
+					// Update FIR flag to true if any quest is FIR
+					if (requirement.FIR) fir = true;
+
+					if (progress == null)
 					{
-						// If the progress data doesn't have this requirement, then it should be a needed item
-						if (!teammate.HideoutObjectives.ContainsKey(requirement.HideoutObjectiveId.ToString()))
-						{
-							neededItem.HideoutNeeded += requirement.Needed;
-						}
-						// Else if we have the requirement in our progress data but its not complete, it might have metadata
-						else if (teammate.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Complete != true)
-						{
-							// Check if we have completed this hideout need
-							neededItem.HideoutNeeded += requirement.Needed;
-							neededItem.HideoutHave += teammate.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Have ?? 0;
-						}
+						need += requirement.Needed;
+						continue;
+					}
+
+					// If the progress data doesn't have this requirement, then it should be a needed item
+					if (!progress.QuestObjectives.ContainsKey(requirement.QuestObjectiveId.ToString()))
+					{
+						need += requirement.Needed;
+					}
+					// Else if we have the requirement in our progress data but its not complete, it might have metadata
+					else if (progress.QuestObjectives[requirement.QuestObjectiveId.ToString()].Complete != true)
+					{
+						// Check if we have completed this quest need
+						need += requirement.Needed;
+						have += progress.QuestObjectives[requirement.QuestObjectiveId.ToString()].Have ?? 0;
 					}
 				}
-
-				// Add to our team dictionary
-				trackedNeeds.Add(teammate.DisplayName, neededItem);
 			}
 
-			// Only show ourself if ShowTeam is unchecked
-			if (!RatConfig.Tracking.TarkovTracker.ShowTeam)
+			return (need, have, fir);
+		}
+
+		private static (int need, int have) GetHideoutRequired(IEnumerable<HideoutItem> requiredHideoutItems, Progress progress)
+		{
+			var need = 0;
+			var have = 0;
+
+			// Add up all the hideout requirements
+			foreach (var requirement in requiredHideoutItems)
 			{
-				trackedNeeds = trackedNeeds.Where(teammate => teammate.Value.Self).ToDictionary(teammate => teammate.Key, teammate => teammate.Value);
+				if (progress == null)
+				{
+					need += requirement.Needed;
+					continue;
+				}
+
+				// If the progress data doesn't have this requirement, then it should be a needed item
+				if (!progress.HideoutObjectives.ContainsKey(requirement.HideoutObjectiveId.ToString()))
+				{
+					need += requirement.Needed;
+				}
+				// Else if we have the requirement in our progress data but its not complete, it might have metadata
+				else if (progress.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Complete != true)
+				{
+					// Check if we have completed this hideout need
+					need += requirement.Needed;
+					have += progress.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Have ?? 0;
+				}
 			}
 
-			return trackedNeeds;
+			return (need, have);
 		}
 
 		public static MarketItem GetMarketItem(this Item item)

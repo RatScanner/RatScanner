@@ -2,6 +2,8 @@
 using RatScanner.FetchModels.TarkovTracker;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Force.DeepCloner;
 
 namespace RatScanner
 {
@@ -9,27 +11,22 @@ namespace RatScanner
 	public class TarkovTrackerDB
 	{
 
-		private Token? _token;
-		private bool _badToken = false;
+		private Token _token;
+		private bool _badToken;
 
-		private List<Progress> _progress;
-
-		private DateTime? _lastUpdate;
+		public List<Progress> Progress = new List<Progress>();
 
 		// Set up the TarkovTracker DB
-		public void Init()
+		public bool Init()
 		{
+			if (!ValidToken()) return false;
 			UpdateProgression();
+			return true;
 		}
 
-		public List<Progress> GetProgress()
+		private bool ValidToken()
 		{
-			UpdateProgression();
-			return _progress;
-		}
-
-		public bool ValidToken()
-		{
+			Logger.LogDebug();
 			if (RatConfig.Tracking.TarkovTracker.Token.Length > 0)
 			{
 				// We have a Token in our config, check it
@@ -38,74 +35,64 @@ namespace RatScanner
 					if (_token.Id != RatConfig.Tracking.TarkovTracker.Token)
 					{
 						// Token in config versus last attempted token are different
-						updateToken();
+						Logger.LogDebug();
+						UpdateToken();
 					}
 				}
 				else
 				{
 					// We have a token config, but haven't tried validating the token
-					updateToken();
+					Logger.LogDebug();
+					UpdateToken();
 				}
 				return !_badToken;
 			}
-			else
-			{
-				return false;
-			}
+			return false;
 		}
 
-		private void updateToken()
+		private void UpdateToken()
 		{
 			// Attempt to verify the token
 			try
 			{
+				Logger.LogDebug();
 				var response = ApiManager.GetTarkovTrackerToken();
+				Logger.LogDebug();
 				if (response != null)
 				{
 					// We have a valid token
 					_token = JsonConvert.DeserializeObject<Token>(response);
 					_badToken = false;
 				}
+				else
+				{
+					Logger.LogWarning("TarkovTracker token refresh responded with null!");
+					_badToken = true;
+				}
 			}
-			catch (RateLimitExceededException e)
+			catch (RateLimitExceededException)
 			{
 				// We hit a rate limit issue, this doesn't mean our token is bad, but we have to wait until we try again
+				Logger.LogWarning("TarkovTracker rate limit reached!");
 			}
-			catch (UnauthorizedTokenException e)
+			catch (UnauthorizedTokenException)
 			{
 				// We have an unauthorized token, retrying won't help until we change it
+				Logger.LogWarning("Unauthorized TarkovTracker token!");
 				_badToken = true;
 				_token = new Token { Id = RatConfig.Tracking.TarkovTracker.Token };
 			}
 		}
 
-		private void updateDisplayNames()
-		{
-			int personNum = 1;
-			foreach (Progress teammate in _progress)
-			{
-				if (teammate.DisplayName == null)
-				{
-					teammate.DisplayName = "Unknown #" + personNum;
-				}
-			}
-		}
-
-		// Return how many instances of progress we have
 		public int TeammateCount
 		{
 			get
 			{
 				// Are we set to utilize teams?
-				if (RatConfig.Tracking.TarkovTracker.ShowTeam)
-				{
-					return _progress.Count;
-				}
-				else
-				{
-					// We are only supposed to show solo, so just count 1 if we have any progress
-					return _progress.Count > 0 ? 1 : 0;
-				}
+				if (RatConfig.Tracking.TarkovTracker.ShowTeam) return Math.Max(Progress.Count - 1, 0);
+
+				// We are only supposed to show solo, so just count 1 if we have any progress
+				return Progress.Count > 0 ? 1 : 0;
 			}
 		}
 
@@ -119,57 +106,48 @@ namespace RatScanner
 			return _token.Permissions.Contains("GP");
 		}
 
-		public void UpdateProgression()
+		private void UpdateProgression()
 		{
-			if(ValidToken())
+			// We have access to team progression
+			if (TeamProgressAvailable())
 			{
-				// If we last updated more than 10 minutes ago, update again
-				if(_lastUpdate == null || (_lastUpdate - DateTime.Now) < TimeSpan.FromMinutes(10))
+				try
 				{
-					// We have access to team progression
-					if (TeamProgressAvailable())
-					{
-						try
-						{
-							_progress = JsonConvert.DeserializeObject<List<Progress>>(ApiManager.GetTarkovTrackerTeam());
-							_lastUpdate = DateTime.Now;
-							updateDisplayNames();
-						}
-						catch (FetchModels.TarkovTracker.RateLimitExceededException e)
-						{
-							// We hit a rate limit issue, this doesn't mean our token is bad, but we have to wait until we try again
-						}
-						catch (FetchModels.TarkovTracker.UnauthorizedTokenException e)
-						{
-							// We have an unauthorized token exception, it could be that we don't have permissions for this call
-						}
-					}
-					// We have permission to get individual progress
-					else if (SoloProgressAvailable())
-					{
-						try
-						{
-							var soloProgress = JsonConvert.DeserializeObject<Progress>(ApiManager.GetTarkovTrackerSolo());
-							_progress = new List<Progress>();
-							_progress.Add(soloProgress);
-							_lastUpdate = DateTime.Now;
-							updateDisplayNames();
-						}
-						catch (FetchModels.TarkovTracker.RateLimitExceededException e)
-						{
-							// We hit a rate limit issue, this doesn't mean our token is bad, but we have to wait until we try again
-						}
-						catch (FetchModels.TarkovTracker.UnauthorizedTokenException e)
-						{
-							// We have an unauthorized token exception, it could be that we don't have permissions for this call
-						}
-					}
-					else
-					{
-						// We dont have any supported permissions to get progression :(
-						_lastUpdate = DateTime.Now;
-					}
+					Progress = JsonConvert.DeserializeObject<List<Progress>>(ApiManager.GetTarkovTrackerTeam());
 				}
+				catch (RateLimitExceededException e)
+				{
+					// We hit a rate limit issue, this doesn't mean our token is bad, but we have to wait until we try again
+					Logger.LogWarning(e.Message);
+				}
+				catch (UnauthorizedTokenException e)
+				{
+					// We have an unauthorized token exception, it could be that we don't have permissions for this call
+					Logger.LogWarning(e.Message);
+				}
+			}
+			// We have permission to get individual progress
+			else if (SoloProgressAvailable())
+			{
+				try
+				{
+					var soloProgress = JsonConvert.DeserializeObject<Progress>(ApiManager.GetTarkovTrackerSolo());
+					Progress = new List<Progress> { soloProgress };
+				}
+				catch (RateLimitExceededException e)
+				{
+					// We hit a rate limit issue, this doesn't mean our token is bad, but we have to wait until we try again
+					Logger.LogWarning(e.Message);
+				}
+				catch (UnauthorizedTokenException e)
+				{
+					// We have an unauthorized token exception, it could be that we don't have permissions for this call
+					Logger.LogWarning(e.Message);
+				}
+			}
+			else
+			{
+				Logger.ShowWarning("This TarkovTracker API Token has insufficient permissions.");
 			}
 		}
 

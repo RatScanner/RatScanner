@@ -12,8 +12,8 @@ namespace RatScanner
 	/// </summary>
 	public partial class PageSwitcher : Window
 	{
-		private const int WindowWidth = 280;
-		private const int WindowHeight = 390;
+		public const int DefaultWidth = 280;
+		public const int DefaultHeight = 390;
 
 		private NotifyIcon _notifyIcon;
 
@@ -44,11 +44,11 @@ namespace RatScanner
 		internal void ResetWindowSize()
 		{
 			SizeToContent = SizeToContent.Manual;
-			Width = WindowWidth;
-			Height = WindowHeight;
+			Width = DefaultWidth;
+			Height = DefaultHeight;
 
 			// Avoid window stretching when using minimal menu
-			MaxWidth = WindowWidth;
+			MaxWidth = DefaultWidth;
 		}
 
 		internal void Navigate(UserControl nextControl, object state = null)
@@ -69,6 +69,8 @@ namespace RatScanner
 
 			var nextControlSwitchable = (ISwitchable)nextControl;
 			if (state != null) nextControlSwitchable.UtilizeState(state);
+
+			nextControlSwitchable.OnOpen();
 		}
 
 		protected override void OnStateChanged(EventArgs e)

@@ -120,11 +120,12 @@ namespace RatScanner
 		// Progress Tracking options
 		internal static class Tracking
 		{
-			internal static bool ShowQuestNeeds = true;
-			internal static bool ShowQuestHandoverNeeds = false;
-			internal static bool ShowHideoutNeeds = false;
+			internal static bool ShowNonFIRNeeds = true;
+
 			internal static class TarkovTracker
 			{
+				internal static bool Enable => Token.Length > 0;
+
 				internal static string Token = "";
 				internal static bool ShowTeam = true;
 			}
@@ -306,9 +307,7 @@ namespace RatScanner
 			MinimalUi.Opacity = config.ReadInt(nameof(MinimalUi.Opacity), 50);
 
 			config.Section = nameof(Tracking);
-			Tracking.ShowQuestNeeds = config.ReadBool(nameof(Tracking.ShowQuestNeeds), true);
-			Tracking.ShowQuestHandoverNeeds = config.ReadBool(nameof(Tracking.ShowQuestHandoverNeeds), false);
-			Tracking.ShowHideoutNeeds = config.ReadBool(nameof(Tracking.ShowHideoutNeeds), false);
+			Tracking.ShowNonFIRNeeds = config.ReadBool(nameof(Tracking.ShowNonFIRNeeds), true);
 
 			config.Section = nameof(Tracking.TarkovTracker);
 			Tracking.TarkovTracker.Token = config.ReadString(nameof(Tracking.TarkovTracker.Token), "");
@@ -350,9 +349,7 @@ namespace RatScanner
 			config.WriteInt(nameof(MinimalUi.Opacity), MinimalUi.Opacity);
 
 			config.Section = nameof(Tracking);
-			config.WriteBool(nameof(Tracking.ShowQuestNeeds), Tracking.ShowQuestNeeds);
-			config.WriteBool(nameof(Tracking.ShowQuestHandoverNeeds), Tracking.ShowQuestHandoverNeeds);
-			config.WriteBool(nameof(Tracking.ShowHideoutNeeds), Tracking.ShowHideoutNeeds);
+			config.WriteBool(nameof(Tracking.ShowNonFIRNeeds), Tracking.ShowNonFIRNeeds);
 
 			config.Section = nameof(Tracking.TarkovTracker);
 			config.WriteString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);

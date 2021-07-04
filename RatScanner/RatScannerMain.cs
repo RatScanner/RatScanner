@@ -75,9 +75,17 @@ namespace RatScanner
 			LoadItemDatabase();
 
 			// Check for TarkovTracker data
-			Logger.LogInfo("Loading TarkovTracker...");
 			TarkovTrackerDB = new TarkovTrackerDB();
-			TarkovTrackerDB.Init();
+			if (RatConfig.Tracking.TarkovTracker.Enable)
+			{
+				Logger.LogInfo("Loading TarkovTracker...");
+				if (!TarkovTrackerDB.Init())
+				{
+					Logger.ShowWarning("TarkovTracker API Token invalid!\n\nPlease provide a new token.");
+					RatConfig.Tracking.TarkovTracker.Token = "";
+					RatConfig.SaveConfig();
+				}
+			}
 
 			// Grab quest and hideout requirements from tarkovdata
 			Logger.LogInfo("Loading progress data...");

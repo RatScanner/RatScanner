@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
@@ -15,6 +16,7 @@ namespace RatScanner.View
 		{
 			InitializeComponent();
 			DataContext = new SettingsVM();
+			PageSwitcher.Instance.ResetWindowSize();
 			RatScannerMain.Instance.HotkeyManager.UnregisterHotkeys();
 		}
 
@@ -43,11 +45,10 @@ namespace RatScanner.View
 			var settingsVM = (SettingsVM)DataContext;
 
 			// Pre saving stuff
-
 			var updateMarketDB = settingsVM.NameScanLanguage != (int)RatConfig.NameScan.Language;
+			var updateTarkovTrackerToken = settingsVM.TarkovTrackerToken != RatConfig.Tracking.TarkovTracker.Token;
 
-			// Save settings
-
+			// Save config
 			RatConfig.NameScan.Enable = settingsVM.EnableNameScan;
 			RatConfig.NameScan.Language = (ApiManager.Language)settingsVM.NameScanLanguage;
 
@@ -66,11 +67,9 @@ namespace RatScanner.View
 			RatConfig.MinimalUi.ShowUpdated = settingsVM.ShowUpdated;
 			RatConfig.MinimalUi.Opacity = settingsVM.Opacity;
 
-			RatConfig.Tracking.ShowQuestNeeds = settingsVM.ShowQuestNeeds;
-			RatConfig.Tracking.ShowQuestHandoverNeeds = settingsVM.ShowQuestHandoverNeeds;
-			RatConfig.Tracking.ShowHideoutNeeds = settingsVM.ShowHideoutNeeds;
+			RatConfig.Tracking.ShowNonFIRNeeds = settingsVM.ShowNonFIRNeeds;
 
-			RatConfig.Tracking.TarkovTracker.Token = settingsVM.TarkovTrackerToken;
+			RatConfig.Tracking.TarkovTracker.Token = settingsVM.TarkovTrackerToken.Trim();
 			RatConfig.Tracking.TarkovTracker.ShowTeam = settingsVM.ShowTarkovTrackerTeam;
 
 			RatConfig.ScreenResolution = (RatConfig.Resolution)settingsVM.ScreenResolution;
@@ -78,17 +77,30 @@ namespace RatScanner.View
 			RatConfig.AlwaysOnTop = settingsVM.AlwaysOnTop;
 			RatConfig.LogDebug = settingsVM.LogDebug;
 
-			Logger.LogInfo("Saving config...");
-			RatConfig.SaveConfig();
-
 			// Apply config
 			PageSwitcher.Instance.Topmost = RatConfig.AlwaysOnTop;
 			if (updateMarketDB) RatScannerMain.Instance.MarketDB.Init();
 			RatScannerMain.Instance.HotkeyManager.RegisterHotkeys();
+			if (updateTarkovTrackerToken) UpdateTarkovTrackerToken();
+
+			// Save config to file
+			Logger.LogInfo("Saving config...");
+			RatConfig.SaveConfig();
 			Logger.LogInfo("Config saved!");
 
 			// Switch back to main menu
 			PageSwitcher.Instance.Navigate(new MainMenu());
+		}
+
+		private void UpdateTarkovTrackerToken()
+		{
+			if (RatScannerMain.Instance.TarkovTrackerDB.Init()) return;
+
+			var token = RatConfig.Tracking.TarkovTracker.Token;
+			token = token[..8] + string.Concat(Enumerable.Repeat(" *", token.Length - 8));
+			Logger.ShowWarning($"The TarkovTracker API Token does not seem to work.\n\n{token}");
+
+			RatConfig.Tracking.TarkovTracker.Token = "";
 		}
 
 		public void UtilizeState(object state)
@@ -96,10 +108,11 @@ namespace RatScanner.View
 			throw new System.NotImplementedException();
 		}
 
+		public void OnOpen() { }
+
 		public void OnClose()
 		{
 			RatScannerMain.Instance.HotkeyManager.RegisterHotkeys();
 		}
-
 	}
 }

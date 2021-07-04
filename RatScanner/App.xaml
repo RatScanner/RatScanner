@@ -148,7 +148,7 @@
 
 		<Style TargetType="{x:Type Separator}">
 			<Setter Property="Margin"
-							Value="0" />
+							Value="0, 5" />
 			<Setter Property="Background"
 							Value="#AAAAAA" />
 		</Style>
@@ -354,5 +354,28 @@
 		<Style TargetType="{x:Type controls:HotkeySelector}"
 					 BasedOn="{StaticResource {x:Type Button}}">
 		</Style>
+
+		<!-- icons -->
+		<DrawingImage x:Key="hideoutIcon">
+			<DrawingImage.Drawing>
+				<DrawingGroup ClipGeometry="M0,0 V1024 H1024 V0 H0 Z">
+					<DrawingGroup Opacity="1">
+						<GeometryDrawing Brush="#EEEEEE"
+														 Geometry="F1 M1024,1024z M0,0z M213.33,853.33L213.33,512 85.33,512 512,128 938.67,512 810.67,512 810.67,853.33 597.33,853.33 597.33,597.33 426.67,597.33 426.67,853.33z" />
+					</DrawingGroup>
+				</DrawingGroup>
+			</DrawingImage.Drawing>
+		</DrawingImage>
+
+		<DrawingImage x:Key="questIcon">
+			<DrawingImage.Drawing>
+				<DrawingGroup ClipGeometry="M0,0 V1024 H1024 V0 H0 Z">
+					<DrawingGroup Opacity="1">
+						<GeometryDrawing Brush="#EEEEEE"
+														 Geometry="F1 M1024,1024z M0,0z M896,213.33L896,810.67C896,857.6,857.6,896,810.67,896L213.33,896C166.4,896,128,857.6,128,810.67L128,213.33C128,166.4,166.4,128,213.33,128L391.68,128C409.6,78.51 456.53,42.6700000000001 512,42.6700000000001 567.47,42.6700000000001 614.4,78.5100000000001 632.32,128L810.67,128C857.6,128,896,166.4,896,213.33z M725.33,298.67L298.67,298.67 298.67,384 725.33,384z M725.33,469.33L298.67,469.33 298.67,554.67 725.33,554.67z M597.33,640L298.67,640 298.67,725.33 597.33,725.33z M469.33,170.67C469.33,194.14 488.53,213.33 512,213.33 535.47,213.33 554.67,194.14 554.67,170.67 554.67,147.2 535.47,128 512,128 488.53,128 469.33,147.2 469.33,170.67z" />
+					</DrawingGroup>
+				</DrawingGroup>
+			</DrawingImage.Drawing>
+		</DrawingImage>
 	</Application.Resources>
 </Application>

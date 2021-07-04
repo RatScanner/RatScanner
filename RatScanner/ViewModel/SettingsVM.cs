@@ -30,12 +30,11 @@ namespace RatScanner.ViewModel
 		public bool LogDebug { get; set; }
 
 		// Progress Tracking Settings
-		public bool ShowQuestNeeds { get; set; }
-		public bool ShowQuestHandoverNeeds { get; set; }
-		public bool ShowHideoutNeeds { get; set; }
+		public bool ShowNonFIRNeeds { get; set; }
 
 		// TarkovTracker Specific Tracking Settings
 		public string TarkovTrackerToken { get; set; }
+
 		public bool ShowTarkovTrackerTeam { get; set; }
 
 
@@ -64,9 +63,7 @@ namespace RatScanner.ViewModel
 			AlwaysOnTop = RatConfig.AlwaysOnTop;
 			LogDebug = RatConfig.LogDebug;
 
-			ShowQuestNeeds = RatConfig.Tracking.ShowQuestNeeds;
-			ShowQuestHandoverNeeds = RatConfig.Tracking.ShowQuestHandoverNeeds;
-			ShowHideoutNeeds = RatConfig.Tracking.ShowHideoutNeeds;
+			ShowNonFIRNeeds = RatConfig.Tracking.ShowNonFIRNeeds;
 
 			TarkovTrackerToken = RatConfig.Tracking.TarkovTracker.Token;
 			ShowTarkovTrackerTeam = RatConfig.Tracking.TarkovTracker.ShowTeam;

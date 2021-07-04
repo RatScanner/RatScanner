@@ -5,6 +5,8 @@
 						 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 						 xmlns:ratScanner="clr-namespace:RatScanner"
 						 xmlns:controls="clr-namespace:RatScanner.Controls"
+						 xmlns:viewmodel="clr-namespace:RatScanner.ViewModel"
+						 d:DataContext="{d:DesignInstance Type=viewmodel:SettingsVM}"
 						 d:DesignHeight="390"
 						 d:DesignWidth="280"
 						 x:ClassModifier="internal"
@@ -519,26 +521,8 @@
 					</TextBlock>
 				</StackPanel>
 			</TabItem>
-      <TabItem Header="Tracking">
+			<TabItem Header="Tracking">
 				<StackPanel>
-					<Grid>
-						<Grid.ToolTip>
-							<TextBlock>
-								Show items needed for quests
-							</TextBlock>
-						</Grid.ToolTip>
-						<Label Grid.Column="0"
-									 Content="Show Quest Needs" />
-						<CheckBox Grid.Column="1"
-											Margin="5,0"
-											VerticalAlignment="Center"
-											IsChecked="{Binding ShowQuestNeeds}" />
-
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*" />
-							<ColumnDefinition Width="Auto" />
-						</Grid.ColumnDefinitions>
-					</Grid>
 					<Grid>
 						<Grid.ToolTip>
 							<TextBlock>
@@ -546,31 +530,11 @@
 							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
-									 Content="Show Non-FIR Needs"
-									 Margin="15,0"/>
+									 Content="Show Non-FIR Needs" />
 						<CheckBox Grid.Column="1"
-											Margin="5,0"
 											VerticalAlignment="Center"
-											IsChecked="{Binding ShowQuestHandoverNeeds}" />
-
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*" />
-							<ColumnDefinition Width="Auto" />
-						</Grid.ColumnDefinitions>
-					</Grid>
-					<Grid Margin="0,10">
-						<Grid.ToolTip>
-							<TextBlock>
-								Show items needed for Hideout Upgrades
-							</TextBlock>
-						</Grid.ToolTip>
-						<Label Grid.Column="0"
-									 Content="Show Hideout Needs"
-									 Margin="0,0"/>
-						<CheckBox Grid.Column="1"
 											Margin="5,0"
-											VerticalAlignment="Center"
-											IsChecked="{Binding ShowHideoutNeeds}" />
+											IsChecked="{Binding ShowNonFIRNeeds}" />
 
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="*" />
@@ -606,8 +570,8 @@
 							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
-									 Content="Show Team Needs"
-									 Margin="0,0"/>
+									 Content="Show Team"
+									 Margin="0,0" />
 						<CheckBox Grid.Column="1"
 											Margin="5,0"
 											VerticalAlignment="Center"
@@ -620,7 +584,7 @@
 					</Grid>
 				</StackPanel>
 			</TabItem>
-    </TabControl>
+		</TabControl>
 
 		<Grid Grid.Row="1"
 					Height="30"

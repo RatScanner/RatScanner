@@ -24,6 +24,9 @@ namespace RatScanner.FetchModels.tarkovdata
 		[JsonProperty("title")]
 		public string Title { get; set; }
 
+		[JsonProperty("wiki")]
+		public string Wiki { get; set; }
+
 		// The objectives of the quest
 		[JsonProperty("objectives")]
 		public QuestObjective[] Objectives { get; set; }

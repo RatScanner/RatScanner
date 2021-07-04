@@ -90,12 +90,12 @@ namespace RatScanner
 			catch (WebException e)
 			{
 				HttpStatusCode? status = (e.Response as HttpWebResponse)?.StatusCode;
-				if(status != null && status == HttpStatusCode.Unauthorized)
+				if (status is HttpStatusCode.Unauthorized)
 				{
 					// We can work with a 401
 					throw new FetchModels.TarkovTracker.UnauthorizedTokenException("Token was rejected by the API", e);
 				}
-				else if(status != null && status == HttpStatusCode.TooManyRequests)
+				if (status is HttpStatusCode.TooManyRequests)
 				{
 					throw new FetchModels.TarkovTracker.RateLimitExceededException("Rate Limiting reached for token", e);
 				}
@@ -120,7 +120,7 @@ namespace RatScanner
 			catch (WebException e)
 			{
 				HttpStatusCode? status = (e.Response as HttpWebResponse)?.StatusCode;
-				if (status != null && status == HttpStatusCode.TooManyRequests)
+				if (status is HttpStatusCode.TooManyRequests)
 				{
 					throw new FetchModels.TarkovTracker.RateLimitExceededException("Rate Limiting reached for token", e);
 				}
@@ -148,7 +148,7 @@ namespace RatScanner
 			catch (WebException e)
 			{
 				HttpStatusCode? status = (e.Response as HttpWebResponse)?.StatusCode;
-				if (status != null && status == HttpStatusCode.TooManyRequests)
+				if (status is HttpStatusCode.TooManyRequests)
 				{
 					throw new FetchModels.TarkovTracker.RateLimitExceededException("Rate Limiting reached for token", e);
 				}
@@ -208,7 +208,7 @@ namespace RatScanner
 			{
 				Logger.LogInfo($"Loading resource \"{resPath}\"...");
 				var json = Get($"{BaseUrl}/res/{resPath}");
-				var value = JsonConvert.DeserializeObject<Resource>(json).Value;
+				var value = JsonConvert.DeserializeObject<Resource>(json)?.Value;
 				ResCache.Add(resource, value);
 				return value;
 			}

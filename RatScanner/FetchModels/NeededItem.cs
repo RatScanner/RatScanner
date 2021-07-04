@@ -50,7 +50,7 @@ namespace RatScanner.FetchModels
 		{
 			get
 			{
-				return HideoutNeeded -  HideoutHave;
+				return HideoutNeeded - HideoutHave;
 			}
 		}
 	}

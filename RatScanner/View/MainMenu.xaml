@@ -3,6 +3,8 @@
 						 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 						 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 						 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+						 xmlns:viewmodel="clr-namespace:RatScanner.ViewModel"
+						 d:DataContext="{d:DesignInstance Type=viewmodel:MainWindowVM}"
 						 d:DesignHeight="390"
 						 d:DesignWidth="280"
 						 x:ClassModifier="internal"
@@ -11,140 +13,37 @@
 						 Loaded="OnLoaded">
 
 	<Grid Margin="10,0">
-		<Grid>
-			<StackPanel Grid.Row="0">
-				<Grid Margin="0,10,0,10">
-					<StackPanel Grid.Column="0"
-											VerticalAlignment="Center"
-											Orientation="Horizontal">
-						<WrapPanel VerticalAlignment="Center">
-							<Rectangle Width="20"
-												 Height="20"
-												 Margin="5,0,0,0">
-								<Rectangle.Fill>
-									<SolidColorBrush Color="#EEEEEE" />
-								</Rectangle.Fill>
-								<Rectangle.OpacityMask>
-									<ImageBrush ImageSource="../Resources/iconMods.png" />
-								</Rectangle.OpacityMask>
-							</Rectangle>
+		<StackPanel Grid.Row="0">
+			<Grid Margin="0,10,0,5">
+				<StackPanel Grid.Column="0"
+										VerticalAlignment="Center"
+										Orientation="Horizontal">
+					<WrapPanel VerticalAlignment="Center">
+						<Rectangle Width="20"
+											 Height="20"
+											 Margin="5,0,0,0">
+							<Rectangle.Fill>
+								<SolidColorBrush Color="#EEEEEE" />
+							</Rectangle.Fill>
+							<Rectangle.OpacityMask>
+								<ImageBrush ImageSource="../Resources/iconMods.png" />
+							</Rectangle.OpacityMask>
+						</Rectangle>
 
-							<Separator Margin="1,1,3,1">
-								<Separator.LayoutTransform>
-									<RotateTransform Angle="90" />
-								</Separator.LayoutTransform>
-							</Separator>
+						<Separator Margin="1,1,3,1">
+							<Separator.LayoutTransform>
+								<RotateTransform Angle="90" />
+							</Separator.LayoutTransform>
+						</Separator>
 
-							<WrapPanel.ToolTip>
-								<TextBlock>
+						<WrapPanel.ToolTip>
+							<TextBlock>
 								Prices include attached mods
-								</TextBlock>
-							</WrapPanel.ToolTip>
+							</TextBlock>
+						</WrapPanel.ToolTip>
 
-							<WrapPanel.Style>
-								<Style TargetType="WrapPanel">
-									<Style.Triggers>
-										<DataTrigger Binding="{Binding Path=HasMods}"
-																 Value="True">
-											<Setter Property="Visibility"
-															Value="Visible" />
-										</DataTrigger>
-										<DataTrigger Binding="{Binding Path=HasMods}"
-																 Value="False">
-											<Setter Property="Visibility"
-															Value="Collapsed" />
-										</DataTrigger>
-									</Style.Triggers>
-								</Style>
-							</WrapPanel.Style>
-						</WrapPanel>
-						<Label Padding="0"
-									 VerticalAlignment="Center"
-									 Content="{Binding Name}" />
-					</StackPanel>
-
-					<Border Grid.Column="1"
-									HorizontalAlignment="Right"
-									Background="#EEEEEE"
-									CornerRadius="3">
-						<Image Height="32"
-									 MinWidth="32"
-									 MaxWidth="96"
-									 Source="{Binding IconPath}" />
-					</Border>
-
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="*" />
-						<ColumnDefinition Width="Auto" />
-					</Grid.ColumnDefinitions>
-				</Grid>
-
-				<StackPanel>
-					<Separator Margin="5, 0" />
-					<Grid>
-						<Label Grid.Column="0"
-									 Content="Average Day Price" />
-						<Label Grid.Column="1"
-									 Content="{Binding Avg24hPrice}" />
-
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*" />
-							<ColumnDefinition Width="Auto" />
-						</Grid.ColumnDefinitions>
-					</Grid>
-
-					<Grid>
-						<Label Grid.Column="0"
-									 Content="Price per Slot" />
-						<Label Grid.Column="1"
-									 Content="{Binding PricePerSlot}" />
-
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*" />
-							<ColumnDefinition Width="Auto" />
-						</Grid.ColumnDefinitions>
-					</Grid>
-				</StackPanel>
-
-				<StackPanel>
-					<Separator />
-					<Grid>
-						<Label Grid.Column="0"
-									 Content="Trader" />
-						<Label Grid.Column="1"
-									 Content="{Binding TraderName}" />
-
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*" />
-							<ColumnDefinition Width="Auto" />
-						</Grid.ColumnDefinitions>
-					</Grid>
-
-					<Grid>
-						<Label Grid.Column="0"
-									 Content="Buy Price" />
-						<Label Grid.Column="1"
-									 Content="{Binding BestTraderPrice}" />
-
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*" />
-							<ColumnDefinition Width="Auto" />
-						</Grid.ColumnDefinitions>
-					</Grid>
-
-					<Grid>
-						<Label Grid.Column="0"
-									 Content="Max Buy Price" />
-						<Label Grid.Column="1"
-									 Content="{Binding MaxTraderPrice}" />
-
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*" />
-							<ColumnDefinition Width="Auto" />
-						</Grid.ColumnDefinitions>
-
-						<Grid.Style>
-							<Style TargetType="Grid">
+						<WrapPanel.Style>
+							<Style TargetType="WrapPanel">
 								<Style.Triggers>
 									<DataTrigger Binding="{Binding Path=HasMods}"
 															 Value="True">
@@ -158,120 +57,48 @@
 									</DataTrigger>
 								</Style.Triggers>
 							</Style>
-						</Grid.Style>
-					</Grid>
-
-					<StackPanel.Style>
-						<Style TargetType="StackPanel">
-							<Style.Triggers>
-								<DataTrigger Binding="{Binding TraderName}"
-														 Value="">
-									<Setter Property="Height"
-													Value="0" />
-								</DataTrigger>
-							</Style.Triggers>
-						</Style>
-					</StackPanel.Style>
+						</WrapPanel.Style>
+					</WrapPanel>
+					<Label Padding="0"
+								 VerticalAlignment="Center"
+								 Content="{Binding Name}" />
 				</StackPanel>
 
-				<StackPanel>
-					<Separator />
+				<Border Grid.Column="1"
+								HorizontalAlignment="Right"
+								Background="#EEEEEE"
+								CornerRadius="3">
+					<Image Height="32"
+								 MinWidth="32"
+								 MaxWidth="96"
+								 Source="{Binding IconPath}" />
+				</Border>
 
-					<Grid>
-						<Label Grid.Column="0"
-									 Content="Links" />
-						<TextBlock Grid.Column="1"
-											 Margin="0,0,5,0"
-											 VerticalAlignment="Center">
-						<Hyperlink NavigateUri="{Binding WikiLink}"
-											 RequestNavigate="HyperlinkRequestNavigate">
-							<Underline>Wiki</Underline>
-						</Hyperlink>
-						</TextBlock>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
+			</Grid>
 
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*" />
-							<ColumnDefinition Width="Auto" />
-						</Grid.ColumnDefinitions>
-					</Grid>
-				</StackPanel>
-
-				<StackPanel>
-					<Separator />
-
-					<Grid>
-						<Label Grid.Column="0"
-									 Content="Teammate"
-									 FontWeight="Medium"
-									 HorizontalAlignment="Left" />
-						<Label Grid.Column="1"
-									 Content="Quest"
-									 FontWeight="Medium"
-									 HorizontalAlignment="Center" />
-						<Label Grid.Column="2"
-									 Content="Hideout"
-									 FontWeight="Medium"
-									 HorizontalAlignment="Center" />
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="2*" />
-							<ColumnDefinition Width="*" />
-							<ColumnDefinition Width="*" />
-						</Grid.ColumnDefinitions>
-					</Grid>
-
-					<ListView ItemsSource="{Binding TrackingNeeds}"
-										Background="Transparent"
-										BorderThickness="0">
-						<ListView.ItemContainerStyle>
-							<Style TargetType="ListViewItem">
-								<Setter Property="HorizontalContentAlignment"
-												Value="Stretch" />
-							</Style>
-						</ListView.ItemContainerStyle>
-
-						<ListView.ItemTemplate>
-							<DataTemplate>
-								<Grid>
-									<Grid.Resources>
-										<Style TargetType="Label"
-													 BasedOn="{StaticResource {x:Type Label}}">
-											<Setter Property="Margin"
-															Value="0" />
-											<Setter Property="Padding"
-															Value="0" />
-											<Setter Property="HorizontalAlignment"
-															Value="Center" />
-										</Style>
-									</Grid.Resources>
-									<Label Grid.Column="0"
-												 HorizontalAlignment="Left"
-												 Content="{Binding Key}" />
-									<Label Grid.Column="1"
-												 Content="{Binding Value.QuestRemaining}" />
-									<Label Grid.Column="2"
-												 Content="{Binding Value.HideoutRemaining}" />
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="2*" />
-										<ColumnDefinition Width="*" />
-										<ColumnDefinition Width="*" />
-									</Grid.ColumnDefinitions>
-								</Grid>
-							</DataTemplate>
-						</ListView.ItemTemplate>
-					</ListView>
-				</StackPanel>
-			</StackPanel>
-
-			<StackPanel Grid.Row="1">
+			<StackPanel>
 				<Separator />
+				<Grid>
+					<Label Grid.Column="0"
+								 Content="Average Day Price" />
+					<Label Grid.Column="1"
+								 Content="{Binding Avg24hPrice}" />
+
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" />
+						<ColumnDefinition Width="Auto" />
+					</Grid.ColumnDefinitions>
+				</Grid>
 
 				<Grid>
 					<Label Grid.Column="0"
-								 Content="Updated"
-								 FontSize="10" />
+								 Content="Price per Slot" />
 					<Label Grid.Column="1"
-								 Content="{Binding Updated}"
-								 FontSize="10" />
+								 Content="{Binding PricePerSlot}" />
 
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*" />
@@ -279,11 +106,207 @@
 					</Grid.ColumnDefinitions>
 				</Grid>
 			</StackPanel>
-			<Grid.RowDefinitions>
-				<RowDefinition Height="*" />
-				<RowDefinition Height="Auto" />
-			</Grid.RowDefinitions>
-		</Grid>
+
+			<StackPanel>
+				<Separator />
+				<Grid>
+					<Label Grid.Column="0"
+								 Content="Trader" />
+					<Label Grid.Column="1"
+								 Content="{Binding TraderName}" />
+
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" />
+						<ColumnDefinition Width="Auto" />
+					</Grid.ColumnDefinitions>
+				</Grid>
+
+				<Grid>
+					<Label Grid.Column="0"
+								 Content="Buy Price" />
+					<Label Grid.Column="1"
+								 Content="{Binding BestTraderPrice}" />
+
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" />
+						<ColumnDefinition Width="Auto" />
+					</Grid.ColumnDefinitions>
+				</Grid>
+
+				<Grid>
+					<Label Grid.Column="0"
+								 Content="Max Buy Price" />
+					<Label Grid.Column="1"
+								 Content="{Binding MaxTraderPrice}" />
+
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" />
+						<ColumnDefinition Width="Auto" />
+					</Grid.ColumnDefinitions>
+
+					<Grid.Style>
+						<Style TargetType="Grid">
+							<Style.Triggers>
+								<DataTrigger Binding="{Binding Path=HasMods}"
+														 Value="True">
+									<Setter Property="Visibility"
+													Value="Visible" />
+								</DataTrigger>
+								<DataTrigger Binding="{Binding Path=HasMods}"
+														 Value="False">
+									<Setter Property="Visibility"
+													Value="Collapsed" />
+								</DataTrigger>
+							</Style.Triggers>
+						</Style>
+					</Grid.Style>
+				</Grid>
+
+				<StackPanel.Style>
+					<Style TargetType="StackPanel">
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding TraderName}"
+													 Value="">
+								<Setter Property="Height"
+												Value="0" />
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</StackPanel.Style>
+			</StackPanel>
+
+			<StackPanel>
+				<Separator />
+
+				<Grid>
+					<Label Grid.Column="0"
+								 Content="Links" />
+					<TextBlock Grid.Column="1"
+										 Margin="0,0,5,0"
+										 VerticalAlignment="Center">
+						<Hyperlink NavigateUri="{Binding WikiLink}"
+											 RequestNavigate="HyperlinkRequestNavigate">
+							<Underline>Wiki</Underline>
+						</Hyperlink>
+					</TextBlock>
+
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="*" />
+						<ColumnDefinition Width="Auto" />
+					</Grid.ColumnDefinitions>
+				</Grid>
+			</StackPanel>
+			<Separator />
+
+			<Grid>
+				<Label Grid.Column="0"
+							 HorizontalAlignment="Left"
+							 Content="Quest &amp; Hideout" />
+				<StackPanel Grid.Column="1"
+										Orientation="Horizontal"
+										HorizontalAlignment="Right">
+					<Label Grid.Column="1"
+								 Content="{Binding TrackingNeeds.QuestRemaining, FallbackValue=0}" />
+					<Image Source="{StaticResource questIcon}"
+								 Height="20" />
+				</StackPanel>
+				<StackPanel Grid.Column="2"
+										Orientation="Horizontal"
+										HorizontalAlignment="Right">
+					<Label Grid.Column="2"
+								 Content="{Binding TrackingNeeds.HideoutRemaining, FallbackValue=0}" />
+					<Image Source="{StaticResource hideoutIcon}"
+								 Height="20" />
+				</StackPanel>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="2*" />
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
+			</Grid>
+
+			<!-- Optional teammate section -->
+			<StackPanel x:Name="TeammateQHTrackingDisplay">
+				<Separator />
+
+				<Grid>
+					<Label Grid.Column="0"
+								 Content="Teammate"
+								 FontWeight="Medium"
+								 HorizontalAlignment="Left" />
+					<Label Grid.Column="1"
+								 Content="Quest"
+								 FontWeight="Medium"
+								 HorizontalAlignment="Center" />
+					<Label Grid.Column="2"
+								 Content="Hideout"
+								 FontWeight="Medium"
+								 HorizontalAlignment="Right" />
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="2*" />
+						<ColumnDefinition Width="*" />
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+				</Grid>
+
+				<ListView ItemsSource="{Binding TrackingTeamNeeds}"
+									Background="Transparent"
+									BorderThickness="0">
+					<ListView.ItemContainerStyle>
+						<Style TargetType="ListViewItem">
+							<Setter Property="HorizontalContentAlignment"
+											Value="Stretch" />
+						</Style>
+					</ListView.ItemContainerStyle>
+
+					<ListView.ItemTemplate>
+						<DataTemplate>
+							<Grid Height="17">
+								<Grid.Resources>
+									<Style TargetType="Label"
+												 BasedOn="{StaticResource {x:Type Label}}">
+										<Setter Property="Margin"
+														Value="0" />
+										<Setter Property="Padding"
+														Value="0" />
+										<Setter Property="HorizontalAlignment"
+														Value="Center" />
+									</Style>
+								</Grid.Resources>
+								<Label Grid.Column="0"
+											 HorizontalAlignment="Left"
+											 Content="{Binding Key}" />
+								<Label Grid.Column="1"
+											 Content="{Binding Value.QuestRemaining}" />
+								<Label Grid.Column="2"
+											 Content="{Binding Value.HideoutRemaining}" />
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="2*" />
+									<ColumnDefinition Width="*" />
+									<ColumnDefinition Width="*" />
+								</Grid.ColumnDefinitions>
+							</Grid>
+						</DataTemplate>
+					</ListView.ItemTemplate>
+				</ListView>
+			</StackPanel>
+
+			<Separator />
+
+			<Grid>
+				<Label Grid.Column="0"
+							 Content="Updated"
+							 FontSize="12" />
+				<Label Grid.Column="1"
+							 Content="{Binding Updated}"
+							 FontSize="12" />
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
+			</Grid>
+		</StackPanel>
 
 		<Grid Grid.Row="1"
 					Margin="-5,10">

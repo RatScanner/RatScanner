@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -74,14 +75,23 @@ namespace RatScanner
 			}
 		}
 
-		internal static void LogDebug(string message)
+		internal static void LogDebug(string message = "", [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = "")
 		{
-			if (RatConfig.LogDebug) AppendToLog("[Debug] " + message);
+			if (!RatConfig.LogDebug) return;
+			message = $"{caller}:{lineNumber} -> {message}";
+			AppendToLog("[Debug] " + message);
 		}
 
 		internal static void ShowMessage(string message, string title = null)
 		{
+			LogInfo(message);
 			MessageBox.Show(message, title ?? "Rat Scanner " + RatConfig.Version, MessageBoxButton.OK, MessageBoxImage.Information);
+		}
+
+		internal static void ShowWarning(string message, string title = null)
+		{
+			LogWarning(message);
+			MessageBox.Show(message, title ?? "Rat Scanner " + RatConfig.Version, MessageBoxButton.OK, MessageBoxImage.Warning);
 		}
 
 		private static string GetUniquePath(string basePath, string fileName, string extension)

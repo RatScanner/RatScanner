@@ -54,7 +54,9 @@ namespace RatScanner.ViewModel
 
 		private int GetMaxTraderPrice() => MatchedItems[0].GetMaxTraderPrice();
 
-		public Dictionary<string, NeededItem> TrackingNeeds => MatchedItems[0].GetTrackingNeeds();
+		public List<KeyValuePair<string, NeededItem>> TrackingTeamNeeds => MatchedItems[0].GetTrackingTeamNeeds();
+
+		public NeededItem TrackingNeeds => MatchedItems[0].GetTrackingNeeds();
 
 		public string DiscordLink => ApiManager.GetResource(ApiManager.ResourceType.DiscordLink);
 
