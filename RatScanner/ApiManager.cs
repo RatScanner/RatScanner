@@ -99,17 +99,14 @@ namespace RatScanner
 				{
 					throw new FetchModels.TarkovTracker.RateLimitExceededException("Rate Limiting reached for token", e);
 				}
-				else
-				{
-					// Unknown error, continue throwing
-					Logger.LogError($"Retrieving token metadata failed.\n{e}");
-					throw e;
-				}
+				// Unknown error, continue throwing
+				Logger.LogError($"Retrieving token metadata failed.", e);
+				throw;
 			}
 			catch (Exception e)
 			{
-				Logger.LogError($"Retrieving token metadata failed.\n{e}");
-				throw e;
+				Logger.LogError($"Retrieving token metadata failed.", e);
+				throw;
 			}
 		}
 
@@ -130,13 +127,13 @@ namespace RatScanner
 				else
 				{
 					// Unknown error, continue throwing
-					Logger.LogError($"Retrieving TarkovTracker team data failed.\n{e}");
+					Logger.LogError($"Retrieving TarkovTracker team data failed.", e);
 					throw e;
 				}
 			}
 			catch (Exception e)
 			{
-				Logger.LogError($"Retrieving TarkovTracker team data failed.\n{e}");
+				Logger.LogError($"Retrieving TarkovTracker team data failed.", e);
 				return null;
 			}
 		}
@@ -158,13 +155,13 @@ namespace RatScanner
 				else
 				{
 					// Unknown error, continue throwing
-					Logger.LogError($"Retrieving TarkovTracker progress data failed.\n{e}");
+					Logger.LogError($"Retrieving TarkovTracker progress data failed.", e);
 					throw e;
 				}
 			}
 			catch (Exception e)
 			{
-				Logger.LogError($"Retrieving TarkovTracker progress data failed.\n{e}");
+				Logger.LogError($"Retrieving TarkovTracker progress data failed.", e);
 				return null;
 			}
 		}
@@ -178,7 +175,7 @@ namespace RatScanner
 			}
 			catch (Exception e)
 			{
-				Logger.LogError($"Loading of quest data failed.\n{e}");
+				Logger.LogError($"Loading of quest data failed.", e);
 				return null;
 			}
 		}
@@ -192,7 +189,7 @@ namespace RatScanner
 			}
 			catch (Exception e)
 			{
-				Logger.LogError($"Loading of hideout data failed.\n{e}");
+				Logger.LogError($"Loading of hideout data failed.", e);
 				return null;
 			}
 		}
