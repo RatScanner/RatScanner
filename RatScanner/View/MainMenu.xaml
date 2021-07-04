@@ -9,8 +9,7 @@
 						 d:DesignWidth="280"
 						 x:ClassModifier="internal"
 						 Background="#444444"
-						 mc:Ignorable="d"
-						 Loaded="OnLoaded">
+						 mc:Ignorable="d">
 
 	<Grid Margin="10,0">
 		<StackPanel Grid.Row="0">
