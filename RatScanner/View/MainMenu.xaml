@@ -254,6 +254,15 @@
 						<Style TargetType="ListViewItem">
 							<Setter Property="HorizontalContentAlignment"
 											Value="Stretch" />
+							<Setter Property="Focusable"
+											Value="False" />
+							<Setter Property="Template">
+								<Setter.Value>
+									<ControlTemplate TargetType="ListViewItem">
+										<ContentPresenter Margin="0, 2" />
+									</ControlTemplate>
+								</Setter.Value>
+							</Setter>
 						</Style>
 					</ListView.ItemContainerStyle>
 
@@ -272,6 +281,7 @@
 									</Style>
 								</Grid.Resources>
 								<Label Grid.Column="0"
+											 Margin="5, 0"
 											 HorizontalAlignment="Left"
 											 Content="{Binding Key}" />
 								<Label Grid.Column="1"
