@@ -100,6 +100,20 @@ namespace RatScanner
 			return trackedNeeds.OrderBy(x => -x.Value.Remaining).ToList();
 		}
 
+		public static NeededItem GetSummedTrackingTeamNeeds(this Item item)
+		{
+			var result = new NeededItem(item.Id);
+			var teamData = item.GetTrackingTeamNeeds();
+			foreach (var (_, value) in teamData)
+			{
+				result.HideoutNeeded += value.HideoutNeeded;
+				result.QuestNeeded += value.QuestNeeded;
+				result.HideoutHave += value.HideoutHave;
+				result.QuestHave += value.QuestHave;
+			}
+			return result;
+		}
+
 		private static (int need, int have, bool FIR) GetQuestRequired(IEnumerable<QuestItem> requiredQuestItems, Progress progress)
 		{
 			var need = 0;

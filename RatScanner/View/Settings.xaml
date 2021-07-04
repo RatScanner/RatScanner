@@ -348,7 +348,7 @@
 							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
-									 Content="Show Name" />
+									 Content="Name" />
 						<CheckBox Grid.Column="1"
 											Margin="5,0"
 											VerticalAlignment="Center"
@@ -366,7 +366,7 @@
 							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
-									 Content="Show Average Day Price" />
+									 Content="Average Day Price" />
 						<CheckBox Grid.Column="1"
 											Margin="5,0"
 											VerticalAlignment="Center"
@@ -384,7 +384,7 @@
 							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
-									 Content="Show Price per Slot" />
+									 Content="Price per Slot" />
 						<CheckBox Grid.Column="1"
 											Margin="5,0"
 											VerticalAlignment="Center"
@@ -402,7 +402,7 @@
 							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
-									 Content="Show Trader Price" />
+									 Content="Trader Price" />
 						<CheckBox Grid.Column="1"
 											Margin="5,0"
 											VerticalAlignment="Center"
@@ -420,7 +420,7 @@
 							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
-									 Content="Show Max Trader Price" />
+									 Content="Max Trader Price" />
 						<CheckBox Grid.Column="1"
 											Margin="5,0"
 											VerticalAlignment="Center"
@@ -434,11 +434,48 @@
 					<Grid>
 						<Grid.ToolTip>
 							<TextBlock>
+								Show the amount of the item needed for quests and the hideout
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0"
+									 Content="Needed Quest &amp; Hideout" />
+						<CheckBox Grid.Column="1"
+											Margin="5,0"
+											VerticalAlignment="Center"
+											IsChecked="{Binding ShowQuestHideoutTracker}" />
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								Show the amount of the item needed for quests and the hideout by team members<LineBreak />
+								This requires a TarkovTracker api token
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0"
+									 Content="Needed Quest &amp; Hideout of Team" />
+						<CheckBox Grid.Column="1"
+											Margin="5,0"
+											VerticalAlignment="Center"
+											IsChecked="{Binding ShowQuestHideoutTeamTracker}" />
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
 								Show when the data was last updated
 							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
-									 Content="Show Updated" />
+									 Content="Updated" />
 						<CheckBox Grid.Column="1"
 											Margin="5,0"
 											VerticalAlignment="Center"
@@ -544,7 +581,7 @@
 							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
-									 Content="Show Non-FIR Needs" />
+									 Content="Non-FIR Needs" />
 						<CheckBox Grid.Column="1"
 											VerticalAlignment="Center"
 											Margin="5,0"
@@ -585,7 +622,7 @@
 							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
-									 Content="Show Team"
+									 Content="Team"
 									 Margin="0,0" />
 						<CheckBox Grid.Column="1"
 											Margin="5,0"

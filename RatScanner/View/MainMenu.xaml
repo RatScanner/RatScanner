@@ -224,7 +224,8 @@
 			</Grid>
 
 			<!-- Optional teammate section -->
-			<StackPanel x:Name="TeammateQHTrackingDisplay">
+			<StackPanel x:Name="TeammateQHTrackingDisplay"
+									d:Visibility="Collapsed">
 				<Separator />
 
 				<Grid>

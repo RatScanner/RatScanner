@@ -64,6 +64,8 @@ namespace RatScanner.View
 			RatConfig.MinimalUi.ShowPricePerSlot = settingsVM.ShowPricePerSlot;
 			RatConfig.MinimalUi.ShowTraderPrice = settingsVM.ShowTraderPrice;
 			RatConfig.MinimalUi.ShowTraderMaxPrice = settingsVM.ShowTraderMaxPrice;
+			RatConfig.MinimalUi.ShowQuestHideoutTracker = settingsVM.ShowQuestHideoutTracker;
+			RatConfig.MinimalUi.ShowQuestHideoutTeamTracker = settingsVM.ShowQuestHideoutTeamTracker;
 			RatConfig.MinimalUi.ShowUpdated = settingsVM.ShowUpdated;
 			RatConfig.MinimalUi.Opacity = settingsVM.Opacity;
 

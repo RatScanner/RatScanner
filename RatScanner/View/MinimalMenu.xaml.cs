@@ -28,6 +28,8 @@ namespace RatScanner.View
 			PricePerSlotDisplay.Visibility = RCMinUi.ShowPricePerSlot ? v : c;
 			TraderPriceDisplay.Visibility = RCMinUi.ShowTraderPrice ? v : c;
 			TraderMaxPriceDisplay.Visibility = RCMinUi.ShowTraderMaxPrice ? v : c;
+			TrackingDisplay.Visibility = RCMinUi.ShowQuestHideoutTracker ? v : c;
+			TeamTrackingDisplay.Visibility = RCMinUi.ShowQuestHideoutTeamTracker ? v : c;
 			UpdatedDisplay.Visibility = RCMinUi.ShowUpdated ? v : c;
 		}
 

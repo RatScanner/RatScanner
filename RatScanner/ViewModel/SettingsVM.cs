@@ -22,6 +22,8 @@ namespace RatScanner.ViewModel
 		public bool ShowTraderPrice { get; set; }
 		public bool ShowTraderMaxPrice { get; set; }
 		public bool ShowUpdated { get; set; }
+		public bool ShowQuestHideoutTracker { get; set; }
+		public bool ShowQuestHideoutTeamTracker { get; set; }
 		public int Opacity { get; set; }
 
 		public int ScreenResolution { get; set; }
@@ -55,6 +57,8 @@ namespace RatScanner.ViewModel
 			ShowPricePerSlot = RatConfig.MinimalUi.ShowPricePerSlot;
 			ShowTraderPrice = RatConfig.MinimalUi.ShowTraderPrice;
 			ShowTraderMaxPrice = RatConfig.MinimalUi.ShowTraderMaxPrice;
+			ShowQuestHideoutTracker = RatConfig.MinimalUi.ShowQuestHideoutTracker;
+			ShowQuestHideoutTeamTracker = RatConfig.MinimalUi.ShowQuestHideoutTeamTracker;
 			ShowUpdated = RatConfig.MinimalUi.ShowUpdated;
 			Opacity = RatConfig.MinimalUi.Opacity;
 

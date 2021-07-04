@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using RatScanner.FetchModels;
 using RatScanner.Scan;
 using RatStash;
@@ -63,9 +64,13 @@ namespace RatScanner.ViewModel
 			return MatchedItems[0].GetMaxTraderPrice();
 		}
 
+		public NeededItem TrackingNeeds => MatchedItems[0].GetTrackingNeeds();
+
+		public NeededItem TrackingTeamNeedsSummed => MatchedItems[0].GetSummedTrackingTeamNeeds();
+
 		public List<KeyValuePair<string, NeededItem>> TrackingTeamNeeds => MatchedItems[0].GetTrackingTeamNeeds();
 
-		public NeededItem TrackingNeeds => MatchedItems[0].GetTrackingNeeds();
+		public List<KeyValuePair<string, NeededItem>> TrackingTeamNeedsFiltered => TrackingTeamNeeds.Where(x => x.Value.Remaining > 0).ToList();
 
 		public string DiscordLink => ApiManager.GetResource(ApiManager.ResourceType.DiscordLink);
 
