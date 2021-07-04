@@ -10,7 +10,6 @@ namespace RatScanner
 	// Storing information about progression from TarkovTracker API
 	public class TarkovTrackerDB
 	{
-
 		private Token _token;
 		private bool _badToken;
 
@@ -45,8 +44,10 @@ namespace RatScanner
 					Logger.LogDebug();
 					UpdateToken();
 				}
+
 				return !_badToken;
 			}
+
 			return false;
 		}
 
@@ -110,7 +111,6 @@ namespace RatScanner
 		{
 			// We have access to team progression
 			if (TeamProgressAvailable())
-			{
 				try
 				{
 					Progress = JsonConvert.DeserializeObject<List<Progress>>(ApiManager.GetTarkovTrackerTeam());
@@ -125,10 +125,8 @@ namespace RatScanner
 					// We have an unauthorized token exception, it could be that we don't have permissions for this call
 					Logger.LogWarning(e.Message);
 				}
-			}
 			// We have permission to get individual progress
 			else if (SoloProgressAvailable())
-			{
 				try
 				{
 					var soloProgress = JsonConvert.DeserializeObject<Progress>(ApiManager.GetTarkovTrackerSolo());
@@ -144,12 +142,8 @@ namespace RatScanner
 					// We have an unauthorized token exception, it could be that we don't have permissions for this call
 					Logger.LogWarning(e.Message);
 				}
-			}
 			else
-			{
 				Logger.ShowWarning("This TarkovTracker API Token has insufficient permissions.");
-			}
 		}
-
 	}
 }

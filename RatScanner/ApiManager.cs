@@ -22,12 +22,12 @@ namespace RatScanner
 
 		private static readonly Dictionary<Language, string> LanguageMapping = new Dictionary<Language, string>()
 		{
-			{ Language.English, "en" },
-			{ Language.Russian, "ru" },
-			{ Language.German, "de" },
-			{ Language.French, "fr" },
-			{ Language.Spanish, "es" },
-			{ Language.Chinese, "cn" },
+			{Language.English, "en"},
+			{Language.Russian, "ru"},
+			{Language.German, "de"},
+			{Language.French, "fr"},
+			{Language.Spanish, "es"},
+			{Language.Chinese, "cn"},
 		};
 
 		public enum ResourceType
@@ -44,14 +44,14 @@ namespace RatScanner
 
 		private static readonly Dictionary<ResourceType, string> ResMapping = new Dictionary<ResourceType, string>
 		{
-			{ ResourceType.ClientVersion, "RSClientVersion" },
-			{ ResourceType.DownloadLink, "RSDownloadLink" },
-			{ ResourceType.PatreonLink, "RSPatreonLink" },
-			{ ResourceType.GithubLink, "RSGithubLink" },
-			{ ResourceType.DiscordLink, "RSDiscordLink" },
-			{ ResourceType.FAQLink, "RSFAQLink" },
-			{ ResourceType.ItemDataLink, "RSItemDataLink" },
-			{ ResourceType.ItemDataVersion, "RSItemDataVersion" },
+			{ResourceType.ClientVersion, "RSClientVersion"},
+			{ResourceType.DownloadLink, "RSDownloadLink"},
+			{ResourceType.PatreonLink, "RSPatreonLink"},
+			{ResourceType.GithubLink, "RSGithubLink"},
+			{ResourceType.DiscordLink, "RSDiscordLink"},
+			{ResourceType.FAQLink, "RSFAQLink"},
+			{ResourceType.ItemDataLink, "RSItemDataLink"},
+			{ResourceType.ItemDataVersion, "RSItemDataVersion"},
 		};
 
 		private static readonly Dictionary<ResourceType, string> ResCache = new Dictionary<ResourceType, string>();
@@ -89,16 +89,13 @@ namespace RatScanner
 			}
 			catch (WebException e)
 			{
-				HttpStatusCode? status = (e.Response as HttpWebResponse)?.StatusCode;
+				var status = (e.Response as HttpWebResponse)?.StatusCode;
 				if (status is HttpStatusCode.Unauthorized)
-				{
 					// We can work with a 401
 					throw new FetchModels.TarkovTracker.UnauthorizedTokenException("Token was rejected by the API", e);
-				}
+
 				if (status is HttpStatusCode.TooManyRequests)
-				{
 					throw new FetchModels.TarkovTracker.RateLimitExceededException("Rate Limiting reached for token", e);
-				}
 				// Unknown error, continue throwing
 				Logger.LogError($"Retrieving token metadata failed.", e);
 				throw;
@@ -119,17 +116,12 @@ namespace RatScanner
 			}
 			catch (WebException e)
 			{
-				HttpStatusCode? status = (e.Response as HttpWebResponse)?.StatusCode;
+				var status = (e.Response as HttpWebResponse)?.StatusCode;
 				if (status is HttpStatusCode.TooManyRequests)
-				{
 					throw new FetchModels.TarkovTracker.RateLimitExceededException("Rate Limiting reached for token", e);
-				}
-				else
-				{
-					// Unknown error, continue throwing
-					Logger.LogError($"Retrieving TarkovTracker team data failed.", e);
-					throw e;
-				}
+				// Unknown error, continue throwing
+				Logger.LogError($"Retrieving TarkovTracker team data failed.", e);
+				throw;
 			}
 			catch (Exception e)
 			{
@@ -147,17 +139,12 @@ namespace RatScanner
 			}
 			catch (WebException e)
 			{
-				HttpStatusCode? status = (e.Response as HttpWebResponse)?.StatusCode;
+				var status = (e.Response as HttpWebResponse)?.StatusCode;
 				if (status is HttpStatusCode.TooManyRequests)
-				{
 					throw new FetchModels.TarkovTracker.RateLimitExceededException("Rate Limiting reached for token", e);
-				}
-				else
-				{
-					// Unknown error, continue throwing
-					Logger.LogError($"Retrieving TarkovTracker progress data failed.", e);
-					throw e;
-				}
+				// Unknown error, continue throwing
+				Logger.LogError($"Retrieving TarkovTracker progress data failed.", e);
+				throw;
 			}
 			catch (Exception e)
 			{
@@ -198,10 +185,7 @@ namespace RatScanner
 		{
 			if (ResCache.ContainsKey(resource)) return ResCache[resource];
 
-			if (!ResMapping.ContainsKey(resource))
-			{
-				Logger.LogError($"Could not find resource mapping for: {resource}");
-			}
+			if (!ResMapping.ContainsKey(resource)) Logger.LogError($"Could not find resource mapping for: {resource}");
 			var resPath = ResMapping[resource];
 
 			try
@@ -239,10 +223,7 @@ namespace RatScanner
 			request.Method = WebRequestMethods.Http.Get;
 			request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 			request.UserAgent = $"RatScanner-Client/{RatConfig.Version}";
-			if (bearerToken != null)
-			{
-				request.Headers.Add("Authorization", "Bearer " + bearerToken);
-			}
+			if (bearerToken != null) request.Headers.Add("Authorization", "Bearer " + bearerToken);
 
 			using var response = (HttpWebResponse)request.GetResponse();
 			using var stream = response.GetResponseStream();

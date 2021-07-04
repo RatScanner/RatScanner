@@ -103,13 +103,11 @@ namespace RatScanner
 		}
 
 		#region Icon loading
+
 		private static void LoadStaticIcons()
 		{
 			Logger.LogInfo("Loading static icons...");
-			if (!Directory.Exists(RCPaths.StaticIcon))
-			{
-				Logger.LogError("Could not find icon folder at: " + RCPaths.StaticIcon);
-			}
+			if (!Directory.Exists(RCPaths.StaticIcon)) Logger.LogError("Could not find icon folder at: " + RCPaths.StaticIcon);
 
 			var iconPathArray = Directory.GetFiles(RCPaths.StaticIcon, "*.png");
 
@@ -133,10 +131,7 @@ namespace RatScanner
 
 				lock (StaticIcons)
 				{
-					if (!StaticIcons.ContainsKey(size))
-					{
-						StaticIcons.Add(size, new Dictionary<string, Mat>());
-					}
+					if (!StaticIcons.ContainsKey(size)) StaticIcons.Add(size, new Dictionary<string, Mat>());
 
 					// Add icon to icon and path dictionary
 					StaticIcons[size][iconKey] = mat;
@@ -153,10 +148,7 @@ namespace RatScanner
 			Logger.LogInfo("Loading dynamic icons...");
 			var newDynamicIcons = new Dictionary<Size, Dictionary<string, Mat>>();
 
-			if (!Directory.Exists(RCPaths.DynamicIcon))
-			{
-				Logger.LogError("Could not find icon cache folder at: " + RCPaths.DynamicIcon);
-			}
+			if (!Directory.Exists(RCPaths.DynamicIcon)) Logger.LogError("Could not find icon cache folder at: " + RCPaths.DynamicIcon);
 
 			try
 			{
@@ -182,10 +174,7 @@ namespace RatScanner
 
 					lock (newDynamicIcons)
 					{
-						if (!newDynamicIcons.ContainsKey(size))
-						{
-							newDynamicIcons.Add(size, new Dictionary<string, Mat>());
-						}
+						if (!newDynamicIcons.ContainsKey(size)) newDynamicIcons.Add(size, new Dictionary<string, Mat>());
 
 						// Add icon to icon and path dictionary
 						newDynamicIcons[size][iconKey] = mat;
@@ -207,37 +196,34 @@ namespace RatScanner
 					Thread.Sleep(100);
 					return LoadDynamicIcons(retryIndex);
 				}
+
 				return null;
 			}
 		}
+
 		#endregion
 
 		#region Correlation data loading
+
 		private static void LoadStaticCorrelationData()
 		{
 			Logger.LogInfo("Loading static correlation data...");
 
-			if (!File.Exists(RCPaths.StaticCorrelation))
-			{
-				Logger.LogError("Could not find static correlation data at: " + RCPaths.StaticCorrelation);
-			}
+			if (!File.Exists(RCPaths.StaticCorrelation)) Logger.LogError("Could not find static correlation data at: " + RCPaths.StaticCorrelation);
 
 			var json = File.ReadAllText(RCPaths.StaticCorrelation);
 			var correlations = JArray.Parse(json);
 
 			foreach (var jToken in correlations)
 			{
-				var correlation = (JObject)jToken;
+				var correlation = (JObject) jToken;
 				var icon = correlation.GetValue("icon").ToString();
 				var uid = correlation.GetValue("uid").ToString();
 
 				// Remove file extension from icon path
 				var fileName = Path.GetFileNameWithoutExtension(icon);
 				var iconKey = GetIconKey(fileName, true);
-				if (!CorrelationData.ContainsKey(iconKey))
-				{
-					CorrelationData.Add(iconKey, new HashSet<ItemInfo>());
-				}
+				if (!CorrelationData.ContainsKey(iconKey)) CorrelationData.Add(iconKey, new HashSet<ItemInfo>());
 
 				// This will never throw because we just made sure that the key exists
 				CorrelationData[iconKey].Add(new ItemInfo(uid));
@@ -250,9 +236,7 @@ namespace RatScanner
 			var newCorrelationData = new Dictionary<string, HashSet<ItemInfo>>();
 
 			if (!File.Exists(RCPaths.DynamicCorrelation))
-			{
 				Logger.LogError("Could not find dynamic correlation data at: " + RCPaths.DynamicCorrelation);
-			}
 
 			try
 			{
@@ -268,6 +252,7 @@ namespace RatScanner
 					Logger.LogInfo("Dynamic correlation data already up to date");
 					return null;
 				}
+
 				dynamicCorrelationDataHash = hashCode;
 
 				// We did not parse it earlier so we will do now
@@ -282,10 +267,7 @@ namespace RatScanner
 
 					// Remove file extension from icon path
 					var iconKey = GetIconKey(fileName, false);
-					if (!newCorrelationData.ContainsKey(iconKey))
-					{
-						newCorrelationData.Add(iconKey, new HashSet<ItemInfo>());
-					}
+					if (!newCorrelationData.ContainsKey(iconKey)) newCorrelationData.Add(iconKey, new HashSet<ItemInfo>());
 
 					// This will never throw because we just made sure that the key exists
 					newCorrelationData[iconKey].Add(ParseUidString(uidString));
@@ -303,6 +285,7 @@ namespace RatScanner
 					Thread.Sleep(100);
 					return LoadDynamicCorrelationData(retryIndex);
 				}
+
 				return null;
 			}
 		}
@@ -345,12 +328,8 @@ namespace RatScanner
 
 			// Populate with new data
 			foreach (var (iconKey, itemInfos) in CorrelationData)
-			{
-				foreach (var itemInfo in itemInfos)
-				{
-					CorrelationDataInv[itemInfo] = iconKey;
-				}
-			}
+			foreach (var itemInfo in itemInfos)
+				CorrelationDataInv[itemInfo] = iconKey;
 		}
 
 		#endregion
@@ -380,31 +359,27 @@ namespace RatScanner
 			if (!RatConfig.IconScan.UseCachedIcons) return;
 
 			lock (RatScannerMain.NameScanLock)
-				lock (RatScannerMain.IconScanLock)
-				{
+			lock (RatScannerMain.IconScanLock)
+			{
+				// Try to load new dynamic correlation data
+				var newDynamicCorrelationData = LoadDynamicCorrelationData();
+				if (newDynamicCorrelationData == null) return;
 
-					// Try to load new dynamic correlation data
-					var newDynamicCorrelationData = LoadDynamicCorrelationData();
-					if (newDynamicCorrelationData == null) return;
+				// Try to load new dynamic icons
+				var newDynamicIcons = LoadDynamicIcons();
+				if (newDynamicIcons == null) return;
 
-					// Try to load new dynamic icons
-					var newDynamicIcons = LoadDynamicIcons();
-					if (newDynamicIcons == null) return;
+				// All data loaded successfully at this point so we can begin swapping the data
 
-					// All data loaded successfully at this point so we can begin swapping the data
+				// Replace old with new dynamic icons
+				DynamicIcons = newDynamicIcons;
 
-					// Replace old with new dynamic icons
-					DynamicIcons = newDynamicIcons;
+				// Replace old with new dynamic correlation data
+				foreach (var (key, value) in newDynamicCorrelationData) CorrelationData[key] = value;
 
-					// Replace old with new dynamic correlation data
-					foreach (var (key, value) in newDynamicCorrelationData)
-					{
-						CorrelationData[key] = value;
-					}
-
-					// Update inverse correlation data
-					InverseCorrelationData();
-				}
+				// Update inverse correlation data
+				InverseCorrelationData();
+			}
 		}
 
 		/// <summary>
@@ -413,10 +388,7 @@ namespace RatScanner
 		/// <returns>Count of icons in the icon cache folder</returns>
 		internal static int GetIconCacheSize()
 		{
-			if (!Directory.Exists(RCPaths.DynamicIcon))
-			{
-				Logger.LogError("Could not find icon cache folder at: " + RCPaths.DynamicIcon);
-			}
+			if (!Directory.Exists(RCPaths.DynamicIcon)) Logger.LogError("Could not find icon cache folder at: " + RCPaths.DynamicIcon);
 			return Directory.GetFiles(RCPaths.DynamicIcon, "*.png").Length;
 		}
 
@@ -436,6 +408,7 @@ namespace RatScanner
 			{
 				Logger.LogWarning("Could not delete icon cache folder", e);
 			}
+
 			File.WriteAllText(RCPaths.DynamicCorrelation, "{}");
 		}
 
@@ -511,7 +484,7 @@ namespace RatScanner
 		internal static int PixelsToSlots(int pixels, int? slotSize = null)
 		{
 			// Use converter class to round to nearest int instead of always rounding down
-			return Convert.ToInt32((pixels - 1) / (float)(slotSize ?? RatConfig.IconScan.ItemSlotSize));
+			return Convert.ToInt32((pixels - 1) / (float) (slotSize ?? RatConfig.IconScan.ItemSlotSize));
 		}
 
 		/// <summary>

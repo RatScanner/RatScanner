@@ -111,8 +111,8 @@ namespace RatScanner.Scan
 			Logger.LogDebug("Icon Key: " + matchResult.iconKey);
 			Logger.LogDebug("Conf: " + matchResult.conf);
 
-			IconRect.X = MousePos.X - (RatConfig.IconScan.ScanWidth / 2) + iconPosition.X + matchResult.pos.X;
-			IconRect.Y = MousePos.Y - (RatConfig.IconScan.ScanHeight / 2) + iconPosition.Y + matchResult.pos.Y;
+			IconRect.X = MousePos.X - RatConfig.IconScan.ScanWidth / 2 + iconPosition.X + matchResult.pos.X;
+			IconRect.Y = MousePos.Y - RatConfig.IconScan.ScanHeight / 2 + iconPosition.Y + matchResult.pos.Y;
 
 			Confidence = matchResult.conf;
 
@@ -168,7 +168,7 @@ namespace RatScanner.Scan
 				{
 					if (maxVal > hmConf)
 					{
-						hmConf = (float)maxVal;
+						hmConf = (float) maxVal;
 						hmKey = icon.Key;
 						hmPos = new Vector2(maxLoc);
 					}
@@ -201,8 +201,8 @@ namespace RatScanner.Scan
 			var topBorderDist = FindGridEdgeDistance(-1, 0);
 			var bottomBorderDist = FindGridEdgeDistance(1, 0);
 
-			var positionX = (RatConfig.IconScan.ScanWidth / 2) - leftBorderDist;
-			var positionY = (RatConfig.IconScan.ScanHeight / 2) - topBorderDist;
+			var positionX = RatConfig.IconScan.ScanWidth / 2 - leftBorderDist;
+			var positionY = RatConfig.IconScan.ScanHeight / 2 - topBorderDist;
 			var position = new Vector2(positionX, positionY);
 
 			var size = new Vector2(rightBorderDist + leftBorderDist, topBorderDist + bottomBorderDist);

@@ -44,7 +44,7 @@ namespace RatScanner
 		internal MarketDB MarketDB;
 		internal ProgressDB ProgressDB;
 		internal TarkovTrackerDB TarkovTrackerDB;
-		internal RatStash.Database ItemDB;
+		internal Database ItemDB;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
@@ -141,10 +141,7 @@ namespace RatScanner
 
 		private void UpdateRatScanner()
 		{
-			if (!File.Exists(RatConfig.Paths.Updater))
-			{
-				Logger.LogError(RatConfig.Paths.Updater + " could not be found! Please update manually.");
-			}
+			if (!File.Exists(RatConfig.Paths.Updater)) Logger.LogError(RatConfig.Paths.Updater + " could not be found! Please update manually.");
 			var startInfo = new ProcessStartInfo(RatConfig.Paths.Updater);
 			startInfo.UseShellExecute = true;
 			startInfo.ArgumentList.Add("--start");
@@ -171,15 +168,14 @@ namespace RatScanner
 			Logger.LogDebug("Icon scanning at: " + position);
 			lock (IconScanLock)
 			{
-
 				_iconScanToolTip.Dispatcher.Invoke(() =>
 				{
 					IconScanToolTip.ScheduleHide();
 					_iconScanToolTip.Hide(); // Hide it instantly
 				});
 
-				var x = position.X - (RatConfig.IconScan.ScanWidth / 2);
-				var y = position.Y - (RatConfig.IconScan.ScanHeight / 2);
+				var x = position.X - RatConfig.IconScan.ScanWidth / 2;
+				var y = position.Y - RatConfig.IconScan.ScanHeight / 2;
 
 				var screenshotPosition = new Vector2(x, y);
 				var size = new Size(RatConfig.IconScan.ScanWidth, RatConfig.IconScan.ScanHeight);
@@ -193,6 +189,7 @@ namespace RatScanner
 
 				ShowToolTip(itemIconScan);
 			}
+
 			return true;
 		}
 
@@ -206,11 +203,10 @@ namespace RatScanner
 			Logger.LogDebug("Name scanning at: " + position);
 			lock (NameScanLock)
 			{
-
 				_nameScanToolTip.Dispatcher.Invoke(() =>
 				{
 					NameScanToolTip.ScheduleHide();
-					_nameScanToolTip.Hide();    // Hide it instantly
+					_nameScanToolTip.Hide(); // Hide it instantly
 				});
 
 				// Wait for game ui to update the click
@@ -218,8 +214,8 @@ namespace RatScanner
 
 				// Get raw screenshot which includes the icon and text
 				var markerScanSize = RatConfig.NameScan.MarkerScanSize;
-				var screenshotPosX = position.X - (markerScanSize / 2);
-				var screenshotPosY = position.Y - (markerScanSize / 2);
+				var screenshotPosX = position.X - markerScanSize / 2;
+				var screenshotPosY = position.Y - markerScanSize / 2;
 				var sizeWidth = markerScanSize + RatConfig.NameScan.TextWidth + RatConfig.NameScan.TextHorizontalOffset;
 				var sizeHeight = markerScanSize;
 				var screenshot = GetScreenshot(new Vector2(screenshotPosX, screenshotPosY), new Size(sizeWidth, sizeHeight));
@@ -232,6 +228,7 @@ namespace RatScanner
 
 				ShowToolTip(itemNameScan);
 			}
+
 			return true;
 		}
 

@@ -108,7 +108,6 @@ namespace RatScanner
 
 			// Add up all the quest requirements
 			foreach (var requirement in requiredQuestItems)
-			{
 				// Add the item if its FIR or we want to show non FIR
 				if (requirement.FIR || RatConfig.Tracking.ShowNonFIRNeeds)
 				{
@@ -134,7 +133,6 @@ namespace RatScanner
 						have += progress.QuestObjectives[requirement.QuestObjectiveId.ToString()].Have ?? 0;
 					}
 				}
-			}
 
 			return (need, have, fir);
 		}
@@ -179,10 +177,7 @@ namespace RatScanner
 		public static int GetAvg24hMarketPrice(this Item item)
 		{
 			var total = item.GetMarketItem().Avg24hPrice;
-			if (item is CompoundItem itemC)
-			{
-				total += itemC.Slots.Sum(slot => slot.ContainedItem?.GetAvg24hMarketPrice() ?? 0);
-			}
+			if (item is CompoundItem itemC) total += itemC.Slots.Sum(slot => slot.ContainedItem?.GetAvg24hMarketPrice() ?? 0);
 			return total;
 		}
 
@@ -190,10 +185,7 @@ namespace RatScanner
 		{
 			var traderPrices = item.GetMarketItem().TraderPrices;
 			var total = traderPrices.Length > 0 ? traderPrices.Max(trader => trader.Price) : 0;
-			if (item is CompoundItem itemC)
-			{
-				total += itemC.Slots.Sum(slot => slot.ContainedItem?.GetMaxTraderPrice() ?? 0);
-			}
+			if (item is CompoundItem itemC) total += itemC.Slots.Sum(slot => slot.ContainedItem?.GetMaxTraderPrice() ?? 0);
 			return total;
 		}
 
@@ -202,10 +194,7 @@ namespace RatScanner
 			var traderPrices = item.GetMarketItem().TraderPrices;
 			var total = traderPrices?.FirstOrDefault(price => price.TraderId == traderId)?.Price ?? 0;
 
-			if (item is CompoundItem itemC)
-			{
-				total += itemC.Slots.Sum(slot => slot.ContainedItem?.GetTraderPrice(traderId) ?? 0);
-			}
+			if (item is CompoundItem itemC) total += itemC.Slots.Sum(slot => slot.ContainedItem?.GetTraderPrice(traderId) ?? 0);
 
 			return total;
 		}
@@ -218,6 +207,7 @@ namespace RatScanner
 				var traderPrice = item.GetTraderPrice(traderId);
 				if (traderPrice > result.price) result = (traderId, traderPrice);
 			}
+
 			return result;
 		}
 	}

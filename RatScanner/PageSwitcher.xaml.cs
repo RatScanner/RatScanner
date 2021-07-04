@@ -53,10 +53,7 @@ namespace RatScanner
 
 		internal void Navigate(UserControl nextControl, object state = null)
 		{
-			if (!(nextControl is ISwitchable))
-			{
-				throw new ArgumentException("NextPage is not ISwitchable! " + nextControl.Name);
-			}
+			if (!(nextControl is ISwitchable)) throw new ArgumentException("NextPage is not ISwitchable! " + nextControl.Name);
 
 			if (activeControl != null)
 			{
@@ -141,7 +138,7 @@ namespace RatScanner
 
 		internal void SetBackgroundOpacity(float opacity)
 		{
-			Background.Opacity = Math.Clamp(opacity, (1f / 510f), 1f);
+			Background.Opacity = Math.Clamp(opacity, 1f / 510f, 1f);
 		}
 	}
 }

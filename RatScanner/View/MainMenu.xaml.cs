@@ -30,7 +30,7 @@ namespace RatScanner.View
 			if (RatConfig.Tracking.TarkovTracker.ShowTeam)
 			{
 				var count = RatScannerMain.Instance.TarkovTrackerDB.TeammateCount;
-				PageSwitcher.Instance.Height = PageSwitcher.DefaultHeight + ((float)count * 21.1) + 30;
+				PageSwitcher.Instance.Height = PageSwitcher.DefaultHeight + (float)count * 21.1 + 30;
 			}
 		}
 
@@ -39,7 +39,7 @@ namespace RatScanner.View
 			var psi = new ProcessStartInfo
 			{
 				FileName = e.Uri.ToString(),
-				UseShellExecute = true
+				UseShellExecute = true,
 			};
 			Process.Start(psi);
 			e.Handled = true;
@@ -52,7 +52,7 @@ namespace RatScanner.View
 
 		public void UtilizeState(object state)
 		{
-			throw new System.NotImplementedException();
+			throw new NotImplementedException();
 		}
 
 		private void OnLoaded(object sender, RoutedEventArgs e)

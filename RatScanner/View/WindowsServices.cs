@@ -5,8 +5,8 @@ namespace RatScanner.View
 {
 	public static class WindowsServices
 	{
-		const int WsExTransparent = 0x00000020;
-		const int GwlExStyle = (-20);
+		private const int WsExTransparent = 0x00000020;
+		private const int GwlExStyle = -20;
 
 		[DllImport("user32.dll")]
 		private static extern int GetWindowLong(IntPtr hwnd, int index);

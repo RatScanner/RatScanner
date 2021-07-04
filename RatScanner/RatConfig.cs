@@ -26,15 +26,15 @@ namespace RatScanner
 			R2560x1080 = 7,
 			R3840x1080 = 8,
 			R3440x1440 = 9,
-			R5120x1440 = 10
+			R5120x1440 = 10,
 		}
 
 		internal static Dictionary<Resolution, Vector2> ResolutionDict = new Dictionary<Resolution, Vector2>()
 		{
-			{Resolution.R1366x768, new Vector2(1366,  768)},
-			{Resolution.R1440x900, new Vector2(1440,  900)},
+			{Resolution.R1366x768, new Vector2(1366, 768)},
+			{Resolution.R1440x900, new Vector2(1440, 900)},
 			{Resolution.R1440x1080, new Vector2(1440, 1080)},
-			{Resolution.R1600x900, new Vector2(1600,  900)},
+			{Resolution.R1600x900, new Vector2(1600, 900)},
 			{Resolution.R1920x1080, new Vector2(1920, 1080)},
 			{Resolution.R2560x1440, new Vector2(2560, 1440)},
 			{Resolution.R3840x2160, new Vector2(3840, 2160)},
@@ -138,6 +138,7 @@ namespace RatScanner
 		private static int ConfigVersion => 1;
 
 		private static Resolution screenResolution = Resolution.R1920x1080;
+
 		internal static Resolution ScreenResolution
 		{
 			get => screenResolution;
@@ -174,6 +175,7 @@ namespace RatScanner
 		}
 
 		#region Resolution presets
+
 		private static void LoadWXGA()
 		{
 			NameScan.Marker = Resources.markerWXGA;
@@ -229,6 +231,7 @@ namespace RatScanner
 			IconScan.ItemSlotSize = 126;
 			ToolTip.HeightOffset = 10;
 		}
+
 		#endregion
 
 		internal static float GetScreenScaleFactor()
@@ -251,10 +254,7 @@ namespace RatScanner
 			var config = new SimpleConfig(Paths.ConfigFile, "Other");
 			var readConfigVersion = config.ReadInt(nameof(ConfigVersion), -1);
 			var isSupportedConfigVersion = ConfigVersion == readConfigVersion;
-			if (!isSupportedConfigVersion)
-			{
-				Logger.LogWarning("Config version (" + readConfigVersion + ") is not supported!");
-			}
+			if (!isSupportedConfigVersion) Logger.LogWarning("Config version (" + readConfigVersion + ") is not supported!");
 			return isSupportedConfigVersion;
 		}
 
@@ -371,10 +371,7 @@ namespace RatScanner
 			var boundsRectangle = Screen.PrimaryScreen.Bounds;
 			var resolutionString = $"R{boundsRectangle.Width}x{boundsRectangle.Height}";
 			Enum.TryParse(typeof(Resolution), resolutionString, out var matchingResolution);
-			if (matchingResolution != null)
-			{
-				screenResolution = (Resolution)matchingResolution;
-			}
+			if (matchingResolution != null) screenResolution = (Resolution)matchingResolution;
 		}
 	}
 }

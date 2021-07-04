@@ -39,7 +39,10 @@ namespace RatScanner.ViewModel
 		// ReSharper disable InconsistentNaming
 		public string Avg24hPrice => PriceToString(GetAvg24hPrice());
 
-		private int GetAvg24hPrice() => MatchedItems[0].GetAvg24hMarketPrice();
+		private int GetAvg24hPrice()
+		{
+			return MatchedItems[0].GetAvg24hMarketPrice();
+		}
 		// ReSharper restore InconsistentNaming
 
 		public string PricePerSlot => PriceToString(GetAvg24hPrice() / (MatchedItems[0].Width * MatchedItems[0].Height));
@@ -48,11 +51,17 @@ namespace RatScanner.ViewModel
 
 		public string BestTraderPrice => IntToGroupedString(GetBestTrader().price) + " ₽";
 
-		private (string traderId, int price) GetBestTrader() => MatchedItems[0].GetBestTrader();
+		private (string traderId, int price) GetBestTrader()
+		{
+			return MatchedItems[0].GetBestTrader();
+		}
 
 		public string MaxTraderPrice => IntToGroupedString(GetMaxTraderPrice()) + " ₽";
 
-		private int GetMaxTraderPrice() => MatchedItems[0].GetMaxTraderPrice();
+		private int GetMaxTraderPrice()
+		{
+			return MatchedItems[0].GetMaxTraderPrice();
+		}
 
 		public List<KeyValuePair<string, NeededItem>> TrackingTeamNeeds => MatchedItems[0].GetTrackingTeamNeeds();
 
@@ -96,10 +105,7 @@ namespace RatScanner.ViewModel
 
 		private string PriceToString(int price)
 		{
-			if (MatchedItems.Length == 1)
-			{
-				return IntToGroupedString(price) + " ₽";
-			}
+			if (MatchedItems.Length == 1) return IntToGroupedString(price) + " ₽";
 
 			// TODO make this more informative. Perhaps a value range?
 			return "Uncertain";

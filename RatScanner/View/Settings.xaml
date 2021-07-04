@@ -22,7 +22,8 @@
 						<Grid.ToolTip>
 							<TextBlock>
 								The duration in millisecond, how long<LineBreak />
-								the tool tip should be shown.</TextBlock>
+								the tool tip should be shown.
+							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
 									 Content="ToolTip Duration" />
@@ -40,7 +41,8 @@
 						<Grid.ToolTip>
 							<TextBlock>
 								The resolution of your game. Adjust this to<LineBreak />
-								make sure both Name Scan and Icon Scan will work.</TextBlock>
+								make sure both Name Scan and Icon Scan will work.
+							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
 									 Content="Resolution" />
@@ -85,7 +87,8 @@
 						<Grid.ToolTip>
 							<TextBlock>
 								When minimizing this windows, it will no long<LineBreak />
-								show in the task bar but instead in the icon tray.</TextBlock>
+								show in the task bar but instead in the icon tray.
+							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
 									 Content="Minimize to Tray" />
@@ -104,7 +107,8 @@
 						<Grid.ToolTip>
 							<TextBlock>
 								Makes this windows always stay<LineBreak />
-								on top of other windows.</TextBlock>
+								on top of other windows.
+							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
 									 Content="Always on Top" />
@@ -125,7 +129,8 @@
 								Writes additional information into the log file,<LineBreak />
 								as well as saving screenshots of scanned items,<LineBreak />
 								which can be useful for further investigation.<LineBreak />
-								This will impact performance slightly.</TextBlock>
+								This will impact performance slightly.
+							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
 									 Content="Log Debug Info" />
@@ -149,7 +154,8 @@
 							<TextBlock>
 								A name scan is executed when left clicking on<LineBreak />
 								the magnifier glass in the top left corner of<LineBreak />
-								the inspection window.</TextBlock>
+								the inspection window.
+							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
 									 Content="Enable Name Scan" />
@@ -168,7 +174,8 @@
 						<Grid.ToolTip>
 							<TextBlock>
 								Set the language according to your<LineBreak />
-								Escape from Tarkov language setting.</TextBlock>
+								Escape from Tarkov language setting.
+							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
 									 Content="Name Scan Language" />
@@ -202,7 +209,8 @@
 						<Grid.ToolTip>
 							<TextBlock>
 								A icon scan is executed when holding the modifier key<LineBreak />
-								and left clicking on a icon of a item.</TextBlock>
+								and left clicking on a icon of a item.
+							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
 									 Content="Enable Icon Scan" />
@@ -222,7 +230,8 @@
 							<TextBlock>
 								Also scan for rotated icons.<LineBreak />
 								Scanning for rotated icons will make the<LineBreak />
-								total scan time take twice as long.</TextBlock>
+								total scan time take twice as long.
+							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
 									 Content="Scan Rotated Icons" />
@@ -243,9 +252,12 @@
 								<TextBlock>
 									Scan for items inside your icon cache folder.<LineBreak />
 									This will allow you to scan weapons, armor and<LineBreak />
-									other items a like.</TextBlock>
+									other items a like.
+								</TextBlock>
 								<TextBlock FontWeight="Bold"
-													 TextAlignment="Center">-  Requires restart  -</TextBlock>
+													 TextAlignment="Center">
+									-  Requires restart  -
+								</TextBlock>
 							</StackPanel>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
@@ -267,9 +279,12 @@
 								<TextBlock>
 									Clearing the icon cache will increase scanning speed.<LineBreak />
 									You should only clean the cache when it's larger<LineBreak />
-									than 300 and impacting performance noticeably.</TextBlock>
+									than 300 and impacting performance noticeably.
+								</TextBlock>
 								<TextBlock FontWeight="Bold"
-													 TextAlignment="Center">Recommended to close EfT</TextBlock>
+													 TextAlignment="Center">
+									Recommended to close EfT
+								</TextBlock>
 							</StackPanel>
 						</Grid.ToolTip>
 						<WrapPanel Grid.Column="0">
@@ -314,8 +329,7 @@
 																		 Margin="5,3"
 																		 DoCaptureMouse="True"
 																		 ListeningBackground="SlateGray"
-																		 Hotkey="{Binding IconScanHotkey}">
-						</controls:HotkeySelector>
+																		 Hotkey="{Binding IconScanHotkey}" />
 
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="*" />
@@ -550,7 +564,8 @@
 								A TarkovTracker API Token from your<LineBreak />
 								TarkovTracker settings. Requires<LineBreak />
 								Get Progression or Get Team Progression<LineBreak />
-								permissions</TextBlock>
+								permissions
+							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
 									 Content="API Token" />

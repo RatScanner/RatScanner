@@ -61,18 +61,12 @@ namespace RatScanner
 
 		internal static void LogDebugMat(OpenCvSharp.Mat mat, string fileName = "mat")
 		{
-			if (RatConfig.LogDebug)
-			{
-				mat.SaveImage(GetUniquePath(RatConfig.Paths.Debug, fileName, ".png"));
-			}
+			if (RatConfig.LogDebug) mat.SaveImage(GetUniquePath(RatConfig.Paths.Debug, fileName, ".png"));
 		}
 
 		internal static void LogDebugBitmap(Bitmap bitmap, string fileName = "bitmap")
 		{
-			if (RatConfig.LogDebug)
-			{
-				bitmap.Save(GetUniquePath(RatConfig.Paths.Debug, fileName, ".png"));
-			}
+			if (RatConfig.LogDebug) bitmap.Save(GetUniquePath(RatConfig.Paths.Debug, fileName, ".png"));
 		}
 
 		internal static void LogDebug(string message = "", [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = "")
@@ -115,7 +109,7 @@ namespace RatScanner
 		{
 			var text = "[" + DateTime.UtcNow.ToUniversalTime().TimeOfDay + "] > " + content + "\n";
 			Backlog.Enqueue(text);
-			Task.Run((() => ProcessBacklog()));
+			Task.Run(() => ProcessBacklog());
 		}
 
 		private static void AppendToLogRaw(string text)
@@ -128,10 +122,7 @@ namespace RatScanner
 		{
 			lock (SyncObject)
 			{
-				for (var i = 0; i < Backlog.Count; i++)
-				{
-					AppendToLogRaw(Backlog.Dequeue());
-				}
+				for (var i = 0; i < Backlog.Count; i++) AppendToLogRaw(Backlog.Dequeue());
 			}
 		}
 
@@ -143,10 +134,7 @@ namespace RatScanner
 		internal static void ClearMats(string pattern = "*.png")
 		{
 			var files = Directory.GetFiles(RatConfig.Paths.Data, pattern);
-			foreach (var file in files)
-			{
-				File.Delete(file);
-			}
+			foreach (var file in files) File.Delete(file);
 		}
 
 		internal static void ClearDebugMats()
@@ -155,16 +143,14 @@ namespace RatScanner
 
 			var files = Directory.GetFiles(RatConfig.Paths.Debug, "*.png");
 			foreach (var file in files)
-			{
 				try
 				{
 					File.Delete(file);
 				}
 				catch (Exception)
 				{
-					Logger.LogDebug("Exception while deleting debug mats.");
+					LogDebug("Exception while deleting debug mats.");
 				}
-			}
 		}
 
 		private static void OpenFAQ(string message)
@@ -179,10 +165,7 @@ namespace RatScanner
 		private static void CreateGitHubIssue(string message, Exception e)
 		{
 			var body = "**Error**\n" + message + "\n";
-			if (e != null)
-			{
-				body += "```\n" + LimitLength(e.ToString(), 1000) + "\n```\n";
-			}
+			if (e != null) body += "```\n" + LimitLength(e.ToString(), 1000) + "\n```\n";
 
 			body += "<details>\n<summary>Log</summary>\n\n```\n";
 			body += LimitLength(ReadAll(), 3000);
@@ -211,7 +194,7 @@ namespace RatScanner
 			var psi = new ProcessStartInfo
 			{
 				FileName = url,
-				UseShellExecute = true
+				UseShellExecute = true,
 			};
 			Process.Start(psi);
 		}

@@ -205,16 +205,14 @@
 				<StackPanel Grid.Column="1"
 										Orientation="Horizontal"
 										HorizontalAlignment="Right">
-					<Label Grid.Column="1"
-								 Content="{Binding TrackingNeeds.QuestRemaining, FallbackValue=0}" />
+					<Label Content="{Binding TrackingNeeds.QuestRemaining, FallbackValue=0}" />
 					<Image Source="{StaticResource questIcon}"
 								 Height="20" />
 				</StackPanel>
 				<StackPanel Grid.Column="2"
 										Orientation="Horizontal"
 										HorizontalAlignment="Right">
-					<Label Grid.Column="2"
-								 Content="{Binding TrackingNeeds.HideoutRemaining, FallbackValue=0}" />
+					<Label Content="{Binding TrackingNeeds.HideoutRemaining, FallbackValue=0}" />
 					<Image Source="{StaticResource hideoutIcon}"
 								 Height="20" />
 				</StackPanel>

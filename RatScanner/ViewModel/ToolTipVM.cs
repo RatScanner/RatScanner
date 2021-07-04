@@ -30,7 +30,10 @@ namespace RatScanner.ViewModel
 		// ReSharper disable InconsistentNaming
 		public string Avg24hPrice => PriceToString(GetAvg24hPrice());
 
-		private int GetAvg24hPrice() => MatchedItems[0].GetAvg24hMarketPrice();
+		private int GetAvg24hPrice()
+		{
+			return MatchedItems[0].GetAvg24hMarketPrice();
+		}
 		// ReSharper restore InconsistentNaming
 
 		public string IconPath => IconManager.GetIconPath(DataSource.MatchedItems[0]);
@@ -68,10 +71,7 @@ namespace RatScanner.ViewModel
 
 		private string PriceToString(int price)
 		{
-			if (MatchedItems.Length == 1)
-			{
-				return IntToGroupedString(price) + " ₽";
-			}
+			if (MatchedItems.Length == 1) return IntToGroupedString(price) + " ₽";
 
 			// TODO make this more informative. Perhaps a value range?
 			return "Uncertain";
@@ -92,10 +92,10 @@ namespace RatScanner.ViewModel
 		/// <returns>How many physical pixels are used for a virtual pixel</returns>
 		private static float GetScalingFactor()
 		{
-			var physicalHeight = Screen.PrimaryScreen.Bounds.Height;    // Virtual Height
-			var virtualHeight = SystemParameters.PrimaryScreenHeight;   // Physical Height
+			var physicalHeight = Screen.PrimaryScreen.Bounds.Height; // Virtual Height
+			var virtualHeight = SystemParameters.PrimaryScreenHeight; // Physical Height
 			var scaleFactor = physicalHeight / virtualHeight;
-			return (float)scaleFactor;
+			return (float) scaleFactor;
 		}
 	}
 }
