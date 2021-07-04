@@ -80,35 +80,20 @@ namespace RatScanner
 			}
 		}
 
-		public int TeammateCount
-		{
-			get
-			{
-				// Are we set to utilize teams?
-				if (RatConfig.Tracking.TarkovTracker.ShowTeam) return Math.Max(Progress.Count - 1, 0);
+		public int TeammateCount => Progress.Count(x => x.Self == false);
 
-				// We are only supposed to show solo, so just count 1 if we have any progress
-				return Progress.Count > 0 ? 1 : 0;
-			}
-		}
+		public bool TeamProgressAvailable => _token.Permissions.Contains("TP");
 
-		public bool TeamProgressAvailable()
-		{
-			return _token.Permissions.Contains("TP");
-		}
-
-		public bool SoloProgressAvailable()
-		{
-			return _token.Permissions.Contains("GP");
-		}
+		public bool SoloProgressAvailable => _token.Permissions.Contains("GP");
 
 		private void UpdateProgression()
 		{
 			// We have access to team progression
-			if (TeamProgressAvailable())
+			if (TeamProgressAvailable)
 				try
 				{
-					Progress = JsonConvert.DeserializeObject<List<Progress>>(ApiManager.GetTarkovTrackerTeam());
+					var rawProgress = JsonConvert.DeserializeObject<List<Progress>>(ApiManager.GetTarkovTrackerTeam());
+					Progress = rawProgress?.Where(x => x.Hide == false).ToList();
 				}
 				catch (RateLimitExceededException e)
 				{
@@ -121,7 +106,7 @@ namespace RatScanner
 					Logger.LogWarning(e.Message);
 				}
 			// We have permission to get individual progress
-			else if (SoloProgressAvailable())
+			else if (SoloProgressAvailable)
 				try
 				{
 					var soloProgress = JsonConvert.DeserializeObject<Progress>(ApiManager.GetTarkovTrackerSolo());

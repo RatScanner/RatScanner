@@ -19,6 +19,10 @@ namespace RatScanner.FetchModels.TarkovTracker
 		[JsonProperty("shareName")]
 		public string? DisplayName { get; set; }
 
+		// Whether this team member is hidden
+		[JsonProperty("hide")]
+		public bool? Hide { get; set; }
+
 		// TarkovTracker Quest Completion Data
 		[JsonProperty("quests")]
 		public Dictionary<string, QuestCompletion> Quests { get; set; }
