@@ -25,7 +25,6 @@ namespace RatScanner
 
 		private bool ValidToken()
 		{
-			Logger.LogDebug();
 			if (RatConfig.Tracking.TarkovTracker.Token.Length > 0)
 			{
 				// We have a Token in our config, check it
@@ -34,14 +33,12 @@ namespace RatScanner
 					if (_token.Id != RatConfig.Tracking.TarkovTracker.Token)
 					{
 						// Token in config versus last attempted token are different
-						Logger.LogDebug();
 						UpdateToken();
 					}
 				}
 				else
 				{
 					// We have a token config, but haven't tried validating the token
-					Logger.LogDebug();
 					UpdateToken();
 				}
 
@@ -56,9 +53,7 @@ namespace RatScanner
 			// Attempt to verify the token
 			try
 			{
-				Logger.LogDebug();
 				var response = ApiManager.GetTarkovTrackerToken();
-				Logger.LogDebug();
 				if (response != null)
 				{
 					// We have a valid token
