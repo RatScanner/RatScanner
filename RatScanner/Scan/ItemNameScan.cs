@@ -13,7 +13,6 @@ namespace RatScanner.Scan
 {
 	internal class ItemNameScan : ItemScan
 	{
-
 		internal Vector2 MarkerPos;
 
 		internal Vector2 MousePos;
@@ -38,12 +37,13 @@ namespace RatScanner.Scan
 				Logger.LogError("Could not find traineddata at: " + traineddataPath);
 				return;
 			}
+
 			ocrTesseractInstance = OCRTesseract.Create(traineddataDir, "bender", null, 3, 7);
 		}
 
 		internal ItemNameScan()
 		{
-			MatchedItems = new[] { RatScannerMain.Instance.ItemDB.GetItem("57347baf24597738002c6178") };
+			MatchedItems = new[] {RatScannerMain.Instance.ItemDB.GetItem("57347baf24597738002c6178")};
 		}
 
 		internal ItemNameScan(Bitmap capture, Vector2 mouseVector2)
@@ -104,17 +104,20 @@ namespace RatScanner.Scan
 			ScannedText = RemoveSpecialCharacters(ScannedText);
 
 			// Get market item from detected text
-			MatchedItems = new[] { RatScannerMain.Instance.ItemDB.GetItem(item =>
+			MatchedItems = new[]
 			{
-				if(IsShortName) return -LevenshteinDistance(RemoveSpecialCharacters(item.ShortName), ScannedText);
-				return -LevenshteinDistance(RemoveSpecialCharacters(item.Name), ScannedText);
-			}) };
+				RatScannerMain.Instance.ItemDB.GetItem(item =>
+				{
+					if (IsShortName) return -LevenshteinDistance(RemoveSpecialCharacters(item.ShortName), ScannedText);
+					return -LevenshteinDistance(RemoveSpecialCharacters(item.Name), ScannedText);
+				}),
+			};
 
 			// Calculate confidence
 			var match = IsShortName ? MatchedItems[0].ShortName : MatchedItems[0].Name;
 			var matchClean = RemoveSpecialCharacters(match);
 			var dist = LevenshteinDistance(matchClean, ScannedText);
-			Confidence = 1 - dist / (float)matchClean.Length;
+			Confidence = 1 - dist / (float) matchClean.Length;
 			Logger.LogDebug($"Scanned: {ScannedText} | Matched: {matchClean} | Confidence: {Confidence}");
 
 			if (Confidence < RCNameScan.ConfWarnThreshold)
@@ -146,7 +149,7 @@ namespace RatScanner.Scan
 				if (maxVal >= RCNameScan.MarkerThreshold) return new Vector2(maxLoc.X, maxLoc.Y);
 			}
 
-			return null;    // No match found
+			return null; // No match found
 		}
 
 		// Convert image to text
@@ -169,6 +172,7 @@ namespace RatScanner.Scan
 				var srcRect = new Rectangle(0, 0, image.Width, image.Height);
 				gr.DrawImage(image, destRect, srcRect, GraphicsUnit.Pixel);
 			}
+
 			Logger.LogDebugBitmap(resizedImage, "resizedTextSection");
 
 			// Setup tesseract
@@ -205,9 +209,9 @@ namespace RatScanner.Scan
 		{
 			var sb = new StringBuilder();
 			foreach (var c in str.Where(c =>
-				(c >= '0' && c <= '9') ||
-				(c >= 'A' && c <= 'Z') ||
-				(c >= 'a' && c <= 'z'))) sb.Append(c);
+				c >= '0' && c <= '9' ||
+				c >= 'A' && c <= 'Z' ||
+				c >= 'a' && c <= 'z')) sb.Append(c);
 
 			return sb.ToString();
 		}

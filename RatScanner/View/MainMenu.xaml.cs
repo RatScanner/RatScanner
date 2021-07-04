@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,12 +17,28 @@ namespace RatScanner.View
 			InitializeComponent();
 		}
 
+		private void UpdateElements()
+		{
+			const Visibility v = Visibility.Visible;
+			const Visibility c = Visibility.Collapsed;
+
+			var showTeam = RatConfig.Tracking.TarkovTracker.Enable;
+			showTeam = showTeam && RatConfig.Tracking.TarkovTracker.ShowTeam;
+			TeammateQHTrackingDisplay.Visibility = showTeam ? v : c;
+
+			if (showTeam)
+			{
+				var count = RatScannerMain.Instance.TarkovTrackerDB.TeammateCount;
+				PageSwitcher.Instance.Height = PageSwitcher.DefaultHeight + ((float)count * 21.1) + 30;
+			}
+		}
+
 		private void HyperlinkRequestNavigate(object sender, RequestNavigateEventArgs e)
 		{
 			var psi = new ProcessStartInfo
 			{
 				FileName = e.Uri.ToString(),
-				UseShellExecute = true
+				UseShellExecute = true,
 			};
 			Process.Start(psi);
 			e.Handled = true;
@@ -34,12 +51,13 @@ namespace RatScanner.View
 
 		public void UtilizeState(object state)
 		{
-			throw new System.NotImplementedException();
+			throw new NotImplementedException();
 		}
 
-		private void OnLoaded(object sender, RoutedEventArgs e)
+		public void OnOpen()
 		{
 			DataContext = new MainWindowVM(RatScannerMain.Instance);
+			UpdateElements();
 		}
 
 		public void OnClose() { }

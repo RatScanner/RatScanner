@@ -39,10 +39,7 @@ namespace RatScanner.Controls
 
 			var keyboardKeysEmpty = KeyboardKeys.Count == 0;
 			var mouseButtonsEmpty = MouseButtons.Count == 0;
-			if (!mouseButtonsEmpty && !keyboardKeysEmpty)
-			{
-				return keyboardString + '+' + mouseString;
-			}
+			if (!mouseButtonsEmpty && !keyboardKeysEmpty) return keyboardString + '+' + mouseString;
 			return keyboardString + mouseString;
 		}
 	}
@@ -80,7 +77,7 @@ namespace RatScanner.Controls
 		/// </summary>
 		public bool DoCaptureMouse
 		{
-			get => (bool)GetValue(DoCaptureMouseProperty);
+			get => (bool) GetValue(DoCaptureMouseProperty);
 			set => SetValue(DoCaptureMouseProperty, value);
 		}
 
@@ -89,7 +86,7 @@ namespace RatScanner.Controls
 		/// </summary>
 		public Brush ListeningBackground
 		{
-			get => (Brush)GetValue(ListeningBackgroundProperty);
+			get => (Brush) GetValue(ListeningBackgroundProperty);
 			set => SetValue(ListeningBackgroundProperty, value);
 		}
 
@@ -98,7 +95,7 @@ namespace RatScanner.Controls
 		/// </summary>
 		public Hotkey Hotkey
 		{
-			get => (Hotkey)GetValue(HotkeyProperty);
+			get => (Hotkey) GetValue(HotkeyProperty);
 			set
 			{
 				SetValue(HotkeyProperty, value);

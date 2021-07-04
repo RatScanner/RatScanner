@@ -28,6 +28,8 @@ namespace RatScanner.View
 			PricePerSlotDisplay.Visibility = RCMinUi.ShowPricePerSlot ? v : c;
 			TraderPriceDisplay.Visibility = RCMinUi.ShowTraderPrice ? v : c;
 			TraderMaxPriceDisplay.Visibility = RCMinUi.ShowTraderMaxPrice ? v : c;
+			TrackingDisplay.Visibility = RCMinUi.ShowQuestHideoutTracker ? v : c;
+			TeamTrackingDisplay.Visibility = RCMinUi.ShowQuestHideoutTeamTracker ? v : c;
 			UpdatedDisplay.Visibility = RCMinUi.ShowUpdated ? v : c;
 		}
 
@@ -38,16 +40,18 @@ namespace RatScanner.View
 
 		private void OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
-			PageSwitcher.Instance.Navigate(new MainMenu());
-			PageSwitcher.Instance.ShowTitleBar();
 			PageSwitcher.Instance.ResetWindowSize();
 			PageSwitcher.Instance.SetBackgroundOpacity(1);
+			PageSwitcher.Instance.ShowTitleBar();
+			PageSwitcher.Instance.Navigate(new MainMenu());
 		}
 
 		public void UtilizeState(object state)
 		{
 			throw new System.NotImplementedException();
 		}
+
+		public void OnOpen() { }
 
 		public void OnClose() { }
 	}

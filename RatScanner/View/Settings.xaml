@@ -5,7 +5,9 @@
 						 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 						 xmlns:ratScanner="clr-namespace:RatScanner"
 						 xmlns:controls="clr-namespace:RatScanner.Controls"
-						 d:DesignHeight="390"
+						 xmlns:viewmodel="clr-namespace:RatScanner.ViewModel"
+						 d:DataContext="{d:DesignInstance Type=viewmodel:SettingsVM}"
+						 d:DesignHeight="370"
 						 d:DesignWidth="280"
 						 x:ClassModifier="internal"
 						 Background="#444444"
@@ -15,12 +17,13 @@
 		<TabControl Grid.Row="0"
 								Margin="0,5">
 			<TabItem Header="General">
-				<StackPanel>
+				<StackPanel Margin="0, 5">
 					<Grid>
 						<Grid.ToolTip>
 							<TextBlock>
 								The duration in millisecond, how long<LineBreak />
-								the tool tip should be shown.</TextBlock>
+								the tool tip should be shown.
+							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
 									 Content="ToolTip Duration" />
@@ -38,7 +41,8 @@
 						<Grid.ToolTip>
 							<TextBlock>
 								The resolution of your game. Adjust this to<LineBreak />
-								make sure both Name Scan and Icon Scan will work.</TextBlock>
+								make sure both Name Scan and Icon Scan will work.
+							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
 									 Content="Resolution" />
@@ -83,7 +87,8 @@
 						<Grid.ToolTip>
 							<TextBlock>
 								When minimizing this windows, it will no long<LineBreak />
-								show in the task bar but instead in the icon tray.</TextBlock>
+								show in the task bar but instead in the icon tray.
+							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
 									 Content="Minimize to Tray" />
@@ -102,7 +107,8 @@
 						<Grid.ToolTip>
 							<TextBlock>
 								Makes this windows always stay<LineBreak />
-								on top of other windows.</TextBlock>
+								on top of other windows.
+							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
 									 Content="Always on Top" />
@@ -123,7 +129,8 @@
 								Writes additional information into the log file,<LineBreak />
 								as well as saving screenshots of scanned items,<LineBreak />
 								which can be useful for further investigation.<LineBreak />
-								This will impact performance slightly.</TextBlock>
+								This will impact performance slightly.
+							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
 									 Content="Log Debug Info" />
@@ -141,13 +148,14 @@
 			</TabItem>
 
 			<TabItem Header="Scanning">
-				<StackPanel>
+				<StackPanel Margin="0, 5">
 					<Grid>
 						<Grid.ToolTip>
 							<TextBlock>
 								A name scan is executed when left clicking on<LineBreak />
 								the magnifier glass in the top left corner of<LineBreak />
-								the inspection window.</TextBlock>
+								the inspection window.
+							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
 									 Content="Enable Name Scan" />
@@ -166,7 +174,8 @@
 						<Grid.ToolTip>
 							<TextBlock>
 								Set the language according to your<LineBreak />
-								Escape from Tarkov language setting.</TextBlock>
+								Escape from Tarkov language setting.
+							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
 									 Content="Name Scan Language" />
@@ -200,7 +209,8 @@
 						<Grid.ToolTip>
 							<TextBlock>
 								A icon scan is executed when holding the modifier key<LineBreak />
-								and left clicking on a icon of a item.</TextBlock>
+								and left clicking on a icon of a item.
+							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
 									 Content="Enable Icon Scan" />
@@ -220,7 +230,8 @@
 							<TextBlock>
 								Also scan for rotated icons.<LineBreak />
 								Scanning for rotated icons will make the<LineBreak />
-								total scan time take twice as long.</TextBlock>
+								total scan time take twice as long.
+							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
 									 Content="Scan Rotated Icons" />
@@ -241,9 +252,12 @@
 								<TextBlock>
 									Scan for items inside your icon cache folder.<LineBreak />
 									This will allow you to scan weapons, armor and<LineBreak />
-									other items a like.</TextBlock>
+									other items a like.
+								</TextBlock>
 								<TextBlock FontWeight="Bold"
-													 TextAlignment="Center">-  Requires restart  -</TextBlock>
+													 TextAlignment="Center">
+									-  Requires restart  -
+								</TextBlock>
 							</StackPanel>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
@@ -265,9 +279,12 @@
 								<TextBlock>
 									Clearing the icon cache will increase scanning speed.<LineBreak />
 									You should only clean the cache when it's larger<LineBreak />
-									than 300 and impacting performance noticeably.</TextBlock>
+									than 300 and impacting performance noticeably.
+								</TextBlock>
 								<TextBlock FontWeight="Bold"
-													 TextAlignment="Center">Recommended to close EfT</TextBlock>
+													 TextAlignment="Center">
+									Recommended to close EfT
+								</TextBlock>
 							</StackPanel>
 						</Grid.ToolTip>
 						<WrapPanel Grid.Column="0">
@@ -312,8 +329,7 @@
 																		 Margin="5,3"
 																		 DoCaptureMouse="True"
 																		 ListeningBackground="SlateGray"
-																		 Hotkey="{Binding IconScanHotkey}">
-						</controls:HotkeySelector>
+																		 Hotkey="{Binding IconScanHotkey}" />
 
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="*" />
@@ -324,7 +340,7 @@
 			</TabItem>
 
 			<TabItem Header="Minimal UI">
-				<StackPanel>
+				<StackPanel Margin="0, 5">
 					<Grid>
 						<Grid.ToolTip>
 							<TextBlock>
@@ -332,7 +348,7 @@
 							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
-									 Content="Show Name" />
+									 Content="Name" />
 						<CheckBox Grid.Column="1"
 											Margin="5,0"
 											VerticalAlignment="Center"
@@ -350,7 +366,7 @@
 							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
-									 Content="Show Average Day Price" />
+									 Content="Average Day Price" />
 						<CheckBox Grid.Column="1"
 											Margin="5,0"
 											VerticalAlignment="Center"
@@ -368,7 +384,7 @@
 							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
-									 Content="Show Price per Slot" />
+									 Content="Price per Slot" />
 						<CheckBox Grid.Column="1"
 											Margin="5,0"
 											VerticalAlignment="Center"
@@ -386,7 +402,7 @@
 							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
-									 Content="Show Trader Price" />
+									 Content="Trader Price" />
 						<CheckBox Grid.Column="1"
 											Margin="5,0"
 											VerticalAlignment="Center"
@@ -404,7 +420,7 @@
 							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
-									 Content="Show Max Trader Price" />
+									 Content="Max Trader Price" />
 						<CheckBox Grid.Column="1"
 											Margin="5,0"
 											VerticalAlignment="Center"
@@ -418,11 +434,48 @@
 					<Grid>
 						<Grid.ToolTip>
 							<TextBlock>
+								Show the amount of the item needed for quests and the hideout
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0"
+									 Content="Needed Quest &amp; Hideout" />
+						<CheckBox Grid.Column="1"
+											Margin="5,0"
+											VerticalAlignment="Center"
+											IsChecked="{Binding ShowQuestHideoutTracker}" />
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								Show the amount of the item needed for quests and the hideout by team members<LineBreak />
+								This requires a TarkovTracker api token
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0"
+									 Content="Needed Quest &amp; Hideout of Team" />
+						<CheckBox Grid.Column="1"
+											Margin="5,0"
+											VerticalAlignment="Center"
+											IsChecked="{Binding ShowQuestHideoutTeamTracker}" />
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
 								Show when the data was last updated
 							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
-									 Content="Show Updated" />
+									 Content="Updated" />
 						<CheckBox Grid.Column="1"
 											Margin="5,0"
 											VerticalAlignment="Center"
@@ -467,7 +520,7 @@
 			</TabItem>
 
 			<TabItem Header="Info">
-				<StackPanel>
+				<StackPanel Margin="0, 5">
 					<Grid>
 						<Label Grid.Column="0"
 									 Content="Rat Scanner" />
@@ -496,20 +549,12 @@
 					<TextBlock Margin="5,0,5,5">Amazing API for flea market price data</TextBlock>
 
 					<Label>
-						<Hyperlink NavigateUri="https://github.com/shimat/opencvsharp"
+						<Hyperlink NavigateUri="https://tarkovtracker.io/"
 											 RequestNavigate="HyperlinkRequestNavigate">
-							<Underline>OpenCvSharp</Underline>
+							<Underline>Tarkov Tracker</Underline>
 						</Hyperlink>
 					</Label>
-					<TextBlock Margin="5,0,5,5">.Net wrapper for OpenCV</TextBlock>
-
-					<Label>
-						<Hyperlink NavigateUri="https://www.newtonsoft.com/json"
-											 RequestNavigate="HyperlinkRequestNavigate">
-							<Underline>Json.NET</Underline>
-						</Hyperlink>
-					</Label>
-					<TextBlock Margin="5,0,5,5">High-performance JSON framework for .NET</TextBlock>
+					<TextBlock Margin="5,0,5,5">Progress tracker for quests, hideout, and Kappa</TextBlock>
 
 					<Separator />
 
@@ -517,6 +562,70 @@
 										 TextWrapping="WrapWithOverflow">
 						Huge thanks to all Patrons who help me to make this project possible and keep it alive.
 					</TextBlock>
+				</StackPanel>
+			</TabItem>
+			<TabItem Header="Tracking">
+				<StackPanel Margin="0, 5">
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								Show items that aren't found-in-raid required for Quests
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0"
+									 Content="Non-FIR Needs" />
+						<CheckBox Grid.Column="1"
+											VerticalAlignment="Center"
+											Margin="5,0"
+											IsChecked="{Binding ShowNonFIRNeeds}" />
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+					<Separator />
+					<Label HorizontalAlignment="Center"
+								 Content="TarkovTracker" />
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								A TarkovTracker API Token from your<LineBreak />
+								TarkovTracker settings. Requires<LineBreak />
+								Get Progression or Get Team Progression<LineBreak />
+								permissions
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0"
+									 Content="API Token" />
+						<TextBox Grid.Column="1"
+										 Width="128"
+										 Text="{Binding TarkovTrackerToken}" />
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								Show items needed by teammates in the main menu
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0"
+									 Content="Show Team"
+									 Margin="0,0" />
+						<CheckBox Grid.Column="1"
+											Margin="5,0"
+											VerticalAlignment="Center"
+											IsChecked="{Binding ShowTarkovTrackerTeam}" />
+
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
 				</StackPanel>
 			</TabItem>
 		</TabControl>
