@@ -48,10 +48,7 @@ namespace RatScanner
 					if (baseItem is CompoundItem baseItemC)
 					{
 						baseItemC.Slots.Clear();
-						foreach (var mod in mods)
-						{
-							baseItemC.Slots.Add(new Slot() { ContainedItem = mod });
-						}
+						foreach (var mod in mods) baseItemC.Slots.Add(new Slot() {ContainedItem = mod});
 					}
 				}
 
@@ -105,11 +102,8 @@ namespace RatScanner
 
 			if (icon.Meta != Meta) return false;
 			if (icon.Id != Id) return false;
-			if ((icon.HasMods) != (HasMods)) return false;
-			if (icon.Mods != null && Mods != null)
-			{
-				return icon.Mods.SequenceEqual(Mods);
-			}
+			if (icon.HasMods != HasMods) return false;
+			if (icon.Mods != null && Mods != null) return icon.Mods.SequenceEqual(Mods);
 			return true;
 		}
 	}

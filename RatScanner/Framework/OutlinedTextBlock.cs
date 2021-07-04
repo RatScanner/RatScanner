@@ -12,7 +12,7 @@ namespace RatScanner.Framework
 	{
 		Center,
 		Outside,
-		Inside
+		Inside,
 	}
 
 	[ContentProperty("Text")]
@@ -25,21 +25,18 @@ namespace RatScanner.Framework
 				DashCap = PenLineCap.Round,
 				EndLineCap = PenLineCap.Round,
 				LineJoin = PenLineJoin.Round,
-				StartLineCap = PenLineCap.Round
+				StartLineCap = PenLineCap.Round,
 			};
 
-			if (StrokePosition == StrokePosition.Outside || StrokePosition == StrokePosition.Inside)
-			{
-				_pen.Thickness = StrokeThickness * 2;
-			}
+			if (StrokePosition == StrokePosition.Outside || StrokePosition == StrokePosition.Inside) _pen.Thickness = StrokeThickness * 2;
 
 			InvalidateVisual();
 		}
 
 		public StrokePosition StrokePosition
 		{
-			get { return (StrokePosition)GetValue(StrokePositionProperty); }
-			set { SetValue(StrokePositionProperty, value); }
+			get => (StrokePosition) GetValue(StrokePositionProperty);
+			set => SetValue(StrokePositionProperty, value);
 		}
 
 		public static readonly DependencyProperty StrokePositionProperty =
@@ -49,72 +46,72 @@ namespace RatScanner.Framework
 				new FrameworkPropertyMetadata(StrokePosition.Outside, FrameworkPropertyMetadataOptions.AffectsRender));
 
 		public static readonly DependencyProperty FillProperty = DependencyProperty.Register(
-		  "Fill",
-		  typeof(Brush),
-		  typeof(OutlinedTextBlock),
-		  new FrameworkPropertyMetadata(Brushes.Black, FrameworkPropertyMetadataOptions.AffectsRender));
+			"Fill",
+			typeof(Brush),
+			typeof(OutlinedTextBlock),
+			new FrameworkPropertyMetadata(Brushes.Black, FrameworkPropertyMetadataOptions.AffectsRender));
 
 		public static readonly DependencyProperty StrokeProperty = DependencyProperty.Register(
-		  "Stroke",
-		  typeof(Brush),
-		  typeof(OutlinedTextBlock),
-		  new FrameworkPropertyMetadata(Brushes.Black, FrameworkPropertyMetadataOptions.AffectsRender));
+			"Stroke",
+			typeof(Brush),
+			typeof(OutlinedTextBlock),
+			new FrameworkPropertyMetadata(Brushes.Black, FrameworkPropertyMetadataOptions.AffectsRender));
 
 		public static readonly DependencyProperty StrokeThicknessProperty = DependencyProperty.Register(
-		  "StrokeThickness",
-		  typeof(double),
-		  typeof(OutlinedTextBlock),
-		  new FrameworkPropertyMetadata(1d, FrameworkPropertyMetadataOptions.AffectsRender));
+			"StrokeThickness",
+			typeof(double),
+			typeof(OutlinedTextBlock),
+			new FrameworkPropertyMetadata(1d, FrameworkPropertyMetadataOptions.AffectsRender));
 
 		public static readonly DependencyProperty FontFamilyProperty = TextElement.FontFamilyProperty.AddOwner(
-		  typeof(OutlinedTextBlock),
-		  new FrameworkPropertyMetadata(OnFormattedTextUpdated));
+			typeof(OutlinedTextBlock),
+			new FrameworkPropertyMetadata(OnFormattedTextUpdated));
 
 		public static readonly DependencyProperty FontSizeProperty = TextElement.FontSizeProperty.AddOwner(
-		  typeof(OutlinedTextBlock),
-		  new FrameworkPropertyMetadata(OnFormattedTextUpdated));
+			typeof(OutlinedTextBlock),
+			new FrameworkPropertyMetadata(OnFormattedTextUpdated));
 
 		public static readonly DependencyProperty FontStretchProperty = TextElement.FontStretchProperty.AddOwner(
-		  typeof(OutlinedTextBlock),
-		  new FrameworkPropertyMetadata(OnFormattedTextUpdated));
+			typeof(OutlinedTextBlock),
+			new FrameworkPropertyMetadata(OnFormattedTextUpdated));
 
 		public static readonly DependencyProperty FontStyleProperty = TextElement.FontStyleProperty.AddOwner(
-		  typeof(OutlinedTextBlock),
-		  new FrameworkPropertyMetadata(OnFormattedTextUpdated));
+			typeof(OutlinedTextBlock),
+			new FrameworkPropertyMetadata(OnFormattedTextUpdated));
 
 		public static readonly DependencyProperty FontWeightProperty = TextElement.FontWeightProperty.AddOwner(
-		  typeof(OutlinedTextBlock),
-		  new FrameworkPropertyMetadata(OnFormattedTextUpdated));
+			typeof(OutlinedTextBlock),
+			new FrameworkPropertyMetadata(OnFormattedTextUpdated));
 
 		public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
-		  "Text",
-		  typeof(string),
-		  typeof(OutlinedTextBlock),
-		  new FrameworkPropertyMetadata(OnFormattedTextInvalidated));
+			"Text",
+			typeof(string),
+			typeof(OutlinedTextBlock),
+			new FrameworkPropertyMetadata(OnFormattedTextInvalidated));
 
 		public static readonly DependencyProperty TextAlignmentProperty = DependencyProperty.Register(
-		  "TextAlignment",
-		  typeof(TextAlignment),
-		  typeof(OutlinedTextBlock),
-		  new FrameworkPropertyMetadata(OnFormattedTextUpdated));
+			"TextAlignment",
+			typeof(TextAlignment),
+			typeof(OutlinedTextBlock),
+			new FrameworkPropertyMetadata(OnFormattedTextUpdated));
 
 		public static readonly DependencyProperty TextDecorationsProperty = DependencyProperty.Register(
-		  "TextDecorations",
-		  typeof(TextDecorationCollection),
-		  typeof(OutlinedTextBlock),
-		  new FrameworkPropertyMetadata(OnFormattedTextUpdated));
+			"TextDecorations",
+			typeof(TextDecorationCollection),
+			typeof(OutlinedTextBlock),
+			new FrameworkPropertyMetadata(OnFormattedTextUpdated));
 
 		public static readonly DependencyProperty TextTrimmingProperty = DependencyProperty.Register(
-		  "TextTrimming",
-		  typeof(TextTrimming),
-		  typeof(OutlinedTextBlock),
-		  new FrameworkPropertyMetadata(OnFormattedTextUpdated));
+			"TextTrimming",
+			typeof(TextTrimming),
+			typeof(OutlinedTextBlock),
+			new FrameworkPropertyMetadata(OnFormattedTextUpdated));
 
 		public static readonly DependencyProperty TextWrappingProperty = DependencyProperty.Register(
-		  "TextWrapping",
-		  typeof(TextWrapping),
-		  typeof(OutlinedTextBlock),
-		  new FrameworkPropertyMetadata(TextWrapping.NoWrap, OnFormattedTextUpdated));
+			"TextWrapping",
+			typeof(TextWrapping),
+			typeof(OutlinedTextBlock),
+			new FrameworkPropertyMetadata(TextWrapping.NoWrap, OnFormattedTextUpdated));
 
 		private FormattedText _formattedText;
 		private Geometry _textGeometry;
@@ -123,81 +120,81 @@ namespace RatScanner.Framework
 
 		public Brush Fill
 		{
-			get { return (Brush)GetValue(FillProperty); }
-			set { SetValue(FillProperty, value); }
+			get => (Brush) GetValue(FillProperty);
+			set => SetValue(FillProperty, value);
 		}
 
 		public FontFamily FontFamily
 		{
-			get { return (FontFamily)GetValue(FontFamilyProperty); }
-			set { SetValue(FontFamilyProperty, value); }
+			get => (FontFamily) GetValue(FontFamilyProperty);
+			set => SetValue(FontFamilyProperty, value);
 		}
 
 		[TypeConverter(typeof(FontSizeConverter))]
 		public double FontSize
 		{
-			get { return (double)GetValue(FontSizeProperty); }
-			set { SetValue(FontSizeProperty, value); }
+			get => (double) GetValue(FontSizeProperty);
+			set => SetValue(FontSizeProperty, value);
 		}
 
 		public FontStretch FontStretch
 		{
-			get { return (FontStretch)GetValue(FontStretchProperty); }
-			set { SetValue(FontStretchProperty, value); }
+			get => (FontStretch) GetValue(FontStretchProperty);
+			set => SetValue(FontStretchProperty, value);
 		}
 
 		public FontStyle FontStyle
 		{
-			get { return (FontStyle)GetValue(FontStyleProperty); }
-			set { SetValue(FontStyleProperty, value); }
+			get => (FontStyle) GetValue(FontStyleProperty);
+			set => SetValue(FontStyleProperty, value);
 		}
 
 		public FontWeight FontWeight
 		{
-			get { return (FontWeight)GetValue(FontWeightProperty); }
-			set { SetValue(FontWeightProperty, value); }
+			get => (FontWeight) GetValue(FontWeightProperty);
+			set => SetValue(FontWeightProperty, value);
 		}
 
 		public Brush Stroke
 		{
-			get { return (Brush)GetValue(StrokeProperty); }
-			set { SetValue(StrokeProperty, value); }
+			get => (Brush) GetValue(StrokeProperty);
+			set => SetValue(StrokeProperty, value);
 		}
 
 		public double StrokeThickness
 		{
-			get { return (double)GetValue(StrokeThicknessProperty); }
-			set { SetValue(StrokeThicknessProperty, value); }
+			get => (double) GetValue(StrokeThicknessProperty);
+			set => SetValue(StrokeThicknessProperty, value);
 		}
 
 		public string Text
 		{
-			get { return (string)GetValue(TextProperty); }
-			set { SetValue(TextProperty, value); }
+			get => (string) GetValue(TextProperty);
+			set => SetValue(TextProperty, value);
 		}
 
 		public TextAlignment TextAlignment
 		{
-			get { return (TextAlignment)GetValue(TextAlignmentProperty); }
-			set { SetValue(TextAlignmentProperty, value); }
+			get => (TextAlignment) GetValue(TextAlignmentProperty);
+			set => SetValue(TextAlignmentProperty, value);
 		}
 
 		public TextDecorationCollection TextDecorations
 		{
-			get { return (TextDecorationCollection)GetValue(TextDecorationsProperty); }
-			set { SetValue(TextDecorationsProperty, value); }
+			get => (TextDecorationCollection) GetValue(TextDecorationsProperty);
+			set => SetValue(TextDecorationsProperty, value);
 		}
 
 		public TextTrimming TextTrimming
 		{
-			get { return (TextTrimming)GetValue(TextTrimmingProperty); }
-			set { SetValue(TextTrimmingProperty, value); }
+			get => (TextTrimming) GetValue(TextTrimmingProperty);
+			set => SetValue(TextTrimmingProperty, value);
 		}
 
 		public TextWrapping TextWrapping
 		{
-			get { return (TextWrapping)GetValue(TextWrappingProperty); }
-			set { SetValue(TextWrappingProperty, value); }
+			get => (TextWrapping) GetValue(TextWrappingProperty);
+			set => SetValue(TextWrappingProperty, value);
 		}
 
 		public OutlinedTextBlock()
@@ -213,20 +210,12 @@ namespace RatScanner.Framework
 			drawingContext.DrawGeometry(Fill, null, _textGeometry);
 
 			if (StrokePosition == StrokePosition.Outside)
-			{
 				drawingContext.PushClip(_clipGeometry);
-			}
-			else if (StrokePosition == StrokePosition.Inside)
-			{
-				drawingContext.PushClip(_textGeometry);
-			}
+			else if (StrokePosition == StrokePosition.Inside) drawingContext.PushClip(_textGeometry);
 
 			drawingContext.DrawGeometry(null, _pen, _textGeometry);
 
-			if (StrokePosition == StrokePosition.Outside || StrokePosition == StrokePosition.Inside)
-			{
-				drawingContext.Pop();
-			}
+			if (StrokePosition == StrokePosition.Outside || StrokePosition == StrokePosition.Inside) drawingContext.Pop();
 		}
 
 		protected override Size MeasureOverride(Size availableSize)
@@ -263,9 +252,9 @@ namespace RatScanner.Framework
 		}
 
 		private static void OnFormattedTextInvalidated(DependencyObject dependencyObject,
-		  DependencyPropertyChangedEventArgs e)
+			DependencyPropertyChangedEventArgs e)
 		{
-			var outlinedTextBlock = (OutlinedTextBlock)dependencyObject;
+			var outlinedTextBlock = (OutlinedTextBlock) dependencyObject;
 			outlinedTextBlock._formattedText = null;
 			outlinedTextBlock._textGeometry = null;
 
@@ -275,7 +264,7 @@ namespace RatScanner.Framework
 
 		private static void OnFormattedTextUpdated(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
 		{
-			var outlinedTextBlock = (OutlinedTextBlock)dependencyObject;
+			var outlinedTextBlock = (OutlinedTextBlock) dependencyObject;
 			outlinedTextBlock.UpdateFormattedText();
 			outlinedTextBlock._textGeometry = null;
 
@@ -285,29 +274,23 @@ namespace RatScanner.Framework
 
 		private void EnsureFormattedText()
 		{
-			if (_formattedText != null)
-			{
-				return;
-			}
+			if (_formattedText != null) return;
 
 			_formattedText = new FormattedText(
-			  Text ?? "",
-			  CultureInfo.CurrentUICulture,
-			  FlowDirection,
-			  new Typeface(FontFamily, FontStyle, FontWeight, FontStretch),
-			  FontSize,
-			  Brushes.Black,
-			  1);
+				Text ?? "",
+				CultureInfo.CurrentUICulture,
+				FlowDirection,
+				new Typeface(FontFamily, FontStyle, FontWeight, FontStretch),
+				FontSize,
+				Brushes.Black,
+				1);
 
 			UpdateFormattedText();
 		}
 
 		private void UpdateFormattedText()
 		{
-			if (_formattedText == null)
-			{
-				return;
-			}
+			if (_formattedText == null) return;
 
 			_formattedText.MaxLineCount = TextWrapping == TextWrapping.NoWrap ? 1 : int.MaxValue;
 			_formattedText.TextAlignment = TextAlignment;
@@ -323,10 +306,7 @@ namespace RatScanner.Framework
 
 		private void EnsureGeometry()
 		{
-			if (_textGeometry != null)
-			{
-				return;
-			}
+			if (_textGeometry != null) return;
 
 			EnsureFormattedText();
 			_textGeometry = _formattedText.BuildGeometry(new Point(0, 0));
