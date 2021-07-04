@@ -96,10 +96,12 @@ namespace RatScanner.View
 
 		private void UpdateTarkovTrackerToken()
 		{
+			var token = RatConfig.Tracking.TarkovTracker.Token;
+			if (token == "") return;
 			if (RatScannerMain.Instance.TarkovTrackerDB.Init()) return;
 
-			var token = RatConfig.Tracking.TarkovTracker.Token;
-			token = token[..8] + string.Concat(Enumerable.Repeat(" *", token.Length - 8));
+			var visibleLength = (int)(token.Length * 0.25);
+			token = token[..visibleLength] + string.Concat(Enumerable.Repeat(" *", token.Length - visibleLength));
 			Logger.ShowWarning($"The TarkovTracker API Token does not seem to work.\n\n{token}");
 
 			RatConfig.Tracking.TarkovTracker.Token = "";
