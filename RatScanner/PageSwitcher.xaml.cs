@@ -13,7 +13,7 @@ namespace RatScanner
 	public partial class PageSwitcher : Window
 	{
 		public const int DefaultWidth = 280;
-		public const int DefaultHeight = 390;
+		public const int DefaultHeight = 400;
 
 		private NotifyIcon _notifyIcon;
 

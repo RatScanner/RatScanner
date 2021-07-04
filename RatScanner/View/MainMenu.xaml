@@ -5,7 +5,7 @@
 						 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 						 xmlns:viewmodel="clr-namespace:RatScanner.ViewModel"
 						 d:DataContext="{d:DesignInstance Type=viewmodel:MainWindowVM}"
-						 d:DesignHeight="390"
+						 d:DesignHeight="370"
 						 d:DesignWidth="280"
 						 x:ClassModifier="internal"
 						 Background="#444444"

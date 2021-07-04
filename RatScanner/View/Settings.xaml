@@ -7,7 +7,7 @@
 						 xmlns:controls="clr-namespace:RatScanner.Controls"
 						 xmlns:viewmodel="clr-namespace:RatScanner.ViewModel"
 						 d:DataContext="{d:DesignInstance Type=viewmodel:SettingsVM}"
-						 d:DesignHeight="390"
+						 d:DesignHeight="370"
 						 d:DesignWidth="280"
 						 x:ClassModifier="internal"
 						 Background="#444444"
@@ -17,7 +17,7 @@
 		<TabControl Grid.Row="0"
 								Margin="0,5">
 			<TabItem Header="General">
-				<StackPanel>
+				<StackPanel Margin="0, 5">
 					<Grid>
 						<Grid.ToolTip>
 							<TextBlock>
@@ -148,7 +148,7 @@
 			</TabItem>
 
 			<TabItem Header="Scanning">
-				<StackPanel>
+				<StackPanel Margin="0, 5">
 					<Grid>
 						<Grid.ToolTip>
 							<TextBlock>
@@ -340,7 +340,7 @@
 			</TabItem>
 
 			<TabItem Header="Minimal UI">
-				<StackPanel>
+				<StackPanel Margin="0, 5">
 					<Grid>
 						<Grid.ToolTip>
 							<TextBlock>
@@ -520,7 +520,7 @@
 			</TabItem>
 
 			<TabItem Header="Info">
-				<StackPanel>
+				<StackPanel Margin="0, 5">
 					<Grid>
 						<Label Grid.Column="0"
 									 Content="Rat Scanner" />
@@ -549,20 +549,12 @@
 					<TextBlock Margin="5,0,5,5">Amazing API for flea market price data</TextBlock>
 
 					<Label>
-						<Hyperlink NavigateUri="https://github.com/shimat/opencvsharp"
-											 RequestNavigate="HyperlinkRequestNavigate">
-							<Underline>OpenCvSharp</Underline>
+						<Hyperlink NavigateUri="https://tarkovtracker.io/"
+						           RequestNavigate="HyperlinkRequestNavigate">
+							<Underline>Tarkov Tracker</Underline>
 						</Hyperlink>
 					</Label>
-					<TextBlock Margin="5,0,5,5">.Net wrapper for OpenCV</TextBlock>
-
-					<Label>
-						<Hyperlink NavigateUri="https://www.newtonsoft.com/json"
-											 RequestNavigate="HyperlinkRequestNavigate">
-							<Underline>Json.NET</Underline>
-						</Hyperlink>
-					</Label>
-					<TextBlock Margin="5,0,5,5">High-performance JSON framework for .NET</TextBlock>
+					<TextBlock Margin="5,0,5,5">Progress tracker for quests, hideout, and Kappa</TextBlock>
 
 					<Separator />
 
@@ -573,7 +565,7 @@
 				</StackPanel>
 			</TabItem>
 			<TabItem Header="Tracking">
-				<StackPanel>
+				<StackPanel Margin="0, 5">
 					<Grid>
 						<Grid.ToolTip>
 							<TextBlock>
