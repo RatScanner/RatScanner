@@ -26,7 +26,7 @@ namespace RatScanner.View
 			showTeam = showTeam && RatConfig.Tracking.TarkovTracker.ShowTeam;
 			TeammateQHTrackingDisplay.Visibility = showTeam ? v : c;
 
-			if (RatConfig.Tracking.TarkovTracker.ShowTeam)
+			if (showTeam)
 			{
 				var count = RatScannerMain.Instance.TarkovTrackerDB.TeammateCount;
 				PageSwitcher.Instance.Height = PageSwitcher.DefaultHeight + ((float)count * 21.1) + 30;
