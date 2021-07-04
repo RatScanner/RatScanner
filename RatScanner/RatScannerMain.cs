@@ -10,6 +10,7 @@ using RatScanner.Scan;
 using RatScanner.View;
 using RatStash;
 using Size = System.Drawing.Size;
+using Timer = System.Threading.Timer;
 
 namespace RatScanner
 {
@@ -24,6 +25,10 @@ namespace RatScanner
 		private readonly IconScanToolTip _iconScanToolTip;
 
 		private ItemScan _currentItemScan;
+
+		private Timer _marketDBRefreshTimer;
+		private Timer _tarkovTrackerDBRefreshTimer;
+
 
 		/// <summary>
 		/// Lock for name scanning
@@ -120,6 +125,10 @@ namespace RatScanner
 
 			Logger.LogInfo("Checking for new updates...");
 			CheckForUpdates();
+
+			Logger.LogInfo("Setting up data update routines...");
+			_marketDBRefreshTimer = new Timer(RefreshMarketDB, null, RatConfig.MarketDBRefreshTime, Timeout.Infinite);
+			_tarkovTrackerDBRefreshTimer = new Timer(RefreshTarkovTrackerDB, null, RatConfig.Tracking.TarkovTracker.RefreshTime, Timeout.Infinite);
 
 			Logger.LogInfo("Ready!");
 		}
@@ -258,6 +267,20 @@ namespace RatScanner
 
 			if (itemScan is ItemNameScan) NameScanToolTip.ScheduleShow(itemScan, pos, RatConfig.ToolTip.Duration);
 			if (itemScan is ItemIconScan) IconScanToolTip.ScheduleShow(itemScan, pos, RatConfig.ToolTip.Duration);
+		}
+
+		private void RefreshMarketDB(object? o)
+		{
+			Logger.LogInfo("Refreshing Market DB...");
+			MarketDB.Init();
+			_marketDBRefreshTimer.Change(RatConfig.MarketDBRefreshTime, Timeout.Infinite);
+		}
+
+		private void RefreshTarkovTrackerDB(object? o)
+		{
+			Logger.LogInfo("Refreshing TarkovTracker DB...");
+			TarkovTrackerDB.Init();
+			_tarkovTrackerDBRefreshTimer.Change(RatConfig.Tracking.TarkovTracker.RefreshTime, Timeout.Infinite);
 		}
 
 		protected virtual void OnPropertyChanged(string propertyName = null)

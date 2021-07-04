@@ -130,6 +130,7 @@ namespace RatScanner
 
 				internal static string Token = "";
 				internal static bool ShowTeam = true;
+				internal static int RefreshTime = 10 * 60 * 1000;   // 10 minutes
 			}
 		}
 
@@ -145,6 +146,7 @@ namespace RatScanner
 #endif
 		internal static bool MinimizeToTray = false;
 		internal static bool AlwaysOnTop = true;
+		internal static int MarketDBRefreshTime = 60 * 60 * 1000;   // 1 hour
 		private static int ConfigVersion => 1;
 
 		private static Resolution screenResolution = Resolution.R1920x1080;
