@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using System.Web;
 using RatScanner.FetchModels;
 using RatScanner.Scan;
 using RatStash;
@@ -88,7 +89,15 @@ namespace RatScanner.ViewModel
 			}
 		}
 
-		public string WikiLink => MatchedItems[0].GetMarketItem().WikiLink;
+		public string WikiLink
+		{
+			get
+			{
+				var link = MatchedItems[0].GetMarketItem().WikiLink;
+				if (link.Length > 3) return link;
+				return $"https://escapefromtarkov.gamepedia.com/{HttpUtility.UrlEncode(Name.Replace(" ", "_"))}";
+			}
+		}
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
