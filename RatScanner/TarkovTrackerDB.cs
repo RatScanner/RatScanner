@@ -80,7 +80,7 @@ namespace RatScanner
 			}
 		}
 
-		public int TeammateCount => Progress.Count(x => x.Self == false);
+		public int TeammateCount => Progress.Count(x => (x.Self ?? false) == false);
 
 		public bool TeamProgressAvailable => _token.Permissions.Contains("TP");
 
@@ -93,7 +93,7 @@ namespace RatScanner
 				try
 				{
 					var rawProgress = JsonConvert.DeserializeObject<List<Progress>>(ApiManager.GetTarkovTrackerTeam());
-					Progress = rawProgress?.Where(x => x.Hide == false).ToList();
+					Progress = rawProgress?.Where(x => (x.Hide ?? false) == false).ToList();
 				}
 				catch (RateLimitExceededException e)
 				{
