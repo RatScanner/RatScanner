@@ -24,6 +24,16 @@ namespace RatScanner.Scan
 
 		private static readonly byte borderColor = 0xFF;
 		private Mat _grid;
+		private Mat _highlight;
+		private readonly List<(int, int)> _searchOrder = new List<(int, int)> { (-1, 0), (1, 0), (0, -1), (0, 1) };
+
+		private const double GridSearchAvgScoreStop = 0.9;
+		private const double GridSearchEarlyMinScore = 0.25;
+		private const double GridDistanceScalingRate = 0.95;
+		private const int GridSearchMaxIterations = 30;
+		private const int GridSearchMinIterations = 6;
+		private const int GridSearchEarlySearchIterations = 2;
+		private const double GridSearchPerfectScore = 0.95;
 
 		private readonly object _matchLock = new object();
 
@@ -138,6 +148,7 @@ namespace RatScanner.Scan
 			Dictionary<string, Mat> iconTemplates;
 			if (useStaticIcons) iconTemplates = IconManager.GetStaticIcons(iconSlotSize);
 			else iconTemplates = IconManager.GetDynamicIcons(iconSlotSize);
+
 			if (iconTemplates == null) return matchResult;
 
 			var firstIcon = iconTemplates.First().Value;
@@ -188,6 +199,7 @@ namespace RatScanner.Scan
 			var mat = image.ToMat();
 			Logger.LogDebugMat(mat, "capture");
 			_grid = mat.InRange(new Scalar(84, 81, 73), new Scalar(104, 101, 93));
+			_highlight = _grid.Clone();
 			Logger.LogDebugMat(_grid, "in_range");
 			var mask = mat.Canny(100, 100);
 			Logger.LogDebugMat(mask, "canny_edge");
@@ -196,54 +208,176 @@ namespace RatScanner.Scan
 			Cv2.BitwiseAnd(_grid, mask, _grid);
 			Logger.LogDebugMat(_grid, "in_range_and_canny_edge_dilate");
 
-			var rightBorderDist = FindGridEdgeDistance(0, 1);
-			var leftBorderDist = FindGridEdgeDistance(0, -1);
-			var topBorderDist = FindGridEdgeDistance(-1, 0);
-			var bottomBorderDist = FindGridEdgeDistance(1, 0);
+			var (lBorderDist, rBorderDist, tBorderDist, bBorderDist, center) =
+				FindGridEdgeDistances(new Vector2(_grid.Width / 2 - 1, _grid.Height / 2 - 1));
 
-			var positionX = RatConfig.IconScan.ScanWidth / 2 - leftBorderDist;
-			var positionY = RatConfig.IconScan.ScanHeight / 2 - topBorderDist;
+			var positionX = center.X - lBorderDist;
+			var positionY = center.Y - bBorderDist;
 			var position = new Vector2(positionX, positionY);
 
-			var size = new Vector2(rightBorderDist + leftBorderDist, topBorderDist + bottomBorderDist);
+			var size = new Vector2(rBorderDist + lBorderDist, tBorderDist + bBorderDist);
 			return (position, size);
 		}
 
-		private int FindGridEdgeDistance(int up, int right)
+		private (int, int, int, int, Vector2) FindGridEdgeDistances(Vector2 center, int numIters = 0)
 		{
-			var steps = 0;
-			var localMousePos = new Vector2(_grid.Width / 2 - 1, _grid.Height / 2 - 1);
+			// Set up loop values
+			var orderIdx = 0;
+			var leftLimit = RatConfig.IconScan.ItemSlotSize / 2; // Initial edge searches will search 1 grid in each direction
+			var rightLimit = leftLimit;
+			var upLimit = leftLimit;
+			var downLimit = leftLimit;
+			var lastScores = new[] { 0.0, 0.0, 0.0, 0.0 };
+			var foundNewEdge = new[] { false, false, false, false };
+			var myIters = 0;
+			var keepTrying = true;
 
-			switch (up, right)
+			while (keepTrying)
 			{
-				case var d when d == (0, 1):
-					steps = _grid.Width - localMousePos.X;
-					break;
-				case var d when d == (0, -1):
-					steps = localMousePos.X;
-					break;
-				case var d when d == (1, 0):
-					steps = _grid.Height - localMousePos.Y;
-					break;
-				case var d when d == (-1, 0):
-					steps = localMousePos.Y;
-					break;
+				// Get the next direction to search
+				var direction = _searchOrder[orderIdx];
+
+				// Find the edge limits to use on this search based on direction
+				var plus = direction.Item1 == 0 ? upLimit : rightLimit;
+				var minus = direction.Item1 == 0 ? downLimit : leftLimit;
+
+				Logger.LogDebug($"Searching {direction.Item1}, {direction.Item2};");
+				Logger.LogDebug($"Previous score: {lastScores[orderIdx]}; Current Limits: {plus}, {minus};");
+
+				// Find the distance to edge and that edge's score
+				// If we are in the first 2 loops, we are finding an initial bound so we lower the required score and we just search for the
+				// first bound rather than the best bound
+				var minScore = numIters < GridSearchMinIterations ? GridSearchEarlyMinScore : lastScores[orderIdx];
+				var (step, score) = FindGridEdgeDistance(direction.Item1, direction.Item2, center.X, center.Y,
+					GetSteps(direction.Item1, direction.Item2, center),
+					plus, minus, myIters >= GridSearchEarlySearchIterations, minScore);
+
+				// Update scores and limits based on results
+				lastScores[orderIdx] = score;
+
+				foundNewEdge[orderIdx] = false;
+				if (score > 0.0)
+				{
+					switch (direction.Item1, direction.Item2)
+					{
+						case var d when d == (0, 1):
+							foundNewEdge[orderIdx] = rightLimit != step;
+							rightLimit = step;
+							break;
+						case var d when d == (0, -1):
+							foundNewEdge[orderIdx] = leftLimit != step;
+							leftLimit = step;
+							break;
+						case var d when d == (1, 0):
+							foundNewEdge[orderIdx] = upLimit != step;
+							upLimit = step;
+							break;
+						case var d when d == (-1, 0):
+							foundNewEdge[orderIdx] = downLimit != step;
+							downLimit = step;
+							break;
+					}
+				}
+
+				// Check if horizontal or vertical limits have squashed to 0
+				// If this has happened, the center point is on an edge, so we need to search
+				// to find the direction of the highlighted item, and reposition the center slightly
+				// towards the center of the highlighted item then call ourselves to finish from thew new starting point
+				if (leftLimit == 0 && rightLimit == 0)
+				{
+					var itemSlotSize = RatConfig.IconScan.ItemSlotSize;
+					var newX = FindDirection(center, true) ? center.X + itemSlotSize / 2 : center.X - itemSlotSize / 2;
+
+					var newCenter = new Vector2(newX, center.Y);
+					Logger.LogDebug($"On Vertical Edge... Old Center: {center.X}, {center.Y}; New Center: {newCenter.X}, {newCenter.Y};");
+					return FindGridEdgeDistances(newCenter, numIters);
+				}
+
+				if (upLimit == 0 && downLimit == 0)
+				{
+					var newY = FindDirection(center, false)
+						? center.Y + RatConfig.IconScan.ItemSlotSize / 2
+						: center.Y - RatConfig.IconScan.ItemSlotSize / 2;
+
+					var newCenter = new Vector2(center.X, newY);
+					Logger.LogDebug($"On Horizontal Edge... Old Center: {center.X}, {center.Y}; New Center: {newCenter.X}, {newCenter.Y};");
+					return FindGridEdgeDistances(newCenter, numIters);
+				}
+
+				// Log the current bounds if logging debug
+				if (RatConfig.LogDebug)
+				{
+					var positionX = center.X - leftLimit;
+					var positionY = center.Y - downLimit;
+					var position = new Vector2(positionX, positionY);
+					var size = new Vector2(leftLimit + rightLimit, upLimit + downLimit);
+					var rect = new Rect(position, size);
+					var print = _grid.Clone(rect);
+					Logger.LogDebugMat(print, $"search_{center.X}-{center.Y}_{numIters}_");
+				}
+
+				// Loop housekeeping
+				numIters++;
+				myIters++;
+				orderIdx = (orderIdx + 1) % _searchOrder.Count;
+
+				var avgScore = lastScores.Sum() / lastScores.Length;
+				keepTrying = avgScore < GridSearchAvgScoreStop;
+				if (numIters <= GridSearchMinIterations)
+				{
+					keepTrying = true;
+				}
+				// If we haven't found suitable limits in x iterations give up
+				else if (numIters > GridSearchMaxIterations)
+				{
+					Logger.LogDebug("Hit maximum number of iterations...");
+					keepTrying = false;
+				}
+				else if (foundNewEdge.All(s => !s))
+				{
+					Logger.LogDebug("Did a full loop without finding new edges...");
+					keepTrying = false;
+				}
 			}
 
-			var x = localMousePos.X;
-			var y = localMousePos.Y;
+			return (leftLimit, rightLimit, upLimit, downLimit, center);
+		}
 
+		private (int, double) FindGridEdgeDistance(int up, int right, int x, int y, int steps, int plus, int minus, bool findBest = false, double minScore = 0.6)
+		{
 			var indexer = _grid.GetGenericIndexer<byte>();
+
+			var bestScore = 0.0;
+			var best = 0;
 			for (var i = 0; i < steps; i++)
 			{
 				if (indexer[y, x].Equals(borderColor))
 				{
-					Logger.LogDebug("Potential Edge at: " + x + " | " + y);
+					// Search along the edge inside the given plus, minus bounds and get what percentage of the pixels in that range were white
 					var horizontalEdge = up != 0;
-					if (IsGridEdge(x, y, horizontalEdge))
+					var score = FindGridEdge(x, y, plus, minus, horizontalEdge);
+
+					var numGrids = i / Math.Floor(RatConfig.IconScan.ItemSlotSize / 2.0);
+					var scale = Math.Pow(GridDistanceScalingRate, numGrids);
+					score *= scale;
+
+					if (score > bestScore)
 					{
-						Logger.LogDebug("Confirmed as Edge: " + i);
-						return i;
+						bestScore = score;
+						best = i;
+						Logger.LogDebug($"New Best Edge confirmed {i} with score {score};");
+					}
+
+					if (score > minScore && !findBest || score > GridSearchPerfectScore)
+					{
+						Logger.LogDebug($"Found Edge! Up: {up}; Right: {right}; Steps: {steps}; Plus: {plus}; Minus: {minus}; Dist: {i}; Score: {score}");
+						return (i, score);
+					}
+
+					if (1 * scale < minScore)
+					{
+						Logger.LogDebug("Drifted too far to find new best edge.");
+						break;
 					}
 				}
 
@@ -251,50 +385,96 @@ namespace RatScanner.Scan
 				y += up;
 			}
 
-			Logger.LogDebug("Up: " + up + " | Right: " + right + " | Steps: " + steps);
-			return 0;
+
+			if (bestScore > minScore)
+			{
+				Logger.LogDebug($"Found Best Edge! Up: {up}; Right: {right}; Steps: {steps}; Plus: {plus}; Minus: {minus}; Dist: {best}; Score: {bestScore}");
+				return (best, bestScore);
+			}
+
+			Logger.LogDebug($"Failed to find Edge! Up: {up}; Right: {right}; Steps: {steps}; Plus: {plus}; Minus: {minus}; Dist: {best}; Score: {bestScore}");
+
+			return (0, -1.0);
 		}
 
-		private bool IsGridEdge(int x, int y, bool horizontal, int minSize = 60)
+		/// <summary>
+		/// Find the distance to the next grid edge
+		/// </summary>
+		/// <param name="x">Origin X</param>
+		/// <param name="y">Origin Y</param>
+		/// <param name="plus">Positive max offset from origin</param>
+		/// <param name="minus">Negative max offset from origin</param>
+		/// <param name="horizontal"><see langword="true"/> if searching for a grid edge horizontally</param>
+		/// <returns>Distance to the next grid edge</returns>
+		private double FindGridEdge(int x, int y, int plus, int minus, bool horizontal)
 		{
-			var size = 0;
-
 			var indexer = _grid.GetGenericIndexer<byte>();
 
 			var start = horizontal ? x : y;
-			var end = horizontal ? _grid.Height : _grid.Width;
+			var plusEnd = start + plus;
+			var minusEnd = start - minus;
 
-			// Use (start + 1) to avoid counting the origin pixel twice
-			for (var i = start + 1; i < end; i++)
+			plusEnd = Math.Min(plusEnd, horizontal ? _grid.Height : _grid.Width);
+			minusEnd = Math.Max(minusEnd, 0);
+
+			var total = 0;
+			var hits = 0;
+			for (var i = start + 1; i < plusEnd; i++)
+			{
+				total++;
+				var pixel = horizontal ? indexer[y, i] : indexer[i, x];
+				if (pixel.Equals(borderColor)) hits++;
+			}
+
+			for (var i = start; i > minusEnd; i--)
+			{
+				total++;
+				var pixel = horizontal ? indexer[y, i] : indexer[i, x];
+				if (pixel.Equals(borderColor)) hits++;
+			}
+
+			if (total == 0) return -1.0;
+
+			return hits / (double)total;
+		}
+
+		private bool FindDirection(Vector2 center, bool horizontal)
+		{
+			var upHits = 0;
+			var downHits = 0;
+			var indexer = _highlight.GetGenericIndexer<byte>();
+			for (var i = 0; i < RatConfig.IconScan.ItemSlotSize * 2; i++)
 			{
 				if (horizontal)
 				{
-					if (!indexer[y, i].Equals(borderColor)) break;
+					upHits += indexer[center.Y, center.X + i].Equals(borderColor) ? 1 : 0;
+					downHits += indexer[center.Y, center.X - i].Equals(borderColor) ? 1 : 0;
 				}
 				else
 				{
-					if (!indexer[i, x].Equals(borderColor)) break;
+					upHits += indexer[center.Y + i, center.X].Equals(borderColor) ? 1 : 0;
+					downHits += indexer[center.Y - i, center.X].Equals(borderColor) ? 1 : 0;
 				}
-
-				size += 1;
 			}
 
-			for (var i = start; i > 0; i--)
+			return upHits > downHits;
+		}
+
+		private int GetSteps(int up, int right, Vector2 center)
+		{
+			switch (up, right)
 			{
-				if (horizontal)
-				{
-					if (!indexer[y, i].Equals(borderColor)) break;
-				}
-				else
-				{
-					if (!indexer[i, x].Equals(borderColor)) break;
-				}
-
-				size += 1;
+				case var d when d == (0, 1):
+					return _grid.Width - center.X;
+				case var d when d == (0, -1):
+					return center.X;
+				case var d when d == (1, 0):
+					return _grid.Height - center.Y;
+				case var d when d == (-1, 0):
+					return center.Y;
 			}
 
-			Logger.LogDebug("Size: " + size);
-			return size > minSize;
+			return 0;
 		}
 
 		internal override Vector2 GetToolTipPosition()
