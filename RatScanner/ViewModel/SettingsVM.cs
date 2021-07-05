@@ -22,12 +22,23 @@ namespace RatScanner.ViewModel
 		public bool ShowTraderPrice { get; set; }
 		public bool ShowTraderMaxPrice { get; set; }
 		public bool ShowUpdated { get; set; }
+		public bool ShowQuestHideoutTracker { get; set; }
+		public bool ShowQuestHideoutTeamTracker { get; set; }
 		public int Opacity { get; set; }
 
 		public int ScreenResolution { get; set; }
 		public bool MinimizeToTray { get; set; }
 		public bool AlwaysOnTop { get; set; }
 		public bool LogDebug { get; set; }
+
+		// Progress Tracking Settings
+		public bool ShowNonFIRNeeds { get; set; }
+
+		// TarkovTracker Specific Tracking Settings
+		public string TarkovTrackerToken { get; set; }
+
+		public bool ShowTarkovTrackerTeam { get; set; }
+
 
 		internal SettingsVM()
 		{
@@ -46,6 +57,8 @@ namespace RatScanner.ViewModel
 			ShowPricePerSlot = RatConfig.MinimalUi.ShowPricePerSlot;
 			ShowTraderPrice = RatConfig.MinimalUi.ShowTraderPrice;
 			ShowTraderMaxPrice = RatConfig.MinimalUi.ShowTraderMaxPrice;
+			ShowQuestHideoutTracker = RatConfig.MinimalUi.ShowQuestHideoutTracker;
+			ShowQuestHideoutTeamTracker = RatConfig.MinimalUi.ShowQuestHideoutTeamTracker;
 			ShowUpdated = RatConfig.MinimalUi.ShowUpdated;
 			Opacity = RatConfig.MinimalUi.Opacity;
 
@@ -53,6 +66,11 @@ namespace RatScanner.ViewModel
 			MinimizeToTray = RatConfig.MinimizeToTray;
 			AlwaysOnTop = RatConfig.AlwaysOnTop;
 			LogDebug = RatConfig.LogDebug;
+
+			ShowNonFIRNeeds = RatConfig.Tracking.ShowNonFIRNeeds;
+
+			TarkovTrackerToken = RatConfig.Tracking.TarkovTracker.Token;
+			ShowTarkovTrackerTeam = RatConfig.Tracking.TarkovTracker.ShowTeam;
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;

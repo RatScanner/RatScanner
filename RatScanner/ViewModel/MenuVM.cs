@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
+using System.Web;
 using RatScanner.FetchModels;
 using RatScanner.Scan;
 using RatStash;
@@ -73,7 +76,14 @@ namespace RatScanner.ViewModel
 
 		public string MaxTraderPrice => IntToGroupedString(GetMaxTraderPrice()) + " ₽";
 
+		public NeededItem TrackingNeeds => CurrentItem.GetTrackingNeeds();
+
+		public NeededItem TrackingTeamNeedsSummed => CurrentItem.GetSummedTrackingTeamNeeds();
 		private int GetMaxTraderPrice() => CurrentItem.GetMaxTraderPrice();
+
+		public List<KeyValuePair<string, NeededItem>> TrackingTeamNeeds => CurrentItem.GetTrackingTeamNeeds();
+
+		public List<KeyValuePair<string, NeededItem>> TrackingTeamNeedsFiltered => TrackingTeamNeeds.Where(x => x.Value.Remaining > 0).ToList();
 
 		public string DiscordLink => ApiManager.GetResource(ApiManager.ResourceType.DiscordLink);
 
@@ -93,7 +103,15 @@ namespace RatScanner.ViewModel
 
 		public int WishlistAmount => CurrentItem.GetWishlistAmount();
 
-		public string WikiLink => CurrentItem.GetMarketItem().WikiLink;
+		public string WikiLink
+		{
+			get
+			{
+				var link = CurrentItem.GetMarketItem().WikiLink;
+				if (link.Length > 3) return link;
+				return $"https://escapefromtarkov.gamepedia.com/{HttpUtility.UrlEncode(Name.Replace(" ", "_"))}";
+			}
+		}
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
@@ -115,22 +133,10 @@ namespace RatScanner.ViewModel
 
 		#region Commands
 		private readonly RelayCommand increaseAmountCommand;
-		public RelayCommand IncreaseAmountCommand
-		{
-			get
-			{
-				return increaseAmountCommand ?? new RelayCommand(() => IncreaseAmount());
-			}
-		}
+		public RelayCommand IncreaseAmountCommand => increaseAmountCommand ?? new RelayCommand(() => IncreaseAmount());
 
 		private readonly RelayCommand decreaseAmountCommand;
-		public RelayCommand DecreaseAmountCommand
-		{
-			get
-			{
-				return decreaseAmountCommand ?? new RelayCommand(() => DecreaseAmount(), (wa) => WishlistAmount != 0);
-			}
-		}
+		public RelayCommand DecreaseAmountCommand => decreaseAmountCommand ?? new RelayCommand(() => DecreaseAmount(), (wa) => WishlistAmount != 0);
 		#endregion
 
 		#region Methods
@@ -153,10 +159,7 @@ namespace RatScanner.ViewModel
 
 		private string PriceToString(int price)
 		{
-			if (MatchedItems.Length == 1)
-			{
-				return IntToGroupedString(price) + " ₽";
-			}
+			if (MatchedItems.Length == 1) return IntToGroupedString(price) + " ₽";
 
 			// TODO make this more informative. Perhaps a value range?
 			return "Uncertain";

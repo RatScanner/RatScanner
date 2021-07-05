@@ -1,22 +1,32 @@
 <img src="media/RatLogo.png" height=100 align=right>
 
 <div>
-  <a href="https://patreon.com/RatScanner">
-    <img src="https://img.shields.io/badge/dynamic/json?color=%23e85b46&label=Patreon&query=data.attributes.patron_count&suffix=%20patrons&url=https%3A%2F%2Fwww.patreon.com%2Fapi%2Fcampaigns%2F4117180&style=for-the-badge&logo=patreon" />
-  </a>
+<a href="https://patreon.com/RatScanner">
+ <img src="https://img.shields.io/badge/dynamic/json?color=%23e85b46&label=Patreon&query=data.attributes.patron_count&suffix=%20patrons&url=https%3A%2F%2Fwww.patreon.com%2Fapi%2Fcampaigns%2F4117180&style=for-the-badge&logo=patreon" />
+</a>
 
-  <a href="https://discord.gg/aHZf7aP" style="padding:10px">
-    <img src="https://img.shields.io/discord/687549250435153930?label=Discord&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2&style=for-the-badge" />
-  </a>
+<a href="https://discord.gg/aHZf7aP" style="padding:10px">
+ <img src="https://img.shields.io/discord/687549250435153930?label=Discord&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2&style=for-the-badge" />
+</a>
+
+<a href="https://github.com/RatScanner/RatScanner/releases/latest/download/RatScanner.zip">
+<img src="https://img.shields.io/static/v1?&label=&message=Download&color=4FBD54&style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHZpZXdCb3g9IjAsMCwxMDI0LDEwMjQiPgoJPGRlc2M+ZmlsZV9kb3dubG9hZCBpY29uIC0gTGljZW5zZWQgdW5kZXIgQXBhY2hlIExpY2Vuc2UgdjIuMCAoaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4wKSAtIENyZWF0ZWQgd2l0aCBJY29uZnUuY29tIC0gRGVyaXZhdGl2ZSB3b3JrIG9mIE1hdGVyaWFsIGljb25zIChDb3B5cmlnaHQgR29vZ2xlIEluYy4pPC9kZXNjPgoJPGcgZmlsbD0iI2ZmZmZmZiIgZmlsbC1ydWxlPSJub256ZXJvIiBzdHlsZT0ibWl4LWJsZW5kLW1vZGU6IG5vcm1hbCI+CgkJPHBhdGggZD0iTTUxMiw2ODIuNjdsLTI5OC42NywtMjk4LjY3aDE3MC42N3YtMjU2aDI1NnYyNTZoMTcwLjY3ek04MTAuNjcsNzY4djg1LjMzaC01OTcuMzR2LTg1LjMzeiIvPgoJPC9nPgo8L3N2Zz4=" />
+</a>
 </div>
 
 # Rat Scanner
 
 Rat Scanner is a open source tool for [Escape from Tarkov][escape-from-tarkov].
 
-Please consider [supporting](#Support-the-project) the project to help finance the backend server as well as the [API][tarkov-market].
+Please consider [supporting](#Support-the-project) the project to help finance the backend server as well as the [API][tarkov-tools].
 
 [Tutorial / Demo Video][demo-video] - [Frequently asked Questions][faq-page]
+
+<br/>
+
+## Can I get banned for using Rat Scanner?
+
+Have a look [here][faq-page-can-i-get-banned] to see BSG's official response to that question.
 
 <br/>
 
@@ -24,7 +34,7 @@ Please consider [supporting](#Support-the-project) the project to help finance t
 
 Rat Scanner allows you to scan items in the game and provides you with data about items (average price, value per slot, ...).
 
-The information is taken from a [third-party API][tarkov-market] which takes the data directly from the game.
+The information is taken from a [third-party API][tarkov-tools] which takes the data directly from the game.
 
 <br/>
 
@@ -131,17 +141,18 @@ Please read `CONTRIBUTING.md` before contributing.
 
 ## Support the project
 
-This will help to pay for the backend server as well as the [API][tarkov-market] which provides the backend with data.
+This will help to finance the backend server as well as the [API][tarkov-tools] which provides the backend with data.
 
 [![Patreon](https://img.shields.io/badge/dynamic/json?color=%23e85b46&label=Patreon&query=data.attributes.patron_count&suffix=%20patrons&url=https%3A%2F%2Fwww.patreon.com%2Fapi%2Fcampaigns%2F4117180&style=for-the-badge&logo=patreon)](https://patreon.com/RatScanner)
 [![PayPal](https://img.shields.io/static/v1?&label=PayPal&message=Donate&color=0079C1&style=for-the-badge&logo=paypal)](https://paypal.me/mscheve)
 
 [escape-from-tarkov]: https://www.escapefromtarkov.com/
-[tarkov-market]: https://tarkov-market.com/
-[eft-icons-repo]: https://github.com/Blightbuster/EfTIcons
-[latest-release]: https://github.com/Blightbuster/RatScanner/releases/latest/download/RatScanner.zip
-[releases]: https://github.com/Blightbuster/RatScanner/releases/
-[net-core-download]: https://dotnet.microsoft.com/download/dotnet-core/current/runtime
+[tarkov-tools]: https://tarkov-tools.com/
+[eft-icons-repo]: https://github.com/RatScanner/EfTIcons
+[latest-release]: https://github.com/RatScanner/RatScanner/releases/latest/download/RatScanner.zip
+[releases]: https://github.com/RatScanner/RatScanner/releases/
+[net-core-download]: https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-3.1.14-windows-x64-installer
 [demo-video]: https://www.youtube.com/watch?v=tXoIkgXFmdA
 [faq-page]: FAQ.md
+[faq-page-can-i-get-banned]: FAQ.md#can-i-get-banned-for-using-rat-scanner
 [discord]: https://discord.com/invite/aHZf7aP

@@ -3,7 +3,9 @@
 						 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 						 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 						 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-						 d:DesignHeight="200"
+						 xmlns:viewmodel="clr-namespace:RatScanner.ViewModel"
+						 d:DataContext="{d:DesignInstance Type=viewmodel:MainWindowVM}"
+						 d:DesignHeight="300"
 						 d:DesignWidth="200"
 						 MouseDoubleClick="OnMouseDoubleClick"
 						 MouseDown="OnMouseDown"
@@ -61,37 +63,11 @@
 				</WrapPanel>
 				<Label Padding="0"
 							 VerticalAlignment="Center"
-							 Content="{Binding Name}" />
+							 Content="{Binding Name}"
+							 d:Content="AKMN 7.62x39 assault rifle" />
 			</StackPanel>
-			<Separator />
 		</StackPanel>
-
-		<StackPanel>
-			<StackPanel.Style>
-				<Style TargetType="{x:Type StackPanel}">
-					<Setter Property="Visibility" Value="Visible"/>
-					<Style.Triggers>
-						<DataTrigger Binding="{Binding WishlistAmount}" Value="0">
-							<Setter Property="Visibility" Value="Collapsed"/>
-						</DataTrigger>
-					</Style.Triggers>
-				</Style>
-			</StackPanel.Style>
-
-			<Grid Margin="0,0,0,0">
-				<Label Grid.Column="0"
-							 Content="Need" />
-				<Label Grid.Column="1"
-							 Margin="0,0,0,0"
-							 Content="{Binding WishlistAmount}" />
-
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="*" />
-					<ColumnDefinition Width="Auto" />
-				</Grid.ColumnDefinitions>
-			</Grid>
-		</StackPanel>
-
+			
 		<StackPanel>
 			<Separator />
 			<Grid x:Name="AvgDayPriceDisplay"
@@ -99,7 +75,8 @@
 				<Label Grid.Column="0"
 							 Content="Avg. Day Price" />
 				<Label Grid.Column="1"
-							 Content="{Binding Avg24hPrice}" />
+							 Content="{Binding Avg24hPrice}"
+							 d:Content="88.000 ₽" />
 
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="*" />
@@ -111,7 +88,8 @@
 				<Label Grid.Column="0"
 							 Content="Price per Slot" />
 				<Label Grid.Column="1"
-							 Content="{Binding PricePerSlot}" />
+							 Content="{Binding PricePerSlot}"
+							 d:Content="11.000 ₽" />
 
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="*" />
@@ -124,9 +102,11 @@
 			<Separator />
 			<Grid>
 				<Label Grid.Column="0"
-							 Content="{Binding TraderName}" />
+							 Content="{Binding TraderName}"
+							 d:Content="Mechanic" />
 				<Label Grid.Column="1"
-							 Content="{Binding BestTraderPrice}" />
+							 Content="{Binding BestTraderPrice}"
+							 d:Content="53.516 ₽" />
 
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="*" />
@@ -152,7 +132,8 @@
 				<Label Grid.Column="0"
 							 Content="Max Buy Price" />
 				<Label Grid.Column="1"
-							 Content="{Binding MaxTraderPrice}" />
+							 Content="{Binding MaxTraderPrice}"
+							 d:Content="56.942 ₽" />
 
 				<Grid.ColumnDefinitions>
 					<ColumnDefinition Width="*" />
@@ -178,6 +159,157 @@
 			</StackPanel.Style>
 		</StackPanel>
 
+		<StackPanel>
+			<StackPanel.Style>
+				<Style TargetType="{x:Type StackPanel}">
+					<Setter Property="Visibility" Value="Visible"/>
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding WishlistAmount}" Value="0">
+							<Setter Property="Visibility" Value="Collapsed"/>
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</StackPanel.Style>
+			<Separator />
+
+			<Grid Margin="0,0,0,0">
+				<Label Grid.Column="0"
+							 Content="On wishlist" />
+				<Label Grid.Column="1"
+							 Margin="0,0,0,0"
+							 Content="{Binding WishlistAmount, FallbackValue=0}" />
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
+			</Grid>
+		</StackPanel>
+			
+		<StackPanel x:Name="TrackingDisplay">
+			<StackPanel>
+				<Separator />
+				<Grid>
+					<Label Grid.Column="0"
+								 HorizontalAlignment="Left"
+								 Content="Needed Items" />
+					<StackPanel Grid.Column="1"
+											Orientation="Horizontal"
+											HorizontalAlignment="Right">
+						<Label Content="{Binding TrackingNeeds.QuestRemaining, FallbackValue=0}" />
+						<Image Source="{StaticResource questIcon}"
+									 VerticalAlignment="Center"
+									 Height="20" />
+					</StackPanel>
+					<StackPanel Grid.Column="2"
+											Orientation="Horizontal"
+											HorizontalAlignment="Right">
+						<Label Content="{Binding TrackingNeeds.HideoutRemaining, FallbackValue=0}" />
+						<Image Source="{StaticResource hideoutIcon}"
+									 VerticalAlignment="Center"
+									 Height="20" />
+					</StackPanel>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="2*" />
+						<ColumnDefinition Width="*" />
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+				</Grid>
+				<StackPanel.Style>
+					<Style TargetType="StackPanel">
+						<Setter Property="Visibility"
+										Value="Visible" />
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding Path=TrackingNeeds.Remaining}"
+													 Value="0">
+								<Setter Property="Visibility"
+												Value="Collapsed" />
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</StackPanel.Style>
+			</StackPanel>
+		</StackPanel>
+
+		<StackPanel x:Name="TeamTrackingDisplay">
+			<StackPanel>
+				<Separator />
+				<ListView ItemsSource="{Binding TrackingTeamNeedsFiltered}"
+									Background="Transparent"
+									BorderThickness="0">
+					<ListView.ItemContainerStyle>
+						<Style TargetType="ListViewItem">
+							<Setter Property="HorizontalContentAlignment"
+											Value="Stretch" />
+							<Setter Property="Focusable"
+											Value="False" />
+							<Setter Property="Template">
+								<Setter.Value>
+									<ControlTemplate TargetType="ListViewItem">
+										<ContentPresenter Margin="0, 2" />
+									</ControlTemplate>
+								</Setter.Value>
+							</Setter>
+						</Style>
+					</ListView.ItemContainerStyle>
+
+					<ListView.ItemTemplate>
+						<DataTemplate>
+							<Grid Height="17">
+								<Grid.Resources>
+									<Style TargetType="Label"
+												 BasedOn="{StaticResource {x:Type Label}}">
+										<Setter Property="Padding"
+														Value="4, 0" />
+										<Setter Property="VerticalAlignment"
+														Value="Center" />
+									</Style>
+								</Grid.Resources>
+								<Label Grid.Column="0"
+											 HorizontalAlignment="Left"
+											 Content="{Binding Key}" />
+								<StackPanel Grid.Column="1"
+														Orientation="Horizontal"
+														HorizontalAlignment="Right">
+									<Label Content="{Binding Value.QuestRemaining, FallbackValue=0}" />
+									<Image Source="{StaticResource questIcon}"
+												 VerticalAlignment="Center"
+												 Height="20" />
+								</StackPanel>
+								<StackPanel Grid.Column="2"
+														Orientation="Horizontal"
+														HorizontalAlignment="Right">
+									<Label Content="{Binding Value.HideoutRemaining, FallbackValue=0}" />
+									<Image Source="{StaticResource hideoutIcon}"
+												 VerticalAlignment="Center"
+												 Height="20" />
+								</StackPanel>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="2*" />
+									<ColumnDefinition Width="*" />
+									<ColumnDefinition Width="*" />
+								</Grid.ColumnDefinitions>
+							</Grid>
+						</DataTemplate>
+					</ListView.ItemTemplate>
+				</ListView>
+
+				<StackPanel.Style>
+					<Style TargetType="StackPanel">
+						<Setter Property="Visibility"
+										Value="Visible" />
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding Path=TrackingTeamNeedsSummed.Remaining}"
+													 Value="0">
+								<Setter Property="Visibility"
+												Value="Collapsed" />
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</StackPanel.Style>
+			</StackPanel>
+		</StackPanel>
+
 		<StackPanel x:Name="UpdatedDisplay">
 			<Separator />
 			<Grid Margin="0,5,0,0">
@@ -186,6 +318,7 @@
 							 FontSize="10" />
 				<Label Grid.Column="1"
 							 Content="{Binding Updated}"
+							 d:Content="04.07.2021 14:31"
 							 FontSize="10" />
 
 				<Grid.ColumnDefinitions>

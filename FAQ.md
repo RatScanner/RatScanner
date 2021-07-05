@@ -37,7 +37,12 @@
 # General
 
 ## Can I get banned for using Rat Scanner?
-There is no official response yet from BSG. No one ever got banned for using it though.
+After over a year of trying to get in contact with BSG, it finally worked out.
+So here it is, the long-awaited response, regarding the use of Rat Scanner:
+
+> "[They (BSG)] checked it [Rat Scanner] and found nothing suspicious. But stay fair and don't give them [BSG/BE] a reason"
+
+I know it's a rather brief response, when considering how long it took. Nevertheless, I hope lots of you who enjoy Rat Scanner can now continue to do so without the feeling of risking a ban.
 
 <br/>
 

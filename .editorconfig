@@ -1,16 +1,16 @@
 [*.{cs}]
-indent_size = 4
-tab_width = 4
+indent_size=4
+tab_width=4
 
 [*.{appxmanifest,build,config,csproj,dbml,discomap,dtd,json,jsproj,lsproj,njsproj,nuspec,proj,props,resjson,resw,resx,StyleCop,targets,tasks,vbproj,xaml,xamlx,xml,xoml,xsd}]
-indent_size = 2
-tab_width = 2
+indent_size=2
+tab_width=2
 
 [*]
-indent_style = tab
-end_of_line = crlf
-trim_trailing_whitespace = true
-insert_final_newline = true
+indent_style=tab
+end_of_line=crlf
+trim_trailing_whitespace=true
+insert_final_newline=true
 
 # Microsoft .NET properties
 csharp_new_line_before_members_in_object_initializers=false
@@ -25,3 +25,7 @@ dotnet_style_qualification_for_field=false:warning
 dotnet_style_qualification_for_method=false:warning
 dotnet_style_qualification_for_property=false:warning
 dotnet_style_require_accessibility_modifiers=for_non_interface_members:hint
+
+# ReSharper properties
+resharper_csharp_empty_block_style=together_same_line
+resharper_place_expr_method_on_single_line=true

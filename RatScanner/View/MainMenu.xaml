@@ -3,11 +3,12 @@
 						 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 						 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 						 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-						 d:DesignHeight="390"
+						 xmlns:viewmodel="clr-namespace:RatScanner.ViewModel"
+						 d:DataContext="{d:DesignInstance Type=viewmodel:MainWindowVM}"
+						 d:DesignHeight="370"
 						 d:DesignWidth="280"
 						 x:ClassModifier="internal"
-						 mc:Ignorable="d"
-						 Loaded="OnLoaded">
+						 mc:Ignorable="d">
 
 	<UserControl.Style>
 		<Style TargetType="{x:Type UserControl}">
@@ -22,7 +23,7 @@
 
 	<Grid Margin="10,0">
 		<StackPanel Grid.Row="0">
-			<Grid Margin="0,10,0,10">
+			<Grid Margin="0,5,0,5">
 				<StackPanel Grid.Column="0"
 										VerticalAlignment="Center"
 										Orientation="Horizontal">
@@ -89,32 +90,7 @@
 			</Grid>
 
 			<StackPanel>
-				<Separator Margin="5,0,0,0"/>
-				<Grid Margin="0,5,5,5">
-					<Label Grid.Column="0"
-								 Content="Wishlist" />
-
-					<DockPanel Grid.Column="1">
-						<Button Content="▼"
-										Command="{Binding DecreaseAmountCommand}"
-										Height="20"
-										Width="20" />
-						<Label Content="{Binding WishlistAmount, UpdateSourceTrigger=PropertyChanged}" />
-						<Button Content="▲"
-										Command="{Binding IncreaseAmountCommand}"
-										Height="20"
-										Width="20" />
-					</DockPanel>
-
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="*" />
-						<ColumnDefinition Width="Auto" />
-					</Grid.ColumnDefinitions>
-				</Grid>
-			</StackPanel>
-
-			<StackPanel>
-				<Separator Margin="5,0,0,0" />
+				<Separator Margin="0,0,0,0" />
 				<Grid>
 					<Label Grid.Column="0"
 								 Content="Average Day Price" />
@@ -127,7 +103,7 @@
 					</Grid.ColumnDefinitions>
 				</Grid>
 
-				<Grid Margin="0,5">
+				<Grid>
 					<Label Grid.Column="0"
 								 Content="Price per Slot" />
 					<Label Grid.Column="1"
@@ -142,7 +118,7 @@
 
 			<StackPanel>
 				<Separator />
-				<Grid Margin="0,5,0,0">
+				<Grid>
 					<Label Grid.Column="0"
 								 Content="Trader" />
 					<Label Grid.Column="1"
@@ -154,7 +130,7 @@
 					</Grid.ColumnDefinitions>
 				</Grid>
 
-				<Grid Margin="0,0,0,5">
+				<Grid>
 					<Label Grid.Column="0"
 								 Content="Buy Price" />
 					<Label Grid.Column="1"
@@ -166,7 +142,7 @@
 					</Grid.ColumnDefinitions>
 				</Grid>
 
-				<Grid Margin="0,0,0,5">
+				<Grid>
 					<Label Grid.Column="0"
 								 Content="Max Buy Price" />
 					<Label Grid.Column="1"
@@ -228,16 +204,24 @@
 					</Grid.ColumnDefinitions>
 				</Grid>
 			</StackPanel>
-					
+
 			<StackPanel>
-				<Separator />
+				<Separator Margin="0,0,0,0"/>
 				<Grid Margin="0,5,0,0">
 					<Label Grid.Column="0"
-								 Content="Updated"
-								 FontSize="10" />
-					<Label Grid.Column="1"
-								 Content="{Binding Updated}"
-								 FontSize="10" />
+								 Content="Wishlist" />
+
+					<DockPanel Grid.Column="1">
+						<Button Content="▼"
+										Command="{Binding DecreaseAmountCommand}"
+										Height="20"
+										Width="20" />
+						<Label Content="{Binding WishlistAmount, UpdateSourceTrigger=PropertyChanged}" />
+						<Button Content="▲"
+										Command="{Binding IncreaseAmountCommand}"
+										Height="20"
+										Width="20" />
+					</DockPanel>
 
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*" />
@@ -245,6 +229,124 @@
 					</Grid.ColumnDefinitions>
 				</Grid>
 			</StackPanel>
+
+			<Grid>
+				<Label Grid.Column="0"
+							 HorizontalAlignment="Left"
+							 Content="Quest &amp; Hideout" />
+				<StackPanel Grid.Column="1"
+										Orientation="Horizontal"
+										HorizontalAlignment="Right">
+					<Label Content="{Binding TrackingNeeds.QuestRemaining, FallbackValue=0}" />
+					<Image Source="{StaticResource questIcon}"
+								 Height="20" />
+				</StackPanel>
+				<StackPanel Grid.Column="2"
+										Orientation="Horizontal"
+										HorizontalAlignment="Right">
+					<Label Content="{Binding TrackingNeeds.HideoutRemaining, FallbackValue=0}" />
+					<Image Source="{StaticResource hideoutIcon}"
+								 Height="20" />
+				</StackPanel>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="2*" />
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
+			</Grid>
+
+			<!-- Optional teammate section -->
+			<StackPanel x:Name="TeammateQHTrackingDisplay"
+									d:Visibility="Collapsed">
+				<Separator />
+
+				<Grid>
+					<Label Grid.Column="0"
+								 Content="Teammate"
+								 FontWeight="Medium"
+								 HorizontalAlignment="Left" />
+					<Label Grid.Column="1"
+								 Content="Quest"
+								 FontWeight="Medium"
+								 HorizontalAlignment="Center" />
+					<Label Grid.Column="2"
+								 Content="Hideout"
+								 FontWeight="Medium"
+								 HorizontalAlignment="Right" />
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="2*" />
+						<ColumnDefinition Width="*" />
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+				</Grid>
+
+				<ListView ItemsSource="{Binding TrackingTeamNeeds}"
+									Background="Transparent"
+									BorderThickness="0">
+					<ListView.ItemContainerStyle>
+						<Style TargetType="ListViewItem">
+							<Setter Property="HorizontalContentAlignment"
+											Value="Stretch" />
+							<Setter Property="Focusable"
+											Value="False" />
+							<Setter Property="Template">
+								<Setter.Value>
+									<ControlTemplate TargetType="ListViewItem">
+										<ContentPresenter Margin="0, 2" />
+									</ControlTemplate>
+								</Setter.Value>
+							</Setter>
+						</Style>
+					</ListView.ItemContainerStyle>
+
+					<ListView.ItemTemplate>
+						<DataTemplate>
+							<Grid Height="17">
+								<Grid.Resources>
+									<Style TargetType="Label"
+												 BasedOn="{StaticResource {x:Type Label}}">
+										<Setter Property="Margin"
+														Value="0" />
+										<Setter Property="Padding"
+														Value="0" />
+										<Setter Property="HorizontalAlignment"
+														Value="Center" />
+									</Style>
+								</Grid.Resources>
+								<Label Grid.Column="0"
+											 Margin="5, 0"
+											 HorizontalAlignment="Left"
+											 Content="{Binding Key}" />
+								<Label Grid.Column="1"
+											 Content="{Binding Value.QuestRemaining}" />
+								<Label Grid.Column="2"
+											 Content="{Binding Value.HideoutRemaining}" />
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="2*" />
+									<ColumnDefinition Width="*" />
+									<ColumnDefinition Width="*" />
+								</Grid.ColumnDefinitions>
+							</Grid>
+						</DataTemplate>
+					</ListView.ItemTemplate>
+				</ListView>
+			</StackPanel>
+
+			<Separator />
+
+			<Grid>
+				<Label Grid.Column="0"
+							 Content="Updated"
+							 FontSize="12" />
+				<Label Grid.Column="1"
+							 Content="{Binding Updated}"
+							 FontSize="12" />
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
+			</Grid>
 		</StackPanel>
 
 		<Grid Grid.Row="1"

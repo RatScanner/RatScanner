@@ -26,15 +26,15 @@ namespace RatScanner
 			R2560x1080 = 7,
 			R3840x1080 = 8,
 			R3440x1440 = 9,
-			R5120x1440 = 10
+			R5120x1440 = 10,
 		}
 
 		internal static Dictionary<Resolution, Vector2> ResolutionDict = new Dictionary<Resolution, Vector2>()
 		{
-			{Resolution.R1366x768, new Vector2(1366,  768)},
-			{Resolution.R1440x900, new Vector2(1440,  900)},
+			{Resolution.R1366x768, new Vector2(1366, 768)},
+			{Resolution.R1440x900, new Vector2(1440, 900)},
 			{Resolution.R1440x1080, new Vector2(1440, 1080)},
-			{Resolution.R1600x900, new Vector2(1600,  900)},
+			{Resolution.R1600x900, new Vector2(1600, 900)},
 			{Resolution.R1920x1080, new Vector2(1920, 1080)},
 			{Resolution.R2560x1440, new Vector2(2560, 1440)},
 			{Resolution.R3840x2160, new Vector2(3840, 2160)},
@@ -115,16 +115,44 @@ namespace RatScanner
 			internal static bool ShowTraderPrice = true;
 			internal static bool ShowTraderMaxPrice = false;
 			internal static bool ShowUpdated = false;
+			internal static bool ShowQuestHideoutTracker = true;
+			internal static bool ShowQuestHideoutTeamTracker = false;
 			internal static int Opacity = 10;
 		}
 
+		// Progress Tracking options
+		internal static class Tracking
+		{
+			internal static bool ShowNonFIRNeeds = true;
+
+			internal static class TarkovTracker
+			{
+				internal static bool Enable => Token.Length > 0;
+
+				internal static string Token = "";
+				internal static bool ShowTeam = true;
+				internal static int RefreshTime = 10 * 60 * 1000;   // 10 minutes
+			}
+		}
+
 		// Other
+#if DEBUG
+		internal static bool LogDebug
+		{
+			get => true;
+			set { }
+		}
+#else
 		internal static bool LogDebug = false;
+#endif
 		internal static bool MinimizeToTray = false;
 		internal static bool AlwaysOnTop = true;
+		internal static int MarketDBRefreshTime = 60 * 60 * 1000;   // 1 hour
+		internal static string ItemDataVersion = "20200101";
 		private static int ConfigVersion => 1;
 
 		private static Resolution screenResolution = Resolution.R1920x1080;
+
 		internal static Resolution ScreenResolution
 		{
 			get => screenResolution;
@@ -161,6 +189,7 @@ namespace RatScanner
 		}
 
 		#region Resolution presets
+
 		private static void LoadWXGA()
 		{
 			NameScan.Marker = Resources.markerWXGA;
@@ -216,6 +245,7 @@ namespace RatScanner
 			IconScan.ItemSlotSize = 126;
 			ToolTip.HeightOffset = 10;
 		}
+
 		#endregion
 
 		internal static float GetScreenScaleFactor()
@@ -238,10 +268,7 @@ namespace RatScanner
 			var config = new SimpleConfig(Paths.ConfigFile, "Other");
 			var readConfigVersion = config.ReadInt(nameof(ConfigVersion), -1);
 			var isSupportedConfigVersion = ConfigVersion == readConfigVersion;
-			if (!isSupportedConfigVersion)
-			{
-				Logger.LogWarning("Config version (" + readConfigVersion + ") is not supported!");
-			}
+			if (!isSupportedConfigVersion) Logger.LogWarning("Config version (" + readConfigVersion + ") is not supported!");
 			return isSupportedConfigVersion;
 		}
 
@@ -291,12 +318,22 @@ namespace RatScanner
 			MinimalUi.ShowTraderPrice = config.ReadBool(nameof(MinimalUi.ShowTraderPrice), true);
 			MinimalUi.ShowTraderMaxPrice = config.ReadBool(nameof(MinimalUi.ShowTraderMaxPrice), true);
 			MinimalUi.ShowUpdated = config.ReadBool(nameof(MinimalUi.ShowUpdated), true);
+			MinimalUi.ShowQuestHideoutTracker = config.ReadBool(nameof(MinimalUi.ShowQuestHideoutTracker), true);
+			MinimalUi.ShowQuestHideoutTeamTracker = config.ReadBool(nameof(MinimalUi.ShowQuestHideoutTeamTracker), true);
 			MinimalUi.Opacity = config.ReadInt(nameof(MinimalUi.Opacity), 50);
+
+			config.Section = nameof(Tracking);
+			Tracking.ShowNonFIRNeeds = config.ReadBool(nameof(Tracking.ShowNonFIRNeeds), true);
+
+			config.Section = nameof(Tracking.TarkovTracker);
+			Tracking.TarkovTracker.Token = config.ReadString(nameof(Tracking.TarkovTracker.Token), "");
+			Tracking.TarkovTracker.ShowTeam = config.ReadBool(nameof(Tracking.TarkovTracker.ShowTeam), true);
 
 			config.Section = "Other";
 			ScreenResolution = (Resolution)config.ReadInt(nameof(ScreenResolution), (int)Resolution.R1920x1080);
 			MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), false);
 			AlwaysOnTop = config.ReadBool(nameof(AlwaysOnTop), false);
+			ItemDataVersion = config.ReadString(nameof(ItemDataVersion), "20200101");
 			LogDebug = config.ReadBool(nameof(LogDebug), false);
 		}
 
@@ -326,12 +363,22 @@ namespace RatScanner
 			config.WriteBool(nameof(MinimalUi.ShowTraderPrice), MinimalUi.ShowTraderPrice);
 			config.WriteBool(nameof(MinimalUi.ShowTraderMaxPrice), MinimalUi.ShowTraderMaxPrice);
 			config.WriteBool(nameof(MinimalUi.ShowUpdated), MinimalUi.ShowUpdated);
+			config.WriteBool(nameof(MinimalUi.ShowQuestHideoutTracker), MinimalUi.ShowQuestHideoutTracker);
+			config.WriteBool(nameof(MinimalUi.ShowQuestHideoutTeamTracker), MinimalUi.ShowQuestHideoutTeamTracker);
 			config.WriteInt(nameof(MinimalUi.Opacity), MinimalUi.Opacity);
+
+			config.Section = nameof(Tracking);
+			config.WriteBool(nameof(Tracking.ShowNonFIRNeeds), Tracking.ShowNonFIRNeeds);
+
+			config.Section = nameof(Tracking.TarkovTracker);
+			config.WriteString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);
+			config.WriteBool(nameof(Tracking.TarkovTracker.ShowTeam), Tracking.TarkovTracker.ShowTeam);
 
 			config.Section = "Other";
 			config.WriteInt(nameof(ScreenResolution), (int)ScreenResolution);
 			config.WriteBool(nameof(MinimizeToTray), MinimizeToTray);
 			config.WriteBool(nameof(AlwaysOnTop), AlwaysOnTop);
+			config.WriteString(nameof(ItemDataVersion), ItemDataVersion);
 			config.WriteBool(nameof(LogDebug), LogDebug);
 			config.WriteInt(nameof(ConfigVersion), ConfigVersion);
 		}
@@ -344,10 +391,7 @@ namespace RatScanner
 			var boundsRectangle = Screen.PrimaryScreen.Bounds;
 			var resolutionString = $"R{boundsRectangle.Width}x{boundsRectangle.Height}";
 			Enum.TryParse(typeof(Resolution), resolutionString, out var matchingResolution);
-			if (matchingResolution != null)
-			{
-				screenResolution = (Resolution)matchingResolution;
-			}
+			if (matchingResolution != null) screenResolution = (Resolution)matchingResolution;
 		}
 	}
 }
