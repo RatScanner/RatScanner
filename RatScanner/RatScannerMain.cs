@@ -136,16 +136,14 @@ namespace RatScanner
 		private void CheckForUpdates()
 		{
 			var mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ClientVersion);
-			if (RatConfig.Version != mostRecentVersion)
-			{
-				Logger.LogInfo("A new version is available: " + mostRecentVersion);
+			if (RatConfig.Version == mostRecentVersion) return;
+			Logger.LogInfo("A new version is available: " + mostRecentVersion);
 
-				var message = "Version " + mostRecentVersion + " is available!\n";
-				message += "You are using: " + RatConfig.Version + "\n\n";
-				message += "Do you want to install it now?";
-				var result = MessageBox.Show(message, "Rat Scanner Updater", MessageBoxButton.YesNo);
-				if (result == MessageBoxResult.Yes) UpdateRatScanner();
-			}
+			var message = "Version " + mostRecentVersion + " is available!\n";
+			message += "You are using: " + RatConfig.Version + "\n\n";
+			message += "Do you want to install it now?";
+			var result = MessageBox.Show(message, "Rat Scanner Updater", MessageBoxButton.YesNo);
+			if (result == MessageBoxResult.Yes) UpdateRatScanner();
 		}
 
 		private void UpdateRatScanner()
