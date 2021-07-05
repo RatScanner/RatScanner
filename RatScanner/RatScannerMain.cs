@@ -159,8 +159,16 @@ namespace RatScanner
 
 		private void LoadItemDatabase()
 		{
-			var itemDataLink = ApiManager.GetResource(ApiManager.ResourceType.ItemDataLink);
-			ApiManager.DownloadFile(itemDataLink, RatConfig.Paths.ItemData);
+			var mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ItemDataVersion);
+			if (mostRecentVersion != RatConfig.ItemDataVersion)
+			{
+				Logger.LogInfo("A new item data version is available: " + mostRecentVersion);
+				var itemDataLink = ApiManager.GetResource(ApiManager.ResourceType.ItemDataLink);
+				ApiManager.DownloadFile(itemDataLink, RatConfig.Paths.ItemData);
+				RatConfig.ItemDataVersion = mostRecentVersion;
+				RatConfig.SaveConfig();
+			}
+
 			var itemDB = Database.FromFile(RatConfig.Paths.ItemData);
 			ItemDB = itemDB.Filter(item => !item.QuestItem);
 		}

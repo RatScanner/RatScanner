@@ -147,6 +147,7 @@ namespace RatScanner
 		internal static bool MinimizeToTray = false;
 		internal static bool AlwaysOnTop = true;
 		internal static int MarketDBRefreshTime = 60 * 60 * 1000;   // 1 hour
+		internal static string ItemDataVersion = "20200101";
 		private static int ConfigVersion => 1;
 
 		private static Resolution screenResolution = Resolution.R1920x1080;
@@ -331,6 +332,7 @@ namespace RatScanner
 			ScreenResolution = (Resolution)config.ReadInt(nameof(ScreenResolution), (int)Resolution.R1920x1080);
 			MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), false);
 			AlwaysOnTop = config.ReadBool(nameof(AlwaysOnTop), false);
+			ItemDataVersion = config.ReadString(nameof(ItemDataVersion), "20200101");
 			LogDebug = config.ReadBool(nameof(LogDebug), false);
 		}
 
@@ -375,6 +377,7 @@ namespace RatScanner
 			config.WriteInt(nameof(ScreenResolution), (int)ScreenResolution);
 			config.WriteBool(nameof(MinimizeToTray), MinimizeToTray);
 			config.WriteBool(nameof(AlwaysOnTop), AlwaysOnTop);
+			config.WriteString(nameof(ItemDataVersion), ItemDataVersion);
 			config.WriteBool(nameof(LogDebug), LogDebug);
 			config.WriteInt(nameof(ConfigVersion), ConfigVersion);
 		}
