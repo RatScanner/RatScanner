@@ -22,12 +22,12 @@ namespace RatScanner
 
 		private static readonly Dictionary<Language, string> LanguageMapping = new Dictionary<Language, string>()
 		{
-			{ Language.English, "en" },
-			{ Language.Russian, "ru" },
-			{ Language.German, "de" },
-			{ Language.French, "fr" },
-			{ Language.Spanish, "es" },
-			{ Language.Chinese, "cn" },
+			{Language.English, "en"},
+			{Language.Russian, "ru"},
+			{Language.German, "de"},
+			{Language.French, "fr"},
+			{Language.Spanish, "es"},
+			{Language.Chinese, "cn"},
 		};
 
 		public enum ResourceType
@@ -44,19 +44,26 @@ namespace RatScanner
 
 		private static readonly Dictionary<ResourceType, string> ResMapping = new Dictionary<ResourceType, string>
 		{
-			{ ResourceType.ClientVersion, "RSClientVersion" },
-			{ ResourceType.DownloadLink, "RSDownloadLink" },
-			{ ResourceType.PatreonLink, "RSPatreonLink" },
-			{ ResourceType.GithubLink, "RSGithubLink" },
-			{ ResourceType.DiscordLink, "RSDiscordLink" },
-			{ ResourceType.FAQLink, "RSFAQLink" },
-			{ ResourceType.ItemDataLink, "RSItemDataLink" },
-			{ ResourceType.ItemDataVersion, "RSItemDataVersion" },
+			{ResourceType.ClientVersion, "RSClientVersion"},
+			{ResourceType.DownloadLink, "RSDownloadLink"},
+			{ResourceType.PatreonLink, "RSPatreonLink"},
+			{ResourceType.GithubLink, "RSGithubLink"},
+			{ResourceType.DiscordLink, "RSDiscordLink"},
+			{ResourceType.FAQLink, "RSFAQLink"},
+			{ResourceType.ItemDataLink, "RSItemDataLink"},
+			{ResourceType.ItemDataVersion, "RSItemDataVersion"},
 		};
 
 		private static readonly Dictionary<ResourceType, string> ResCache = new Dictionary<ResourceType, string>();
 
+		// Official RatScanner API URL
 		private const string BaseUrl = "https://api.ratscanner.com/v3";
+
+		// GitHub page for the tarkovdata repository, serves the master branch
+		private const string TarkovDataUrl = "https://tarkovtracker.github.io/tarkovdata";
+
+		// Base URL for the TarkovTracker URL
+		private const string TarkovTrackerUrl = "https://tarkovtracker.io/api/v1";
 
 		public static MarketItem[] GetMarketDB(Language language = Language.English)
 		{
@@ -73,21 +80,119 @@ namespace RatScanner
 			}
 		}
 
+		// Checks the token metadata endpoint for TarkovTracker
+		public static string? GetTarkovTrackerToken()
+		{
+			try
+			{
+				return Get($"{TarkovTrackerUrl}/token", RatConfig.Tracking.TarkovTracker.Token);
+			}
+			catch (WebException e)
+			{
+				var status = (e.Response as HttpWebResponse)?.StatusCode;
+				if (status is HttpStatusCode.Unauthorized)
+					// We can work with a 401
+					throw new FetchModels.TarkovTracker.UnauthorizedTokenException("Token was rejected by the API", e);
+
+				if (status is HttpStatusCode.TooManyRequests)
+					throw new FetchModels.TarkovTracker.RateLimitExceededException("Rate Limiting reached for token", e);
+				// Unknown error, continue throwing
+				Logger.LogError($"Retrieving token metadata failed.", e);
+				throw;
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"Retrieving token metadata failed.", e);
+				throw;
+			}
+		}
+
+		// Checks the token metadata endpoint for TarkovTracker
+		public static string GetTarkovTrackerTeam()
+		{
+			try
+			{
+				return Get($"{TarkovTrackerUrl}/team/progress", RatConfig.Tracking.TarkovTracker.Token);
+			}
+			catch (WebException e)
+			{
+				var status = (e.Response as HttpWebResponse)?.StatusCode;
+				if (status is HttpStatusCode.TooManyRequests)
+					throw new FetchModels.TarkovTracker.RateLimitExceededException("Rate Limiting reached for token", e);
+				// Unknown error, continue throwing
+				Logger.LogError($"Retrieving TarkovTracker team data failed.", e);
+				throw;
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"Retrieving TarkovTracker team data failed.", e);
+				return null;
+			}
+		}
+
+		// Checks the token metadata endpoint for TarkovTracker
+		public static string GetTarkovTrackerSolo()
+		{
+			try
+			{
+				return Get($"{TarkovTrackerUrl}/progress", RatConfig.Tracking.TarkovTracker.Token);
+			}
+			catch (WebException e)
+			{
+				var status = (e.Response as HttpWebResponse)?.StatusCode;
+				if (status is HttpStatusCode.TooManyRequests)
+					throw new FetchModels.TarkovTracker.RateLimitExceededException("Rate Limiting reached for token", e);
+				// Unknown error, continue throwing
+				Logger.LogError($"Retrieving TarkovTracker progress data failed.", e);
+				throw;
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"Retrieving TarkovTracker progress data failed.", e);
+				return null;
+			}
+		}
+
+		// Pulls the whole quest data file from tarkovdata for processing
+		public static string GetProgressDataQuest()
+		{
+			try
+			{
+				return Get($"{TarkovDataUrl}/quests.json");
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"Loading of quest data failed.", e);
+				return null;
+			}
+		}
+
+		// Pulls the whole hideout file form tarkovdata for processing
+		public static string GetProgressDataHideout()
+		{
+			try
+			{
+				return Get($"{TarkovDataUrl}/hideout.json");
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"Loading of hideout data failed.", e);
+				return null;
+			}
+		}
+
 		public static string GetResource(ResourceType resource)
 		{
 			if (ResCache.ContainsKey(resource)) return ResCache[resource];
 
-			if (!ResMapping.ContainsKey(resource))
-			{
-				Logger.LogError($"Could not find resource mapping for: {resource}");
-			}
+			if (!ResMapping.ContainsKey(resource)) Logger.LogError($"Could not find resource mapping for: {resource}");
 			var resPath = ResMapping[resource];
 
 			try
 			{
 				Logger.LogInfo($"Loading resource \"{resPath}\"...");
 				var json = Get($"{BaseUrl}/res/{resPath}");
-				var value = JsonConvert.DeserializeObject<Resource>(json).Value;
+				var value = JsonConvert.DeserializeObject<Resource>(json)?.Value;
 				ResCache.Add(resource, value);
 				return value;
 			}
@@ -112,12 +217,13 @@ namespace RatScanner
 			}
 		}
 
-		private static string Get(string url)
+		private static string Get(string url, string bearerToken = null)
 		{
 			var request = WebRequest.CreateHttp(url);
 			request.Method = WebRequestMethods.Http.Get;
 			request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
-			request.UserAgent = $"Rat Scanner Client {RatConfig.Version}";
+			request.UserAgent = $"RatScanner-Client/{RatConfig.Version}";
+			if (bearerToken != null) request.Headers.Add("Authorization", "Bearer " + bearerToken);
 
 			using var response = (HttpWebResponse)request.GetResponse();
 			using var stream = response.GetResponseStream();

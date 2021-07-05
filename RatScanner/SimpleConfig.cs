@@ -15,6 +15,7 @@ namespace RatScanner
 
 		[DllImport("kernel32")]
 		private static extern long WritePrivateProfileString(string section, string key, string val, string filePath);
+
 		[DllImport("kernel32")]
 		private static extern int GetPrivateProfileString(string section, string key, string def, StringBuilder retVal, int size, string filePath);
 

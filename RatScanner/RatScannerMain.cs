@@ -10,6 +10,7 @@ using RatScanner.Scan;
 using RatScanner.View;
 using RatStash;
 using Size = System.Drawing.Size;
+using Timer = System.Threading.Timer;
 
 namespace RatScanner
 {
@@ -24,6 +25,10 @@ namespace RatScanner
 		private readonly IconScanToolTip _iconScanToolTip;
 
 		private ItemScan _currentItemScan;
+
+		private Timer _marketDBRefreshTimer;
+		private Timer _tarkovTrackerDBRefreshTimer;
+
 
 		/// <summary>
 		/// Lock for name scanning
@@ -42,7 +47,9 @@ namespace RatScanner
 		internal static object IconScanLock = new object();
 
 		internal MarketDB MarketDB;
-		internal RatStash.Database ItemDB;
+		internal ProgressDB ProgressDB;
+		internal TarkovTrackerDB TarkovTrackerDB;
+		internal Database ItemDB;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
@@ -71,6 +78,24 @@ namespace RatScanner
 
 			Logger.LogInfo("Loading item data...");
 			LoadItemDatabase();
+
+			// Check for TarkovTracker data
+			TarkovTrackerDB = new TarkovTrackerDB();
+			if (RatConfig.Tracking.TarkovTracker.Enable)
+			{
+				Logger.LogInfo("Loading TarkovTracker...");
+				if (!TarkovTrackerDB.Init())
+				{
+					Logger.ShowWarning("TarkovTracker API Token invalid!\n\nPlease provide a new token.");
+					RatConfig.Tracking.TarkovTracker.Token = "";
+					RatConfig.SaveConfig();
+				}
+			}
+
+			// Grab quest and hideout requirements from tarkovdata
+			Logger.LogInfo("Loading progress data...");
+			ProgressDB = new ProgressDB();
+			ProgressDB.Init();
 
 			Logger.LogInfo("Loading price data...");
 			MarketDB = new MarketDB();
@@ -101,30 +126,29 @@ namespace RatScanner
 			Logger.LogInfo("Checking for new updates...");
 			CheckForUpdates();
 
+			Logger.LogInfo("Setting up data update routines...");
+			_marketDBRefreshTimer = new Timer(RefreshMarketDB, null, RatConfig.MarketDBRefreshTime, Timeout.Infinite);
+			_tarkovTrackerDBRefreshTimer = new Timer(RefreshTarkovTrackerDB, null, RatConfig.Tracking.TarkovTracker.RefreshTime, Timeout.Infinite);
+
 			Logger.LogInfo("Ready!");
 		}
 
 		private void CheckForUpdates()
 		{
 			var mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ClientVersion);
-			if (RatConfig.Version != mostRecentVersion)
-			{
-				Logger.LogInfo("A new version is available: " + mostRecentVersion);
+			if (RatConfig.Version == mostRecentVersion) return;
+			Logger.LogInfo("A new version is available: " + mostRecentVersion);
 
-				var message = "Version " + mostRecentVersion + " is available!\n";
-				message += "You are using: " + RatConfig.Version + "\n\n";
-				message += "Do you want to install it now?";
-				var result = MessageBox.Show(message, "Rat Scanner Updater", MessageBoxButton.YesNo);
-				if (result == MessageBoxResult.Yes) UpdateRatScanner();
-			}
+			var message = "Version " + mostRecentVersion + " is available!\n";
+			message += "You are using: " + RatConfig.Version + "\n\n";
+			message += "Do you want to install it now?";
+			var result = MessageBox.Show(message, "Rat Scanner Updater", MessageBoxButton.YesNo);
+			if (result == MessageBoxResult.Yes) UpdateRatScanner();
 		}
 
 		private void UpdateRatScanner()
 		{
-			if (!File.Exists(RatConfig.Paths.Updater))
-			{
-				Logger.LogError(RatConfig.Paths.Updater + " could not be found! Please update manually.");
-			}
+			if (!File.Exists(RatConfig.Paths.Updater)) Logger.LogError(RatConfig.Paths.Updater + " could not be found! Please update manually.");
 			var startInfo = new ProcessStartInfo(RatConfig.Paths.Updater);
 			startInfo.UseShellExecute = true;
 			startInfo.ArgumentList.Add("--start");
@@ -135,8 +159,16 @@ namespace RatScanner
 
 		private void LoadItemDatabase()
 		{
-			var itemDataLink = ApiManager.GetResource(ApiManager.ResourceType.ItemDataLink);
-			ApiManager.DownloadFile(itemDataLink, RatConfig.Paths.ItemData);
+			var mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ItemDataVersion);
+			if (mostRecentVersion != RatConfig.ItemDataVersion)
+			{
+				Logger.LogInfo("A new item data version is available: " + mostRecentVersion);
+				var itemDataLink = ApiManager.GetResource(ApiManager.ResourceType.ItemDataLink);
+				ApiManager.DownloadFile(itemDataLink, RatConfig.Paths.ItemData);
+				RatConfig.ItemDataVersion = mostRecentVersion;
+				RatConfig.SaveConfig();
+			}
+
 			var itemDB = Database.FromFile(RatConfig.Paths.ItemData);
 			ItemDB = itemDB.Filter(item => !item.QuestItem);
 		}
@@ -151,15 +183,14 @@ namespace RatScanner
 			Logger.LogDebug("Icon scanning at: " + position);
 			lock (IconScanLock)
 			{
-
 				_iconScanToolTip.Dispatcher.Invoke(() =>
 				{
 					IconScanToolTip.ScheduleHide();
 					_iconScanToolTip.Hide(); // Hide it instantly
 				});
 
-				var x = position.X - (RatConfig.IconScan.ScanWidth / 2);
-				var y = position.Y - (RatConfig.IconScan.ScanHeight / 2);
+				var x = position.X - RatConfig.IconScan.ScanWidth / 2;
+				var y = position.Y - RatConfig.IconScan.ScanHeight / 2;
 
 				var screenshotPosition = new Vector2(x, y);
 				var size = new Size(RatConfig.IconScan.ScanWidth, RatConfig.IconScan.ScanHeight);
@@ -173,6 +204,7 @@ namespace RatScanner
 
 				ShowToolTip(itemIconScan);
 			}
+
 			return true;
 		}
 
@@ -186,11 +218,10 @@ namespace RatScanner
 			Logger.LogDebug("Name scanning at: " + position);
 			lock (NameScanLock)
 			{
-
 				_nameScanToolTip.Dispatcher.Invoke(() =>
 				{
 					NameScanToolTip.ScheduleHide();
-					_nameScanToolTip.Hide();    // Hide it instantly
+					_nameScanToolTip.Hide(); // Hide it instantly
 				});
 
 				// Wait for game ui to update the click
@@ -198,8 +229,8 @@ namespace RatScanner
 
 				// Get raw screenshot which includes the icon and text
 				var markerScanSize = RatConfig.NameScan.MarkerScanSize;
-				var screenshotPosX = position.X - (markerScanSize / 2);
-				var screenshotPosY = position.Y - (markerScanSize / 2);
+				var screenshotPosX = position.X - markerScanSize / 2;
+				var screenshotPosY = position.Y - markerScanSize / 2;
 				var sizeWidth = markerScanSize + RatConfig.NameScan.TextWidth + RatConfig.NameScan.TextHorizontalOffset;
 				var sizeHeight = markerScanSize;
 				var screenshot = GetScreenshot(new Vector2(screenshotPosX, screenshotPosY), new Size(sizeWidth, sizeHeight));
@@ -212,6 +243,7 @@ namespace RatScanner
 
 				ShowToolTip(itemNameScan);
 			}
+
 			return true;
 		}
 
@@ -220,9 +252,14 @@ namespace RatScanner
 		{
 			var bmp = new Bitmap(size.Width, size.Height, PixelFormat.Format24bppRgb);
 
-			using (var gfx = Graphics.FromImage(bmp))
+			try
 			{
+				using var gfx = Graphics.FromImage(bmp);
 				gfx.CopyFromScreen(vector2.X, vector2.Y, 0, 0, size, CopyPixelOperation.SourceCopy);
+			}
+			catch (Exception e)
+			{
+				Logger.LogWarning("Unable to capture screenshot", e);
 			}
 
 			return bmp;
@@ -236,6 +273,20 @@ namespace RatScanner
 
 			if (itemScan is ItemNameScan) NameScanToolTip.ScheduleShow(itemScan, pos, RatConfig.ToolTip.Duration);
 			if (itemScan is ItemIconScan) IconScanToolTip.ScheduleShow(itemScan, pos, RatConfig.ToolTip.Duration);
+		}
+
+		private void RefreshMarketDB(object? o)
+		{
+			Logger.LogInfo("Refreshing Market DB...");
+			MarketDB.Init();
+			_marketDBRefreshTimer.Change(RatConfig.MarketDBRefreshTime, Timeout.Infinite);
+		}
+
+		private void RefreshTarkovTrackerDB(object? o)
+		{
+			Logger.LogInfo("Refreshing TarkovTracker DB...");
+			TarkovTrackerDB.Init();
+			_tarkovTrackerDBRefreshTimer.Change(RatConfig.Tracking.TarkovTracker.RefreshTime, Timeout.Infinite);
 		}
 
 		protected virtual void OnPropertyChanged(string propertyName = null)

@@ -7,7 +7,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>Resources\RatLogoSmall.ico</ApplicationIcon>
     <StartupObject>RatScanner.App</StartupObject>
-    <Version>2.6.1</Version>
+    <Version>2.7.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -61,13 +61,10 @@
   <ItemGroup>
     <SplashScreen Include="Resources\RatLogoMedium.png" />
   </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(ProjectDir)Data\*&quot; &quot;$(TargetDir)\Data\&quot; /y /e /s /q" />
-    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DebugType>None</DebugType>
-    <DebugSymbols>false</DebugSymbols>
-  </PropertyGroup>
-
-</Target>
+  
+  <ItemGroup>
+    <Content Include="Data\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>

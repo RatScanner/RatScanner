@@ -43,7 +43,7 @@ namespace RatScanner
 				MouseButton.Middle => 0x04,
 				MouseButton.XButton1 => 0x05,
 				MouseButton.XButton2 => 0x06,
-				_ => throw new ArgumentOutOfRangeException(nameof(mouseButton), mouseButton, null)
+				_ => throw new ArgumentOutOfRangeException(nameof(mouseButton), mouseButton, null),
 			};
 		}
 
@@ -172,14 +172,17 @@ namespace RatScanner
 			/// Specifies a POINT structure that contains the x- and y-coordinates of the cursor, in screen coordinates. 
 			/// </summary>
 			internal Win32Point pt;
+
 			/// <summary>
 			/// Handle to the window that will receive the mouse message corresponding to the mouse event. 
 			/// </summary>
 			internal int hwnd;
+
 			/// <summary>
 			/// Specifies the hit-test value. For a list of hit-test values, see the description of the WM_NCHITTEST message. 
 			/// </summary>
 			internal int wHitTestCode;
+
 			/// <summary>
 			/// Specifies extra information associated with the message. 
 			/// </summary>
@@ -196,6 +199,7 @@ namespace RatScanner
 			/// Specifies a POINT structure that contains the x- and y-coordinates of the cursor, in screen coordinates. 
 			/// </summary>
 			internal Win32Point pt;
+
 			/// <summary>
 			/// If the message is WM_MOUSEWHEEL, the high-order word of this member is the wheel delta. 
 			/// The low-order word is reserved. A positive value indicates that the wheel was rotated forward, 
@@ -210,6 +214,7 @@ namespace RatScanner
 			///The second X button was pressed or released.
 			/// </summary>
 			internal int mouseData;
+
 			/// <summary>
 			/// Specifies the event-injected flag. An application can use the following value to test the mouse flags. Value Purpose 
 			///LLMHF_INJECTED Test the event-injected flag.  
@@ -219,10 +224,12 @@ namespace RatScanner
 			///Reserved.
 			/// </summary>
 			internal int flags;
+
 			/// <summary>
 			/// Specifies the time stamp for this message.
 			/// </summary>
 			internal int time;
+
 			/// <summary>
 			/// Specifies extra information associated with the message. 
 			/// </summary>
@@ -243,18 +250,22 @@ namespace RatScanner
 			/// Specifies a virtual-key code. The code must be a value in the range 1 to 254. 
 			/// </summary>
 			internal int vkCode;
+
 			/// <summary>
 			/// Specifies a hardware scan code for the key. 
 			/// </summary>
 			internal int scanCode;
+
 			/// <summary>
 			/// Specifies the extended-key flag, event-injected flag, context code, and transition-state flag.
 			/// </summary>
 			internal int flags;
+
 			/// <summary>
 			/// Specifies the time stamp for this message.
 			/// </summary>
 			internal int time;
+
 			/// <summary>
 			/// Specifies extra information associated with the message. 
 			/// </summary>
@@ -292,7 +303,7 @@ namespace RatScanner
 		/// http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winui/winui/windowsuserinterface/windowing/hooks/hookreference/hookfunctions/setwindowshookex.asp
 		/// </remarks>
 		[DllImport("user32.dll", CharSet = CharSet.Auto,
-		   CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+			CallingConvention = CallingConvention.StdCall, SetLastError = true)]
 		private static extern int SetWindowsHookEx(
 			int idHook,
 			HookProc lpfn,
@@ -391,7 +402,7 @@ namespace RatScanner
 					WH_KEYBOARD_LL,
 					KeyboardHookProcedure,
 					Marshal.GetHINSTANCE(
-					Assembly.GetExecutingAssembly().GetModules()[0]),
+						Assembly.GetExecutingAssembly().GetModules()[0]),
 					0);
 				// If SetWindowsHookEx fails
 				if (hKeyboardHook == 0)
@@ -480,16 +491,13 @@ namespace RatScanner
 			var handled = false;
 
 			// It was ok and someone listens to events
-			if ((nCode >= 0) && OnKeyboardKeyUp != null)
+			if (nCode >= 0 && OnKeyboardKeyUp != null)
 			{
 				// Read structure KeyboardHookStruct at lParam
-				var keyboardHookStruct = (KeyboardHookStruct)Marshal.PtrToStructure(lParam, typeof(KeyboardHookStruct));
+				var keyboardHookStruct = (KeyboardHookStruct) Marshal.PtrToStructure(lParam, typeof(KeyboardHookStruct));
 
 				// Skip processing if the key is not in a transition state
-				if ((keyboardHookStruct?.flags & 0b1000_0000) == 0)
-				{
-					return CallNextHookEx(hKeyboardHook, nCode, wParam, lParam);
-				}
+				if ((keyboardHookStruct?.flags & 0b1000_0000) == 0) return CallNextHookEx(hKeyboardHook, nCode, wParam, lParam);
 
 				// Raise OnKeyboardKeyUp
 				if (OnKeyboardKeyUp != null && (wParam == WM_KEYUP || wParam == WM_SYSKEYUP))
@@ -535,7 +543,7 @@ namespace RatScanner
 			var handled = false;
 
 			// If ok and someone listens to our events
-			if ((nCode >= 0) && OnMouseButtonUp != null)
+			if (nCode >= 0 && OnMouseButtonUp != null)
 			{
 				// Read structure MouseLLHookStruct at lParam
 				int? virtualKeycode = null;
@@ -552,7 +560,7 @@ namespace RatScanner
 						virtualKeycode = 0x04;
 						break;
 					case WM_XBUTTONUP:
-						var mouseHookStruct = (MouseLLHookStruct)Marshal.PtrToStructure(lParam, typeof(MouseLLHookStruct));
+						var mouseHookStruct = (MouseLLHookStruct) Marshal.PtrToStructure(lParam, typeof(MouseLLHookStruct));
 						if (mouseHookStruct.mouseData == 0x10000) virtualKeycode = 0x05;
 						else if (mouseHookStruct.mouseData == 0x20000) virtualKeycode = 0x06;
 						break;
@@ -568,6 +576,7 @@ namespace RatScanner
 			// If event is marked as handled, do not forward to other listeners
 			return handled ? 1 : CallNextHookEx(hMouseHook, nCode, wParam, lParam);
 		}
+
 		#endregion
 	}
 
