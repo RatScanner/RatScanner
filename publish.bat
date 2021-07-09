@@ -2,10 +2,10 @@
 
 if "%~1"=="--self-contained" (
 	echo Publishing as self contained
-	set selfContained = "true"
+	set selfContained="true"
 ) else (
 	echo Publishing framework dependet
-	set selfContained = "false"
+	set selfContained="false"
 )
 
 :: Remove old publish folder
