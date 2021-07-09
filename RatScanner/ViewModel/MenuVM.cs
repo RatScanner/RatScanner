@@ -132,11 +132,11 @@ namespace RatScanner.ViewModel
 		}
 
 		#region Commands
-		private readonly RelayCommand increaseAmountCommand;
-		public RelayCommand IncreaseAmountCommand => increaseAmountCommand ?? new RelayCommand(() => IncreaseAmount());
+		private RelayCommand increaseAmountCommand;
+		public RelayCommand IncreaseAmountCommand => increaseAmountCommand ??= new RelayCommand(() => IncreaseAmount());
 
-		private readonly RelayCommand decreaseAmountCommand;
-		public RelayCommand DecreaseAmountCommand => decreaseAmountCommand ?? new RelayCommand(() => DecreaseAmount(), (wa) => WishlistAmount != 0);
+		private RelayCommand decreaseAmountCommand;
+		public RelayCommand DecreaseAmountCommand => decreaseAmountCommand ??= new RelayCommand(() => DecreaseAmount(), (wa) => WishlistAmount != 0);
 		#endregion
 
 		#region Methods
@@ -146,7 +146,7 @@ namespace RatScanner.ViewModel
 			wishlistChanged = true;
 
 			OnPropertyChanged("WishlistAmount");
-			OnPropertyChanged("DecreaseAmountCommand");
+			DecreaseAmountCommand.RaiseCanExecuteChanged();
 		}
 
 		private void DecreaseAmount()

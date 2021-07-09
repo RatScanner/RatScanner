@@ -5,13 +5,19 @@ namespace RatScanner
 {
 	public class RelayCommand : ICommand
 	{
-		private Action action;
-		private Predicate<object> canExecute;
+		private readonly Action action;
+		private readonly Predicate<object> canExecute;
+		private bool isExecuting;
 
 		public event EventHandler CanExecuteChanged = (sender, e) => { };
 
 		public bool CanExecute(object parameter)
 		{
+			if (IsExecuting)
+			{
+				return false;
+			}
+
 			if (canExecute == null)
 			{
 				return true;
@@ -20,7 +26,15 @@ namespace RatScanner
 			return canExecute(parameter);
 		}
 
-		public bool IsExecuting { get; set; }
+		public bool IsExecuting
+		{
+			get => isExecuting;
+			set
+			{
+				isExecuting = value;
+				RaiseCanExecuteChanged();
+			}
+		}
 
 		public RelayCommand(Action action)
 		{
@@ -36,10 +50,10 @@ namespace RatScanner
 		public void Execute(object parameter)
 		{
 			IsExecuting = true;
-			action();
-			IsExecuting = false;
 
-			RaiseCanExecuteChanged();
+			action();
+
+			IsExecuting = false;
 		}
 
 		public void RaiseCanExecuteChanged()
