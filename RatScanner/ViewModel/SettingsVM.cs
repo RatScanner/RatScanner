@@ -11,7 +11,6 @@ namespace RatScanner.ViewModel
 		public bool EnableIconScan { get; set; }
 		public bool ScanRotatedIcons { get; set; }
 		public bool UseCachedIcons { get; set; }
-		public int IconCacheSize => IconManager.GetIconCacheSize();
 		public Hotkey IconScanHotkey { get; set; }
 
 		public string ToolTipDuration { get; set; }
@@ -26,7 +25,8 @@ namespace RatScanner.ViewModel
 		public bool ShowQuestHideoutTeamTracker { get; set; }
 		public int Opacity { get; set; }
 
-		public int ScreenResolution { get; set; }
+		public int ScreenWidth { get; set; }
+		public int ScreenHeight { get; set; }
 		public bool MinimizeToTray { get; set; }
 		public bool AlwaysOnTop { get; set; }
 		public bool LogDebug { get; set; }
@@ -62,7 +62,8 @@ namespace RatScanner.ViewModel
 			ShowUpdated = RatConfig.MinimalUi.ShowUpdated;
 			Opacity = RatConfig.MinimalUi.Opacity;
 
-			ScreenResolution = (int)RatConfig.ScreenResolution;
+			ScreenWidth = RatConfig.ScreenWidth;
+			ScreenHeight = RatConfig.ScreenHeight;
 			MinimizeToTray = RatConfig.MinimizeToTray;
 			AlwaysOnTop = RatConfig.AlwaysOnTop;
 			LogDebug = RatConfig.LogDebug;

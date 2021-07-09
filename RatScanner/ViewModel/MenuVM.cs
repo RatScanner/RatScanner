@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Web;
+using RatEye;
 using RatScanner.FetchModels;
 using RatScanner.Scan;
 using RatStash;
@@ -31,7 +32,17 @@ namespace RatScanner.ViewModel
 
 		private Item[] MatchedItems => CurrentItemScan?.MatchedItems;
 
-		public string IconPath => IconManager.GetIconPath(MatchedItems[0]);
+		public string IconPath
+		{
+			get
+			{
+				ItemExtraInfo itemExtraInfo;
+				if (CurrentItemScan is ItemIconScan scan) itemExtraInfo = scan.ItemExtraInfo;
+				else itemExtraInfo = new ItemExtraInfo();
+				var path = CurrentItemScan.IconPath;
+				return path ?? RatConfig.Paths.UnknownIcon;
+			}
+		}
 
 		public string Name => MatchedItems[0].Name;
 

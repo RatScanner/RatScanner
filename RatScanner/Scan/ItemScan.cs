@@ -14,6 +14,9 @@ namespace RatScanner.Scan
 		internal Bitmap Capture;
 
 		internal float Confidence;
+
+		internal string IconPath;
+
 		internal abstract Vector2 GetToolTipPosition();
 	}
 }
