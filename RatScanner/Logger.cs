@@ -54,16 +54,6 @@ namespace RatScanner
 			Environment.Exit(0);
 		}
 
-		internal static void LogMat(OpenCvSharp.Mat mat, string fileName = "mat")
-		{
-			mat.SaveImage(GetUniquePath(RatConfig.Paths.Data, fileName, ".png"));
-		}
-
-		internal static void LogDebugMat(OpenCvSharp.Mat mat, string fileName = "mat")
-		{
-			if (RatConfig.LogDebug) mat.SaveImage(GetUniquePath(RatConfig.Paths.Debug, fileName, ".png"));
-		}
-
 		internal static void LogDebugBitmap(Bitmap bitmap, string fileName = "bitmap")
 		{
 			if (RatConfig.LogDebug) bitmap.Save(GetUniquePath(RatConfig.Paths.Debug, fileName, ".png"));

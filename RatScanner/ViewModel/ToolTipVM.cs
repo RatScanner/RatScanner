@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media;
+using RatEye;
 using RatScanner.Scan;
 using RatStash;
 using Brush = System.Windows.Media.Brush;
@@ -36,7 +37,17 @@ namespace RatScanner.ViewModel
 		}
 		// ReSharper restore InconsistentNaming
 
-		public string IconPath => IconManager.GetIconPath(DataSource.MatchedItems[0]);
+		public string IconPath
+		{
+			get
+			{
+				ItemExtraInfo itemExtraInfo;
+				if (DataSource is ItemIconScan scan) itemExtraInfo = scan.ItemExtraInfo;
+				else itemExtraInfo = new ItemExtraInfo();
+				var path = DataSource.MatchedItems[0].GetIconPath(itemExtraInfo);
+				return path ?? RatConfig.Paths.UnknownIcon;
+			}
+		}
 
 		public int IconAngle => DataSource is ItemIconScan scan && scan.Rotated ? 90 : 0;
 
@@ -95,7 +106,7 @@ namespace RatScanner.ViewModel
 			var physicalHeight = Screen.PrimaryScreen.Bounds.Height; // Virtual Height
 			var virtualHeight = SystemParameters.PrimaryScreenHeight; // Physical Height
 			var scaleFactor = physicalHeight / virtualHeight;
-			return (float) scaleFactor;
+			return (float)scaleFactor;
 		}
 	}
 }

@@ -6,6 +6,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Threading;
 using System.Windows;
+using RatEye;
 using RatScanner.Scan;
 using RatScanner.View;
 using RatStash;
@@ -104,12 +105,8 @@ namespace RatScanner
 			Logger.LogInfo("Setting default item...");
 			CurrentItemScan = new ItemNameScan();
 
-			// Init item scan types
-			Logger.LogInfo("Initializing name scan...");
-			ItemNameScan.Init();
-
-			Logger.LogInfo("Initializing icon scan...");
-			ItemIconScan.Init();
+			Logger.LogInfo("Initializing RatEye...");
+			SetupRatEye();
 
 			// Prewarm tool tips
 			Logger.LogInfo("Prewarming name tool tip...");
@@ -173,6 +170,26 @@ namespace RatScanner
 			ItemDB = itemDB.Filter(item => !item.QuestItem);
 		}
 
+		private void SetupRatEye()
+		{
+			var config = RatEye.Config.GlobalConfig;
+			config.PathConfig.LogFile = "RatEyeLog.txt";
+			config.PathConfig.BenderTraineddata = RatConfig.Paths.Data;
+			config.PathConfig.DynamicIcons = RatConfig.Paths.DynamicIcon;
+			config.PathConfig.DynamicCorrelationData = RatConfig.Paths.DynamicCorrelation;
+
+			config.ProcessingConfig.Scale = config.ProcessingConfig.Resolution2Scale(1920, 1080);
+
+			config.ProcessingConfig.IconConfig.UseDynamicIcons = RatConfig.IconScan.UseCachedIcons;
+			config.ProcessingConfig.IconConfig.WatchDynamicIcons = true;
+			config.ProcessingConfig.IconConfig.ScanRotatedIcons = RatConfig.IconScan.ScanRotatedIcons;
+
+			config.ProcessingConfig.InventoryConfig.MaxGridColor = (89, 89, 89);
+
+			config.LogDebug = true;
+			config.Apply();
+		}
+
 		/// <summary>
 		/// Perform a icon scan at the given position
 		/// </summary>
@@ -196,7 +213,16 @@ namespace RatScanner
 				var size = new Size(RatConfig.IconScan.ScanWidth, RatConfig.IconScan.ScanHeight);
 				var screenshot = GetScreenshot(screenshotPosition, size);
 
-				var itemIconScan = new ItemIconScan(screenshot, position);
+				ItemIconScan itemIconScan;
+				try
+				{
+					itemIconScan = new ItemIconScan(screenshot, position);
+				}
+				catch (Exception e)
+				{
+					Logger.LogWarning("Exception while icon scanning", e);
+					return false;
+				}
 
 				if (!itemIconScan.ValidItem) return false;
 

@@ -26,12 +26,6 @@ namespace RatScanner.View
 			e.Handled = true;
 		}
 
-		private void ClearIconCache(object sender, RoutedEventArgs e)
-		{
-			IconManager.ClearIconCache();
-			((SettingsVM)DataContext).OnPropertyChanged();
-		}
-
 		private void CloseSettings(object sender, RoutedEventArgs e)
 		{
 			// Switch back to main menu

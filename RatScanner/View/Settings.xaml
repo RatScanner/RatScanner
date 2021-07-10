@@ -275,47 +275,6 @@
 
 					<Grid>
 						<Grid.ToolTip>
-							<StackPanel>
-								<TextBlock>
-									Clearing the icon cache will increase scanning speed.<LineBreak />
-									You should only clean the cache when it's larger<LineBreak />
-									than 300 and impacting performance noticeably.
-								</TextBlock>
-								<TextBlock FontWeight="Bold"
-													 TextAlignment="Center">
-									Recommended to close EfT
-								</TextBlock>
-							</StackPanel>
-						</Grid.ToolTip>
-						<WrapPanel Grid.Column="0">
-							<Label Content="Icon Cache Folder" />
-							<Label Padding="0"
-										 VerticalAlignment="Center"
-										 Content="["
-										 Foreground="DarkGray" />
-							<Label Padding="2,0"
-										 VerticalAlignment="Center"
-										 Content="{Binding IconCacheSize}"
-										 Foreground="DarkGray" />
-							<Label Padding="0"
-										 VerticalAlignment="Center"
-										 Content="]"
-										 Foreground="DarkGray" />
-						</WrapPanel>
-						<Button Grid.Column="1"
-										Width="64"
-										Margin="5,3"
-										Click="ClearIconCache"
-										Content="Clear" />
-
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*" />
-							<ColumnDefinition Width="Auto" />
-						</Grid.ColumnDefinitions>
-					</Grid>
-
-					<Grid>
-						<Grid.ToolTip>
 							<TextBlock>
 								The hotkey to initiate a icon scan at your mouse position.
 							</TextBlock>

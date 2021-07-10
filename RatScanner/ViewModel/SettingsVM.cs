@@ -11,7 +11,6 @@ namespace RatScanner.ViewModel
 		public bool EnableIconScan { get; set; }
 		public bool ScanRotatedIcons { get; set; }
 		public bool UseCachedIcons { get; set; }
-		public int IconCacheSize => IconManager.GetIconCacheSize();
 		public Hotkey IconScanHotkey { get; set; }
 
 		public string ToolTipDuration { get; set; }
