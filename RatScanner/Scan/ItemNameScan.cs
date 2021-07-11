@@ -29,6 +29,7 @@ namespace RatScanner.Scan
 			Confidence = inspection.MarkerConfidence;
 			MarkerPos = mousePosition + new Vector2(inspection.MarkerPosition);
 			MarkerPos -= new Vector2(RatConfig.NameScan.MarkerScanSize, RatConfig.NameScan.MarkerScanSize) / 2;
+			IconPath = inspection.IconPath;
 			ValidItem = true;
 		}
 

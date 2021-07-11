@@ -184,7 +184,8 @@ namespace RatScanner
 			config.ProcessingConfig.IconConfig.WatchDynamicIcons = true;
 			config.ProcessingConfig.IconConfig.ScanRotatedIcons = RatConfig.IconScan.ScanRotatedIcons;
 
-			config.ProcessingConfig.InventoryConfig.MaxGridColor = (89, 89, 89);
+			config.ProcessingConfig.InventoryConfig.OptimizeHighlighted = true;
+			config.ProcessingConfig.InventoryConfig.MaxGridColor = System.Drawing.Color.FromArgb(89, 89, 89);
 
 			config.LogDebug = true;
 			config.Apply();

@@ -44,7 +44,7 @@ namespace RatScanner.ViewModel
 				ItemExtraInfo itemExtraInfo;
 				if (DataSource is ItemIconScan scan) itemExtraInfo = scan.ItemExtraInfo;
 				else itemExtraInfo = new ItemExtraInfo();
-				var path = DataSource.MatchedItems[0].GetIconPath(itemExtraInfo);
+				var path = DataSource.IconPath;
 				return path ?? RatConfig.Paths.UnknownIcon;
 			}
 		}

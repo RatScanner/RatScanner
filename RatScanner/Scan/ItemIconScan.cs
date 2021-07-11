@@ -30,8 +30,9 @@ namespace RatScanner.Scan
 			MatchedItems = new[] { _icon.Item };
 			ItemExtraInfo = _icon.ItemExtraInfo;
 			Confidence = _icon.DetectionConfidence;
-			ValidItem = _icon.DetectionConfidence > 0.5;
 			Rotated = _icon.Rotated;
+			IconPath = _icon.IconPath;
+			ValidItem = _icon.DetectionConfidence > 0.5;
 			Logger.LogDebug($"Confidence: {Confidence}");
 		}
 
