@@ -14,7 +14,7 @@ namespace RatScanner.FetchModels.TarkovTracker
 			: base(message, inner) { }
 	}
 
-	// Exception for when TarkovTracker rate limiting is hit
+	// Exception for when TarkovTracker token is not accepted
 	public class UnauthorizedTokenException : Exception
 	{
 		public UnauthorizedTokenException() : base("Unauthorized token") { }

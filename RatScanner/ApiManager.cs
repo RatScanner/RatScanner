@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using RatScanner.FetchModels;
+using RatScanner.FetchModels.TarkovTracker;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -107,7 +108,7 @@ namespace RatScanner
 			}
 		}
 
-		// Checks the token metadata endpoint for TarkovTracker
+		// Retrieves team progress data from the TarkovTracker endpoint
 		public static string GetTarkovTrackerTeam()
 		{
 			try
@@ -130,7 +131,7 @@ namespace RatScanner
 			}
 		}
 
-		// Checks the token metadata endpoint for TarkovTracker
+		// Retrieves solo progress data from the TarkovTracker endpoint
 		public static string GetTarkovTrackerSolo()
 		{
 			try
@@ -149,6 +150,106 @@ namespace RatScanner
 			catch (Exception e)
 			{
 				Logger.LogError($"Retrieving TarkovTracker progress data failed.", e);
+				return null;
+			}
+		}
+
+		// Updates a quest progress block by ID
+		public static string PostTarkovTrackerQuest(int questId, QuestCompletion questData)
+		{
+			try
+			{
+				return Post($"{TarkovTrackerUrl}/progress/quest/{questId}", JsonConvert.SerializeObject(questData), RatConfig.Tracking.TarkovTracker.Token);
+			}
+			catch (WebException e)
+			{
+				var status = (e.Response as HttpWebResponse)?.StatusCode;
+				if (status is HttpStatusCode.TooManyRequests)
+					throw new FetchModels.TarkovTracker.RateLimitExceededException("Rate Limiting reached for token", e);
+				if (status is HttpStatusCode.BadRequest)
+					throw new FetchModels.TarkovTracker.BadRequestException("Quest data update format malformed", e);
+				// Unknown error, continue throwing
+				Logger.LogError($"Updating TarkovTracker quest data failed.", e);
+				throw;
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"Updating TarkovTracker quest data failed.", e);
+				return null;
+			}
+		}
+
+		// Updates a quest objective progress block by ID
+		public static string PostTarkovTrackerQuestObjective(int objectiveId, QuestObjectiveCompletion objectiveData)
+		{
+			try
+			{
+				return Post($"{TarkovTrackerUrl}/progress/quest/objective/{objectiveId}", JsonConvert.SerializeObject(objectiveData), RatConfig.Tracking.TarkovTracker.Token);
+			}
+			catch (WebException e)
+			{
+				var status = (e.Response as HttpWebResponse)?.StatusCode;
+				if (status is HttpStatusCode.TooManyRequests)
+					throw new FetchModels.TarkovTracker.RateLimitExceededException("Rate Limiting reached for token", e);
+				if (status is HttpStatusCode.BadRequest)
+					throw new FetchModels.TarkovTracker.BadRequestException("Quest objective data update format malformed", e);
+				// Unknown error, continue throwing
+				Logger.LogError($"Updating TarkovTracker quest objective data failed.", e);
+				throw;
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"Updating TarkovTracker quest objective data failed.", e);
+				return null;
+			}
+		}
+
+		// Updates a hideout progress block by ID
+		public static string PostTarkovTrackerHideout(int hideoutId, HideoutCompletion hideoutData)
+		{
+			try
+			{
+				return Post($"{TarkovTrackerUrl}/progress/hideout/{hideoutId}", JsonConvert.SerializeObject(hideoutData), RatConfig.Tracking.TarkovTracker.Token);
+			}
+			catch (WebException e)
+			{
+				var status = (e.Response as HttpWebResponse)?.StatusCode;
+				if (status is HttpStatusCode.TooManyRequests)
+					throw new FetchModels.TarkovTracker.RateLimitExceededException("Rate Limiting reached for token", e);
+				if (status is HttpStatusCode.BadRequest)
+					throw new FetchModels.TarkovTracker.BadRequestException("Hideout data update format malformed", e);
+				// Unknown error, continue throwing
+				Logger.LogError($"Updating TarkovTracker hideout data failed.", e);
+				throw;
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"Updating TarkovTracker hideout data failed.", e);
+				return null;
+			}
+		}
+
+		// Updates a hideout objective progress block by ID
+		public static string PostTarkovTrackerHideoutObjective(int objectiveId, HideoutObjectiveCompletion objectiveData)
+		{
+			try
+			{
+				return Post($"{TarkovTrackerUrl}/progress/hideout/objective/{objectiveId}", JsonConvert.SerializeObject(objectiveData), RatConfig.Tracking.TarkovTracker.Token);
+			}
+			catch (WebException e)
+			{
+				var status = (e.Response as HttpWebResponse)?.StatusCode;
+				if (status is HttpStatusCode.TooManyRequests)
+					throw new FetchModels.TarkovTracker.RateLimitExceededException("Rate Limiting reached for token", e);
+				if (status is HttpStatusCode.BadRequest)
+					throw new FetchModels.TarkovTracker.BadRequestException("Hideout objective data update format malformed", e);
+				// Unknown error, continue throwing
+				Logger.LogError($"Updating TarkovTracker hideout objective data failed.", e);
+				throw;
+			}
+			catch (Exception e)
+			{
+				Logger.LogError($"Updating TarkovTracker hideout objective data failed.", e);
 				return null;
 			}
 		}
@@ -224,6 +325,32 @@ namespace RatScanner
 			request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 			request.UserAgent = $"RatScanner-Client/{RatConfig.Version}";
 			if (bearerToken != null) request.Headers.Add("Authorization", "Bearer " + bearerToken);
+
+			using var response = (HttpWebResponse)request.GetResponse();
+			using var stream = response.GetResponseStream();
+
+			var noEncoding = string.IsNullOrEmpty(response.CharacterSet);
+			var encoding = noEncoding ? Encoding.UTF8 : Encoding.GetEncoding(response.CharacterSet);
+			var reader = new StreamReader(stream, encoding);
+			return reader.ReadToEnd();
+		}
+
+		private static string Post(string url, string jsonBody = null, string bearerToken = null)
+		{
+			var request = WebRequest.CreateHttp(url);
+			request.Method = WebRequestMethods.Http.Post;
+			request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
+			request.UserAgent = $"RatScanner-Client/{RatConfig.Version}";
+			if (bearerToken != null) request.Headers.Add("Authorization", "Bearer " + bearerToken);
+			if (jsonBody != null) {
+				request.ContentType = "application/json";
+				var postData = Encoding.Default.GetBytes(jsonBody);
+				request.ContentLength = postData.Length;
+
+				var postStream = request.GetRequestStream();
+				postStream.Write(postData, 0, postData.Length);
+				postStream.Close();
+			}
 
 			using var response = (HttpWebResponse)request.GetResponse();
 			using var stream = response.GetResponseStream();
