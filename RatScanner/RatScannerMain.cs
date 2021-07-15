@@ -187,7 +187,7 @@ namespace RatScanner
 			config.ProcessingConfig.InventoryConfig.OptimizeHighlighted = true;
 			config.ProcessingConfig.InventoryConfig.MaxGridColor = System.Drawing.Color.FromArgb(89, 89, 89);
 
-			config.LogDebug = true;
+			config.LogDebug = RatConfig.LogDebug;
 			config.Apply();
 		}
 
