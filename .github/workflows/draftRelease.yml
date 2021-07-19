@@ -14,6 +14,9 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+    - name: Set Workflow Tag Name
+      id: vars
+      run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
@@ -25,11 +28,11 @@ jobs:
     - name: Include Updater
       run: curl -L "https://github.com/RatScanner/RatUpdater/releases/latest/download/RatUpdater.exe" --output "publish/RatUpdater.exe"
     - name: Zip Content
-      run: 7z a -r RatScanner.zip ./publish/*
+      run: 7z a -r RatScanner-${{ steps.vars.outputs.tag }}.zip ./publish/*
     - name: Draft Release
       uses: softprops/action-gh-release@v1
       with:
-        files: RatScanner.zip
+        files: RatScanner-${{ steps.vars.outputs.tag }}.zip
         draft: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
