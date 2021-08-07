@@ -74,6 +74,15 @@ namespace RatScanner
 			Logger.LogInfo("----- RatScanner " + RatConfig.Version + " -----");
 			Logger.LogInfo("Starting RatScanner...");
 
+			// Prewarm tool tips
+			Logger.LogInfo("Prewarming name tool tip...");
+			_nameScanToolTip = new NameScanToolTip();
+			_nameScanToolTip.Show();
+
+			Logger.LogInfo("Prewarming icon tool tip...");
+			_iconScanToolTip = new IconScanToolTip();
+			_iconScanToolTip.Show();
+
 			Logger.LogInfo("Loading config...");
 			RatConfig.LoadConfig();
 
@@ -107,15 +116,6 @@ namespace RatScanner
 
 			Logger.LogInfo("Initializing RatEye...");
 			SetupRatEye();
-
-			// Prewarm tool tips
-			Logger.LogInfo("Prewarming name tool tip...");
-			_nameScanToolTip = new NameScanToolTip();
-			_nameScanToolTip.Show();
-
-			Logger.LogInfo("Prewarming icon tool tip...");
-			_iconScanToolTip = new IconScanToolTip();
-			_iconScanToolTip.Show();
 
 			Logger.LogInfo("Initializing hotkey manager...");
 			HotkeyManager = new HotkeyManager();
