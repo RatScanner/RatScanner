@@ -37,17 +37,7 @@ namespace RatScanner.ViewModel
 		}
 		// ReSharper restore InconsistentNaming
 
-		public string IconPath
-		{
-			get
-			{
-				ItemExtraInfo itemExtraInfo;
-				if (DataSource is ItemIconScan scan) itemExtraInfo = scan.ItemExtraInfo;
-				else itemExtraInfo = new ItemExtraInfo();
-				var path = DataSource.IconPath;
-				return path ?? RatConfig.Paths.UnknownIcon;
-			}
-		}
+		public string IconPath => DataSource.IconPath ?? RatConfig.Paths.UnknownIcon;
 
 		public int IconAngle => DataSource is ItemIconScan scan && scan.Rotated ? 90 : 0;
 
