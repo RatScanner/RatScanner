@@ -178,7 +178,7 @@ namespace RatScanner
 			config.PathConfig.DynamicIcons = RatConfig.Paths.DynamicIcon;
 			config.PathConfig.DynamicCorrelationData = RatConfig.Paths.DynamicCorrelation;
 
-			config.ProcessingConfig.Scale = config.ProcessingConfig.Resolution2Scale(1920, 1080);
+			config.ProcessingConfig.Scale = config.ProcessingConfig.Resolution2Scale(RatConfig.ScreenWidth, RatConfig.ScreenHeight);
 
 			config.ProcessingConfig.IconConfig.UseDynamicIcons = RatConfig.IconScan.UseCachedIcons;
 			config.ProcessingConfig.IconConfig.WatchDynamicIcons = true;
@@ -258,7 +258,7 @@ namespace RatScanner
 				var markerScanSize = RatConfig.NameScan.MarkerScanSize;
 				var screenshotPosX = position.X - markerScanSize / 2;
 				var screenshotPosY = position.Y - markerScanSize / 2;
-				var sizeWidth = markerScanSize + RatConfig.NameScan.TextWidth + RatConfig.NameScan.TextHorizontalOffset;
+				var sizeWidth = markerScanSize + RatConfig.NameScan.TextWidth;
 				var sizeHeight = markerScanSize;
 				var screenshot = GetScreenshot(new Vector2(screenshotPosX, screenshotPosY), new Size(sizeWidth, sizeHeight));
 

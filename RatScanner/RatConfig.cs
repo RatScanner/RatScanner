@@ -14,36 +14,6 @@ namespace RatScanner
 {
 	internal static class RatConfig
 	{
-		internal enum Resolution
-		{
-			R1366x768 = 0,
-			R1440x900 = 1,
-			R1440x1080 = 2,
-			R1600x900 = 3,
-			R1920x1080 = 4,
-			R2560x1440 = 5,
-			R3840x2160 = 6,
-			R2560x1080 = 7,
-			R3840x1080 = 8,
-			R3440x1440 = 9,
-			R5120x1440 = 10,
-		}
-
-		internal static Dictionary<Resolution, Vector2> ResolutionDict = new Dictionary<Resolution, Vector2>()
-		{
-			{Resolution.R1366x768, new Vector2(1366, 768)},
-			{Resolution.R1440x900, new Vector2(1440, 900)},
-			{Resolution.R1440x1080, new Vector2(1440, 1080)},
-			{Resolution.R1600x900, new Vector2(1600, 900)},
-			{Resolution.R1920x1080, new Vector2(1920, 1080)},
-			{Resolution.R2560x1440, new Vector2(2560, 1440)},
-			{Resolution.R3840x2160, new Vector2(3840, 2160)},
-			{Resolution.R2560x1080, new Vector2(2560, 1080)},
-			{Resolution.R3840x1080, new Vector2(3840, 1080)},
-			{Resolution.R3440x1440, new Vector2(3440, 1440)},
-			{Resolution.R5120x1440, new Vector2(5210, 1440)},
-		};
-
 		// Version
 		public static string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
 
@@ -72,14 +42,9 @@ namespace RatScanner
 		{
 			internal static bool Enable = true;
 			internal static ApiManager.Language Language = ApiManager.Language.English;
-			internal static Bitmap Marker = Resources.markerFHD;
-			internal static Bitmap MarkerShort = Resources.markerShortFHD;
 			internal static float ConfWarnThreshold = 0.85f;
-			internal static int MarkerScanSize = 50;
-			internal static float MarkerThreshold = 0.9f;
-			internal static int TextHorizontalOffset = 21;
-			internal static int TextWidth = 500;
-			internal static int TextHeight = 17;
+			internal static int MarkerScanSize => (int)(50 * ScreenScale);
+			internal static int TextWidth => (int)(600 * ScreenScale);
 		}
 
 		// Icon Scan options
@@ -88,10 +53,8 @@ namespace RatScanner
 			internal static bool Enable = true;
 			internal static float ConfWarnThreshold = 0.8f;
 			internal static bool ScanRotatedIcons = true;
-			internal static int ScanPadding => (int)(GetScreenScaleFactor() * 10);
-			internal static int ScanWidth => (int)(GetScreenScaleFactor() * 896);
-			internal static int ScanHeight => (int)(GetScreenScaleFactor() * 896);
-			internal static int ItemSlotSize = 63;
+			internal static int ScanWidth => (int)(ScreenScale * 896);
+			internal static int ScanHeight => (int)(ScreenScale * 896);
 			internal static Hotkey Hotkey = new Hotkey(new[] { Key.LeftShift }.ToList(), new[] { MouseButton.Left });
 			internal static bool UseCachedIcons = true;
 		}
@@ -101,8 +64,6 @@ namespace RatScanner
 		{
 			internal static string DigitGroupingSymbol = ".";
 			internal static int Duration = 1500;
-			internal static int WidthOffset = 0;
-			internal static int HeightOffset = 5;
 		}
 
 		// Minimal UI
@@ -148,119 +109,12 @@ namespace RatScanner
 		internal static bool AlwaysOnTop = true;
 		internal static int MarketDBRefreshTime = 60 * 60 * 1000;   // 1 hour
 		internal static string ItemDataVersion = "20200101";
-		private static int ConfigVersion => 1;
+		private static int ConfigVersion => 2;
 
-		private static Resolution screenResolution = Resolution.R1920x1080;
+		internal static int ScreenWidth = 1920;
+		internal static int ScreenHeight = 1080;
 
-		internal static Resolution ScreenResolution
-		{
-			get => screenResolution;
-			set
-			{
-				screenResolution = value;
-				switch (screenResolution)
-				{
-					case Resolution.R1366x768: LoadWXGA(); break;
-					case Resolution.R1440x900: LoadWXGAPlus(); break;
-					case Resolution.R1440x1080: LoadR1440x1080(); break;
-					case Resolution.R1600x900: LoadHDPlus(); break;
-					case Resolution.R1920x1080: LoadFHD(); break;
-					case Resolution.R2560x1080: LoadFHD(); break;
-					case Resolution.R3840x1080: LoadFHD(); break;
-					case Resolution.R2560x1440: LoadQHD(); break;
-					case Resolution.R3440x1440: LoadQHD(); break;
-					case Resolution.R5120x1440: LoadQHD(); break;
-					case Resolution.R3840x2160: LoadUHD(); break;
-					default: throw new ArgumentOutOfRangeException(nameof(value), "Unknown screen resolution");
-				}
-
-				UpdateResolutionSettings();
-			}
-		}
-
-		private static void UpdateResolutionSettings()
-		{
-			var marker = NameScan.Marker;
-			NameScan.MarkerScanSize = Math.Max(marker.Width, marker.Height) * 3;
-			NameScan.TextHorizontalOffset = (int)(marker.Width * 1.2f);
-			NameScan.TextHeight = marker.Height;
-			NameScan.TextWidth = (int)(GetScreenScaleFactor() * 600f);
-		}
-
-		#region Resolution presets
-
-		private static void LoadWXGA()
-		{
-			NameScan.Marker = Resources.markerWXGA;
-			// TODO NameScan.MarkerShort = ...;
-			IconScan.ItemSlotSize = 45;
-			ToolTip.HeightOffset = -1;
-		}
-
-		private static void LoadWXGAPlus()
-		{
-			NameScan.Marker = Resources.markerWXGAPlus;
-			// TODO NameScan.MarkerShort = ...;
-			IconScan.ItemSlotSize = 49;
-			ToolTip.HeightOffset = 0;
-		}
-
-		private static void LoadR1440x1080()
-		{
-			NameScan.Marker = Resources.markerR1440x1080;
-			// TODO NameScan.MarkerShort = ...;
-			IconScan.ItemSlotSize = 47;
-			ToolTip.HeightOffset = 0;
-		}
-
-		private static void LoadHDPlus()
-		{
-			NameScan.Marker = Resources.markerHDPlus;
-			// TODO NameScan.MarkerShort = ...;
-			IconScan.ItemSlotSize = 51;
-			ToolTip.HeightOffset = 2;
-		}
-
-		private static void LoadFHD()
-		{
-			NameScan.Marker = Resources.markerFHD;
-			NameScan.MarkerShort = Resources.markerShortFHD;
-			IconScan.ItemSlotSize = 63;
-			ToolTip.HeightOffset = 5;
-		}
-
-		private static void LoadQHD()
-		{
-			NameScan.Marker = Resources.markerQHD;
-			NameScan.MarkerShort = Resources.markerShortQHD;
-			IconScan.ItemSlotSize = 84;
-			ToolTip.HeightOffset = 11;
-		}
-
-		private static void LoadUHD()
-		{
-			NameScan.Marker = Resources.markerUHD;
-			NameScan.MarkerShort = Resources.markerShortUHD;
-			IconScan.ItemSlotSize = 126;
-			ToolTip.HeightOffset = 10;
-		}
-
-		#endregion
-
-		internal static float GetScreenScaleFactor()
-		{
-			var screenDimension = ResolutionDict[ScreenResolution];
-
-			var screenScaleFactor1 = screenDimension.X / 1920f;
-			var screenScaleFactor2 = screenDimension.Y / 1080f;
-
-			return Math.Min(screenScaleFactor1, screenScaleFactor2);
-		}
-
-		internal static float GetInverseScreenScaleFactor()
-		{
-			return 1 / GetScreenScaleFactor();
-		}
+		internal static float ScreenScale => RatEye.Config.GlobalConfig.ProcessingConfig.Scale;
 
 		private static bool IsSupportedConfigVersion()
 		{
@@ -329,7 +183,8 @@ namespace RatScanner
 			Tracking.TarkovTracker.ShowTeam = config.ReadBool(nameof(Tracking.TarkovTracker.ShowTeam), true);
 
 			config.Section = "Other";
-			ScreenResolution = (Resolution)config.ReadInt(nameof(ScreenResolution), (int)Resolution.R1920x1080);
+			ScreenWidth = config.ReadInt(nameof(ScreenWidth), 1920);
+			ScreenHeight = config.ReadInt(nameof(ScreenHeight), 1080);
 			MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), false);
 			AlwaysOnTop = config.ReadBool(nameof(AlwaysOnTop), false);
 			ItemDataVersion = config.ReadString(nameof(ItemDataVersion), "20200101");
@@ -374,7 +229,8 @@ namespace RatScanner
 			config.WriteBool(nameof(Tracking.TarkovTracker.ShowTeam), Tracking.TarkovTracker.ShowTeam);
 
 			config.Section = "Other";
-			config.WriteInt(nameof(ScreenResolution), (int)ScreenResolution);
+			config.WriteInt(nameof(ScreenWidth), ScreenWidth);
+			config.WriteInt(nameof(ScreenHeight), ScreenHeight);
 			config.WriteBool(nameof(MinimizeToTray), MinimizeToTray);
 			config.WriteBool(nameof(AlwaysOnTop), AlwaysOnTop);
 			config.WriteString(nameof(ItemDataVersion), ItemDataVersion);
@@ -387,10 +243,11 @@ namespace RatScanner
 		/// </summary>
 		internal static void TrySetScreenResolution()
 		{
-			var boundsRectangle = Screen.PrimaryScreen.Bounds;
-			var resolutionString = $"R{boundsRectangle.Width}x{boundsRectangle.Height}";
-			Enum.TryParse(typeof(Resolution), resolutionString, out var matchingResolution);
-			if (matchingResolution != null) screenResolution = (Resolution)matchingResolution;
+			ScreenWidth = Screen.PrimaryScreen.Bounds.Width;
+			ScreenHeight = Screen.PrimaryScreen.Bounds.Height;
+			var message = $"Detected {ScreenWidth}x{ScreenHeight} Resolution.\n\n";
+			message += "You can adjust this inside the settings.";
+			Logger.ShowMessage(message);
 		}
 	}
 }

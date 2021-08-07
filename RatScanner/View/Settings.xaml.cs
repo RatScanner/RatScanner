@@ -68,7 +68,8 @@ namespace RatScanner.View
 			RatConfig.Tracking.TarkovTracker.Token = settingsVM.TarkovTrackerToken.Trim();
 			RatConfig.Tracking.TarkovTracker.ShowTeam = settingsVM.ShowTarkovTrackerTeam;
 
-			RatConfig.ScreenResolution = (RatConfig.Resolution)settingsVM.ScreenResolution;
+			RatConfig.ScreenWidth = settingsVM.ScreenWidth;
+			RatConfig.ScreenHeight = settingsVM.ScreenHeight;
 			RatConfig.MinimizeToTray = settingsVM.MinimizeToTray;
 			RatConfig.AlwaysOnTop = settingsVM.AlwaysOnTop;
 			RatConfig.LogDebug = settingsVM.LogDebug;
@@ -76,8 +77,11 @@ namespace RatScanner.View
 			// Apply config
 			PageSwitcher.Instance.Topmost = RatConfig.AlwaysOnTop;
 			if (updateMarketDB) RatScannerMain.Instance.MarketDB.Init();
-			RatScannerMain.Instance.HotkeyManager.RegisterHotkeys();
 			if (updateTarkovTrackerToken) UpdateTarkovTrackerToken();
+			var processingConfig = RatEye.Config.GlobalConfig.ProcessingConfig;
+			processingConfig.Scale = processingConfig.Resolution2Scale(RatConfig.ScreenWidth, RatConfig.ScreenHeight);
+			RatEye.Config.GlobalConfig.Apply();
+			RatScannerMain.Instance.HotkeyManager.RegisterHotkeys();
 
 			// Save config to file
 			Logger.LogInfo("Saving config...");

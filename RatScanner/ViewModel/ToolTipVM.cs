@@ -41,7 +41,7 @@ namespace RatScanner.ViewModel
 
 		public int IconAngle => DataSource is ItemIconScan scan && scan.Rotated ? 90 : 0;
 
-		public float ScaleFactor => RatConfig.GetScreenScaleFactor() / GetScalingFactor();
+		public static float ScaleFactor => RatConfig.ScreenScale / GetScalingFactor();
 
 		public Brush WarningBrush
 		{

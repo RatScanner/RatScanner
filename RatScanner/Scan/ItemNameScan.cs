@@ -35,10 +35,7 @@ namespace RatScanner.Scan
 
 		internal override Vector2 GetToolTipPosition()
 		{
-			var position = MarkerPos;
-			position += new Vector2(0, Resources.markerFHD.Height);
-			position += new Vector2(RatConfig.ToolTip.WidthOffset, RatConfig.ToolTip.HeightOffset);
-			return position;
+			return MarkerPos;
 		}
 	}
 }
