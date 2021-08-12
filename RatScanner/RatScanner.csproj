@@ -35,8 +35,8 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="RatEye" Version="1.3.6" />
-    <PackageReference Include="RatStash" Version="1.3.3" />
+    <PackageReference Include="RatEye" Version="1.4.1" />
+    <PackageReference Include="RatStash" Version="1.4.1" />
   </ItemGroup>
 
   <ItemGroup>
