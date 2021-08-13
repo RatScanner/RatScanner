@@ -83,6 +83,9 @@ namespace RatScanner
 			_iconScanToolTip = new IconScanToolTip();
 			_iconScanToolTip.Show();
 
+			Logger.LogInfo("Checking for new updates...");
+			CheckForUpdates();
+
 			Logger.LogInfo("Loading config...");
 			RatConfig.LoadConfig();
 
@@ -119,9 +122,6 @@ namespace RatScanner
 
 			Logger.LogInfo("Initializing hotkey manager...");
 			HotkeyManager = new HotkeyManager();
-
-			Logger.LogInfo("Checking for new updates...");
-			CheckForUpdates();
 
 			Logger.LogInfo("Setting up data update routines...");
 			_marketDBRefreshTimer = new Timer(RefreshMarketDB, null, RatConfig.MarketDBRefreshTime, Timeout.Infinite);
