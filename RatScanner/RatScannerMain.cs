@@ -157,7 +157,7 @@ namespace RatScanner
 		private void LoadItemDatabase()
 		{
 			var mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ItemDataVersion);
-			if (mostRecentVersion != RatConfig.ItemDataVersion)
+			if (!File.Exists(RatConfig.Paths.ItemData) || mostRecentVersion != RatConfig.ItemDataVersion)
 			{
 				Logger.LogInfo("A new item data version is available: " + mostRecentVersion);
 				var itemDataLink = ApiManager.GetResource(ApiManager.ResourceType.ItemDataLink);
