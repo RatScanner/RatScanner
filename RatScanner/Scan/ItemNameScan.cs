@@ -1,5 +1,4 @@
 ﻿using System.Drawing;
-using RatScanner.Properties;
 
 namespace RatScanner.Scan
 {
@@ -17,6 +16,7 @@ namespace RatScanner.Scan
 		{
 			Capture = capture;
 			var inspection = new RatEye.Processing.Inspection(capture);
+			Logger.LogDebug(inspection.MarkerConfidence.ToString());
 
 			if (!inspection.ContainsMarker) return;
 			if (inspection.Item == null)
