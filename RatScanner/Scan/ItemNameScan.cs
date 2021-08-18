@@ -8,7 +8,7 @@ namespace RatScanner.Scan
 
 		internal ItemNameScan()
 		{
-			MatchedItems = new[] { RatScannerMain.Instance.ItemDB.GetItem("57347baf24597738002c6178") };
+			MatchedItems = new[] { RatScannerMain.Instance.ItemDB.GetItem("59faff1d86f7746c51718c9c") };
 			ValidItem = true;
 		}
 
