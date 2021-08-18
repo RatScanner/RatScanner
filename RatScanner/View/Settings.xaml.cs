@@ -3,6 +3,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
+using RatEye;
 using RatScanner.ViewModel;
 
 namespace RatScanner.View
@@ -41,6 +42,7 @@ namespace RatScanner.View
 			// Pre saving stuff
 			var updateMarketDB = settingsVM.NameScanLanguage != (int)RatConfig.NameScan.Language;
 			var updateTarkovTrackerToken = settingsVM.TarkovTrackerToken != RatConfig.Tracking.TarkovTracker.Token;
+			var updateResolution = settingsVM.ScreenWidth != RatConfig.ScreenWidth || settingsVM.ScreenHeight != RatConfig.ScreenHeight;
 
 			// Save config
 			RatConfig.NameScan.Enable = settingsVM.EnableNameScan;
@@ -78,9 +80,12 @@ namespace RatScanner.View
 			PageSwitcher.Instance.Topmost = RatConfig.AlwaysOnTop;
 			if (updateMarketDB) RatScannerMain.Instance.MarketDB.Init();
 			if (updateTarkovTrackerToken) UpdateTarkovTrackerToken();
-			var processingConfig = RatEye.Config.GlobalConfig.ProcessingConfig;
-			RatEye.Config.GlobalConfig.Apply();
+			if (updateResolution)
+			{
+				var processingConfig = Config.GlobalConfig.ProcessingConfig;
 				processingConfig.Scale = Config.Processing.Resolution2Scale(RatConfig.ScreenWidth, RatConfig.ScreenHeight);
+				Config.GlobalConfig.Apply();
+			}
 			RatScannerMain.Instance.HotkeyManager.RegisterHotkeys();
 
 			// Save config to file
