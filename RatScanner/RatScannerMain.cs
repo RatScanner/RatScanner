@@ -178,7 +178,7 @@ namespace RatScanner
 			config.PathConfig.DynamicIcons = RatConfig.Paths.DynamicIcon;
 			config.PathConfig.DynamicCorrelationData = RatConfig.Paths.DynamicCorrelation;
 
-			config.ProcessingConfig.Scale = config.ProcessingConfig.Resolution2Scale(RatConfig.ScreenWidth, RatConfig.ScreenHeight);
+			config.ProcessingConfig.Scale = Config.Processing.Resolution2Scale(RatConfig.ScreenWidth, RatConfig.ScreenHeight);
 
 			config.ProcessingConfig.IconConfig.UseDynamicIcons = RatConfig.IconScan.UseCachedIcons;
 			config.ProcessingConfig.IconConfig.WatchDynamicIcons = true;

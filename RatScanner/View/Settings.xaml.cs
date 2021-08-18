@@ -79,8 +79,8 @@ namespace RatScanner.View
 			if (updateMarketDB) RatScannerMain.Instance.MarketDB.Init();
 			if (updateTarkovTrackerToken) UpdateTarkovTrackerToken();
 			var processingConfig = RatEye.Config.GlobalConfig.ProcessingConfig;
-			processingConfig.Scale = processingConfig.Resolution2Scale(RatConfig.ScreenWidth, RatConfig.ScreenHeight);
 			RatEye.Config.GlobalConfig.Apply();
+				processingConfig.Scale = Config.Processing.Resolution2Scale(RatConfig.ScreenWidth, RatConfig.ScreenHeight);
 			RatScannerMain.Instance.HotkeyManager.RegisterHotkeys();
 
 			// Save config to file
