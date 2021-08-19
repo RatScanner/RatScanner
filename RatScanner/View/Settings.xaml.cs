@@ -86,6 +86,7 @@ namespace RatScanner.View
 				processingConfig.Scale = Config.Processing.Resolution2Scale(RatConfig.ScreenWidth, RatConfig.ScreenHeight);
 				Config.GlobalConfig.Apply();
 			}
+			Config.GlobalConfig.LogDebug = RatConfig.LogDebug;
 			RatScannerMain.Instance.HotkeyManager.RegisterHotkeys();
 
 			// Save config to file
