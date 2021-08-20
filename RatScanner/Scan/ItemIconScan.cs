@@ -32,7 +32,7 @@ namespace RatScanner.Scan
 			Confidence = _icon.DetectionConfidence;
 			Rotated = _icon.Rotated;
 			IconPath = _icon.IconPath;
-			ValidItem = _icon.DetectionConfidence > 0.5;
+			ValidItem = _icon.DetectionConfidence > 0f;
 			Logger.LogDebug($"Confidence: {Confidence}");
 		}
 
