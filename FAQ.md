@@ -20,7 +20,7 @@
 ### Program issues
 - [There is no RatScanner.exe file](#there-is-no-ratscannerexe-file)
 - [Rat Scanner is not starting](#rat-scanner-is-not-starting)
-- [Nothing happends when scanning](#nothing-happends-when-scanning)
+- [Nothing happens when scanning](#nothing-happens-when-scanning)
 - [Could not find icon cache folder at: ...](#could-not-find-icon-cache-folder-at-)
 - [Could not find dynamic correlation data at: ...](#could-not-find-dynamic-correlation-data-at-)
 - [The type initializer for 'OpenCvSharp.NativeMethods' threw an exception.](#the-type-initializer-for-opencvsharpnativemethods-threw-an-exception)
@@ -61,7 +61,7 @@ In that case, create a exception for it or disable your antivirus.
 ## Rat Scanner is not starting
 Make sure you have the **x64 Version** of the [.Net Core Runtime][net-core-download] installed.
 
-## Nothing happends when scanning
+## Nothing happens when scanning
 - Check that you set your resolution correctly inside the settings
 - Try to run RatScanner as administrator
 
