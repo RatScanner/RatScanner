@@ -10,6 +10,7 @@ using RatEye;
 using RatScanner.Scan;
 using RatScanner.View;
 using RatStash;
+using Color = System.Drawing.Color;
 using Size = System.Drawing.Size;
 using Timer = System.Threading.Timer;
 
@@ -175,17 +176,16 @@ namespace RatScanner
 			var config = RatEye.Config.GlobalConfig;
 			config.PathConfig.LogFile = "RatEyeLog.txt";
 			config.PathConfig.BenderTraineddata = RatConfig.Paths.Data;
-			config.PathConfig.DynamicIcons = RatConfig.Paths.DynamicIcon;
-			config.PathConfig.DynamicCorrelationData = RatConfig.Paths.DynamicCorrelation;
+			config.PathConfig.StaticIcons = RatConfig.Paths.StaticIcon;
+			config.PathConfig.StaticCorrelationData = RatConfig.Paths.StaticCorrelation;
 
 			config.ProcessingConfig.Scale = Config.Processing.Resolution2Scale(RatConfig.ScreenWidth, RatConfig.ScreenHeight);
 
-			config.ProcessingConfig.IconConfig.UseDynamicIcons = RatConfig.IconScan.UseCachedIcons;
-			config.ProcessingConfig.IconConfig.WatchDynamicIcons = true;
+			config.ProcessingConfig.IconConfig.UseStaticIcons = true;
 			config.ProcessingConfig.IconConfig.ScanRotatedIcons = RatConfig.IconScan.ScanRotatedIcons;
 
 			config.ProcessingConfig.InventoryConfig.OptimizeHighlighted = true;
-			config.ProcessingConfig.InventoryConfig.MaxGridColor = System.Drawing.Color.FromArgb(89, 89, 89);
+			config.ProcessingConfig.InventoryConfig.MaxGridColor = Color.FromArgb(89, 100, 100);
 
 			config.ProcessingConfig.InspectionConfig.MarkerThreshold = 0.9f;
 			config.ProcessingConfig.InspectionConfig.EnableContainers = false;
