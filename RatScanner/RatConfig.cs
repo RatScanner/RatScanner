@@ -22,12 +22,12 @@ namespace RatScanner
 		{
 			internal static string Base = AppDomain.CurrentDomain.BaseDirectory;
 			internal static string Data = Path.Combine(Base, "Data");
-			internal static string StaticIcon = Path.Combine(Data, "name");
+			internal static string StaticIcon = Path.Combine(Data, "icons");
 
 			private const string EftTempDir = "Battlestate Games\\EscapeFromTarkov\\";
 			private static readonly string EftTemp = Path.Combine(Path.GetTempPath(), EftTempDir);
 			internal static string DynamicIcon = Path.Combine(EftTemp, "Icon Cache");
-			internal static string StaticCorrelation = Path.Combine(Data, "correlation.json");
+			internal static string StaticCorrelation = Path.Combine(StaticIcon, "correlation.json");
 			internal static string DynamicCorrelation = Path.Combine(DynamicIcon, "index.json");
 			internal static string ItemData = Path.Combine(Data, "items.json");
 			internal static string UnknownIcon = Path.Combine(Data, "unknown.png");
