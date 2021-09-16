@@ -64,6 +64,10 @@ namespace RatScanner
 		{
 			internal static string DigitGroupingSymbol = ".";
 			internal static int Duration = 1500;
+			internal static bool ShowFleaPrice = true;
+			internal static int FleaPricePerSlotThreshold = 0;
+			internal static bool ShowTraderPrice = false;
+			internal static int TraderPricePerSlotThreshold = 0;
 		}
 
 		// Minimal UI

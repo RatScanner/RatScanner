@@ -14,6 +14,10 @@ namespace RatScanner.ViewModel
 		public Hotkey IconScanHotkey { get; set; }
 
 		public string ToolTipDuration { get; set; }
+		public bool ToolTipShowFleaPrice { get; set; }
+		public string ToolTipFleaPricePerSlotThreshold { get; set; }
+		public bool ToolTipShowTraderPrice { get; set; }
+		public string ToolTipTraderPricePerSlotThreshold { get; set; }
 
 		public bool ShowName { get; set; }
 		public bool ShowAvgDayPrice { get; set; }
@@ -51,6 +55,10 @@ namespace RatScanner.ViewModel
 			IconScanHotkey = RatConfig.IconScan.Hotkey;
 
 			ToolTipDuration = RatConfig.ToolTip.Duration.ToString();
+			ToolTipShowFleaPrice = RatConfig.ToolTip.ShowFleaPrice;
+			ToolTipFleaPricePerSlotThreshold = RatConfig.ToolTip.FleaPricePerSlotThreshold.ToString();
+			ToolTipShowTraderPrice = RatConfig.ToolTip.ShowTraderPrice;
+			ToolTipTraderPricePerSlotThreshold = RatConfig.ToolTip.TraderPricePerSlotThreshold.ToString();
 
 			ShowName = RatConfig.MinimalUi.ShowName;
 			ShowAvgDayPrice = RatConfig.MinimalUi.ShowAvgDayPrice;

@@ -21,25 +21,6 @@
 					<Grid>
 						<Grid.ToolTip>
 							<TextBlock>
-								The duration in millisecond, how long<LineBreak />
-								the tool tip should be shown.
-							</TextBlock>
-						</Grid.ToolTip>
-						<Label Grid.Column="0"
-									 Content="ToolTip Duration" />
-						<TextBox Grid.Column="1"
-										 Width="100"
-										 Text="{Binding ToolTipDuration}" />
-
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*" />
-							<ColumnDefinition Width="Auto" />
-						</Grid.ColumnDefinitions>
-					</Grid>
-
-					<Grid>
-						<Grid.ToolTip>
-							<TextBlock>
 								The resolution of your game. Adjust this to<LineBreak />
 								make sure both Name Scan and Icon Scan will work.
 							</TextBlock>
@@ -137,6 +118,103 @@
 							<ColumnDefinition Width="Auto" />
 						</Grid.ColumnDefinitions>
 					</Grid>
+				</StackPanel>
+			</TabItem>
+
+			<TabItem Header="Tooltip">
+				<StackPanel Margin="0, 5">
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								The duration in millisecond, how long<LineBreak />
+								the tool tip should be shown.
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0"
+									 Content="Duration" />
+						<TextBox Grid.Column="1"
+										 Width="100"
+										 Text="{Binding ToolTipDuration}" />
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+					<Separator/>
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								Show the flea market price per slot of the item.
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0"
+									 Content="Show Flea Price" />
+						<CheckBox Grid.Column="1"
+											Margin="5,0"
+											VerticalAlignment="Center"
+											IsChecked="{Binding ToolTipShowFleaPrice}" />
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								Flea Price will be colored green or red if<LineBreak />
+								the Price per Slot is above or below the threshold.<LineBreak />
+								WARNING: Doesn't account for weapon attachements!
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0"
+									 Content="Price per Slot Threshold" />
+						<TextBox Grid.Column="1"
+										 Width="90"
+										 Text="{Binding ToolTipFleaPricePerSlotThreshold}" />
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+					<Separator/>
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								Show the best trader price per slot of the item.
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0"
+									 Content="Show Trader Price" />
+						<CheckBox Grid.Column="1"
+											Margin="5,0"
+											VerticalAlignment="Center"
+											IsChecked="{Binding ToolTipShowTraderPrice}" />
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+
+					<Grid>
+						<Grid.ToolTip>
+							<TextBlock>
+								Trader Price will be colored green or red if<LineBreak />
+								the Price per Slot is above or below the threshold.<LineBreak />
+								WARNING: Doesn't account for weapon attachements!
+							</TextBlock>
+						</Grid.ToolTip>
+						<Label Grid.Column="0"
+									 Content="Price per Slot Threshold" />
+						<TextBox Grid.Column="1"
+										 Width="90"
+										 Text="{Binding ToolTipTraderPricePerSlotThreshold}" />
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+					</Grid>
+
 				</StackPanel>
 			</TabItem>
 
@@ -516,6 +594,7 @@
 					</TextBlock>
 				</StackPanel>
 			</TabItem>
+
 			<TabItem Header="Tracking">
 				<StackPanel Margin="0, 5">
 					<Grid>

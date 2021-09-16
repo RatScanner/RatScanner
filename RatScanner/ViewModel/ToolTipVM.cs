@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media;
 using RatEye;
 using RatScanner.Scan;
+using RatScanner.View;
 using RatStash;
 using Brush = System.Windows.Media.Brush;
 using Color = System.Windows.Media.Color;
@@ -29,13 +31,10 @@ namespace RatScanner.ViewModel
 
 		// https://youtrack.jetbrains.com/issue/RSRP-468572
 		// ReSharper disable InconsistentNaming
-		public string Avg24hPrice => PriceToString(GetAvg24hPrice());
-
-		private int GetAvg24hPrice()
-		{
-			return MatchedItems[0].GetAvg24hMarketPrice();
-		}
+		public string FleaPrice => PriceToString(MatchedItems[0].GetAvg24hMarketPrice());
 		// ReSharper restore InconsistentNaming
+
+		public string MaxTraderPrice => PriceToString(MatchedItems[0].GetMaxTraderPrice());
 
 		public string IconPath => DataSource.IconPath ?? RatConfig.Paths.UnknownIcon;
 
@@ -55,6 +54,37 @@ namespace RatScanner.ViewModel
 
 				if (DataSource.Confidence < threshold) color = Color.FromRgb(227, 38, 25);
 				return new SolidColorBrush(color);
+			}
+		}
+
+		public Brush FleaPriceBrush
+		{
+			get
+			{
+				if (RatConfig.ToolTip.FleaPricePerSlotThreshold == 0)
+					return new SolidColorBrush(Color.FromRgb(0, 0, 0));
+
+				if (MatchedItems[0].GetAvg24hMarketPricePerSlot() >= RatConfig.ToolTip.FleaPricePerSlotThreshold)
+					return new SolidColorBrush(Color.FromRgb(0, 100, 0));
+
+				return new SolidColorBrush(Color.FromRgb(139, 0, 0));
+			}
+		}
+
+		public Brush TraderPriceBrush
+		{
+			get
+			{
+				if (RatConfig.ToolTip.TraderPricePerSlotThreshold == 0)
+					return new SolidColorBrush(Color.FromRgb(0, 0, 0));
+
+				var test1 = MatchedItems[0].GetMaxTraderPrice();
+				var test2 = MatchedItems[0].GetMaxTraderPricePerSlot();
+
+				if (MatchedItems[0].GetMaxTraderPricePerSlot() >= RatConfig.ToolTip.TraderPricePerSlotThreshold)
+					return new SolidColorBrush(Color.FromRgb(0, 100, 0));
+
+				return new SolidColorBrush(Color.FromRgb(139, 0, 0));
 			}
 		}
 
