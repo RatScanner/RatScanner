@@ -55,8 +55,8 @@ namespace RatScanner.View
 
 			RatConfig.ToolTip.Duration = int.TryParse(settingsVM.ToolTipDuration, out var tooltipDuration) ? tooltipDuration : 0;
 			RatConfig.ToolTip.ShowFleaPrice = settingsVM.ToolTipShowFleaPrice;
-			RatConfig.ToolTip.FleaPricePerSlotThreshold = int.TryParse(settingsVM.ToolTipFleaPricePerSlotThreshold, out var tooltipFleaPriceThreshold) ? tooltipFleaPriceThreshold : 0;
 			RatConfig.ToolTip.ShowTraderPrice = settingsVM.ToolTipShowTraderPrice;
+			RatConfig.ToolTip.FleaPricePerSlotThreshold = int.TryParse(settingsVM.ToolTipFleaPricePerSlotThreshold, out var tooltipFleaPriceThreshold) ? tooltipFleaPriceThreshold : 0;
 			RatConfig.ToolTip.TraderPricePerSlotThreshold = int.TryParse(settingsVM.ToolTipTraderPricePerSlotThreshold, out var tooltipTraderPriceThreshold) ? tooltipTraderPriceThreshold : 0;
 
 			RatConfig.MinimalUi.ShowName = settingsVM.ShowName;

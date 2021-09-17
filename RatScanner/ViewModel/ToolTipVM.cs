@@ -1,12 +1,9 @@
 ﻿using System.ComponentModel;
-using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media;
-using RatEye;
 using RatScanner.Scan;
-using RatScanner.View;
 using RatStash;
 using Brush = System.Windows.Media.Brush;
 using Color = System.Windows.Media.Color;
@@ -31,7 +28,7 @@ namespace RatScanner.ViewModel
 
 		// https://youtrack.jetbrains.com/issue/RSRP-468572
 		// ReSharper disable InconsistentNaming
-		public string FleaPrice => PriceToString(MatchedItems[0].GetAvg24hMarketPrice());
+		public string Avg24hMarketPrice => PriceToString(MatchedItems[0].GetAvg24hMarketPrice());
 		// ReSharper restore InconsistentNaming
 
 		public string MaxTraderPrice => PriceToString(MatchedItems[0].GetMaxTraderPrice());
@@ -77,9 +74,6 @@ namespace RatScanner.ViewModel
 			{
 				if (RatConfig.ToolTip.TraderPricePerSlotThreshold == 0)
 					return new SolidColorBrush(Color.FromRgb(0, 0, 0));
-
-				var test1 = MatchedItems[0].GetMaxTraderPrice();
-				var test2 = MatchedItems[0].GetMaxTraderPricePerSlot();
 
 				if (MatchedItems[0].GetMaxTraderPricePerSlot() >= RatConfig.ToolTip.TraderPricePerSlotThreshold)
 					return new SolidColorBrush(Color.FromRgb(0, 100, 0));

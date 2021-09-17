@@ -66,7 +66,7 @@ namespace RatScanner.View
 			Left = vector2.X;
 			Top = vector2.Y;
 
-			FleaPriceDisplay.Visibility = RatConfig.ToolTip.ShowFleaPrice == true ? Visibility.Visible : Visibility.Collapsed;
+			FleaPriceDisplay.Visibility = RatConfig.ToolTip.ShowFleaPrice ? Visibility.Visible : Visibility.Collapsed;
 			TraderPriceDisplay.Visibility = RatConfig.ToolTip.ShowTraderPrice ? Visibility.Visible : Visibility.Collapsed;
 
 			Show();

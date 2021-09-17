@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using RatScanner.FetchModels;
 using System.Collections.Generic;
 using RatStash;
@@ -239,7 +238,5 @@ namespace RatScanner
 
 			return result;
 		}
-
-
 	}
 }
