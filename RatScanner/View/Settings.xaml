@@ -140,7 +140,7 @@
 							<ColumnDefinition Width="Auto" />
 						</Grid.ColumnDefinitions>
 					</Grid>
-					<Separator/>
+					<Separator />
 					<Grid>
 						<Grid.ToolTip>
 							<TextBlock>
@@ -164,7 +164,7 @@
 							<TextBlock>
 								Flea Price will be colored green or red if the<LineBreak />
 								Price per Slot is above or below the threshold.<LineBreak />
-								WARNING:<LineBreak />Doesn't account for weapon attachements!
+								WARNING:<LineBreak />Doesn't account for weapon attachments!
 							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
@@ -177,7 +177,7 @@
 							<ColumnDefinition Width="Auto" />
 						</Grid.ColumnDefinitions>
 					</Grid>
-					<Separator/>
+					<Separator />
 					<Grid>
 						<Grid.ToolTip>
 							<TextBlock>
@@ -201,7 +201,7 @@
 							<TextBlock>
 								Trader Price will be colored green or red if the<LineBreak />
 								Price per Slot is above or below the threshold.<LineBreak />
-								WARNING:<LineBreak />Doesn't account for weapon attachements!
+								WARNING:<LineBreak />Doesn't account for weapon attachments!
 							</TextBlock>
 						</Grid.ToolTip>
 						<Label Grid.Column="0"
