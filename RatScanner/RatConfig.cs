@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -8,7 +6,6 @@ using System.Reflection;
 using System.Windows.Forms;
 using System.Windows.Input;
 using RatScanner.Controls;
-using RatScanner.Properties;
 
 namespace RatScanner
 {
@@ -65,8 +62,8 @@ namespace RatScanner
 			internal static string DigitGroupingSymbol = ".";
 			internal static int Duration = 1500;
 			internal static bool ShowFleaPrice = true;
-			internal static int FleaPricePerSlotThreshold = 0;
 			internal static bool ShowTraderPrice = false;
+			internal static int FleaPricePerSlotThreshold = 0;
 			internal static int TraderPricePerSlotThreshold = 0;
 		}
 
@@ -167,6 +164,10 @@ namespace RatScanner
 			config.Section = nameof(ToolTip);
 			ToolTip.Duration = config.ReadInt(nameof(ToolTip.Duration), 1500);
 			ToolTip.DigitGroupingSymbol = config.ReadString(nameof(ToolTip.DigitGroupingSymbol), NumberFormatInfo.CurrentInfo.NumberGroupSeparator);
+			ToolTip.ShowFleaPrice = config.ReadBool(nameof(ToolTip.ShowFleaPrice), true);
+			ToolTip.ShowTraderPrice = config.ReadBool(nameof(ToolTip.ShowTraderPrice), false);
+			ToolTip.FleaPricePerSlotThreshold = config.ReadInt(nameof(ToolTip.FleaPricePerSlotThreshold), 0);
+			ToolTip.TraderPricePerSlotThreshold = config.ReadInt(nameof(ToolTip.TraderPricePerSlotThreshold), 0);
 
 			config.Section = nameof(MinimalUi);
 			MinimalUi.ShowName = config.ReadBool(nameof(MinimalUi.ShowName), true);
@@ -213,6 +214,10 @@ namespace RatScanner
 			config.Section = nameof(ToolTip);
 			config.WriteInt(nameof(ToolTip.Duration), ToolTip.Duration);
 			config.WriteString(nameof(ToolTip.DigitGroupingSymbol), ToolTip.DigitGroupingSymbol);
+			config.WriteBool(nameof(ToolTip.ShowFleaPrice), ToolTip.ShowFleaPrice);
+			config.WriteBool(nameof(ToolTip.ShowTraderPrice), ToolTip.ShowTraderPrice);
+			config.WriteInt(nameof(ToolTip.FleaPricePerSlotThreshold), ToolTip.FleaPricePerSlotThreshold);
+			config.WriteInt(nameof(ToolTip.TraderPricePerSlotThreshold), ToolTip.TraderPricePerSlotThreshold);
 
 			config.Section = nameof(MinimalUi);
 			config.WriteBool(nameof(MinimalUi.ShowName), MinimalUi.ShowName);
