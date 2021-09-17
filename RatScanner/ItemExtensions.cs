@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using RatScanner.FetchModels;
 using System.Collections.Generic;
 using RatStash;
@@ -188,11 +187,21 @@ namespace RatScanner
 			return marketItem ?? new MarketItem(item.Id);
 		}
 
+		public static int GetAvg24hMarketPricePerSlot(this Item item)
+		{
+			return item.GetAvg24hMarketPrice() / item.GetSlots();
+		}
+
 		public static int GetAvg24hMarketPrice(this Item item)
 		{
 			var total = item.GetMarketItem().Avg24hPrice;
 			if (item is CompoundItem itemC) total += itemC.Slots.Sum(slot => slot.ContainedItem?.GetAvg24hMarketPrice() ?? 0);
 			return total;
+		}
+
+		public static int GetMaxTraderPricePerSlot(this Item item)
+		{
+			return item.GetMaxTraderPrice() / item.GetSlots();
 		}
 
 		public static int GetMaxTraderPrice(this Item item)
@@ -211,6 +220,11 @@ namespace RatScanner
 			if (item is CompoundItem itemC) total += itemC.Slots.Sum(slot => slot.ContainedItem?.GetTraderPrice(traderId) ?? 0);
 
 			return total;
+		}
+
+		public static int GetSlots(this Item item)
+		{
+			return item.Width * item.Height;
 		}
 
 		public static (string traderId, int price) GetBestTrader(this Item item)

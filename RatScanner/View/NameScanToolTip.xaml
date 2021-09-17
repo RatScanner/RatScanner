@@ -16,12 +16,22 @@
 				WindowStyle="None"
 				mc:Ignorable="d">
 
-	<StackPanel>
-		<Label Padding="3,0"
-					 Background="{Binding WarningBrush}"
-					 Content="{Binding Avg24hPrice}"
+	<StackPanel Background="{Binding WarningBrush}">
+		<Label x:Name="FleaPriceDisplay"
+					 Padding="3,0"
+					 Content="{Binding Avg24hMarketPrice}"
+					 d:Content="100.000€"
 					 FontFamily="Roboto Normal"
 					 FontWeight="Bold"
-					 Foreground="#000000" />
+					 Foreground="{Binding FleaPriceBrush}"
+					 HorizontalAlignment="Right" />
+		<Label x:Name="TraderPriceDisplay"
+					 Padding="3,0"
+					 Content="{Binding MaxTraderPrice}"
+					 d:Content="50.000€"
+					 FontFamily="Roboto Normal"
+					 FontWeight="Bold"
+					 Foreground="{Binding TraderPriceBrush}"
+					 HorizontalAlignment="Right" />
 	</StackPanel>
 </Window>
