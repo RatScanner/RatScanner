@@ -1,0 +1,115 @@
+﻿@inherits LayoutComponentBase
+<MudThemeProvider Theme="currentTheme" />
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+<div style="width:100%;height:100%">
+    <MudLayout>
+        <MudAppBar Elevation="1" Bottom="true" Dense="true">
+            <MudSpacer />
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.End" OnClick="@ToggleDrawer"/>
+        </MudAppBar>
+        <MudDrawer @bind-Open="@drawerOpen" Elevation="1" Anchor="Anchor.Left" Variant="@DrawerVariant.Responsive">
+            <MudDrawerHeader LinkToIndex="true">
+                <img src="RatLogoMedium.png" width="20%"/>
+                <MudText Typo="Typo.h5" Class="mud-info-text">
+                    RatScanner
+                </MudText>
+            </MudDrawerHeader>
+            <MudNavMenu>
+                <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Filled.Dashboard">Dashboard</MudNavLink>
+                <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Filled.ManageSearch">Lookup</MudNavLink>
+                <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Filled.LocationSearching">Tracking</MudNavLink>
+                <MudNavLink Match="NavLinkMatch.All" Icon="@Icons.Filled.Settings">Settings</MudNavLink>
+            </MudNavMenu>
+        </MudDrawer>
+        <MudMainContent>
+            @Body
+        </MudMainContent>
+    </MudLayout>
+</div>
+
+@code{
+
+    [CascadingParameter]
+    public Error Error { get; set; }
+
+    bool drawerOpen = true;
+    
+    void ToggleDrawer()
+    {
+        drawerOpen = !drawerOpen;
+    }
+
+    protected override void OnInitialized()
+    {
+        currentTheme = defaultTheme;
+    }
+
+    void DarkMode()
+    {
+        if (currentTheme == defaultTheme)
+        {
+            currentTheme = darkTheme;
+        }
+        else
+        {
+            currentTheme = defaultTheme;
+        }
+    }
+
+    MudTheme currentTheme = new MudTheme();
+    MudTheme defaultTheme = new MudTheme()
+    {
+        Palette = new Palette()
+        {
+            Black = "#27272f",
+            Background = "rgba(50,51,61, 0.50)",
+            BackgroundGrey = "#27272f",
+            Surface = "#373740",
+            DrawerBackground = "#27272f",
+            DrawerText = "rgba(255,255,255, 0.50)",
+            DrawerIcon = "rgba(255,255,255, 0.50)",
+            AppbarBackground = "#27272f",
+            AppbarText = "rgba(255,255,255, 0.70)",
+            TextPrimary = "rgba(255,255,255, 0.70)",
+            TextSecondary = "rgba(255,255,255, 0.50)",
+            ActionDefault = "#adadb1",
+            ActionDisabled = "rgba(255,255,255, 0.26)",
+            ActionDisabledBackground = "rgba(255,255,255, 0.12)",
+            Divider = "rgba(255,255,255, 0.12)",
+            DividerLight = "rgba(255,255,255, 0.06)",
+            TableLines = "rgba(255,255,255, 0.12)",
+            LinesDefault = "rgba(255,255,255, 0.12)",
+            LinesInputs = "rgba(255,255,255, 0.3)",
+            TextDisabled = "rgba(255,255,255, 0.2)"
+        }
+    };
+
+    MudTheme darkTheme = new MudTheme()
+    {
+        Palette = new Palette()
+        {
+            Black = "#27272f",
+            Background = "rgba(50,51,61, 0.50)",
+            BackgroundGrey = "#27272f",
+            Surface = "#373740",
+            DrawerBackground = "#27272f",
+            DrawerText = "rgba(255,255,255, 0.50)",
+            DrawerIcon = "rgba(255,255,255, 0.50)",
+            AppbarBackground = "#27272f",
+            AppbarText = "rgba(255,255,255, 0.70)",
+            TextPrimary = "rgba(255,255,255, 0.70)",
+            TextSecondary = "rgba(255,255,255, 0.50)",
+            ActionDefault = "#adadb1",
+            ActionDisabled = "rgba(255,255,255, 0.26)",
+            ActionDisabledBackground = "rgba(255,255,255, 0.12)",
+            Divider = "rgba(255,255,255, 0.12)",
+            DividerLight = "rgba(255,255,255, 0.06)",
+            TableLines = "rgba(255,255,255, 0.12)",
+            LinesDefault = "rgba(255,255,255, 0.12)",
+            LinesInputs = "rgba(255,255,255, 0.3)",
+            TextDisabled = "rgba(255,255,255, 0.2)"
+        }
+    };
+}
