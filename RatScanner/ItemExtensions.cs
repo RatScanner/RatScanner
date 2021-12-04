@@ -104,6 +104,14 @@ namespace RatScanner
 		{
 			var result = new NeededItem(item.Id);
 			var teamData = item.GetTrackingTeamNeeds();
+			if (teamData == null)
+			{
+				result.HideoutNeeded = 0;
+				result.QuestNeeded = 0;
+				result.HideoutHave = 0;
+				result.QuestHave = 0;
+				return result;
+			}
 			foreach (var (_, value) in teamData)
 			{
 				result.HideoutNeeded += value.HideoutNeeded;

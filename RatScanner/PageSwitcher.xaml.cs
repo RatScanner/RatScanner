@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using NotifyIcon = System.Windows.Forms.NotifyIcon;
+using RatRazor.Interfaces;
 
 namespace RatScanner
 {
@@ -13,7 +14,7 @@ namespace RatScanner
 	public partial class PageSwitcher : Window
 	{
 		public const int DefaultWidth = 280;
-		public const int DefaultHeight = 400;
+		public const int DefaultHeight = 450;
 
 		private NotifyIcon _notifyIcon;
 
@@ -34,6 +35,7 @@ namespace RatScanner
 				AddTrayIcon();
 
 				Topmost = RatConfig.AlwaysOnTop;
+				SetBackgroundOpacity(RatConfig.MinimalUi.Opacity / 100f);
 			}
 			catch (Exception e)
 			{
@@ -115,10 +117,10 @@ namespace RatScanner
 
 		private void OnTitleBarMinimal(object sender, RoutedEventArgs e)
 		{
-			CollapseTitleBar();
-			SizeToContent = SizeToContent.WidthAndHeight;
+			//CollapseTitleBar();
+			//SizeToContent = SizeToContent.WidthAndHeight;
 			SetBackgroundOpacity(RatConfig.MinimalUi.Opacity / 100f);
-			Navigate(new MinimalMenu());
+			//Navigate(new MinimalMenu());
 		}
 
 		private void OnTitleBarClose(object sender, RoutedEventArgs e)

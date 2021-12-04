@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using RatStash;
+using RatRazor.Interfaces;
 
 namespace RatScanner.Scan
 {

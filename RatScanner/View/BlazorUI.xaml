@@ -7,9 +7,9 @@
 			 xmlns:ratrazor="clr-namespace:RatRazor;assembly=RatRazor"
 		     xmlns:blazor="clr-namespace:Microsoft.AspNetCore.Components.WebView.Wpf;assembly=Microsoft.AspNetCore.Components.WebView.Wpf"
              mc:Ignorable="d" 
-             d:DesignHeight="370" d:DesignWidth="280">
+             d:DesignHeight="450" d:DesignWidth="280">
     <Grid>
-		<blazor:BlazorWebView HostPage="wwwroot/index.html" Services="{StaticResource services}" Panel.ZIndex="999">
+		<blazor:BlazorWebView HostPage="wwwroot/index.html" Services="{StaticResource services}" Panel.ZIndex="999" x:Name="blazorWebView">
 			<blazor:BlazorWebView.RootComponents>
 				<blazor:RootComponent Selector="#app" ComponentType="{x:Type ratrazor:App}" />
 			</blazor:BlazorWebView.RootComponents>

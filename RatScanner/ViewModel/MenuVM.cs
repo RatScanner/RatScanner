@@ -8,10 +8,11 @@ using RatEye;
 using RatScanner.FetchModels;
 using RatScanner.Scan;
 using RatStash;
+using RatRazor.Interfaces;
 
 namespace RatScanner.ViewModel
 {
-	internal class MainWindowVM : INotifyPropertyChanged
+	internal class MainWindowVM : INotifyPropertyChanged, IRatScannerUI
 	{
 		private const string UpSymbol = "▲";
 		private const string DownSymbol = "▼";
@@ -31,6 +32,12 @@ namespace RatScanner.ViewModel
 		private ItemScan CurrentItemScan => DataSource?.CurrentItemScan;
 
 		private Item[] MatchedItems => CurrentItemScan?.MatchedItems;
+
+		public void PageSwitcherDragMove()
+		{
+			PageSwitcher.Instance.ResizeMode = System.Windows.ResizeMode.CanResize;
+			//PageSwitcher.Instance.WindowStyle = System.Windows.WindowStyle.SingleBorderWindow;
+		}
 
 		public string IconPath
 		{
@@ -80,9 +87,12 @@ namespace RatScanner.ViewModel
 
 		public NeededItem TrackingTeamNeedsSummed => MatchedItems[0].GetSummedTrackingTeamNeeds();
 
+		public string TrackingNeedsQuestRemaining => TrackingNeeds.QuestRemaining.ToString();
+		public string TrackingNeedsHideoutRemaining => TrackingNeeds.QuestRemaining.ToString();
+
 		public List<KeyValuePair<string, NeededItem>> TrackingTeamNeeds => MatchedItems[0].GetTrackingTeamNeeds();
 
-		public List<KeyValuePair<string, NeededItem>> TrackingTeamNeedsFiltered => TrackingTeamNeeds.Where(x => x.Value.Remaining > 0).ToList();
+		public List<KeyValuePair<string, NeededItem>> TrackingTeamNeedsFiltered => TrackingTeamNeeds?.Where(x => x.Value.Remaining > 0).ToList() ?? new List<KeyValuePair<string, NeededItem>>();
 
 		public string DiscordLink => ApiManager.GetResource(ApiManager.ResourceType.DiscordLink);
 
@@ -109,6 +119,9 @@ namespace RatScanner.ViewModel
 				return $"https://escapefromtarkov.gamepedia.com/{HttpUtility.UrlEncode(Name.Replace(" ", "_"))}";
 			}
 		}
+
+		public string IconLink => MatchedItems[0].GetMarketItem().IconLink;
+		public string ImageLink => MatchedItems[0].GetMarketItem().ImageLink;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 

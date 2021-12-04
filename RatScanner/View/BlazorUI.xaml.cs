@@ -16,6 +16,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MudBlazor.Services;
 using System.Diagnostics;
 using RatScanner.ViewModel;
+using RatRazor.Interfaces;
 
 namespace RatScanner.View
 {
@@ -29,6 +30,7 @@ namespace RatScanner.View
 			var serviceCollection = new ServiceCollection();
 			serviceCollection.AddBlazorWebView();
 			serviceCollection.AddMudServices();
+			serviceCollection.AddSingleton<IRatScannerUI>(s => new MainWindowVM(RatScannerMain.Instance));
 			Resources.Add("services", serviceCollection.BuildServiceProvider());
 
 			InitializeComponent();
@@ -64,8 +66,9 @@ namespace RatScanner.View
 
 		public void OnOpen()
 		{
-			DataContext = new MainWindowVM(RatScannerMain.Instance);
+			//DataContext = new MainWindowVM(RatScannerMain.Instance);
 			UpdateElements();
+			//blazorWebView.Foreground.Opacity = Math.Clamp(10, 1f / 510f, 1f);
 		}
 
 		public void OnClose() { }

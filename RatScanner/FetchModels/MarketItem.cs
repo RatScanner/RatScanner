@@ -8,6 +8,8 @@ namespace RatScanner.FetchModels
 		// Item data
 		public string Id { get; set; }
 		public string WikiLink { get; set; } = "Unknown";
+		public string ImageLink { get; set; }
+		public string IconLink { get; set; }
 		public int Timestamp { get; set; }
 
 		// Price data
