@@ -39,6 +39,8 @@ namespace RatScanner.ViewModel
 			//PageSwitcher.Instance.WindowStyle = System.Windows.WindowStyle.SingleBorderWindow;
 		}
 
+		public string ItemId => MatchedItems[0].Id;
+
 		public string IconPath
 		{
 			get
@@ -52,6 +54,8 @@ namespace RatScanner.ViewModel
 		}
 
 		public string Name => MatchedItems[0].Name;
+
+		public string ShortName => MatchedItems[0].ShortName;
 
 		public bool HasMods => MatchedItems[0] is CompoundItem itemC && itemC.Slots.Count > 0;
 
@@ -119,6 +123,8 @@ namespace RatScanner.ViewModel
 				return $"https://escapefromtarkov.gamepedia.com/{HttpUtility.UrlEncode(Name.Replace(" ", "_"))}";
 			}
 		}
+
+		public string ToolsLink => $"https://tarkov-tools.com/item/{ItemId}";
 
 		public string IconLink => MatchedItems[0].GetMarketItem().IconLink;
 		public string ImageLink => MatchedItems[0].GetMarketItem().ImageLink;

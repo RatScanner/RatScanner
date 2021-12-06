@@ -117,10 +117,10 @@ namespace RatScanner
 
 		private void OnTitleBarMinimal(object sender, RoutedEventArgs e)
 		{
-			//CollapseTitleBar();
-			//SizeToContent = SizeToContent.WidthAndHeight;
+			CollapseTitleBar();
+			SizeToContent = SizeToContent.WidthAndHeight;
 			SetBackgroundOpacity(RatConfig.MinimalUi.Opacity / 100f);
-			//Navigate(new MinimalMenu());
+			Navigate(new MinimalMenu());
 		}
 
 		private void OnTitleBarClose(object sender, RoutedEventArgs e)

@@ -1,0 +1,28 @@
+﻿@inject RatRazor.Interfaces.ISettingsUI SettingsUI
+@inject IJSRuntime JSRuntime;
+@implements IDisposable
+
+<MudGrid Class="pa-0" Spacing="0">
+    <MudItem xs="6">
+        <MudButton Class="ma-2" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Color="Color.Success" FullWidth="true">Save</MudButton>
+    </MudItem>
+    <MudSpacer />
+    <MudItem xs="6">
+        <MudButton Class="ma-2" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" FullWidth="true">Discard</MudButton>
+    </MudItem>
+</MudGrid>
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        SettingsUI.PropertyChanged += PropertyChangeHandler;
+    }
+
+    private async void PropertyChangeHandler(object sender, EventArgs e)
+    {
+        await InvokeAsync(() => StateHasChanged());
+    }
+
+    public void Dispose() => SettingsUI.PropertyChanged -= PropertyChangeHandler;
+}

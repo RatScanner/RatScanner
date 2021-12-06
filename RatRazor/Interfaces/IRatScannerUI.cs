@@ -13,9 +13,11 @@ namespace RatRazor.Interfaces
 	{
 		// Item Metadata
 		public string Name { get; }
+		public string ShortName { get; }
 		public string ImageLink { get; }
 		public string IconLink { get; }
 		public string WikiLink { get; }
+		public string ToolsLink { get; }
 
 		// Item Information
 		public string Avg24hPrice { get; }

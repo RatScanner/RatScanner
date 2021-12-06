@@ -31,6 +31,7 @@ namespace RatScanner.View
 			serviceCollection.AddBlazorWebView();
 			serviceCollection.AddMudServices();
 			serviceCollection.AddSingleton<IRatScannerUI>(s => new MainWindowVM(RatScannerMain.Instance));
+			serviceCollection.AddSingleton<ISettingsUI>(s => new SettingsVM());
 			Resources.Add("services", serviceCollection.BuildServiceProvider());
 
 			InitializeComponent();

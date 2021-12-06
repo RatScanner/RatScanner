@@ -7,9 +7,10 @@
     <MudItem xs="12">
         <div class="d-flex align-center justify-center mx-2 mt-2 mb-1">
                 <img src="@RatScannerUI.IconLink" class="mr-2 mud-elevation-1" style="border-style:solid;border-width:1px;border-color:#585D60;display: block;max-width: 64px;max-height: 64px;width: auto;height: auto;"/>
-                <span>
+                <div>
                     <MudText Typo="Typo.subtitle1" Color="Color.Inherit">@RatScannerUI.Name</MudText>
-                </span>
+                    <MudText Typo="Typo.subtitle2" Color="Color.Inherit">@RatScannerUI.ShortName</MudText>
+                </div>
             </div>
     </MudItem>
     <MudItem xs="6">
@@ -65,7 +66,7 @@
 
     private async void OpenTarkovTools()
     {
-        await JSRuntime.InvokeAsync<string>("open", RatScannerUI.WikiLink, "_blank");
+        await JSRuntime.InvokeAsync<string>("open", RatScannerUI.ToolsLink, "_blank");
     }
 
     protected override void OnInitialized()

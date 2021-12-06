@@ -59,4 +59,7 @@
   <ItemGroup>
     <ProjectReference Include="..\RatRazor\RatRazor.csproj" />
   </ItemGroup>
+	<ItemGroup>
+		<None Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
 </Project>
