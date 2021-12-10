@@ -15,6 +15,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Pages\Settings\SettingsGeneral.razor.css" />
+    <None Remove="Pages\Settings\SettingsMinimalUI.razor.css" />
+    <None Remove="Pages\Settings\SettingsScanning.razor.css" />
+    <None Remove="Pages\Settings\SettingsTracking.razor.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Pages\Settings\SettingsGeneral.razor.css" />
+    <Content Include="Pages\Settings\SettingsMinimalUI.razor.css" />
+    <Content Include="Pages\Settings\SettingsScanning.razor.css" />
+    <Content Include="Pages\Settings\SettingsTracking.razor.css" />
+  </ItemGroup>
+
+  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
@@ -32,6 +46,10 @@
     <Content Update="_Imports.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\" />
   </ItemGroup>
 
 </Project>

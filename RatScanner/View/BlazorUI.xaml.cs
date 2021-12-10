@@ -17,6 +17,8 @@ using MudBlazor.Services;
 using System.Diagnostics;
 using RatScanner.ViewModel;
 using RatRazor.Interfaces;
+using Microsoft.Web.WebView2.Core;
+using RatScanner.Controls;
 
 namespace RatScanner.View
 {
@@ -25,16 +27,43 @@ namespace RatScanner.View
 	/// </summary>
 	public partial class BlazorUI : UserControl, ISwitchable
 	{
+		public HotkeySelector IconScanHotkeySelector { get; set; }
+
 		public BlazorUI()
 		{
 			var serviceCollection = new ServiceCollection();
 			serviceCollection.AddBlazorWebView();
 			serviceCollection.AddMudServices();
 			serviceCollection.AddSingleton<IRatScannerUI>(s => new MainWindowVM(RatScannerMain.Instance));
-			serviceCollection.AddSingleton<ISettingsUI>(s => new SettingsVM());
+			var settingsVM = new SettingsVM();
+			serviceCollection.AddSingleton<ISettingsUI>(s => settingsVM);
+			IconScanHotkeySelector = new HotkeySelector();
+			IconScanHotkeySelector.Hotkey = settingsVM.IconScanHotkey;
+			IconScanHotkeySelector.Width = 0;
+			IconScanHotkeySelector.Height = 0;
+			serviceCollection.AddSingleton<IHotkeySelector>(s => IconScanHotkeySelector);
 			Resources.Add("services", serviceCollection.BuildServiceProvider());
 
 			InitializeComponent();
+		}
+
+		void BlazorUI_Loaded(object sender, RoutedEventArgs e)
+		{
+			Panel.SetZIndex(IconScanHotkeySelector, 100);
+			blazorUIGrid.Children.Add(IconScanHotkeySelector);
+			blazorWebView.WebView.DefaultBackgroundColor = System.Drawing.Color.Transparent;
+			blazorWebView.WebView.NavigationCompleted += WebView_Loaded;
+		}
+
+		void WebView_Loaded(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs e)
+		{
+			// If we are running in a development/debugger mode, open dev tools to help out
+			if(Debugger.IsAttached)
+			{
+				blazorWebView.WebView.CoreWebView2.OpenDevToolsWindow();
+				
+			}
+			
 		}
 
 		private void UpdateElements()
@@ -55,20 +84,21 @@ namespace RatScanner.View
 			e.Handled = true;
 		}
 
-		private void OpenSettingsWindow(object sender, RoutedEventArgs e)
-		{
-			PageSwitcher.Instance.Navigate(new Settings());
-		}
-
 		public void UtilizeState(object state)
 		{
 			throw new NotImplementedException();
+		}
+
+		protected override void OnPreviewKeyDown(KeyEventArgs e)
+		{
+			//Test
 		}
 
 		public void OnOpen()
 		{
 			//DataContext = new MainWindowVM(RatScannerMain.Instance);
 			UpdateElements();
+			//
 			//blazorWebView.Foreground.Opacity = Math.Clamp(10, 1f / 510f, 1f);
 		}
 

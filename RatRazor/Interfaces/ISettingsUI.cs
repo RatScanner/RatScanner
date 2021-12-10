@@ -44,5 +44,7 @@ namespace RatRazor.Interfaces
 		public bool ShowTarkovTrackerTeam { get; set; }
 
 		public void SaveSettings();
+
+		public void LoadSettings();
 	}
 }

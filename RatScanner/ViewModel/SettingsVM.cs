@@ -46,6 +46,11 @@ namespace RatScanner.ViewModel
 
 		internal SettingsVM()
 		{
+			LoadSettings();
+		}
+
+		public void LoadSettings()
+		{
 			EnableNameScan = RatConfig.NameScan.Enable;
 			NameScanLanguage = (int)RatConfig.NameScan.Language;
 
@@ -77,6 +82,7 @@ namespace RatScanner.ViewModel
 
 			TarkovTrackerToken = RatConfig.Tracking.TarkovTracker.Token;
 			ShowTarkovTrackerTeam = RatConfig.Tracking.TarkovTracker.ShowTeam;
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
 		}
 
 		public void SaveSettings()
@@ -135,6 +141,7 @@ namespace RatScanner.ViewModel
 			Logger.LogInfo("Saving config...");
 			RatConfig.SaveConfig();
 			Logger.LogInfo("Config saved!");
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
 		}
 
 		private void UpdateTarkovTrackerToken()

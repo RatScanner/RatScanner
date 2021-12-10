@@ -33,12 +33,6 @@ namespace RatScanner.ViewModel
 
 		private Item[] MatchedItems => CurrentItemScan?.MatchedItems;
 
-		public void PageSwitcherDragMove()
-		{
-			PageSwitcher.Instance.ResizeMode = System.Windows.ResizeMode.CanResize;
-			//PageSwitcher.Instance.WindowStyle = System.Windows.WindowStyle.SingleBorderWindow;
-		}
-
 		public string ItemId => MatchedItems[0].Id;
 
 		public string IconPath

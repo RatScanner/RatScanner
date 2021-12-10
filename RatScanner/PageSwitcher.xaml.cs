@@ -35,7 +35,6 @@ namespace RatScanner
 				AddTrayIcon();
 
 				Topmost = RatConfig.AlwaysOnTop;
-				SetBackgroundOpacity(RatConfig.MinimalUi.Opacity / 100f);
 			}
 			catch (Exception e)
 			{
@@ -140,6 +139,7 @@ namespace RatScanner
 
 		internal void SetBackgroundOpacity(float opacity)
 		{
+			//return;
 			Background.Opacity = Math.Clamp(opacity, 1f / 510f, 1f);
 		}
 	}

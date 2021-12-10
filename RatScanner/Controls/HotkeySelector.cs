@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using RatRazor.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -7,7 +10,7 @@ using System.Windows.Media;
 
 namespace RatScanner.Controls
 {
-	public class Hotkey
+	public class Hotkey : INotifyPropertyChanged, IHotkey
 	{
 		/// <summary>
 		/// Keyboard key of the selected hotkey
@@ -32,19 +35,32 @@ namespace RatScanner.Controls
 			RequiresMouse = MouseButtons.Count > 0;
 		}
 
+		public string HotkeyString {
+			get
+			{
+				var keyboardString = string.Join('+', KeyboardKeys);
+				var mouseString = string.Join('+', MouseButtons);
+
+				var keyboardKeysEmpty = KeyboardKeys.Count == 0;
+				var mouseButtonsEmpty = MouseButtons.Count == 0;
+				if (!mouseButtonsEmpty && !keyboardKeysEmpty) return keyboardString + '+' + mouseString;
+				return keyboardString + mouseString;
+			}
+		}
+
 		public override string ToString()
 		{
-			var keyboardString = string.Join('+', KeyboardKeys);
-			var mouseString = string.Join('+', MouseButtons);
+			return HotkeyString;
+		}
 
-			var keyboardKeysEmpty = KeyboardKeys.Count == 0;
-			var mouseButtonsEmpty = MouseButtons.Count == 0;
-			if (!mouseButtonsEmpty && !keyboardKeysEmpty) return keyboardString + '+' + mouseString;
-			return keyboardString + mouseString;
+		public event PropertyChangedEventHandler PropertyChanged;
+		internal virtual void OnPropertyChanged(string propertyName = null)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		}
 	}
 
-	public class HotkeySelector : Button
+	public class HotkeySelector : Button, IHotkeySelector, INotifyPropertyChanged
 	{
 		/// <summary>
 		/// Identifies the <see cref="DoCaptureMouse"/> dependency property.
@@ -53,7 +69,7 @@ namespace RatScanner.Controls
 			nameof(DoCaptureMouse),
 			typeof(bool),
 			typeof(HotkeySelector),
-			new PropertyMetadata(false));
+			new PropertyMetadata(true));
 
 		/// <summary>
 		/// Identifies the <see cref="ListeningBackground"/> dependency property.
@@ -103,8 +119,19 @@ namespace RatScanner.Controls
 			}
 		}
 
+		public IHotkey HotkeyInterface {
+			get {
+				return Hotkey;
+			}
+		}
+
 		private bool _listening = false;
 		private Brush _previousBackground;
+
+		public bool Listening
+		{
+			get => _listening;
+		}
 
 		static HotkeySelector()
 		{
@@ -133,7 +160,9 @@ namespace RatScanner.Controls
 			if (Hotkey.KeyboardKeys.Contains(e.Key)) return;
 
 			Hotkey.KeyboardKeys.Add(e.Key);
+			OnPropertyChanged();
 			UpdateControl();
+			Console.WriteLine($"Adding Key: {e.Key}");
 
 			e.Handled = true;
 		}
@@ -141,9 +170,18 @@ namespace RatScanner.Controls
 		/// <summary>
 		/// Stop listening for keys as soon as a single key is released
 		/// </summary>
-		protected override void OnKeyUp(KeyEventArgs e)
+		protected override void OnPreviewKeyUp(KeyEventArgs e)
 		{
-			StopListening();
+			if (_listening)
+			{
+				StopListening();
+				e.Handled = true;
+			}
+			else
+			{
+				base.OnPreviewKeyUp(e);
+			}
+			
 		}
 
 		/// <summary>
@@ -161,6 +199,7 @@ namespace RatScanner.Controls
 			if (Hotkey.MouseButtons.Contains(e.ChangedButton)) return;
 
 			Hotkey.MouseButtons.Add(e.ChangedButton);
+			OnPropertyChanged();
 			UpdateControl();
 
 			e.Handled = true;
@@ -189,8 +228,9 @@ namespace RatScanner.Controls
 			base.OnLostFocus(e);
 		}
 
-		private void StartListening()
+		public void StartListening()
 		{
+			this.Focus();
 			if (_listening) return;
 
 			Hotkey.KeyboardKeys.Clear();
@@ -204,13 +244,18 @@ namespace RatScanner.Controls
 			SetValue(BackgroundProperty, ListeningBackground);
 
 			_listening = true;
+			Logger.LogDebug($"Started listening for input");
 		}
 
-		private void StopListening()
+		public void StopListening()
 		{
-			if (!_listening) return;
+			if (!_listening)
+			{
+				return;
+			}
 
 			_listening = false;
+			OnPropertyChanged();
 
 			// Release mouse capture
 			ReleaseMouseCapture();
@@ -231,9 +276,17 @@ namespace RatScanner.Controls
 			Hotkey.MouseButtons.Sort();
 		}
 
+		public string HotkeyString => Hotkey.HotkeyString;
+
 		public override string ToString()
 		{
-			return Hotkey.ToString();
+			return HotkeyString;
+		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
+		internal virtual void OnPropertyChanged(string propertyName = null)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		}
 	}
 }

@@ -32,7 +32,5 @@ namespace RatRazor.Interfaces
 		public string TrackingNeedsQuestRemaining { get; }
 		public string TrackingNeedsHideoutRemaining { get; }
 
-		public void PageSwitcherDragMove();
-
 	}
 }

@@ -3,13 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:RatScanner.View"
+             xmlns:controls="clr-namespace:RatScanner.Controls"
 			 xmlns:ratrazor="clr-namespace:RatRazor;assembly=RatRazor"
 		     xmlns:blazor="clr-namespace:Microsoft.AspNetCore.Components.WebView.Wpf;assembly=Microsoft.AspNetCore.Components.WebView.Wpf"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="280">
-    <Grid>
-		<blazor:BlazorWebView HostPage="wwwroot/index.html" Services="{StaticResource services}" Panel.ZIndex="999" x:Name="blazorWebView">
+             mc:Ignorable="d"
+             d:DesignHeight="470" d:DesignWidth="280">
+	<Grid x:Name="blazorUIGrid">
+		<blazor:BlazorWebView HostPage="wwwroot/index.html" Services="{StaticResource services}" Panel.ZIndex="99" x:Name="blazorWebView" Loaded="BlazorUI_Loaded"
+>
 			<blazor:BlazorWebView.RootComponents>
 				<blazor:RootComponent Selector="#app" ComponentType="{x:Type ratrazor:App}" />
 			</blazor:BlazorWebView.RootComponents>

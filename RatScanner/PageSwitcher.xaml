@@ -4,8 +4,8 @@
 				xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 				xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 				Title="Rat Scanner"
-				AllowsTransparency="False"
-				Background="#444444"
+				AllowsTransparency="True"
+				Background="#70121212"
 				ResizeMode="NoResize"
 				WindowStyle="None"
 				mc:Ignorable="d">
@@ -108,6 +108,6 @@
 		</Border>
 
 		<ContentControl x:Name="ContentControl"
-										Grid.Row="1" />
+										Grid.Row="1"/>
 	</Grid>
 </Window>
