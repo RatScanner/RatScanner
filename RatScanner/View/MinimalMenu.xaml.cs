@@ -43,7 +43,7 @@ namespace RatScanner.View
 			PageSwitcher.Instance.ResetWindowSize();
 			PageSwitcher.Instance.SetBackgroundOpacity(1);
 			PageSwitcher.Instance.ShowTitleBar();
-			PageSwitcher.Instance.Navigate(new MainMenu());
+			PageSwitcher.Instance.Navigate(new BlazorUI());
 		}
 
 		public void UtilizeState(object state)

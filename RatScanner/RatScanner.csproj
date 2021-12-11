@@ -57,7 +57,9 @@
     <SplashScreen Include="Resources\RatLogoMedium.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\RatLib\RatLib.csproj" />
     <ProjectReference Include="..\RatRazor\RatRazor.csproj" />
+    <ProjectReference Include="..\RatTracking\RatTracking.csproj" />
   </ItemGroup>
 	<ItemGroup>
 		<None Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />

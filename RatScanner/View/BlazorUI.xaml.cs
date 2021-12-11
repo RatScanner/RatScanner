@@ -1,24 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Microsoft.Extensions.DependencyInjection;
 using MudBlazor.Services;
 using System.Diagnostics;
 using RatScanner.ViewModel;
 using RatRazor.Interfaces;
-using Microsoft.Web.WebView2.Core;
 using RatScanner.Controls;
+using RatTracking;
+using RatLib;
 
 namespace RatScanner.View
 {
@@ -28,6 +20,7 @@ namespace RatScanner.View
 	public partial class BlazorUI : UserControl, ISwitchable
 	{
 		public HotkeySelector IconScanHotkeySelector { get; set; }
+		public BlazorOverlay BlazorOverlay { get; set; }
 
 		public BlazorUI()
 		{
@@ -42,7 +35,15 @@ namespace RatScanner.View
 			IconScanHotkeySelector.Width = 0;
 			IconScanHotkeySelector.Height = 0;
 			serviceCollection.AddSingleton<IHotkeySelector>(s => IconScanHotkeySelector);
-			Resources.Add("services", serviceCollection.BuildServiceProvider());
+			serviceCollection.AddSingleton<VirtualScreenOffset>(s => new VirtualScreenOffset((int)SystemParameters.VirtualScreenLeft, (int)SystemParameters.VirtualScreenTop));
+			serviceCollection.AddSingleton<TarkovTrackerDB>(s => RatScannerMain.Instance.TarkovTrackerDB);
+
+			ServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
+
+			BlazorOverlay = new BlazorOverlay(serviceProvider);
+			BlazorOverlay.Show();
+
+			Resources.Add("services", serviceProvider);
 
 			InitializeComponent();
 		}
@@ -53,6 +54,7 @@ namespace RatScanner.View
 			blazorUIGrid.Children.Add(IconScanHotkeySelector);
 			blazorWebView.WebView.DefaultBackgroundColor = System.Drawing.Color.Transparent;
 			blazorWebView.WebView.NavigationCompleted += WebView_Loaded;
+			blazorWebView.WebView.CoreWebView2InitializationCompleted += CoreWebView_Loaded;
 		}
 
 		void WebView_Loaded(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs e)
@@ -61,9 +63,12 @@ namespace RatScanner.View
 			if(Debugger.IsAttached)
 			{
 				blazorWebView.WebView.CoreWebView2.OpenDevToolsWindow();
-				
 			}
-			
+		}
+
+		void CoreWebView_Loaded(object sender, Microsoft.Web.WebView2.Core.CoreWebView2InitializationCompletedEventArgs e)
+		{
+			blazorWebView.WebView.CoreWebView2.Navigate("https://0.0.0.0/app");
 		}
 
 		private void UpdateElements()
@@ -92,6 +97,16 @@ namespace RatScanner.View
 		protected override void OnPreviewKeyDown(KeyEventArgs e)
 		{
 			//Test
+		}
+
+		private void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
+		{
+			if (e.ChangedButton == MouseButton.Left)
+			{
+				PageSwitcher.Instance.DragMove();
+				e.Handled = true;
+			}
+
 		}
 
 		public void OnOpen()

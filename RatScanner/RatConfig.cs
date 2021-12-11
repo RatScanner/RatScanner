@@ -91,7 +91,7 @@ namespace RatScanner
 
 				internal static string Token = "";
 				internal static bool ShowTeam = true;
-				internal static int RefreshTime = 10 * 60 * 1000;   // 10 minutes
+				internal static int RefreshTime = 5 * 60 * 1000;   // 5 minutes
 			}
 		}
 
@@ -107,7 +107,7 @@ namespace RatScanner
 #endif
 		internal static bool MinimizeToTray = false;
 		internal static bool AlwaysOnTop = true;
-		internal static int MarketDBRefreshTime = 60 * 60 * 1000;   // 1 hour
+		internal static int MarketDBRefreshTime = 30 * 60 * 1000;   // 30 minutes
 		internal static string ItemDataVersion = "20200101";
 		private static int ConfigVersion => 2;
 

@@ -7,12 +7,13 @@ using System.IO;
 using System.Threading;
 using System.Windows;
 using RatEye;
-using RatScanner.Scan;
 using RatScanner.View;
 using RatStash;
 using Color = System.Drawing.Color;
 using Size = System.Drawing.Size;
 using Timer = System.Threading.Timer;
+using RatTracking;
+using RatLib.Scan;
 
 namespace RatScanner
 {
@@ -25,11 +26,13 @@ namespace RatScanner
 
 		private readonly NameScanToolTip _nameScanToolTip;
 		private readonly IconScanToolTip _iconScanToolTip;
+		private readonly BlazorOverlay _blazorOverlay;
 
 		private ItemScan _currentItemScan;
 
 		private Timer _marketDBRefreshTimer;
 		private Timer _tarkovTrackerDBRefreshTimer;
+		private Timer _scanRefreshTimer;
 
 
 		/// <summary>
@@ -50,7 +53,7 @@ namespace RatScanner
 
 		internal MarketDB MarketDB;
 		internal ProgressDB ProgressDB;
-		internal TarkovTrackerDB TarkovTrackerDB;
+		public TarkovTrackerDB TarkovTrackerDB;
 		internal Database ItemDB;
 
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -69,7 +72,7 @@ namespace RatScanner
 		{
 			_instance = this;
 
-			// Remove old log
+			// Remove old log+
 			Logger.Clear();
 
 			Logger.LogInfo("----- RatScanner " + RatConfig.Version + " -----");
@@ -97,6 +100,7 @@ namespace RatScanner
 			TarkovTrackerDB = new TarkovTrackerDB();
 			if (RatConfig.Tracking.TarkovTracker.Enable)
 			{
+				TarkovTrackerDB.Token = RatConfig.Tracking.TarkovTracker.Token;
 				Logger.LogInfo("Loading TarkovTracker...");
 				if (!TarkovTrackerDB.Init())
 				{
@@ -116,7 +120,7 @@ namespace RatScanner
 			MarketDB.Init();
 
 			Logger.LogInfo("Setting default item...");
-			CurrentItemScan = new ItemNameScan();
+			CurrentItemScan = new ItemNameScan(ItemDB.GetItem("59faff1d86f7746c51718c9c"));
 
 			Logger.LogInfo("Initializing RatEye...");
 			SetupRatEye();
@@ -127,6 +131,7 @@ namespace RatScanner
 			Logger.LogInfo("Setting up data update routines...");
 			_marketDBRefreshTimer = new Timer(RefreshMarketDB, null, RatConfig.MarketDBRefreshTime, Timeout.Infinite);
 			_tarkovTrackerDBRefreshTimer = new Timer(RefreshTarkovTrackerDB, null, RatConfig.Tracking.TarkovTracker.RefreshTime, Timeout.Infinite);
+			_scanRefreshTimer = new Timer(new TimerCallback(RefreshOverlay));
 
 			Logger.LogInfo("Ready!");
 		}
@@ -220,7 +225,7 @@ namespace RatScanner
 				ItemIconScan itemIconScan;
 				try
 				{
-					itemIconScan = new ItemIconScan(screenshot, position);
+					itemIconScan = new ItemIconScan(screenshot, position, RatConfig.IconScan.ScanWidth, RatConfig.IconScan.ScanHeight, RatConfig.ToolTip.Duration);
 				}
 				catch (Exception e)
 				{
@@ -231,8 +236,9 @@ namespace RatScanner
 				if (!itemIconScan.ValidItem) return false;
 
 				CurrentItemScan = itemIconScan;
+				SetOverlayRefresh();
 
-				ShowToolTip(itemIconScan);
+				//ShowToolTip(itemIconScan);
 			}
 
 			return true;
@@ -266,12 +272,13 @@ namespace RatScanner
 				var screenshot = GetScreenshot(new Vector2(screenshotPosX, screenshotPosY), new Size(sizeWidth, sizeHeight));
 
 				// Scan the item
-				var itemNameScan = new ItemNameScan(screenshot, position);
+				var itemNameScan = new ItemNameScan(screenshot, position, RatConfig.NameScan.MarkerScanSize, RatConfig.ToolTip.Duration);
 
 				if (!itemNameScan.ValidItem) return false;
 				CurrentItemScan = itemNameScan;
+				SetOverlayRefresh();
 
-				ShowToolTip(itemNameScan);
+				//ShowToolTip(itemNameScan);
 			}
 
 			return true;
@@ -303,6 +310,17 @@ namespace RatScanner
 
 			if (itemScan is ItemNameScan) NameScanToolTip.ScheduleShow(itemScan, pos, RatConfig.ToolTip.Duration);
 			if (itemScan is ItemIconScan) IconScanToolTip.ScheduleShow(itemScan, pos, RatConfig.ToolTip.Duration);
+		}
+
+		private void SetOverlayRefresh()
+		{
+			_scanRefreshTimer.Change(RatConfig.ToolTip.Duration, Timeout.Infinite);
+		}
+
+		private void RefreshOverlay(object? o)
+		{
+			// Overlay will react to event
+			OnPropertyChanged();
 		}
 
 		private void RefreshMarketDB(object? o)

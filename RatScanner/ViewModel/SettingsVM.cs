@@ -148,6 +148,7 @@ namespace RatScanner.ViewModel
 		{
 			var token = RatConfig.Tracking.TarkovTracker.Token;
 			if (token == "") return;
+			RatScannerMain.Instance.TarkovTrackerDB.Token = RatConfig.Tracking.TarkovTracker.Token;
 			if (RatScannerMain.Instance.TarkovTrackerDB.Init()) return;
 
 			var visibleLength = (int)(token.Length * 0.25);

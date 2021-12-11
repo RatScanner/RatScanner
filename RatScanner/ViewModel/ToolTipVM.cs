@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media;
 using RatEye;
-using RatScanner.Scan;
+using RatLib.Scan;
 using RatStash;
 using Brush = System.Windows.Media.Brush;
 using Color = System.Windows.Media.Color;

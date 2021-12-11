@@ -2,7 +2,8 @@
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Interop;
-using RatScanner.Scan;
+using RatLib;
+using RatLib.Scan;
 using RatScanner.ViewModel;
 using Point = System.Windows.Point;
 

@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Drawing;
 using System.ComponentModel;
+using RatTracking.FetchModels;
+using RatLib.Scan;
 
 namespace RatRazor.Interfaces
 {
@@ -29,8 +31,12 @@ namespace RatRazor.Interfaces
 		public string PatreonLink { get; }
 		public string GithubLink { get; }
 
-		public string TrackingNeedsQuestRemaining { get; }
-		public string TrackingNeedsHideoutRemaining { get; }
+		public List<KeyValuePair<string, NeededItem>> TrackingTeamNeeds { get; }
+
+		public NeededItem TrackingNeeds { get; }
+		public NeededItem TrackingTeamNeedsSummed { get; }
+
+		public ItemScan CurrentItemScan { get; }
 
 	}
 }
