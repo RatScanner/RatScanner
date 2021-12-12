@@ -41,11 +41,6 @@
         @RatScannerUI.Avg24hPrice @if(RatScannerUI.TrackingNeeds.QuestRemaining > 0) { <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" /> } @if(RatScannerUI.TrackingNeeds.HideoutRemaining > 0) { <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" /> }
         </div>
     }
-
-}
-else
-{
-    <span>Did not pass</span>
 }
 
 @code {
