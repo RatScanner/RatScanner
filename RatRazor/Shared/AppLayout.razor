@@ -15,10 +15,15 @@
         </MudAppBar>
         <MudDrawer @bind-Open="@drawerOpen" Elevation="1" Anchor="Anchor.Left" Variant="@DrawerVariant.Responsive">
             <MudDrawerHeader LinkToIndex="true">
-                <img src="RatLogoMedium.png" width="20%"/>
-                <MudText Typo="Typo.h5" Class="mud-info-text">
-                    RatScanner
-                </MudText>
+                <div>
+                    <img src="RatLogoMedium.png" width="20%" style="vertical-align: middle;"/>
+                    <span style="font-size: 150%; vertical-align: bottom;">
+                        Rat Scanner
+                        <span style="font-size: 50%;">
+                            <text>v</text>@RatScannerUI.GetType().Assembly.GetName().Version.ToString(3)
+                        </span>
+                    </span>
+                </div>
             </MudDrawerHeader>
             <MudNavMenu>
                 <MudNavLink Href="/app" Match="NavLinkMatch.All" Icon="@Icons.Filled.Dashboard">Dashboard</MudNavLink>
