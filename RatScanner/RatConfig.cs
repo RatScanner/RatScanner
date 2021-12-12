@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
+﻿using RatScanner.Controls;
+using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Windows.Input;
-using RatScanner.Controls;
-using RatScanner.Properties;
 
 namespace RatScanner
 {
@@ -91,7 +88,7 @@ namespace RatScanner
 
 				internal static string Token = "";
 				internal static bool ShowTeam = true;
-				internal static int RefreshTime = 10 * 60 * 1000;   // 10 minutes
+				internal static int RefreshTime = 5 * 60 * 1000;   // 5 minutes
 			}
 		}
 
@@ -107,7 +104,7 @@ namespace RatScanner
 #endif
 		internal static bool MinimizeToTray = false;
 		internal static bool AlwaysOnTop = true;
-		internal static int MarketDBRefreshTime = 60 * 60 * 1000;   // 1 hour
+		internal static int MarketDBRefreshTime = 30 * 60 * 1000;   // 30 minutes
 		internal static string ItemDataVersion = "20200101";
 		private static int ConfigVersion => 2;
 

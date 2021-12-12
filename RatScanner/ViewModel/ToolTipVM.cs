@@ -1,11 +1,10 @@
-﻿using System.ComponentModel;
+﻿using RatLib.Scan;
+using RatStash;
+using System.ComponentModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media;
-using RatEye;
-using RatScanner.Scan;
-using RatStash;
 using Brush = System.Windows.Media.Brush;
 using Color = System.Windows.Media.Color;
 

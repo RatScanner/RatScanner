@@ -13,7 +13,7 @@ namespace RatScanner
 	public partial class PageSwitcher : Window
 	{
 		public const int DefaultWidth = 280;
-		public const int DefaultHeight = 400;
+		public const int DefaultHeight = 450;
 
 		private NotifyIcon _notifyIcon;
 
@@ -30,7 +30,7 @@ namespace RatScanner
 
 				InitializeComponent();
 				ResetWindowSize();
-				Navigate(new MainMenu());
+				Navigate(new BlazorUI());
 				AddTrayIcon();
 
 				Topmost = RatConfig.AlwaysOnTop;
@@ -138,6 +138,7 @@ namespace RatScanner
 
 		internal void SetBackgroundOpacity(float opacity)
 		{
+			//return;
 			Background.Opacity = Math.Clamp(opacity, 1f / 510f, 1f);
 		}
 	}
