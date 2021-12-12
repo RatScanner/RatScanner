@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using RatTracking.FetchModels;
 using RatTracking.FetchModels.tarkovdata;
 
@@ -10,7 +7,7 @@ namespace RatTracking
 	// Storing information about items needed for EFT progression
 	public class ProgressDB
 	{
-		private static readonly string[] _questObjectiveItemTypes = {"collect", "find", "mark", "key"};
+		private static readonly string[] _questObjectiveItemTypes = { "collect", "find", "mark", "key" };
 
 		private const string TarkovDataUrl = "https://tarkovtracker.github.io/tarkovdata";
 
@@ -35,27 +32,27 @@ namespace RatTracking
 			// Loop through each quest in our quest list
 			foreach (var quest in quests)
 				// Loop through all of our objectives within each quest
-			foreach (var objective in quest.Objectives)
-				// Check if the objective is a type that requires an item
-				if (_questObjectiveItemTypes.Contains(objective.Type))
-					// Some objectives can have array of targets (one-of-keys are currently only example), so add each
-					foreach (var item in objective.Target)
-						_questItems.Add(new QuestItem
-						{
-							Id = item, QuestId = quest.Id, Needed = objective.Number, QuestObjectiveId = objective.Id, FIR = objective.Type == "find",
-						});
+				foreach (var objective in quest.Objectives)
+					// Check if the objective is a type that requires an item
+					if (_questObjectiveItemTypes.Contains(objective.Type))
+						// Some objectives can have array of targets (one-of-keys are currently only example), so add each
+						foreach (var item in objective.Target)
+							_questItems.Add(new QuestItem
+							{
+								Id = item, QuestId = quest.Id, Needed = objective.Number, QuestObjectiveId = objective.Id, FIR = objective.Type == "find",
+							});
 
 			// Loop through each hideout module in our hideout data
 			foreach (var module in hideout.Modules)
 				// Loop through each requirement within the module
-			foreach (var requirement in module.Requirements)
-				// If its an item requirement, add it to the list
-				if (requirement.Type == "item")
-					_hideoutItems.Add(new HideoutItem
-					{
-						Id = requirement.Name, StationId = module.StationId, ModuleLevel = module.Level, HideoutObjectiveId = requirement.Id,
-						Needed = requirement.Quantity,
-					});
+				foreach (var requirement in module.Requirements)
+					// If its an item requirement, add it to the list
+					if (requirement.Type == "item")
+						_hideoutItems.Add(new HideoutItem
+						{
+							Id = requirement.Name, StationId = module.StationId, ModuleLevel = module.Level, HideoutObjectiveId = requirement.Id,
+							Needed = requirement.Quantity,
+						});
 		}
 
 		// Check if item is needed for any part of progression, quest or hideout
@@ -114,7 +111,7 @@ namespace RatTracking
 			{
 				return APIClient.Get($"{TarkovDataUrl}/quests.json");
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
 				return null;
 			}
@@ -127,7 +124,7 @@ namespace RatTracking
 			{
 				return APIClient.Get($"{TarkovDataUrl}/hideout.json");
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
 				return null;
 			}

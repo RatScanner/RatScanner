@@ -1,13 +1,13 @@
-﻿using System;
+﻿using RatLib.Scan;
+using RatRazor.Interfaces;
+using RatScanner.FetchModels;
+using RatStash;
+using RatTracking.FetchModels;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
-using RatScanner.FetchModels;
-using RatLib.Scan;
-using RatStash;
-using RatRazor.Interfaces;
-using RatTracking.FetchModels;
 using System.Web;
 
 namespace RatScanner.ViewModel
@@ -80,7 +80,7 @@ namespace RatScanner.ViewModel
 		{
 			return MatchedItems[0].GetMaxTraderPrice();
 		}
-		
+
 
 		public NeededItem TrackingNeeds => MatchedItems[0].GetTrackingNeeds();
 		public NeededItem TrackingTeamNeedsSummed => MatchedItems[0].GetSummedTrackingTeamNeeds();

@@ -1,5 +1,5 @@
-﻿using System.Drawing;
-using RatStash;
+﻿using RatStash;
+using System.Drawing;
 
 namespace RatLib.Scan
 {

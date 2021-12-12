@@ -1,7 +1,7 @@
-﻿using System.Windows;
+﻿using RatScanner.ViewModel;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using RatScanner.ViewModel;
 using RCMinUi = RatScanner.RatConfig.MinimalUi;
 
 namespace RatScanner.View

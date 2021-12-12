@@ -1,10 +1,10 @@
-﻿using System.Diagnostics;
+﻿using RatEye;
+using RatScanner.ViewModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
-using RatEye;
-using RatScanner.ViewModel;
 
 namespace RatScanner.View
 {

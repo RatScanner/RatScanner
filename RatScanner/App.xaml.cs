@@ -20,7 +20,7 @@ namespace RatScanner
 		{
 			AppDomain.CurrentDomain.UnhandledException += (s, e) =>
 			{
-				LogUnhandledException((Exception) e.ExceptionObject, "AppDomain.CurrentDomain.UnhandledException");
+				LogUnhandledException((Exception)e.ExceptionObject, "AppDomain.CurrentDomain.UnhandledException");
 			};
 
 			DispatcherUnhandledException += (s, e) =>

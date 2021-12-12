@@ -1,9 +1,9 @@
-﻿using System;
+﻿using RatLib;
+using System;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
-using RatLib;
 
 namespace RatScanner
 {
@@ -495,7 +495,7 @@ namespace RatScanner
 			if (nCode >= 0 && OnKeyboardKeyUp != null)
 			{
 				// Read structure KeyboardHookStruct at lParam
-				var keyboardHookStruct = (KeyboardHookStruct) Marshal.PtrToStructure(lParam, typeof(KeyboardHookStruct));
+				var keyboardHookStruct = (KeyboardHookStruct)Marshal.PtrToStructure(lParam, typeof(KeyboardHookStruct));
 
 				// Skip processing if the key is not in a transition state
 				if ((keyboardHookStruct?.flags & 0b1000_0000) == 0) return CallNextHookEx(hKeyboardHook, nCode, wParam, lParam);
@@ -561,7 +561,7 @@ namespace RatScanner
 						virtualKeycode = 0x04;
 						break;
 					case WM_XBUTTONUP:
-						var mouseHookStruct = (MouseLLHookStruct) Marshal.PtrToStructure(lParam, typeof(MouseLLHookStruct));
+						var mouseHookStruct = (MouseLLHookStruct)Marshal.PtrToStructure(lParam, typeof(MouseLLHookStruct));
 						if (mouseHookStruct.mouseData == 0x10000) virtualKeycode = 0x05;
 						else if (mouseHookStruct.mouseData == 0x20000) virtualKeycode = 0x06;
 						break;

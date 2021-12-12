@@ -1,16 +1,16 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using MudBlazor.Services;
+using RatLib;
+using RatRazor.Interfaces;
+using RatScanner.Controls;
+using RatScanner.ViewModel;
+using RatTracking;
+using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
-using Microsoft.Extensions.DependencyInjection;
-using MudBlazor.Services;
-using System.Diagnostics;
-using RatScanner.ViewModel;
-using RatRazor.Interfaces;
-using RatScanner.Controls;
-using RatTracking;
-using RatLib;
 
 namespace RatScanner.View
 {
@@ -60,7 +60,7 @@ namespace RatScanner.View
 		void WebView_Loaded(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs e)
 		{
 			// If we are running in a development/debugger mode, open dev tools to help out
-			if(Debugger.IsAttached)
+			if (Debugger.IsAttached)
 			{
 				blazorWebView.WebView.CoreWebView2.OpenDevToolsWindow();
 			}
@@ -73,9 +73,6 @@ namespace RatScanner.View
 
 		private void UpdateElements()
 		{
-			const Visibility v = Visibility.Visible;
-			const Visibility c = Visibility.Collapsed;
-
 		}
 
 		private void HyperlinkRequestNavigate(object sender, RequestNavigateEventArgs e)

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RatTracking.FetchModels
+﻿namespace RatTracking.FetchModels
 {
 	[Serializable]
 	public class HideoutItem

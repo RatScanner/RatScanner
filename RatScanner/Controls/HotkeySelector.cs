@@ -35,7 +35,8 @@ namespace RatScanner.Controls
 			RequiresMouse = MouseButtons.Count > 0;
 		}
 
-		public string HotkeyString {
+		public string HotkeyString
+		{
 			get
 			{
 				var keyboardString = string.Join('+', KeyboardKeys);
@@ -93,7 +94,7 @@ namespace RatScanner.Controls
 		/// </summary>
 		public bool DoCaptureMouse
 		{
-			get => (bool) GetValue(DoCaptureMouseProperty);
+			get => (bool)GetValue(DoCaptureMouseProperty);
 			set => SetValue(DoCaptureMouseProperty, value);
 		}
 
@@ -102,7 +103,7 @@ namespace RatScanner.Controls
 		/// </summary>
 		public Brush ListeningBackground
 		{
-			get => (Brush) GetValue(ListeningBackgroundProperty);
+			get => (Brush)GetValue(ListeningBackgroundProperty);
 			set => SetValue(ListeningBackgroundProperty, value);
 		}
 
@@ -111,7 +112,7 @@ namespace RatScanner.Controls
 		/// </summary>
 		public Hotkey Hotkey
 		{
-			get => (Hotkey) GetValue(HotkeyProperty);
+			get => (Hotkey)GetValue(HotkeyProperty);
 			set
 			{
 				SetValue(HotkeyProperty, value);
@@ -119,8 +120,10 @@ namespace RatScanner.Controls
 			}
 		}
 
-		public IHotkey HotkeyInterface {
-			get {
+		public IHotkey HotkeyInterface
+		{
+			get
+			{
 				return Hotkey;
 			}
 		}
@@ -181,7 +184,7 @@ namespace RatScanner.Controls
 			{
 				base.OnPreviewKeyUp(e);
 			}
-			
+
 		}
 
 		/// <summary>

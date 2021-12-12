@@ -1,10 +1,9 @@
-﻿using System;
-using System.Linq;
-using RatScanner.FetchModels;
-using System.Collections.Generic;
+﻿using RatScanner.FetchModels;
 using RatStash;
-using RatTracking.FetchModels.TarkovTracker;
 using RatTracking.FetchModels;
+using RatTracking.FetchModels.TarkovTracker;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace RatScanner
 {

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RatTracking.FetchModels.TarkovTracker
+﻿namespace RatTracking.FetchModels.TarkovTracker
 {
 	// Exception for when TarkovTracker rate limiting is hit
 	public class RateLimitExceededException : Exception

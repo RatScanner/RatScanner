@@ -1,6 +1,5 @@
-﻿using System.Drawing;
-using RatLib.Scan;
-using RatStash;
+﻿using RatStash;
+using System.Drawing;
 using Icon = RatEye.Processing.Icon;
 
 namespace RatLib.Scan
@@ -23,7 +22,7 @@ namespace RatLib.Scan
 		private int _scanWidth;
 		private int _scanHeight;
 
-		public  ItemIconScan(Bitmap capture, Vector2 mousePosition, int scanWidth, int scanHeight, int duration)
+		public ItemIconScan(Bitmap capture, Vector2 mousePosition, int scanWidth, int scanHeight, int duration)
 		{
 			_mousePosition = mousePosition;
 			var inventory = new RatEye.Processing.Inventory(capture);

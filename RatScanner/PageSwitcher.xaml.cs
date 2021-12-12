@@ -4,7 +4,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using NotifyIcon = System.Windows.Forms.NotifyIcon;
-using RatRazor.Interfaces;
 
 namespace RatScanner
 {

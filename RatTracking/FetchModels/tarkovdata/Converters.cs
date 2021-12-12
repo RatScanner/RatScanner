@@ -1,7 +1,5 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
 
 // Custom converters needed for tarkovdata
 namespace RatTracking.FetchModels.tarkovdata
@@ -18,7 +16,7 @@ namespace RatTracking.FetchModels.tarkovdata
 		{
 			var token = JToken.Load(reader);
 			if (token.Type == JTokenType.Array) return token.ToObject<List<T>>();
-			return new List<T> {token.ToObject<T>()};
+			return new List<T> { token.ToObject<T>() };
 		}
 
 		public override bool CanWrite => false;

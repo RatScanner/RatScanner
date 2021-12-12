@@ -1,7 +1,7 @@
-﻿using System.ComponentModel;
-using RatScanner.Controls;
+﻿using RatEye;
 using RatRazor.Interfaces;
-using RatEye;
+using RatScanner.Controls;
+using System.ComponentModel;
 using System.Linq;
 
 namespace RatScanner.ViewModel

@@ -1,9 +1,5 @@
 ﻿using Newtonsoft.Json;
 using RatTracking.FetchModels.TarkovTracker;
-using RatTracking.FetchModels;
-using RatTracking;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 
 namespace RatTracking
@@ -97,15 +93,17 @@ namespace RatTracking
 					var rawProgress = JsonConvert.DeserializeObject<List<Progress>>(getTarkovTrackerTeam());
 					Progress = rawProgress?.Where(x => (x.Hide ?? false) == false).ToList();
 				}
-				catch (RateLimitExceededException e)
+				catch (RateLimitExceededException)
 				{
 					// We hit a rate limit issue, this doesn't mean our token is bad, but we have to wait until we try again
 				}
-				catch (UnauthorizedTokenException e)
+				catch (UnauthorizedTokenException)
 				{
 					// We have an unauthorized token exception, it could be that we don't have permissions for this call
 				}
-			} else if (SoloProgressAvailable) {
+			}
+			else if (SoloProgressAvailable)
+			{
 				// We have permission to get individual progress
 
 				try
@@ -113,15 +111,17 @@ namespace RatTracking
 					var soloProgress = JsonConvert.DeserializeObject<Progress>(getTarkovTrackerSolo());
 					Progress = new List<Progress> { soloProgress };
 				}
-				catch (RateLimitExceededException e)
+				catch (RateLimitExceededException)
 				{
 					// We hit a rate limit issue, this doesn't mean our token is bad, but we have to wait until we try again
 				}
-				catch (UnauthorizedTokenException e)
+				catch (UnauthorizedTokenException)
 				{
 					// We have an unauthorized token exception, it could be that we don't have permissions for this call
 				}
-			} else {
+			}
+			else
+			{
 				// We dont have permissions
 			}
 		}
@@ -141,7 +141,7 @@ namespace RatTracking
 				// Unknown error, continue throwing
 				throw;
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
 				return null;
 			}
@@ -162,7 +162,7 @@ namespace RatTracking
 				// Unknown error, continue throwing
 				throw;
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
 				return null;
 			}
@@ -187,7 +187,7 @@ namespace RatTracking
 				// Unknown error, continue throwing
 				throw;
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
 				throw;
 			}

@@ -1,4 +1,9 @@
-﻿using System;
+﻿using RatEye;
+using RatLib.Scan;
+using RatScanner.View;
+using RatStash;
+using RatTracking;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -6,14 +11,9 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Threading;
 using System.Windows;
-using RatEye;
-using RatScanner.View;
-using RatStash;
 using Color = System.Drawing.Color;
 using Size = System.Drawing.Size;
 using Timer = System.Threading.Timer;
-using RatTracking;
-using RatLib.Scan;
 
 namespace RatScanner
 {
