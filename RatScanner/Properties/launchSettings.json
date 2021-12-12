@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "RatScanner": {
+      "commandName": "Project",
+      "jsWebView2Debugging": false
+    }
+  }
+}

@@ -35,7 +35,7 @@ namespace RatScanner.Framework
 
 		public StrokePosition StrokePosition
 		{
-			get => (StrokePosition) GetValue(StrokePositionProperty);
+			get => (StrokePosition)GetValue(StrokePositionProperty);
 			set => SetValue(StrokePositionProperty, value);
 		}
 
@@ -120,80 +120,80 @@ namespace RatScanner.Framework
 
 		public Brush Fill
 		{
-			get => (Brush) GetValue(FillProperty);
+			get => (Brush)GetValue(FillProperty);
 			set => SetValue(FillProperty, value);
 		}
 
 		public FontFamily FontFamily
 		{
-			get => (FontFamily) GetValue(FontFamilyProperty);
+			get => (FontFamily)GetValue(FontFamilyProperty);
 			set => SetValue(FontFamilyProperty, value);
 		}
 
 		[TypeConverter(typeof(FontSizeConverter))]
 		public double FontSize
 		{
-			get => (double) GetValue(FontSizeProperty);
+			get => (double)GetValue(FontSizeProperty);
 			set => SetValue(FontSizeProperty, value);
 		}
 
 		public FontStretch FontStretch
 		{
-			get => (FontStretch) GetValue(FontStretchProperty);
+			get => (FontStretch)GetValue(FontStretchProperty);
 			set => SetValue(FontStretchProperty, value);
 		}
 
 		public FontStyle FontStyle
 		{
-			get => (FontStyle) GetValue(FontStyleProperty);
+			get => (FontStyle)GetValue(FontStyleProperty);
 			set => SetValue(FontStyleProperty, value);
 		}
 
 		public FontWeight FontWeight
 		{
-			get => (FontWeight) GetValue(FontWeightProperty);
+			get => (FontWeight)GetValue(FontWeightProperty);
 			set => SetValue(FontWeightProperty, value);
 		}
 
 		public Brush Stroke
 		{
-			get => (Brush) GetValue(StrokeProperty);
+			get => (Brush)GetValue(StrokeProperty);
 			set => SetValue(StrokeProperty, value);
 		}
 
 		public double StrokeThickness
 		{
-			get => (double) GetValue(StrokeThicknessProperty);
+			get => (double)GetValue(StrokeThicknessProperty);
 			set => SetValue(StrokeThicknessProperty, value);
 		}
 
 		public string Text
 		{
-			get => (string) GetValue(TextProperty);
+			get => (string)GetValue(TextProperty);
 			set => SetValue(TextProperty, value);
 		}
 
 		public TextAlignment TextAlignment
 		{
-			get => (TextAlignment) GetValue(TextAlignmentProperty);
+			get => (TextAlignment)GetValue(TextAlignmentProperty);
 			set => SetValue(TextAlignmentProperty, value);
 		}
 
 		public TextDecorationCollection TextDecorations
 		{
-			get => (TextDecorationCollection) GetValue(TextDecorationsProperty);
+			get => (TextDecorationCollection)GetValue(TextDecorationsProperty);
 			set => SetValue(TextDecorationsProperty, value);
 		}
 
 		public TextTrimming TextTrimming
 		{
-			get => (TextTrimming) GetValue(TextTrimmingProperty);
+			get => (TextTrimming)GetValue(TextTrimmingProperty);
 			set => SetValue(TextTrimmingProperty, value);
 		}
 
 		public TextWrapping TextWrapping
 		{
-			get => (TextWrapping) GetValue(TextWrappingProperty);
+			get => (TextWrapping)GetValue(TextWrappingProperty);
 			set => SetValue(TextWrappingProperty, value);
 		}
 
@@ -254,7 +254,7 @@ namespace RatScanner.Framework
 		private static void OnFormattedTextInvalidated(DependencyObject dependencyObject,
 			DependencyPropertyChangedEventArgs e)
 		{
-			var outlinedTextBlock = (OutlinedTextBlock) dependencyObject;
+			var outlinedTextBlock = (OutlinedTextBlock)dependencyObject;
 			outlinedTextBlock._formattedText = null;
 			outlinedTextBlock._textGeometry = null;
 
@@ -264,7 +264,7 @@ namespace RatScanner.Framework
 
 		private static void OnFormattedTextUpdated(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
 		{
-			var outlinedTextBlock = (OutlinedTextBlock) dependencyObject;
+			var outlinedTextBlock = (OutlinedTextBlock)dependencyObject;
 			outlinedTextBlock.UpdateFormattedText();
 			outlinedTextBlock._textGeometry = null;
 

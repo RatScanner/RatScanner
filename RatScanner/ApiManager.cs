@@ -59,12 +59,6 @@ namespace RatScanner
 		// Official RatScanner API URL
 		private const string BaseUrl = "https://api.ratscanner.com/v3";
 
-		// GitHub page for the tarkovdata repository, serves the master branch
-		private const string TarkovDataUrl = "https://tarkovtracker.github.io/tarkovdata";
-
-		// Base URL for the TarkovTracker URL
-		private const string TarkovTrackerUrl = "https://tarkovtracker.io/api/v1";
-
 		public static MarketItem[] GetMarketDB(Language language = Language.English)
 		{
 			try
@@ -76,107 +70,6 @@ namespace RatScanner
 			catch (Exception e)
 			{
 				Logger.LogError($"Loading of market data failed.\n{e}");
-				return null;
-			}
-		}
-
-		// Checks the token metadata endpoint for TarkovTracker
-		public static string? GetTarkovTrackerToken()
-		{
-			try
-			{
-				return Get($"{TarkovTrackerUrl}/token", RatConfig.Tracking.TarkovTracker.Token);
-			}
-			catch (WebException e)
-			{
-				var status = (e.Response as HttpWebResponse)?.StatusCode;
-				if (status is HttpStatusCode.Unauthorized)
-					// We can work with a 401
-					throw new FetchModels.TarkovTracker.UnauthorizedTokenException("Token was rejected by the API", e);
-
-				if (status is HttpStatusCode.TooManyRequests)
-					throw new FetchModels.TarkovTracker.RateLimitExceededException("Rate Limiting reached for token", e);
-				// Unknown error, continue throwing
-				Logger.LogError($"Retrieving token metadata failed.", e);
-				throw;
-			}
-			catch (Exception e)
-			{
-				Logger.LogError($"Retrieving token metadata failed.", e);
-				throw;
-			}
-		}
-
-		// Checks the token metadata endpoint for TarkovTracker
-		public static string GetTarkovTrackerTeam()
-		{
-			try
-			{
-				return Get($"{TarkovTrackerUrl}/team/progress", RatConfig.Tracking.TarkovTracker.Token);
-			}
-			catch (WebException e)
-			{
-				var status = (e.Response as HttpWebResponse)?.StatusCode;
-				if (status is HttpStatusCode.TooManyRequests)
-					throw new FetchModels.TarkovTracker.RateLimitExceededException("Rate Limiting reached for token", e);
-				// Unknown error, continue throwing
-				Logger.LogError($"Retrieving TarkovTracker team data failed.", e);
-				throw;
-			}
-			catch (Exception e)
-			{
-				Logger.LogError($"Retrieving TarkovTracker team data failed.", e);
-				return null;
-			}
-		}
-
-		// Checks the token metadata endpoint for TarkovTracker
-		public static string GetTarkovTrackerSolo()
-		{
-			try
-			{
-				return Get($"{TarkovTrackerUrl}/progress", RatConfig.Tracking.TarkovTracker.Token);
-			}
-			catch (WebException e)
-			{
-				var status = (e.Response as HttpWebResponse)?.StatusCode;
-				if (status is HttpStatusCode.TooManyRequests)
-					throw new FetchModels.TarkovTracker.RateLimitExceededException("Rate Limiting reached for token", e);
-				// Unknown error, continue throwing
-				Logger.LogError($"Retrieving TarkovTracker progress data failed.", e);
-				throw;
-			}
-			catch (Exception e)
-			{
-				Logger.LogError($"Retrieving TarkovTracker progress data failed.", e);
-				return null;
-			}
-		}
-
-		// Pulls the whole quest data file from tarkovdata for processing
-		public static string GetProgressDataQuest()
-		{
-			try
-			{
-				return Get($"{TarkovDataUrl}/quests.json");
-			}
-			catch (Exception e)
-			{
-				Logger.LogError($"Loading of quest data failed.", e);
-				return null;
-			}
-		}
-
-		// Pulls the whole hideout file form tarkovdata for processing
-		public static string GetProgressDataHideout()
-		{
-			try
-			{
-				return Get($"{TarkovDataUrl}/hideout.json");
-			}
-			catch (Exception e)
-			{
-				Logger.LogError($"Loading of hideout data failed.", e);
 				return null;
 			}
 		}

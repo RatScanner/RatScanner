@@ -1,7 +1,7 @@
-﻿using System.Windows;
+﻿using RatScanner.ViewModel;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using RatScanner.ViewModel;
 using RCMinUi = RatScanner.RatConfig.MinimalUi;
 
 namespace RatScanner.View
@@ -43,7 +43,7 @@ namespace RatScanner.View
 			PageSwitcher.Instance.ResetWindowSize();
 			PageSwitcher.Instance.SetBackgroundOpacity(1);
 			PageSwitcher.Instance.ShowTitleBar();
-			PageSwitcher.Instance.Navigate(new MainMenu());
+			PageSwitcher.Instance.Navigate(new BlazorUI());
 		}
 
 		public void UtilizeState(object state)
