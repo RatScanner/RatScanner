@@ -59,7 +59,7 @@ If you still cannot see `RatScanner.exe` it is most likely removed by your antiv
 In that case, create a exception for it or disable your antivirus.
 
 ## Rat Scanner is not starting
-Make sure you have the **x64 Version** of the [.Net Core Runtime][net-core-download] installed.
+Make sure you have the **x64 Version** of the [.Net Runtime][net-download] installed.
 
 ## Nothing happens when scanning
 - Check that you set your resolution correctly inside the settings
@@ -96,6 +96,6 @@ Icon scanning still has some known issues, some which are not possible to fix.
 This currently leads to items like keys and small attachments matching wrong due to their simularity to other items.
 Also, when in the stash, the light bright in the top center of the screen interferes with the top left section of the stash which results in extremly bad results.
 
-[net-core-download]: https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-3.1.14-windows-x64-installer
+[net-download]: https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-6.0.100-windows-x64-installer
 [download-section]: https://github.com/Blightbuster/RatScanner#download
 [windows-media-pack]: https://www.microsoft.com/en-us/software-download/mediafeaturepack
