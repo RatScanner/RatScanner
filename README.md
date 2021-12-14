@@ -113,7 +113,7 @@ Once it has launched, go into the settings menu (bottom right corner) and check 
 
 If you have any problems with the process please checkout the [FAQ][faq-page] or join the [Discord][discord] if you need further help.
 
-**Important:** If the tool does not seem to start, make sure you have the **x64 Version** of [.Net Core Runtime][net-core-download] installed.
+**Important:** If the tool does not seem to start, here's some [common issues][common-issues]
 
 <br/>
 
@@ -151,8 +151,8 @@ This will help to finance the backend server as well as the [API][tarkov-tools] 
 [eft-icons-repo]: https://github.com/RatScanner/EfTIcons
 [latest-release]: https://github.com/RatScanner/RatScanner/releases/latest/download/RatScanner.zip
 [releases]: https://github.com/RatScanner/RatScanner/releases/
-[net-core-download]: https://dotnet.microsoft.com/download/dotnet/thank-you/runtime-desktop-3.1.14-windows-x64-installer
 [demo-video]: https://www.youtube.com/watch?v=tXoIkgXFmdA
 [faq-page]: FAQ.md
 [faq-page-can-i-get-banned]: FAQ.md#can-i-get-banned-for-using-rat-scanner
 [discord]: https://discord.com/invite/aHZf7aP
+[common-issues]:https://github.com/RatScanner/RatScanner/blob/master/FAQ.md#program-issues-1
