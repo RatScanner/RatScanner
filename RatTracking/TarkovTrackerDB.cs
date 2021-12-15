@@ -53,16 +53,12 @@ namespace RatTracking
 			// Attempt to verify the token
 			try
 			{
-				var response = getTarkovTrackerToken();
-				if (response != null)
+				var newToken = getTarkovTrackerToken();
+				_badToken = newToken == null;
+				if (!_badToken)
 				{
 					// We have a valid token
-					_token = JsonConvert.DeserializeObject<Token>(response);
-					_badToken = false;
-				}
-				else
-				{
-					_badToken = true;
+					_token = newToken;
 				}
 			}
 			catch (RateLimitExceededException)
@@ -178,7 +174,7 @@ namespace RatTracking
 		}
 
 		// Checks the token metadata endpoint for TarkovTracker
-		private string getTarkovTrackerToken(string custom_token = null)
+		private Token? getTarkovTrackerToken(string custom_token = null)
 		{
 			string working_token = Token;
 			if (custom_token != null) working_token = custom_token;
@@ -186,8 +182,15 @@ namespace RatTracking
 			try
 			{
 				var response = APIClient.Get($"{TarkovTrackerUrl}/token", working_token);
-				if (response.ToLower().StartsWith("error")) throw new UnauthorizedTokenException();
-				return response;
+				if (response == null) return null;
+				try
+				{
+					return JsonConvert.DeserializeObject<Token>(response);
+				}
+				catch (Exception)
+				{
+					return null;
+				}
 			}
 			catch (WebException)
 			{
