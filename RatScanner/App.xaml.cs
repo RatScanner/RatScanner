@@ -37,8 +37,6 @@ namespace RatScanner
 					// Start the process with the info we specified.
 					// Call WaitForExit and then the using statement will close.
 					Process exeProcess = Process.Start(startInfo);
-					string output = exeProcess.StandardOutput.ReadToEnd();
-					Logger.LogInfo(output);
 					exeProcess.WaitForExit();
 				}
 				catch (Exception ex)
