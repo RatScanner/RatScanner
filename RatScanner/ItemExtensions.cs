@@ -44,7 +44,7 @@ namespace RatScanner
 			var neededItem = new NeededItem(item.Id);
 
 			Progress progress = null;
-			if (RatConfig.Tracking.TarkovTracker.Enable)
+			if (RatConfig.Tracking.TarkovTracker.Enable && RatScannerMain.Instance.TarkovTrackerDB.Progress.Count >= 1)
 			{
 				var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
 				progress = teamProgress.First(x => x.Self ?? false);
