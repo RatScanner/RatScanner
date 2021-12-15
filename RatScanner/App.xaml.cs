@@ -2,6 +2,7 @@
 using SingleInstanceCore;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
@@ -18,6 +19,9 @@ namespace RatScanner
 		protected override void OnStartup(StartupEventArgs e)
 		{
 			base.OnStartup(e);
+
+			// Set current working directory to executable location
+			Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
 			SetupExceptionHandling();
 
