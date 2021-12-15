@@ -79,14 +79,14 @@ namespace RatTracking
 
 		public int TeammateCount => Progress.Count(x => (x.Self ?? false) == false);
 
-		public bool TeamProgressAvailable => _token.Permissions.Contains("TP");
+		public bool? TeamProgressAvailable => _token?.Permissions.Contains("TP");
 
-		public bool SoloProgressAvailable => _token.Permissions.Contains("GP");
+		public bool? SoloProgressAvailable => _token?.Permissions.Contains("GP");
 
 		private void UpdateProgression()
 		{
 			// We have access to team progression
-			if (TeamProgressAvailable)
+			if (TeamProgressAvailable == true)
 			{
 				try
 				{
@@ -102,7 +102,7 @@ namespace RatTracking
 					// We have an unauthorized token exception, it could be that we don't have permissions for this call
 				}
 			}
-			else if (SoloProgressAvailable)
+			else if (SoloProgressAvailable == true)
 			{
 				// We have permission to get individual progress
 
@@ -168,22 +168,32 @@ namespace RatTracking
 			}
 		}
 
-		// Checks the token metadata endpoint for TarkovTracker
-		private string getTarkovTrackerToken()
+		public bool TestToken(string test_token)
 		{
 			try
 			{
-				return APIClient.Get($"{TarkovTrackerUrl}/token", Token);
+				getTarkovTrackerToken(test_token);
 			}
-			catch (WebException e)
+			catch (Exception)
 			{
-				var status = (e.Response as HttpWebResponse)?.StatusCode;
-				if (status is HttpStatusCode.Unauthorized)
-					// We can work with a 401
-					throw new UnauthorizedTokenException("Token was rejected by the API", e);
+				return false;
+			}
+			return true;
+		}
 
-				if (status is HttpStatusCode.TooManyRequests)
-					throw new RateLimitExceededException("Rate Limiting reached for token", e);
+		// Checks the token metadata endpoint for TarkovTracker
+		private string getTarkovTrackerToken(string custom_token = null)
+		{
+			string working_token = Token;
+			if (custom_token != null) working_token = custom_token;
+
+			try
+			{
+				var response = APIClient.Get($"{TarkovTrackerUrl}/token", working_token);
+				return response;
+			}
+			catch (WebException)
+			{
 				// Unknown error, continue throwing
 				throw;
 			}
