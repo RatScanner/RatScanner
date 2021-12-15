@@ -24,8 +24,6 @@ namespace RatScanner
 
 		internal readonly HotkeyManager HotkeyManager;
 
-		private readonly NameScanToolTip _nameScanToolTip;
-		private readonly IconScanToolTip _iconScanToolTip;
 		private readonly BlazorOverlay _blazorOverlay;
 
 		private ItemScan _currentItemScan;
@@ -77,15 +75,6 @@ namespace RatScanner
 
 			Logger.LogInfo("----- RatScanner " + RatConfig.Version + " -----");
 			Logger.LogInfo("Starting RatScanner...");
-
-			// Prewarm tool tips
-			Logger.LogInfo("Prewarming name tool tip...");
-			_nameScanToolTip = new NameScanToolTip();
-			_nameScanToolTip.Show();
-
-			Logger.LogInfo("Prewarming icon tool tip...");
-			_iconScanToolTip = new IconScanToolTip();
-			_iconScanToolTip.Show();
 
 			Logger.LogInfo("Checking for new updates...");
 			CheckForUpdates();
@@ -209,12 +198,6 @@ namespace RatScanner
 			Logger.LogDebug("Icon scanning at: " + position);
 			lock (IconScanLock)
 			{
-				_iconScanToolTip.Dispatcher.Invoke(() =>
-				{
-					IconScanToolTip.ScheduleHide();
-					_iconScanToolTip.Hide(); // Hide it instantly
-				});
-
 				var x = position.X - RatConfig.IconScan.ScanWidth / 2;
 				var y = position.Y - RatConfig.IconScan.ScanHeight / 2;
 
@@ -237,8 +220,6 @@ namespace RatScanner
 
 				CurrentItemScan = itemIconScan;
 				SetOverlayRefresh();
-
-				//ShowToolTip(itemIconScan);
 			}
 
 			return true;
@@ -254,12 +235,6 @@ namespace RatScanner
 			Logger.LogDebug("Name scanning at: " + position);
 			lock (NameScanLock)
 			{
-				_nameScanToolTip.Dispatcher.Invoke(() =>
-				{
-					NameScanToolTip.ScheduleHide();
-					_nameScanToolTip.Hide(); // Hide it instantly
-				});
-
 				// Wait for game ui to update the click
 				Thread.Sleep(50);
 
@@ -277,8 +252,6 @@ namespace RatScanner
 				if (!itemNameScan.ValidItem) return false;
 				CurrentItemScan = itemNameScan;
 				SetOverlayRefresh();
-
-				//ShowToolTip(itemNameScan);
 			}
 
 			return true;
@@ -300,16 +273,6 @@ namespace RatScanner
 			}
 
 			return bmp;
-		}
-
-		// Display the item information in a ToolTip
-		private void ShowToolTip(ItemScan itemScan)
-		{
-			var pos = itemScan.GetToolTipPosition();
-			if (pos == null) return;
-
-			if (itemScan is ItemNameScan) NameScanToolTip.ScheduleShow(itemScan, pos, RatConfig.ToolTip.Duration);
-			if (itemScan is ItemIconScan) IconScanToolTip.ScheduleShow(itemScan, pos, RatConfig.ToolTip.Duration);
 		}
 
 		private void SetOverlayRefresh()
