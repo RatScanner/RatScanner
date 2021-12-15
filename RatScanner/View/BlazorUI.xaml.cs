@@ -27,6 +27,7 @@ namespace RatScanner.View
 			var serviceCollection = new ServiceCollection();
 			serviceCollection.AddBlazorWebView();
 			serviceCollection.AddMudServices();
+			RatConfig.LoadConfig();
 			serviceCollection.AddSingleton<IRatScannerUI>(s => new MainWindowVM(RatScannerMain.Instance));
 			var settingsVM = new SettingsVM();
 			serviceCollection.AddSingleton<ISettingsUI>(s => settingsVM);

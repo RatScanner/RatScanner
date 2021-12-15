@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using RatTracking.FetchModels.TarkovTracker;
 
 namespace RatTracking
 {
@@ -23,6 +24,13 @@ namespace RatTracking
 			HttpRequestMessage request = formRequest(HttpMethod.Get, url, bearerToken);
 			Task<HttpResponseMessage> responseTask = httpClient.SendAsync(request);
 			responseTask.Wait();
+			if (responseTask.Result.StatusCode == HttpStatusCode.Unauthorized)
+			{
+				throw new UnauthorizedTokenException("Token was rejected by the API");
+			}else if(responseTask.Result.StatusCode == HttpStatusCode.TooManyRequests)
+			{
+				throw new RateLimitExceededException("Rate Limiting reached for token");
+			}
 			Task<string> contentTask = responseTask.Result.Content.ReadAsStringAsync();
 			contentTask.Wait();
 
