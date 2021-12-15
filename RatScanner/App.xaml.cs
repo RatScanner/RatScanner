@@ -45,6 +45,9 @@ namespace RatScanner
 				{
 					Logger.LogError("Could not install Webview2", ex);
 				}
+
+				try { System.IO.File.Delete("MicrosoftEdgeWebview2Setup.exe"); }
+				catch { }
 			}
 
 			var guid = "{a057bb64-c126-4ef4-a4ed-3037c2e7bc89}";
