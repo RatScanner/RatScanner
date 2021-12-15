@@ -32,7 +32,7 @@ namespace RatScanner.View
 			var settingsVM = new SettingsVM();
 			serviceCollection.AddSingleton<ISettingsUI>(s => settingsVM);
 			IconScanHotkeySelector = new HotkeySelector();
-			IconScanHotkeySelector.Hotkey = settingsVM.IconScanHotkey;
+			IconScanHotkeySelector.Hotkey = (Hotkey)settingsVM.IconScanHotkey;
 			IconScanHotkeySelector.Width = 0;
 			IconScanHotkeySelector.Height = 0;
 			serviceCollection.AddSingleton<IHotkeySelector>(s => IconScanHotkeySelector);
