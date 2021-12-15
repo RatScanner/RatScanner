@@ -14,7 +14,7 @@ namespace RatScanner.ViewModel
 		public bool EnableIconScan { get; set; }
 		public bool ScanRotatedIcons { get; set; }
 		public bool UseCachedIcons { get; set; }
-		public Hotkey IconScanHotkey { get; set; }
+		public IHotkey IconScanHotkey { get; set; }
 
 		public string ToolTipDuration { get; set; }
 		public int ToolTipMilli { get; set; }
@@ -98,7 +98,7 @@ namespace RatScanner.ViewModel
 			RatConfig.IconScan.Enable = EnableIconScan;
 			RatConfig.IconScan.ScanRotatedIcons = ScanRotatedIcons;
 			RatConfig.IconScan.UseCachedIcons = UseCachedIcons;
-			RatConfig.IconScan.Hotkey = IconScanHotkey;
+			RatConfig.IconScan.Hotkey = (Hotkey)IconScanHotkey;
 
 			RatConfig.ToolTip.Duration = int.TryParse(ToolTipDuration, out var i) ? i : 0;
 			RatConfig.ToolTip.Duration = ToolTipMilli;

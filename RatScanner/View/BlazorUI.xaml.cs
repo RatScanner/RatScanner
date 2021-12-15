@@ -27,11 +27,12 @@ namespace RatScanner.View
 			var serviceCollection = new ServiceCollection();
 			serviceCollection.AddBlazorWebView();
 			serviceCollection.AddMudServices();
+			RatConfig.LoadConfig();
 			serviceCollection.AddSingleton<IRatScannerUI>(s => new MainWindowVM(RatScannerMain.Instance));
 			var settingsVM = new SettingsVM();
 			serviceCollection.AddSingleton<ISettingsUI>(s => settingsVM);
 			IconScanHotkeySelector = new HotkeySelector();
-			IconScanHotkeySelector.Hotkey = settingsVM.IconScanHotkey;
+			IconScanHotkeySelector.Hotkey = (Hotkey)settingsVM.IconScanHotkey;
 			IconScanHotkeySelector.Width = 0;
 			IconScanHotkeySelector.Height = 0;
 			serviceCollection.AddSingleton<IHotkeySelector>(s => IconScanHotkeySelector);

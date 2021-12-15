@@ -1,5 +1,6 @@
 ﻿@page "/app/settings/tracking"
 @inject RatRazor.Interfaces.ISettingsUI SettingsUI
+@inject RatTracking.TarkovTrackerDB TarkovTrackerDB
 @inject IJSRuntime JSRuntime;
 @implements IDisposable
 <div>
@@ -23,7 +24,7 @@
                         </div>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="SettingsUI.TarkovTrackerToken" Label="API Token" InputType="@PasswordInput" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TokenShowClick"></MudTextField>
+                        <MudTextField @bind-Value="SettingsUI.TarkovTrackerToken" Validation="@(new Func<string, IEnumerable<string>>(CheckToken))" Label="API Token" InputType="@PasswordInput" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TokenShowClick"></MudTextField>
                     </MudItem>
                     <MudItem xs="12">
                         <MudCheckBox @bind-Checked="SettingsUI.ShowTarkovTrackerTeam" Label="Show Teammates" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
@@ -50,6 +51,12 @@
     bool isShow;
     InputType PasswordInput = InputType.Password;
     string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+
+    private IEnumerable<string> CheckToken(string token)
+    {
+        if (!string.IsNullOrEmpty(token) && !TarkovTrackerDB.TestToken(token))
+            yield return "Invalid token";
+    }
 
     void TokenShowClick()
     {

@@ -1,9 +1,9 @@
 ﻿using RatScanner.Controls;
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows.Forms;
 using System.Windows.Input;
 
@@ -12,7 +12,7 @@ namespace RatScanner
 	internal static class RatConfig
 	{
 		// Version
-		public static string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
+		public static string Version => Process.GetCurrentProcess().MainModule.FileVersionInfo.ProductVersion;
 
 		// Paths
 		internal static class Paths
@@ -110,6 +110,7 @@ namespace RatScanner
 
 		internal static int ScreenWidth = 1920;
 		internal static int ScreenHeight = 1080;
+		internal static bool SetScreen = false;
 
 		internal static float ScreenScale => RatEye.Config.GlobalConfig.ProcessingConfig.Scale;
 
@@ -180,8 +181,11 @@ namespace RatScanner
 			Tracking.TarkovTracker.ShowTeam = config.ReadBool(nameof(Tracking.TarkovTracker.ShowTeam), true);
 
 			config.Section = "Other";
-			ScreenWidth = config.ReadInt(nameof(ScreenWidth), 1920);
-			ScreenHeight = config.ReadInt(nameof(ScreenHeight), 1080);
+			if(!SetScreen)
+			{
+				ScreenWidth = config.ReadInt(nameof(ScreenWidth), 1920);
+				ScreenHeight = config.ReadInt(nameof(ScreenHeight), 1080);
+			}
 			MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), false);
 			AlwaysOnTop = config.ReadBool(nameof(AlwaysOnTop), false);
 			ItemDataVersion = config.ReadString(nameof(ItemDataVersion), "20200101");
@@ -242,6 +246,7 @@ namespace RatScanner
 		{
 			ScreenWidth = Screen.PrimaryScreen.Bounds.Width;
 			ScreenHeight = Screen.PrimaryScreen.Bounds.Height;
+			SetScreen = true;
 			var message = $"Detected {ScreenWidth}x{ScreenHeight} Resolution.\n\n";
 			message += "You can adjust this inside the settings.";
 			Logger.ShowMessage(message);

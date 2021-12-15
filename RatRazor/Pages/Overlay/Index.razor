@@ -19,16 +19,16 @@
                         <img src="@($"https://assets.tarkov-tools.com/{RatScannerUI.CurrentItemScan.MatchedItems[0].Id}-grid-image.jpg")" style="filter:brightness(1.3);position:absolute;left:0px;top:0px;z-index:-1;@(iconScan.Rotated ? $"width:{iconScan._icon.Size.Y - 2}px;height:{iconScan._icon.Size.X - 2}px;transform: rotate(0.25turn) translate(0%, -100%);transform-origin: left top;" : $"width:{iconScan._icon.Size.X - 2}px;height:{iconScan._icon.Size.Y - 2}px;")">
                     </div>
                 </div>
-                <div>
+                <div class="stroke">
                     @RatScannerUI.Avg24hPrice
                 </div>
                  @if(RatScannerUI.TrackingNeeds.QuestRemaining > 0) {
-                     <div class="d-flex align-center">
+                     <div class="d-flex align-center stroke">
                         @RatScannerUI.TrackingNeeds.QuestRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" />
                      </div>
                  }
                  @if(RatScannerUI.TrackingNeeds.HideoutRemaining > 0) {
-                     <div class="d-flex align-center">
+                     <div class="d-flex align-center stroke">
                         @RatScannerUI.TrackingNeeds.HideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" />
                      </div>
                  }
@@ -38,7 +38,15 @@
     else
     {
         <div class="d-flex align-center" style="position:absolute;left:@(RatScannerUI.CurrentItemScan.GetToolTipPosition().X - VirtualScreenOffset.XOffset)px;top:@(RatScannerUI.CurrentItemScan.GetToolTipPosition().Y - VirtualScreenOffset.YOffset)px;background:#121212;padding:4px;">
-        @RatScannerUI.Avg24hPrice @if(RatScannerUI.TrackingNeeds.QuestRemaining > 0) { <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" /> } @if(RatScannerUI.TrackingNeeds.HideoutRemaining > 0) { <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" /> }
+        <span class="stroke">
+            @RatScannerUI.Avg24hPrice
+        </span>
+        @if(RatScannerUI.TrackingNeeds.QuestRemaining > 0) {
+            <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" />
+        }
+        @if(RatScannerUI.TrackingNeeds.HideoutRemaining > 0) {
+            <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" />
+        }
         </div>
     }
 }

@@ -10,6 +10,7 @@ namespace RatRazor.Interfaces
 		public bool EnableIconScan { get; set; }
 		public bool ScanRotatedIcons { get; set; }
 		public bool UseCachedIcons { get; set; }
+		public IHotkey IconScanHotkey { get; set; }
 
 		public string ToolTipDuration { get; set; }
 		public int ToolTipMilli { get; set; }
