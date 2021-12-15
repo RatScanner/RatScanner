@@ -127,7 +127,7 @@ namespace RatTracking
 		}
 
 		// Checks the token metadata endpoint for TarkovTracker
-		private string getTarkovTrackerTeam()
+		private string? getTarkovTrackerTeam()
 		{
 			try
 			{
@@ -162,10 +162,6 @@ namespace RatTracking
 				// Unknown error, continue throwing
 				throw;
 			}
-			catch (Exception)
-			{
-				return null;
-			}
 		}
 
 		public bool TestToken(string test_token)
@@ -190,15 +186,12 @@ namespace RatTracking
 			try
 			{
 				var response = APIClient.Get($"{TarkovTrackerUrl}/token", working_token);
+				if (response.ToLower().StartsWith("error")) throw new UnauthorizedTokenException();
 				return response;
 			}
 			catch (WebException)
 			{
 				// Unknown error, continue throwing
-				throw;
-			}
-			catch (Exception)
-			{
 				throw;
 			}
 		}
