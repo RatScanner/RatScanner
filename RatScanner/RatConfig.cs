@@ -1,9 +1,9 @@
 ﻿using RatScanner.Controls;
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Windows.Forms;
 using System.Windows.Input;
 
@@ -12,7 +12,7 @@ namespace RatScanner
 	internal static class RatConfig
 	{
 		// Version
-		public static string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
+		public static string Version => FileVersionInfo.GetVersionInfo(Environment.GetCommandLineArgs()[0]).ProductVersion;
 
 		// Paths
 		internal static class Paths

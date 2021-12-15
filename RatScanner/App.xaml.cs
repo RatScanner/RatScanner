@@ -1,6 +1,5 @@
 ﻿using SingleInstanceCore;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -63,19 +62,7 @@ namespace RatScanner
 		private void LogUnhandledException(Exception exception, string source)
 		{
 			var message = $"Unhandled exception ({source})";
-			try
-			{
-				var assemblyName = System.Reflection.Assembly.GetExecutingAssembly().GetName();
-				message = $"Unhandled exception in {assemblyName.Name} {RatConfig.Version}";
-			}
-			catch (Exception ex)
-			{
-				Logger.LogError("Exception in LogUnhandledException", ex);
-			}
-			finally
-			{
-				Logger.LogError(message, exception);
-			}
+			Logger.LogError(message, exception);
 		}
 	}
 }

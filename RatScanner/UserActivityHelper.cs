@@ -1,7 +1,7 @@
 ﻿using RatLib;
 using System;
 using System.ComponentModel;
-using System.Reflection;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
 
@@ -15,6 +15,9 @@ namespace RatScanner
 		[DllImport("user32.dll")]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		private static extern bool GetCursorPos(ref Win32Point pt);
+
+		[DllImport("kernel32.dll")]
+		private static extern IntPtr GetModuleHandle(string name);
 
 		[StructLayout(LayoutKind.Sequential)]
 		private struct Win32Point
@@ -378,8 +381,7 @@ namespace RatScanner
 				hMouseHook = SetWindowsHookEx(
 					WH_MOUSE_LL,
 					MouseHookProcedure,
-					Marshal.GetHINSTANCE(
-						Assembly.GetExecutingAssembly().GetModules()[0]),
+					GetModuleHandle(Process.GetCurrentProcess().MainModule.ModuleName),
 					0);
 				// If SetWindowsHookEx fails
 				if (hMouseHook == 0)
@@ -402,8 +404,7 @@ namespace RatScanner
 				hKeyboardHook = SetWindowsHookEx(
 					WH_KEYBOARD_LL,
 					KeyboardHookProcedure,
-					Marshal.GetHINSTANCE(
-						Assembly.GetExecutingAssembly().GetModules()[0]),
+					GetModuleHandle(Process.GetCurrentProcess().MainModule.ModuleName),
 					0);
 				// If SetWindowsHookEx fails
 				if (hKeyboardHook == 0)
