@@ -79,7 +79,7 @@ namespace RatTracking
 
 		public int TeammateCount => Progress.Count(x => (x.Self ?? false) == false);
 
-		public bool? TeamProgressAvailable =>  _token?.Permissions.Contains("TP");
+		public bool? TeamProgressAvailable => _token?.Permissions.Contains("TP");
 
 		public bool? SoloProgressAvailable => _token?.Permissions.Contains("GP");
 
@@ -173,7 +173,8 @@ namespace RatTracking
 			try
 			{
 				getTarkovTrackerToken(test_token);
-			}catch(Exception)
+			}
+			catch (Exception)
 			{
 				return false;
 			}
@@ -191,7 +192,7 @@ namespace RatTracking
 				var response = APIClient.Get($"{TarkovTrackerUrl}/token", working_token);
 				return response;
 			}
-			catch (WebException e)
+			catch (WebException)
 			{
 				// Unknown error, continue throwing
 				throw;
