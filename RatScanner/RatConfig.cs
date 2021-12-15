@@ -12,7 +12,7 @@ namespace RatScanner
 	internal static class RatConfig
 	{
 		// Version
-		public static string Version => FileVersionInfo.GetVersionInfo(Environment.GetCommandLineArgs()[0]).ProductVersion;
+		public static string Version => Process.GetCurrentProcess().MainModule.FileVersionInfo.ProductVersion;
 
 		// Paths
 		internal static class Paths
