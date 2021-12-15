@@ -17,13 +17,13 @@ namespace RatScanner
 		{
 			base.OnStartup(e);
 
+			SetupExceptionHandling();
+
 			var winLogonKey = Registry.GetValue("HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\EdgeUpdate\\Clients\\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}", "pv", null);
 			if (winLogonKey == null)
 			{
-				using (var client = new WebClient())
-				{
-					client.DownloadFile("https://go.microsoft.com/fwlink/p/?LinkId=2124703", "MicrosoftEdgeWebview2Setup.exe");
-				}
+				using var client = new WebClient();
+				client.DownloadFile("https://go.microsoft.com/fwlink/p/?LinkId=2124703", "MicrosoftEdgeWebview2Setup.exe");
 
 				ProcessStartInfo startInfo = new ProcessStartInfo();
 				startInfo.CreateNoWindow = false;
@@ -43,12 +43,9 @@ namespace RatScanner
 				}
 				catch (Exception ex)
 				{
-					Logger.LogDebug(ex.Message);
-					// Log error.
+					Logger.LogError("Could not install Webview2", ex);
 				}
 			}
-
-			SetupExceptionHandling();
 
 			var guid = "{a057bb64-c126-4ef4-a4ed-3037c2e7bc89}";
 			var isFirstInstance = this.InitializeAsFirstInstance(guid);
