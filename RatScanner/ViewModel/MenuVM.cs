@@ -1,17 +1,18 @@
-﻿using System;
+﻿using RatLib.Scan;
+using RatRazor.Interfaces;
+using RatScanner.FetchModels;
+using RatStash;
+using RatTracking.FetchModels;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Web;
-using RatEye;
-using RatScanner.FetchModels;
-using RatScanner.Scan;
-using RatStash;
 
 namespace RatScanner.ViewModel
 {
-	internal class MainWindowVM : INotifyPropertyChanged
+	internal class MainWindowVM : INotifyPropertyChanged, IRatScannerUI
 	{
 		private const string UpSymbol = "▲";
 		private const string DownSymbol = "▼";
@@ -28,9 +29,11 @@ namespace RatScanner.ViewModel
 			}
 		}
 
-		private ItemScan CurrentItemScan => DataSource?.CurrentItemScan;
+		public ItemScan CurrentItemScan => DataSource?.CurrentItemScan;
 
 		private Item[] MatchedItems => CurrentItemScan?.MatchedItems;
+
+		public string ItemId => MatchedItems[0].Id;
 
 		public string IconPath
 		{
@@ -45,6 +48,8 @@ namespace RatScanner.ViewModel
 		}
 
 		public string Name => MatchedItems[0].Name;
+
+		public string ShortName => MatchedItems[0].ShortName;
 
 		public bool HasMods => MatchedItems[0] is CompoundItem itemC && itemC.Slots.Count > 0;
 
@@ -76,13 +81,16 @@ namespace RatScanner.ViewModel
 			return MatchedItems[0].GetMaxTraderPrice();
 		}
 
-		public NeededItem TrackingNeeds => MatchedItems[0].GetTrackingNeeds();
 
+		public NeededItem TrackingNeeds => MatchedItems[0].GetTrackingNeeds();
 		public NeededItem TrackingTeamNeedsSummed => MatchedItems[0].GetSummedTrackingTeamNeeds();
+
+		public string TrackingNeedsQuestRemaining => TrackingNeeds.QuestRemaining.ToString();
+		public string TrackingNeedsHideoutRemaining => TrackingNeeds.QuestRemaining.ToString();
 
 		public List<KeyValuePair<string, NeededItem>> TrackingTeamNeeds => MatchedItems[0].GetTrackingTeamNeeds();
 
-		public List<KeyValuePair<string, NeededItem>> TrackingTeamNeedsFiltered => TrackingTeamNeeds.Where(x => x.Value.Remaining > 0).ToList();
+		public List<KeyValuePair<string, NeededItem>> TrackingTeamNeedsFiltered => TrackingTeamNeeds?.Where(x => x.Value.Remaining > 0).ToList() ?? new List<KeyValuePair<string, NeededItem>>();
 
 		public string DiscordLink => ApiManager.GetResource(ApiManager.ResourceType.DiscordLink);
 
@@ -109,6 +117,11 @@ namespace RatScanner.ViewModel
 				return $"https://escapefromtarkov.gamepedia.com/{HttpUtility.UrlEncode(Name.Replace(" ", "_"))}";
 			}
 		}
+
+		public string ToolsLink => $"https://tarkov-tools.com/item/{ItemId}";
+
+		public string IconLink => MatchedItems[0].GetMarketItem().IconLink;
+		public string ImageLink => MatchedItems[0].GetMarketItem().ImageLink;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 

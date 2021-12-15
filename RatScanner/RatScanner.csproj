@@ -1,15 +1,13 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
-
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>Resources\RatLogoSmall.ico</ApplicationIcon>
     <StartupObject>RatScanner.App</StartupObject>
-    <Version>2.8.7</Version>
+    <Version>3.0.0</Version>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
@@ -17,28 +15,28 @@
     <DefineConstants>TRACE</DefineConstants>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
-
   <ItemGroup>
     <None Remove="Resources\iconMods.png" />
     <None Remove="Resources\RatLogoMedium.png" />
     <None Remove="Resources\settings.png" />
   </ItemGroup>
-
   <ItemGroup>
     <Resource Include="Resources\iconMods.png" />
     <Resource Include="Resources\settings.png" />
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="6.0.101-preview.10.2068" />
+    <PackageReference Include="MudBlazor" Version="6.0.2" />
     <PackageReference Include="RatEye" Version="1.4.7" />
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.256001">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.0" />
     <PackageReference Include="RatStash" Version="1.4.1" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
@@ -46,25 +44,24 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-
   <ItemGroup>
     <Page Include="App.xaml" />
   </ItemGroup>
-
   <ItemGroup>
     <SplashScreen Include="Resources\RatLogoMedium.png" />
   </ItemGroup>
-  
   <ItemGroup>
-    <Content Include="Data\**">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <ProjectReference Include="..\RatLib\RatLib.csproj" />
+    <ProjectReference Include="..\RatRazor\RatRazor.csproj" />
+    <ProjectReference Include="..\RatTracking\RatTracking.csproj" />
   </ItemGroup>
+	<ItemGroup>
+		<None Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
 </Project>

@@ -1,10 +1,10 @@
-﻿using System.Diagnostics;
+﻿using RatEye;
+using RatScanner.ViewModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
-using RatEye;
-using RatScanner.ViewModel;
 
 namespace RatScanner.View
 {
@@ -102,6 +102,7 @@ namespace RatScanner.View
 		{
 			var token = RatConfig.Tracking.TarkovTracker.Token;
 			if (token == "") return;
+			RatScannerMain.Instance.TarkovTrackerDB.Token = RatConfig.Tracking.TarkovTracker.Token;
 			if (RatScannerMain.Instance.TarkovTrackerDB.Init()) return;
 
 			var visibleLength = (int)(token.Length * 0.25);

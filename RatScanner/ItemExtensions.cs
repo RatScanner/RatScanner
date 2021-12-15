@@ -1,9 +1,9 @@
-﻿using System;
-using System.Linq;
-using RatScanner.FetchModels;
-using System.Collections.Generic;
+﻿using RatScanner.FetchModels;
 using RatStash;
-using RatScanner.FetchModels.TarkovTracker;
+using RatTracking.FetchModels;
+using RatTracking.FetchModels.TarkovTracker;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace RatScanner
 {
@@ -71,7 +71,7 @@ namespace RatScanner
 			var requiredQuest = item.GetQuestRequired();
 			var requiredHideout = item.GetHideoutRequired();
 
-			var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress.Where(x => !(x.Self ?? false)).ToList();
+			var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
 
 			var trackedNeeds = new Dictionary<string, NeededItem>();
 
@@ -104,6 +104,14 @@ namespace RatScanner
 		{
 			var result = new NeededItem(item.Id);
 			var teamData = item.GetTrackingTeamNeeds();
+			if (teamData == null)
+			{
+				result.HideoutNeeded = 0;
+				result.QuestNeeded = 0;
+				result.HideoutHave = 0;
+				result.QuestHave = 0;
+				return result;
+			}
 			foreach (var (_, value) in teamData)
 			{
 				result.HideoutNeeded += value.HideoutNeeded;

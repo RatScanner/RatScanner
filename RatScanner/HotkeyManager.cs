@@ -1,6 +1,6 @@
-﻿using System;
+﻿using RatScanner.Controls;
+using System;
 using System.Windows.Input;
-using RatScanner.Controls;
 using static RatScanner.RatConfig;
 
 namespace RatScanner

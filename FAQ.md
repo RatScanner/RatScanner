@@ -18,12 +18,22 @@
 - [Can I get banned for using Rat Scanner?](#can-i-get-banned-for-using-rat-scanner)
 
 ### Program issues
-- [There is no RatScanner.exe file](#there-is-no-ratscannerexe-file)
-- [Rat Scanner is not starting](#rat-scanner-is-not-starting)
-- [Nothing happens when scanning](#nothing-happens-when-scanning)
-- [Could not find icon cache folder at: ...](#could-not-find-icon-cache-folder-at-)
-- [Could not find dynamic correlation data at: ...](#could-not-find-dynamic-correlation-data-at-)
-- [The type initializer for 'OpenCvSharp.NativeMethods' threw an exception.](#the-type-initializer-for-opencvsharpnativemethods-threw-an-exception)
+- [Rat Scanner FAQ](#rat-scanner-faq)
+  - [Table of Contents](#table-of-contents)
+    - [General](#general)
+    - [Program issues](#program-issues)
+    - [Scanning issues](#scanning-issues)
+- [General](#general-1)
+  - [Can I get banned for using Rat Scanner?](#can-i-get-banned-for-using-rat-scanner)
+- [Program issues](#program-issues-1)
+  - [There is no RatScanner.exe file](#there-is-no-ratscannerexe-file)
+  - [Rat Scanner is not starting](#rat-scanner-is-not-starting)
+  - [Nothing happens when scanning](#nothing-happens-when-scanning)
+  - [Could not find icon cache folder at: ...](#could-not-find-icon-cache-folder-at-)
+  - [Could not find dynamic correlation data at: ...](#could-not-find-dynamic-correlation-data-at-)
+  - [The type initializer for 'OpenCvSharp.NativeMethods' threw an exception.](#the-type-initializer-for-opencvsharpnativemethods-threw-an-exception)
+- [Scanning issues](#scanning-issues-1)
+  - [Icon scanning gets a lot of wrong matches](#icon-scanning-gets-a-lot-of-wrong-matches)
 
 ### Scanning issues
 - [Icon scanning gets a lot of wrong matches](#icon-scanning-gets-a-lot-of-wrong-matches)

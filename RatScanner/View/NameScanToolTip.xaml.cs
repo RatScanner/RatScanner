@@ -1,9 +1,10 @@
-﻿using System;
+﻿using RatLib;
+using RatLib.Scan;
+using RatScanner.ViewModel;
+using System;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Interop;
-using RatScanner.Scan;
-using RatScanner.ViewModel;
 
 namespace RatScanner.View
 {

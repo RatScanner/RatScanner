@@ -1,8 +1,8 @@
-﻿using System;
+﻿using RatScanner.Controls;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using RatScanner.Controls;
 using static RatScanner.UserActivityHelper;
 
 namespace RatScanner

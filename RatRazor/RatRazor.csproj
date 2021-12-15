@@ -1,0 +1,62 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+	<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="wwwroot\**" />
+    <Content Remove="wwwroot\**" />
+    <EmbeddedResource Remove="wwwroot\**" />
+    <None Remove="wwwroot\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Pages\App\Settings\SettingsGeneral.razor.css" />
+    <None Remove="Pages\App\Settings\SettingsMinimalUI.razor.css" />
+    <None Remove="Pages\App\Settings\SettingsScanning.razor.css" />
+    <None Remove="Pages\App\Settings\SettingsTracking.razor.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Pages\App\Settings\SettingsGeneral.razor.css" />
+    <Content Include="Pages\App\Settings\SettingsMinimalUI.razor.css" />
+    <Content Include="Pages\App\Settings\SettingsScanning.razor.css" />
+    <Content Include="Pages\App\Settings\SettingsTracking.razor.css" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
+    <PackageReference Include="MudBlazor" Version="6.0.2" />
+    <PackageReference Include="RatStash" Version="1.4.1" />
+    <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="_Imports.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RatLib\RatLib.csproj" />
+    <ProjectReference Include="..\RatTracking\RatTracking.csproj" />
+  </ItemGroup>
+
+</Project>
