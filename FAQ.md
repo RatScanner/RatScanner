@@ -59,13 +59,10 @@ If you still cannot see `RatScanner.exe` it is most likely removed by your antiv
 In that case, create a exception for it or disable your antivirus.
 
 ## Rat Scanner is not starting
-Make sure you have the following dependencies installed:
+- Try starting `RatScanner.exe` as administrator
+- Make sure that there is no antivirus blocking RatScanner from accessing or downloading additional files
 
-[Download .NET 6.0 Desktop Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-6.0.0-windows-x64-installer)
-
-[Download ASP.NET Core 6.0 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-aspnetcore-6.0.0-windows-hosting-bundle-installer)
-
-If you still cant run the application, you are probably missing the WebView2 Runtime (which should usually come with Edge). 
+If you still can't run the application, you are probably missing the WebView2 Runtime (which should usually come with Edge). 
 
 [Download WebView2 Runtime](https://go.microsoft.com/fwlink/p/?LinkId=2124703)
 
