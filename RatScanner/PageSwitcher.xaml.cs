@@ -79,8 +79,11 @@ namespace RatScanner
 
 		protected override void OnClosed(EventArgs e)
 		{
-			_notifyIcon.Visible = false;
-			_notifyIcon.Dispose();
+			if(_notifyIcon != null)
+			{
+				_notifyIcon.Visible = false;
+				_notifyIcon.Dispose();
+			}
 
 			base.OnClosed(e);
 
