@@ -236,9 +236,8 @@ namespace RatScanner
 				// Scan the item
 				var inventory = RatEyeEngine.NewInventory(screenshot);
 				var icon = inventory.LocateIcon();
-
-
-				if (icon.DetectionConfidence <= 0 || icon.Item == null) return;
+				
+				if (icon?.DetectionConfidence <= 0 || icon?.Item == null) return;
 
 				var toolTipPosition = position;
 				toolTipPosition += icon.Position + icon.ItemPosition;
