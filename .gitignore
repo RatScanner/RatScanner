@@ -1,8 +1,6 @@
 ## Custom ignores
 # Static icon data
-RatScanner/[Dd]ata/icons/
-RatScanner/[Dd]ata/items.json
-RatScanner/[Dd]ata/correlation.json
+RatScanner/[Dd]ata/*
 
 # publish folder
 publish/

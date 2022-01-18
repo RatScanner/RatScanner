@@ -1,7 +1,5 @@
 ﻿using RatEye;
-using RatLib.Scan;
 using RatScanner.View;
-using RatStash;
 using RatTracking;
 using System;
 using System.ComponentModel;
@@ -9,9 +7,13 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Windows;
+using System.Windows.Forms;
+using RatLib.Scan;
 using Color = System.Drawing.Color;
+using MessageBox = System.Windows.MessageBox;
 using Size = System.Drawing.Size;
 using Timer = System.Threading.Timer;
 
@@ -31,7 +33,7 @@ namespace RatScanner
 		private Timer _marketDBRefreshTimer;
 		private Timer _tarkovTrackerDBRefreshTimer;
 		private Timer _scanRefreshTimer;
-
+		private Timer _nameScanTimer;
 
 		/// <summary>
 		/// Lock for name scanning
@@ -52,7 +54,9 @@ namespace RatScanner
 		internal MarketDB MarketDB;
 		internal ProgressDB ProgressDB;
 		public TarkovTrackerDB TarkovTrackerDB;
-		internal Database ItemDB;
+
+		internal RatEyeEngine RatEyeEngine;
+		internal RatEye.Config RatEyeConfig;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
@@ -70,20 +74,20 @@ namespace RatScanner
 		{
 			_instance = this;
 
-			// Remove old log+
+			// Remove old log
 			Logger.Clear();
 
 			Logger.LogInfo("----- RatScanner " + RatConfig.Version + " -----");
 			Logger.LogInfo("Starting RatScanner...");
 
-			Logger.LogInfo("Checking for new updates...");
+			Logger.LogInfo("Checking for updates...");
 			CheckForUpdates();
 
 			Logger.LogInfo("Loading config...");
 			RatConfig.LoadConfig();
 
-			Logger.LogInfo("Loading item data...");
-			LoadItemDatabase();
+			Logger.LogInfo("Checking for item data updates...");
+			CheckForItemDataUpdates();
 
 			// Check for TarkovTracker data
 			TarkovTrackerDB = new TarkovTrackerDB();
@@ -108,11 +112,12 @@ namespace RatScanner
 			MarketDB = new MarketDB();
 			MarketDB.Init();
 
-			Logger.LogInfo("Setting default item...");
-			CurrentItemScan = new ItemNameScan(ItemDB.GetItem("59faff1d86f7746c51718c9c"));
-
 			Logger.LogInfo("Initializing RatEye...");
 			SetupRatEye();
+
+			Logger.LogInfo("Setting default item...");
+			var inspection = RatEyeEngine.NewInspection(new Bitmap(50, 50));
+			CurrentItemScan = new ItemNameScan(inspection);
 
 			Logger.LogInfo("Initializing hotkey manager...");
 			HotkeyManager = new HotkeyManager();
@@ -120,7 +125,8 @@ namespace RatScanner
 			Logger.LogInfo("Setting up data update routines...");
 			_marketDBRefreshTimer = new Timer(RefreshMarketDB, null, RatConfig.MarketDBRefreshTime, Timeout.Infinite);
 			_tarkovTrackerDBRefreshTimer = new Timer(RefreshTarkovTrackerDB, null, RatConfig.Tracking.TarkovTracker.RefreshTime, Timeout.Infinite);
-			_scanRefreshTimer = new Timer(new TimerCallback(RefreshOverlay));
+			_scanRefreshTimer = new Timer(RefreshOverlay);
+			//_nameScanTimer = new Timer(NameScanContinuous, null, 500, 1000);
 
 			Logger.LogInfo("Ready!");
 		}
@@ -149,43 +155,65 @@ namespace RatScanner
 			Environment.Exit(0);
 		}
 
-		private void LoadItemDatabase()
+		private void CheckForItemDataUpdates()
 		{
-			var mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ItemDataVersion);
-			if (!File.Exists(RatConfig.Paths.ItemData) || mostRecentVersion != RatConfig.ItemDataVersion)
+			var mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ItemDataBundleVersion);
+			if (!File.Exists(RatConfig.Paths.ItemData) || mostRecentVersion != RatConfig.ItemDataBundleVersion)
 			{
-				Logger.LogInfo("A new item data version is available: " + mostRecentVersion);
-				var itemDataLink = ApiManager.GetResource(ApiManager.ResourceType.ItemDataLink);
-				ApiManager.DownloadFile(itemDataLink, RatConfig.Paths.ItemData);
-				RatConfig.ItemDataVersion = mostRecentVersion;
-				RatConfig.SaveConfig();
-			}
+				Logger.LogInfo("A new item data bundle is available: " + mostRecentVersion);
 
-			var itemDB = Database.FromFile(RatConfig.Paths.ItemData);
-			ItemDB = itemDB.Filter(item => !item.QuestItem);
+				// Download and extract new item data
+				var itemDataLink = ApiManager.GetResource(ApiManager.ResourceType.ItemDataBundleLink);
+				ApiManager.DownloadFile(itemDataLink, "itemData.zip");
+				System.IO.Compression.ZipFile.ExtractToDirectory("itemData.zip", RatConfig.Paths.Data, true);
+				File.Delete("itemData.zip");
+
+				// Save the current version number to the config
+				RatConfig.ItemDataBundleVersion = mostRecentVersion;
+				RatConfig.SaveConfig();
+
+				Logger.LogInfo("Successfully updated to the latest item data bundle");
+			}
 		}
 
-		private void SetupRatEye()
+		internal void SetupRatEye()
 		{
-			var config = RatEye.Config.GlobalConfig;
-			config.PathConfig.LogFile = "RatEyeLog.txt";
-			config.PathConfig.BenderTraineddata = RatConfig.Paths.Data;
-			config.PathConfig.StaticIcons = RatConfig.Paths.StaticIcon;
-			config.PathConfig.StaticCorrelationData = RatConfig.Paths.StaticCorrelation;
+			RatEye.Config.LogDebug = RatConfig.LogDebug;
+			RatEye.Config.Path.LogFile = "RatEyeLog.txt";
 
-			config.ProcessingConfig.Scale = Config.Processing.Resolution2Scale(RatConfig.ScreenWidth, RatConfig.ScreenHeight);
+			RatEyeConfig = new RatEye.Config()
+			{
+				PathConfig = new Config.Path()
+				{
+					TrainedData = RatConfig.Paths.TrainedData,
+					StaticIcons = RatConfig.Paths.StaticIcon,
+					StaticCorrelationData = RatConfig.Paths.StaticCorrelation,
+					ItemLocales = RatConfig.Paths.Locales,
+					ItemData = RatConfig.Paths.ItemData,
+				},
+				ProcessingConfig = new Config.Processing()
+				{
+					Scale = Config.Processing.Resolution2Scale(RatConfig.ScreenWidth, RatConfig.ScreenHeight),
+					Language = RatConfig.NameScan.Language,
+					IconConfig = new Config.Processing.Icon()
+					{
+						UseStaticIcons = true,
+						ScanRotatedIcons = RatConfig.IconScan.ScanRotatedIcons,
+					},
+					InventoryConfig = new Config.Processing.Inventory()
+					{
+						OptimizeHighlighted = true,
+						MaxGridColor = Color.FromArgb(89, 100, 100),
+					},
+					InspectionConfig = new Config.Processing.Inspection()
+					{
+						MarkerThreshold = 0.9f,
+						EnableContainers = false,
+					},
+				},
+			};
 
-			config.ProcessingConfig.IconConfig.UseStaticIcons = true;
-			config.ProcessingConfig.IconConfig.ScanRotatedIcons = RatConfig.IconScan.ScanRotatedIcons;
-
-			config.ProcessingConfig.InventoryConfig.OptimizeHighlighted = true;
-			config.ProcessingConfig.InventoryConfig.MaxGridColor = Color.FromArgb(89, 100, 100);
-
-			config.ProcessingConfig.InspectionConfig.MarkerThreshold = 0.9f;
-			config.ProcessingConfig.InspectionConfig.EnableContainers = false;
-
-			config.LogDebug = RatConfig.LogDebug;
-			config.Apply();
+			RatEyeEngine = new RatEyeEngine(RatEyeConfig);
 		}
 
 		/// <summary>
@@ -193,7 +221,7 @@ namespace RatScanner
 		/// </summary>
 		/// <param name="position">Position on the screen at which to perform the scan</param>
 		/// <returns><see langword="true"/> if a item was scanned successfully</returns>
-		internal bool IconScan(Vector2 position)
+		internal void IconScan(Vector2 position)
 		{
 			Logger.LogDebug("Icon scanning at: " + position);
 			lock (IconScanLock)
@@ -205,24 +233,20 @@ namespace RatScanner
 				var size = new Size(RatConfig.IconScan.ScanWidth, RatConfig.IconScan.ScanHeight);
 				var screenshot = GetScreenshot(screenshotPosition, size);
 
-				ItemIconScan itemIconScan;
-				try
-				{
-					itemIconScan = new ItemIconScan(screenshot, position, RatConfig.IconScan.ScanWidth, RatConfig.IconScan.ScanHeight, RatConfig.ToolTip.Duration);
-				}
-				catch (Exception e)
-				{
-					Logger.LogWarning("Exception while icon scanning", e);
-					return false;
-				}
+				// Scan the item
+				var inventory = RatEyeEngine.NewInventory(screenshot);
+				var icon = inventory.LocateIcon();
 
-				if (!itemIconScan.ValidItem) return false;
 
-				CurrentItemScan = itemIconScan;
+				if (icon.DetectionConfidence <= 0 || icon.Item == null) return;
+
+				var toolTipPosition = position;
+				toolTipPosition += icon.Position + icon.ItemPosition;
+				toolTipPosition -= new Vector2(RatConfig.IconScan.ScanWidth, RatConfig.IconScan.ScanHeight) / 2;
+
+				CurrentItemScan = new ItemIconScan(icon, toolTipPosition, RatConfig.ToolTip.Duration);
 				SetOverlayRefresh();
 			}
-
-			return true;
 		}
 
 		/// <summary>
@@ -230,7 +254,7 @@ namespace RatScanner
 		/// </summary>
 		/// <param name="position">Position on the screen at which to perform the scan</param>
 		/// <returns></returns>
-		internal bool NameScan(Vector2 position)
+		internal void NameScan(Vector2 position)
 		{
 			Logger.LogDebug("Name scanning at: " + position);
 			lock (NameScanLock)
@@ -247,14 +271,52 @@ namespace RatScanner
 				var screenshot = GetScreenshot(new Vector2(screenshotPosX, screenshotPosY), new Size(sizeWidth, sizeHeight));
 
 				// Scan the item
-				var itemNameScan = new ItemNameScan(screenshot, position, RatConfig.NameScan.MarkerScanSize, RatConfig.ToolTip.Duration);
+				var inspection = RatEyeEngine.NewInspection(screenshot);
 
-				if (!itemNameScan.ValidItem) return false;
-				CurrentItemScan = itemNameScan;
+				if (!inspection.ContainsMarker || inspection.Item == null) return;
+
+				var scanSize = RatConfig.NameScan.MarkerScanSize;
+				var scale = RatEyeConfig.ProcessingConfig.Scale;
+				var toolTipPosition = inspection.MarkerPosition;
+				toolTipPosition += position - new Vector2(scanSize, scanSize) / 2;
+				toolTipPosition += new Vector2(0, (int)(19f * scale));
+
+				CurrentItemScan = new ItemNameScan(
+					inspection,
+					toolTipPosition,
+					RatConfig.ToolTip.Duration);
+
 				SetOverlayRefresh();
 			}
+		}
 
-			return true;
+		internal void NameScanContinuous(object? o = null)
+		{
+			lock (NameScanLock)
+			{
+				var mousePosition = UserActivityHelper.GetMousePosition();
+				var bounds = Screen.AllScreens.Where(screen => screen.Bounds.Contains(mousePosition)).First().Bounds;
+
+				var position = new Vector2(bounds.X, bounds.Y);
+				var screenshot = GetScreenshot(position, bounds.Size);
+
+				// Scan the item
+				var inspection = RatEyeEngine.NewInspection(screenshot);
+
+				if (!inspection.ContainsMarker || inspection.Item == null) return;
+
+				var scale = RatEyeConfig.ProcessingConfig.Scale;
+				var toolTipPosition = inspection.MarkerPosition;
+				toolTipPosition += position;
+				toolTipPosition += new Vector2(0, (int)(19f * scale));
+
+				CurrentItemScan = new ItemNameScan(
+					inspection,
+					toolTipPosition,
+					RatConfig.ToolTip.Duration);
+
+				SetOverlayRefresh();
+			}
 		}
 
 		// Returns the ruff screenshot
@@ -280,20 +342,20 @@ namespace RatScanner
 			_scanRefreshTimer.Change(RatConfig.ToolTip.Duration, Timeout.Infinite);
 		}
 
-		private void RefreshOverlay(object? o)
+		private void RefreshOverlay(object? o = null)
 		{
 			// Overlay will react to event
 			OnPropertyChanged();
 		}
 
-		private void RefreshMarketDB(object? o)
+		private void RefreshMarketDB(object? o = null)
 		{
 			Logger.LogInfo("Refreshing Market DB...");
 			MarketDB.Init();
 			_marketDBRefreshTimer.Change(RatConfig.MarketDBRefreshTime, Timeout.Infinite);
 		}
 
-		private void RefreshTarkovTrackerDB(object? o)
+		private void RefreshTarkovTrackerDB(object? o = null)
 		{
 			Logger.LogInfo("Refreshing TarkovTracker DB...");
 			TarkovTrackerDB.Init();

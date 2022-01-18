@@ -1,6 +1,4 @@
 ﻿@page "/overlay"
-@using RatTracking.FetchModels
-@using RatStash
 @using RatLib.Scan
 @inject RatRazor.Interfaces.IRatScannerUI RatScannerUI
 @inject RatTracking.TarkovTrackerDB TarkovTrackerDB
@@ -12,11 +10,11 @@
 {
     @if(RatScannerUI.CurrentItemScan is ItemIconScan iconScan)
     {
-        <div style="font-size:smaller;position:absolute;left:@(RatScannerUI.CurrentItemScan.GetToolTipPosition().X - VirtualScreenOffset.XOffset + 1)px;top:@(RatScannerUI.CurrentItemScan.GetToolTipPosition().Y - VirtualScreenOffset.YOffset + 1)px;width:@(iconScan._icon.Size.X - 1)px;height:@(iconScan._icon.Size.Y - 1)px;">
+        <div style="font-size:smaller;position:absolute;left:@(RatScannerUI.CurrentItemScan.GetToolTipPosition().X - VirtualScreenOffset.XOffset + 1)px;top:@(RatScannerUI.CurrentItemScan.GetToolTipPosition().Y - VirtualScreenOffset.YOffset + 1)px;width:@(iconScan.Icon.Size.X - 1)px;height:@(iconScan.Icon.Size.Y - 1)px;">
             <div style="height:100%;width:100%;position:relative;text-shadow: 0px 0px 5px black;" class="pa-1">
                 <div style="position:absolute;left:0px;top:0px;">
                     <div style="position:relative;">
-                        <img src="@($"https://assets.tarkov-tools.com/{RatScannerUI.CurrentItemScan.MatchedItems[0].Id}-grid-image.jpg")" style="filter:brightness(1.3);position:absolute;left:0px;top:0px;z-index:-1;@(iconScan.Rotated ? $"width:{iconScan._icon.Size.Y - 2}px;height:{iconScan._icon.Size.X - 2}px;transform: rotate(0.25turn) translate(0%, -100%);transform-origin: left top;" : $"width:{iconScan._icon.Size.X - 2}px;height:{iconScan._icon.Size.Y - 2}px;")">
+                        <img src="@($"https://assets.tarkov-tools.com/{RatScannerUI.CurrentItemScan.MatchedItem.Id}-grid-image.jpg")" style="filter:brightness(1.3);position:absolute;left:0px;top:0px;z-index:-1;@(iconScan.Rotated ? $"width:{iconScan.Icon.Size.Y - 2}px;height:{iconScan.Icon.Size.X - 2}px;transform: rotate(0.25turn) translate(0%, -100%);transform-origin: left top;" : $"width:{iconScan.Icon.Size.X - 2}px;height:{iconScan.Icon.Size.Y - 2}px;")">
                     </div>
                 </div>
                 <div class="stroke">

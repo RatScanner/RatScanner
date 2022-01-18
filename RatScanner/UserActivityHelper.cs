@@ -1,9 +1,9 @@
-﻿using RatLib;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
+using RatEye;
 
 namespace RatScanner
 {

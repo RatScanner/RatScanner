@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Input;
+using RatStash;
+using Key = System.Windows.Input.Key;
 
 namespace RatScanner
 {
@@ -20,6 +22,7 @@ namespace RatScanner
 			internal static string Base = AppDomain.CurrentDomain.BaseDirectory;
 			internal static string Data = Path.Combine(Base, "Data");
 			internal static string StaticIcon = Path.Combine(Data, "icons");
+			internal static string Locales = Path.Combine(Data, "locales");
 
 			private const string EftTempDir = "Battlestate Games\\EscapeFromTarkov\\";
 			private static readonly string EftTemp = Path.Combine(Path.GetTempPath(), EftTempDir);
@@ -27,6 +30,7 @@ namespace RatScanner
 			internal static string StaticCorrelation = Path.Combine(StaticIcon, "correlation.json");
 			internal static string DynamicCorrelation = Path.Combine(DynamicIcon, "index.json");
 			internal static string ItemData = Path.Combine(Data, "items.json");
+			internal static string TrainedData = Path.Combine(Data, "traineddata");
 			internal static string UnknownIcon = Path.Combine(Data, "unknown.png");
 			internal static string ConfigFile = Path.Combine(Base, "config.cfg");
 			internal static string Debug = Path.Combine(Base, "Debug");
@@ -38,7 +42,7 @@ namespace RatScanner
 		internal static class NameScan
 		{
 			internal static bool Enable = true;
-			internal static ApiManager.Language Language = ApiManager.Language.English;
+			internal static Language Language = Language.English;
 			internal static float ConfWarnThreshold = 0.85f;
 			internal static int MarkerScanSize => (int)(50 * ScreenScale);
 			internal static int TextWidth => (int)(600 * ScreenScale);
@@ -105,14 +109,14 @@ namespace RatScanner
 		internal static bool MinimizeToTray = false;
 		internal static bool AlwaysOnTop = true;
 		internal static int MarketDBRefreshTime = 30 * 60 * 1000;   // 30 minutes
-		internal static string ItemDataVersion = "20200101";
+		internal static string ItemDataBundleVersion = "20220118";
 		private static int ConfigVersion => 2;
 
 		internal static int ScreenWidth = 1920;
 		internal static int ScreenHeight = 1080;
 		internal static bool SetScreen = false;
 
-		internal static float ScreenScale => RatEye.Config.GlobalConfig.ProcessingConfig.Scale;
+		internal static float ScreenScale => RatScannerMain.Instance.RatEyeConfig.ProcessingConfig.Scale;
 
 		private static bool IsSupportedConfigVersion()
 		{
@@ -148,7 +152,7 @@ namespace RatScanner
 
 			config.Section = nameof(NameScan);
 			NameScan.Enable = config.ReadBool(nameof(NameScan.Enable), true);
-			NameScan.Language = (ApiManager.Language)config.ReadInt(nameof(NameScan.Language), (int)ApiManager.Language.English);
+			NameScan.Language = (Language)config.ReadInt(nameof(NameScan.Language), (int)Language.English);
 
 			config.Section = nameof(IconScan);
 			IconScan.Enable = config.ReadBool(nameof(IconScan.Enable), true);
@@ -181,14 +185,14 @@ namespace RatScanner
 			Tracking.TarkovTracker.ShowTeam = config.ReadBool(nameof(Tracking.TarkovTracker.ShowTeam), true);
 
 			config.Section = "Other";
-			if(!SetScreen)
+			if (!SetScreen)
 			{
 				ScreenWidth = config.ReadInt(nameof(ScreenWidth), 1920);
 				ScreenHeight = config.ReadInt(nameof(ScreenHeight), 1080);
 			}
 			MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), false);
 			AlwaysOnTop = config.ReadBool(nameof(AlwaysOnTop), false);
-			ItemDataVersion = config.ReadString(nameof(ItemDataVersion), "20200101");
+			ItemDataBundleVersion = config.ReadString(nameof(ItemDataBundleVersion), "20220118");
 			LogDebug = config.ReadBool(nameof(LogDebug), false);
 		}
 
@@ -234,7 +238,7 @@ namespace RatScanner
 			config.WriteInt(nameof(ScreenHeight), ScreenHeight);
 			config.WriteBool(nameof(MinimizeToTray), MinimizeToTray);
 			config.WriteBool(nameof(AlwaysOnTop), AlwaysOnTop);
-			config.WriteString(nameof(ItemDataVersion), ItemDataVersion);
+			config.WriteString(nameof(ItemDataBundleVersion), ItemDataBundleVersion);
 			config.WriteBool(nameof(LogDebug), LogDebug);
 			config.WriteInt(nameof(ConfigVersion), ConfigVersion);
 		}
