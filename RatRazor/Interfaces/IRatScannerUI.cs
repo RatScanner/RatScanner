@@ -1,6 +1,6 @@
-﻿using RatLib.Scan;
-using RatTracking.FetchModels;
+﻿using RatTracking.FetchModels;
 using System.ComponentModel;
+using RatLib.Scan;
 
 namespace RatRazor.Interfaces
 {

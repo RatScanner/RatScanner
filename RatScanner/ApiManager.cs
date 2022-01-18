@@ -5,31 +5,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using RatStash;
 
 namespace RatScanner
 {
 	public static class ApiManager
 	{
-		public enum Language
-		{
-			English,
-			Russian,
-			German,
-			French,
-			Spanish,
-			Chinese,
-		}
-
-		private static readonly Dictionary<Language, string> LanguageMapping = new Dictionary<Language, string>()
-		{
-			{Language.English, "en"},
-			{Language.Russian, "ru"},
-			{Language.German, "de"},
-			{Language.French, "fr"},
-			{Language.Spanish, "es"},
-			{Language.Chinese, "cn"},
-		};
-
 		public enum ResourceType
 		{
 			ClientVersion,
@@ -38,33 +19,20 @@ namespace RatScanner
 			GithubLink,
 			DiscordLink,
 			FAQLink,
-			ItemDataLink,
-			ItemDataVersion,
+			ItemDataBundleLink,
+			ItemDataBundleVersion,
 		}
-
-		private static readonly Dictionary<ResourceType, string> ResMapping = new Dictionary<ResourceType, string>
-		{
-			{ResourceType.ClientVersion, "RSClientVersion"},
-			{ResourceType.DownloadLink, "RSDownloadLink"},
-			{ResourceType.PatreonLink, "RSPatreonLink"},
-			{ResourceType.GithubLink, "RSGithubLink"},
-			{ResourceType.DiscordLink, "RSDiscordLink"},
-			{ResourceType.FAQLink, "RSFAQLink"},
-			{ResourceType.ItemDataLink, "RSItemDataLink"},
-			{ResourceType.ItemDataVersion, "RSItemDataVersion"},
-		};
 
 		private static readonly Dictionary<ResourceType, string> ResCache = new Dictionary<ResourceType, string>();
 
 		// Official RatScanner API URL
 		private const string BaseUrl = "https://api.ratscanner.com/v3";
 
-		public static MarketItem[] GetMarketDB(Language language = Language.English)
+		public static MarketItem[] GetMarketDB()
 		{
 			try
 			{
-				var langString = LanguageMapping[language];
-				var json = Get($"{BaseUrl}/all?lang={langString}");
+				var json = GetString($"{BaseUrl}/all");
 				return JsonConvert.DeserializeObject<MarketItem[]>(json);
 			}
 			catch (Exception e)
@@ -78,13 +46,12 @@ namespace RatScanner
 		{
 			if (ResCache.ContainsKey(resource)) return ResCache[resource];
 
-			if (!ResMapping.ContainsKey(resource)) Logger.LogError($"Could not find resource mapping for: {resource}");
-			var resPath = ResMapping[resource];
+			var resPath = resource.GetResourcePath();
 
 			try
 			{
 				Logger.LogInfo($"Loading resource \"{resPath}\"...");
-				var json = Get($"{BaseUrl}/res/{resPath}");
+				var json = GetString($"{BaseUrl}/res/{resPath}");
 				var value = JsonConvert.DeserializeObject<Resource>(json)?.Value;
 				ResCache.Add(resource, value);
 				return value;
@@ -101,8 +68,8 @@ namespace RatScanner
 			try
 			{
 				Logger.LogInfo($"Downloading file \"{url}\"...");
-				var contents = Get(url);
-				File.WriteAllText(destination, contents);
+				var contents = GetBytes(url);
+				File.WriteAllBytes(destination, contents);
 			}
 			catch (Exception e)
 			{
@@ -110,21 +77,49 @@ namespace RatScanner
 			}
 		}
 
-		private static string Get(string url, string bearerToken = null)
+		private static HttpWebRequest CreateRequest(string url, string bearerToken = null)
 		{
 			var request = WebRequest.CreateHttp(url);
 			request.Method = WebRequestMethods.Http.Get;
 			request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 			request.UserAgent = $"RatScanner-Client/{RatConfig.Version}";
 			if (bearerToken != null) request.Headers.Add("Authorization", "Bearer " + bearerToken);
+			return request;
+		}
 
-			using var response = (HttpWebResponse)request.GetResponse();
+		private static byte[] GetBytes(string url, string bearerToken = null)
+		{
+			using var response = (HttpWebResponse)CreateRequest(url, bearerToken).GetResponse();
 			using var stream = response.GetResponseStream();
+			using var memoryStream = new MemoryStream();
+			stream.CopyTo(memoryStream);
+			return memoryStream.ToArray();
+		}
 
+		private static string GetString(string url, string bearerToken = null)
+		{
+			using var response = (HttpWebResponse)CreateRequest(url, bearerToken).GetResponse();
+			using var stream = response.GetResponseStream();
 			var noEncoding = string.IsNullOrEmpty(response.CharacterSet);
 			var encoding = noEncoding ? Encoding.UTF8 : Encoding.GetEncoding(response.CharacterSet);
 			var reader = new StreamReader(stream, encoding);
 			return reader.ReadToEnd();
+		}
+
+		public static string GetResourcePath(this ResourceType resourceType)
+		{
+			return resourceType switch
+			{
+				ResourceType.ClientVersion => "RSClientVersion",
+				ResourceType.DownloadLink => "RSDownloadLink",
+				ResourceType.PatreonLink => "RSPatreonLink",
+				ResourceType.GithubLink => "RSGithubLink",
+				ResourceType.DiscordLink => "RSDiscordLink",
+				ResourceType.FAQLink => "RSFAQLink",
+				ResourceType.ItemDataBundleLink => "RSItemDataBundleLink",
+				ResourceType.ItemDataBundleVersion => "RSItemDataBundleVersion",
+				_ => throw new NotImplementedException(),
+			};
 		}
 	}
 }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using MudBlazor.Services;
-using RatLib;
 using RatRazor.Interfaces;
 using RatScanner.Controls;
 using RatScanner.ViewModel;
@@ -11,6 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
+using RatLib;
 
 namespace RatScanner.View
 {
@@ -28,23 +28,28 @@ namespace RatScanner.View
 			serviceCollection.AddBlazorWebView();
 			serviceCollection.AddMudServices();
 			RatConfig.LoadConfig();
+
 			serviceCollection.AddSingleton<IRatScannerUI>(s => new MainWindowVM(RatScannerMain.Instance));
+
 			var settingsVM = new SettingsVM();
 			serviceCollection.AddSingleton<ISettingsUI>(s => settingsVM);
+
 			IconScanHotkeySelector = new HotkeySelector();
 			IconScanHotkeySelector.Hotkey = (Hotkey)settingsVM.IconScanHotkey;
 			IconScanHotkeySelector.Width = 0;
 			IconScanHotkeySelector.Height = 0;
 			serviceCollection.AddSingleton<IHotkeySelector>(s => IconScanHotkeySelector);
+
 			serviceCollection.AddSingleton<VirtualScreenOffset>(s => new VirtualScreenOffset((int)SystemParameters.VirtualScreenLeft, (int)SystemParameters.VirtualScreenTop));
+
 			serviceCollection.AddSingleton<TarkovTrackerDB>(s => RatScannerMain.Instance.TarkovTrackerDB);
 
 			ServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
 
+			Resources.Add("services", serviceProvider);
+
 			BlazorOverlay = new BlazorOverlay(serviceProvider);
 			BlazorOverlay.Show();
-
-			Resources.Add("services", serviceProvider);
 
 			InitializeComponent();
 		}

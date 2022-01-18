@@ -1,8 +1,8 @@
-﻿using RatEye;
-using RatRazor.Interfaces;
+﻿using RatRazor.Interfaces;
 using RatScanner.Controls;
 using System.ComponentModel;
 using System.Linq;
+using RatStash;
 
 namespace RatScanner.ViewModel
 {
@@ -90,10 +90,11 @@ namespace RatScanner.ViewModel
 			var updateMarketDB = NameScanLanguage != (int)RatConfig.NameScan.Language;
 			var updateTarkovTrackerToken = TarkovTrackerToken != RatConfig.Tracking.TarkovTracker.Token;
 			var updateResolution = ScreenWidth != RatConfig.ScreenWidth || ScreenHeight != RatConfig.ScreenHeight;
+			var updateLanguage = RatConfig.NameScan.Language != (Language)NameScanLanguage;
 
 			// Save config
 			RatConfig.NameScan.Enable = EnableNameScan;
-			RatConfig.NameScan.Language = (ApiManager.Language)NameScanLanguage;
+			RatConfig.NameScan.Language = (Language)NameScanLanguage;
 
 			RatConfig.IconScan.Enable = EnableIconScan;
 			RatConfig.IconScan.ScanRotatedIcons = ScanRotatedIcons;
@@ -128,13 +129,9 @@ namespace RatScanner.ViewModel
 			PageSwitcher.Instance.Topmost = RatConfig.AlwaysOnTop;
 			if (updateMarketDB) RatScannerMain.Instance.MarketDB.Init();
 			if (updateTarkovTrackerToken) UpdateTarkovTrackerToken();
-			if (updateResolution)
-			{
-				var processingConfig = Config.GlobalConfig.ProcessingConfig;
-				processingConfig.Scale = Config.Processing.Resolution2Scale(RatConfig.ScreenWidth, RatConfig.ScreenHeight);
-				Config.GlobalConfig.Apply();
-			}
-			Config.GlobalConfig.LogDebug = RatConfig.LogDebug;
+			if (updateResolution || updateLanguage) RatScannerMain.Instance.SetupRatEye();
+
+			RatEye.Config.LogDebug = RatConfig.LogDebug;
 			RatScannerMain.Instance.HotkeyManager.RegisterHotkeys();
 
 			// Save config to file
