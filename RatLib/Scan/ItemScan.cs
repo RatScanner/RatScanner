@@ -1,4 +1,5 @@
-﻿using RatStash;
+﻿using System.Net;
+using RatStash;
 using RatEye;
 
 namespace RatLib.Scan
@@ -14,6 +15,5 @@ namespace RatLib.Scan
 		public long? DissapearAt;
 
 		public abstract Vector2 GetToolTipPosition();
-
 	}
 }
