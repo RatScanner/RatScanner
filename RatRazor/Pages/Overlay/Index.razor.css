@@ -7,5 +7,7 @@
 }
 
 .stroke {
-	text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+	/* ReSharper disable InvalidValue */
+	filter: drop-shadow(-1px -1px 0px #000000) drop-shadow(1px -1px 0px #000000) drop-shadow(1px 1px 0px #000000) drop-shadow(-1px 1px 0px #000000);
+	/* ReSharper restore InvalidValue */
 }

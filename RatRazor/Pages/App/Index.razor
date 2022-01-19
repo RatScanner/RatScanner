@@ -32,11 +32,11 @@
         <MudPaper Class="align-center justify-center pa-2 mx-2 my-1" Elevation="2">
             <div class="d-flex justify-space-between align-center mt-2">
                 <MudText Typo="Typo.subtitle2">Recent Avg. Price</MudText>
-                <MudText Typo="Typo.subtitle2">@RatScannerUI.Avg24hPrice</MudText>
+                <MudText Typo="Typo.subtitle2">@RatScannerUI.IntToLongPrice(RatScannerUI.Avg24hPrice)</MudText>
             </div>
             <div class="d-flex justify-space-between align-center my-1">
                 <MudText Typo="Typo.subtitle2">Value per Slot</MudText>
-                <MudText Typo="Typo.subtitle2">@RatScannerUI.PricePerSlot</MudText>
+                <MudText Typo="Typo.subtitle2">@RatScannerUI.IntToLongPrice(RatScannerUI.PricePerSlot)</MudText>
             </div>
             <MudDivider DividerType="DividerType.FullWidth"/>
             <div class="d-flex justify-space-between align-center mt-2">
@@ -47,43 +47,43 @@
             </div>
             <div class="d-flex justify-space-between align-center my-1">
                 <MudText Typo="Typo.subtitle2">Trader Price</MudText>
-                <MudText Typo="Typo.subtitle2">@RatScannerUI.BestTraderPrice</MudText>
+                <MudText Typo="Typo.subtitle2">@RatScannerUI.IntToLongPrice(RatScannerUI.BestTraderPrice)</MudText>
             </div>
         </MudPaper>
     </MudItem>
     <MudItem xs="12">
         <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">
             @*<div class="d-flex align-center">
-                @RatScannerUI.TrackingNeedsQuestRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" /> Quest
-            </div>
-            <div class="d-flex align-center">
-                @RatScannerUI.TrackingNeedsHideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
-            </div>*@
+                        @RatScannerUI.TrackingNeedsQuestRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" /> Quest
+                    </div>
+                    <div class="d-flex align-center">
+                        @RatScannerUI.TrackingNeedsHideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
+                    </div>*@
             @if (RatScannerUI.TrackingTeamNeeds != null && (RatScannerUI.TrackingTeamNeedsSummed.QuestRemaining > 0 || RatScannerUI.TrackingTeamNeedsSummed.HideoutRemaining > 0))
             {
-                <MudGrid Spacing="0" Class="pa-0 ma-0">
+                        <MudGrid Spacing="0" Class="pa-0 ma-0">
                     @foreach (KeyValuePair<string, NeededItem> teammate in RatScannerUI.TrackingTeamNeeds.Where(t => t.Value.QuestRemaining > 0 || t.Value.HideoutRemaining > 0).ToList())
                     {
-                        <MudItem xs="12" Class="pa-0 ma-0">
-                            <div class="d-flex justify-space-between">
-                                <div class="mx-1">@teammate.Key</div>
-                                <div class="d-flex align-center">
-                                    <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="mr-1" /> @teammate.Value.QuestRemaining
-                                    <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-3 mr-1" /> @teammate.Value.HideoutRemaining
-                                </div>
-                            </div>
-                        </MudItem>
+                                        <MudItem xs="12" Class="pa-0 ma-0">
+                                            <div class="d-flex justify-space-between">
+                                                <div class="mx-1">@teammate.Key</div>
+                                                <div class="d-flex align-center">
+                                                    <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="mr-1" /> @teammate.Value.QuestRemaining
+                                                    <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-3 mr-1" /> @teammate.Value.HideoutRemaining
+                                                </div>
+                                            </div>
+                                        </MudItem>
                     }
-                </MudGrid>
+                        </MudGrid>
             }
             else
             {
-                <div class="d-flex align-center">
+                        <div class="d-flex align-center">
                     @RatScannerUI.TrackingNeeds.QuestRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" /> Quest
-                </div>
-                <div class="d-flex align-center">
+                        </div>
+                        <div class="d-flex align-center">
                     @RatScannerUI.TrackingNeeds.HideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
-                </div>
+                        </div>
             }
         </MudPaper>
     </MudItem>
@@ -100,15 +100,15 @@
         OpenURL(RatScannerUI.ToolsLink);
     }
 
-	private void OpenURL(string url)
-	{
-		var psi = new ProcessStartInfo
-		{
-			FileName = url,
-			UseShellExecute = true,
-		};
-		Process.Start(psi);
-	}
+    private void OpenURL(string url)
+    {
+        var psi = new ProcessStartInfo
+            {
+                FileName = url,
+                UseShellExecute = true,
+            };
+        Process.Start(psi);
+    }
 
     protected override void OnInitialized()
     {
