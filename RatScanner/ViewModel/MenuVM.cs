@@ -55,31 +55,16 @@ namespace RatScanner.ViewModel
 
 		// https://youtrack.jetbrains.com/issue/RSRP-468572
 		// ReSharper disable InconsistentNaming
-		public string Avg24hPrice => PriceToString(GetAvg24hPrice());
-
-		private int GetAvg24hPrice()
-		{
-			return MatchedItem.GetAvg24hMarketPrice();
-		}
+		public int Avg24hPrice => MatchedItem.GetAvg24hMarketPrice();
 		// ReSharper restore InconsistentNaming
 
-		public string PricePerSlot => PriceToString(GetAvg24hPrice() / (MatchedItem.Width * MatchedItem.Height));
+		public int PricePerSlot => MatchedItem.GetAvg24hMarketPrice() / (MatchedItem.Width * MatchedItem.Height);
 
-		public string TraderName => TraderPrice.GetTraderName(GetBestTrader().traderId);
+		public string TraderName => TraderPrice.GetTraderName(MatchedItem.GetBestTrader().traderId);
 
-		public string BestTraderPrice => IntToGroupedString(GetBestTrader().price) + " ₽";
+		public int BestTraderPrice => MatchedItem.GetBestTrader().price;
 
-		private (string traderId, int price) GetBestTrader()
-		{
-			return MatchedItem.GetBestTrader();
-		}
-
-		public string MaxTraderPrice => IntToGroupedString(GetMaxTraderPrice()) + " ₽";
-
-		private int GetMaxTraderPrice()
-		{
-			return MatchedItem.GetMaxTraderPrice();
-		}
+		public int MaxTraderPrice => MatchedItem.GetMaxTraderPrice();
 
 
 		public NeededItem TrackingNeeds => MatchedItem.GetTrackingNeeds();
@@ -141,15 +126,32 @@ namespace RatScanner.ViewModel
 			OnPropertyChanged();
 		}
 
-		private string PriceToString(int price) => IntToGroupedString(price) + " ₽";
-
-		private static string IntToGroupedString(int? value)
+		public string IntToLongPrice(int? value)
 		{
-			if (value == null) return "ERROR";
+			if (value == null) return "0 ₽";
 
 			var text = $"{value:n0}";
 			var numberGroupSeparator = NumberFormatInfo.CurrentInfo.NumberGroupSeparator;
-			return text.Replace(numberGroupSeparator, RatConfig.ToolTip.DigitGroupingSymbol);
+			return text.Replace(numberGroupSeparator, RatConfig.ToolTip.DigitGroupingSymbol) + " ₽";
+		}
+
+		public string IntToShortPrice(int? value)
+		{
+			if (value == null) return "₽ 0";
+
+			var priceStr = value.ToString();
+			if (priceStr.Length < 4) return "₽ " + priceStr;
+
+			var suffixes = new string[] { "", "K", "M", "B", "T" };
+
+			var result = priceStr.Substring(0, 3);
+
+			var dotPos = priceStr.Length % 3;
+			//if (dotPos != 0) result = result.Insert(dotPos, ".");
+			if (dotPos != 0) result = result[..dotPos];
+
+			result += " " + suffixes[(int)Math.Floor((priceStr.Length - 1) / 3f)];
+			return "₽ " + result;
 		}
 	}
 }
