@@ -26,7 +26,7 @@ Please consider [supporting](#Support-the-project) the project to help finance t
 
 ## Can I get banned for using Rat Scanner?
 
-Have a look [here][faq-page-can-i-get-banned] to see BSG's official response to that question.
+While Battlestate Games does not support nor is affiliated with this project, it exists since two years with over 1.000 players using it every day in their games. So far there has not been a single instance in which RatScanner was proven to have caused any ban.
 
 <br/>
 
@@ -74,26 +74,14 @@ _Icon scanning refers to scanning the icon of a item._
 
 Limitations
 
+- It is unfortunately no longer possible to scan weapons
 - Uses / durability is always assumed at 100%
 - Items which share a icon with other items (especially keys) will result in a uncertain match
 - There will be missmatches when scanning icons in the top left of the item stash since the bright light (top center of the screen) interferes with it
 
-Notes
-
-- Check out the [indicator for modded items](#modded-item-indicator)
-- If the item size does not get detected correctly, try to click in a corner of the item
-
 <img src="media/IconScan.gif" width=400px>
 
 <br/>
-
-## Modded Item Indicator
-When attached mods on a item were detected, they will be included in the data.
-This is indicated by an icon which is displayed to the left of the item name.
-
-Price includes attached mods       | Price **does not** include attached mods
-:--------------------------------: | :------------------------------------:
-![AttachedMods](media/ModIcon.png) | ![NoAttachedMods](media/NoModIcon.png)
 
 ## Minimal UI
 Switch to the minimal ui by clicking the dedicated button inside the titlebar.
@@ -120,7 +108,7 @@ If you have any problems with the process please checkout the [FAQ][faq-page] or
 ## Setting up the repository for development
 
 1. Clone the repository
-2. Copy the `name` folder and the `correlation.json` from the [EfT-Icons][eft-icons-repo] repository inside `RatScanner\Data\`
+2. Copy the `Data` folder from the latest release to `RatScanner\Data\`
 
 ### Compiling
 
