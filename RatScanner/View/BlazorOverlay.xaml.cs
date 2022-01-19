@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using System.Windows;
+using Microsoft.Web.WebView2.Core;
 
 namespace RatScanner.View
 {
@@ -27,19 +28,18 @@ namespace RatScanner.View
 			blazorOverlayWebView.WebView.CoreWebView2InitializationCompleted += CoreWebView_Loaded;
 		}
 
-		void WebView_Loaded(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs e)
+		void WebView_Loaded(object sender, CoreWebView2NavigationCompletedEventArgs e)
 		{
 			// If we are running in a development/debugger mode, open dev tools to help out
 			if (Debugger.IsAttached)
 			{
 				blazorOverlayWebView.WebView.CoreWebView2.OpenDevToolsWindow();
 			}
-
 		}
 
-		void CoreWebView_Loaded(object sender, Microsoft.Web.WebView2.Core.CoreWebView2InitializationCompletedEventArgs e)
+		void CoreWebView_Loaded(object sender, CoreWebView2InitializationCompletedEventArgs e)
 		{
-			//blazorOverlayWebView.WebView.CoreWebView2.Navigate("/overlay");
+			blazorOverlayWebView.WebView.CoreWebView2.SetVirtualHostNameToFolderMapping("local.data", "Data", CoreWebView2HostResourceAccessKind.Allow);
 		}
 	}
 }

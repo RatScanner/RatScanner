@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using MudBlazor.Services;
-using RatLib;
 using RatRazor.Interfaces;
 using RatScanner.Controls;
 using RatScanner.ViewModel;
@@ -11,6 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
+using RatLib;
 
 namespace RatScanner.View
 {
@@ -20,7 +20,7 @@ namespace RatScanner.View
 	public partial class BlazorUI : UserControl, ISwitchable
 	{
 		public HotkeySelector IconScanHotkeySelector { get; set; }
-		public BlazorOverlay BlazorOverlay { get; set; }
+		public static BlazorOverlay BlazorOverlay { get; set; }
 
 		public BlazorUI()
 		{
@@ -28,23 +28,28 @@ namespace RatScanner.View
 			serviceCollection.AddBlazorWebView();
 			serviceCollection.AddMudServices();
 			RatConfig.LoadConfig();
+
 			serviceCollection.AddSingleton<IRatScannerUI>(s => new MainWindowVM(RatScannerMain.Instance));
+
 			var settingsVM = new SettingsVM();
 			serviceCollection.AddSingleton<ISettingsUI>(s => settingsVM);
+
 			IconScanHotkeySelector = new HotkeySelector();
 			IconScanHotkeySelector.Hotkey = (Hotkey)settingsVM.IconScanHotkey;
 			IconScanHotkeySelector.Width = 0;
 			IconScanHotkeySelector.Height = 0;
 			serviceCollection.AddSingleton<IHotkeySelector>(s => IconScanHotkeySelector);
+
 			serviceCollection.AddSingleton<VirtualScreenOffset>(s => new VirtualScreenOffset((int)SystemParameters.VirtualScreenLeft, (int)SystemParameters.VirtualScreenTop));
+
 			serviceCollection.AddSingleton<TarkovTrackerDB>(s => RatScannerMain.Instance.TarkovTrackerDB);
 
 			ServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
 
-			BlazorOverlay = new BlazorOverlay(serviceProvider);
-			BlazorOverlay.Show();
-
 			Resources.Add("services", serviceProvider);
+
+			BlazorOverlay ??= new BlazorOverlay(serviceProvider);
+			BlazorOverlay.Show();
 
 			InitializeComponent();
 		}
@@ -72,9 +77,7 @@ namespace RatScanner.View
 			blazorWebView.WebView.CoreWebView2.Navigate("https://0.0.0.0/app");
 		}
 
-		private void UpdateElements()
-		{
-		}
+		private void UpdateElements() { }
 
 		private void HyperlinkRequestNavigate(object sender, RequestNavigateEventArgs e)
 		{
@@ -92,10 +95,7 @@ namespace RatScanner.View
 			throw new NotImplementedException();
 		}
 
-		protected override void OnPreviewKeyDown(KeyEventArgs e)
-		{
-			//Test
-		}
+		protected override void OnPreviewKeyDown(KeyEventArgs e) { }
 
 		private void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
 		{
@@ -104,15 +104,11 @@ namespace RatScanner.View
 				PageSwitcher.Instance.DragMove();
 				e.Handled = true;
 			}
-
 		}
 
 		public void OnOpen()
 		{
-			//DataContext = new MainWindowVM(RatScannerMain.Instance);
 			UpdateElements();
-			//
-			//blazorWebView.Foreground.Opacity = Math.Clamp(10, 1f / 510f, 1f);
 		}
 
 		public void OnClose() { }

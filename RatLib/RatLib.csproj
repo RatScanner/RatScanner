@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="RatEye" Version="1.4.7" />
-    <PackageReference Include="RatStash" Version="1.4.1" />
+    <PackageReference Include="RatEye" Version="2.0.2" />
+    <PackageReference Include="RatStash" Version="1.5.3" />
   </ItemGroup>
 
 </Project>

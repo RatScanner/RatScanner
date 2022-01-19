@@ -1,5 +1,4 @@
-﻿using RatLib.Scan;
-using RatRazor.Interfaces;
+﻿using RatRazor.Interfaces;
 using RatScanner.FetchModels;
 using RatStash;
 using RatTracking.FetchModels;
@@ -9,6 +8,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Web;
+using RatLib.Scan;
 
 namespace RatScanner.ViewModel
 {
@@ -31,9 +31,9 @@ namespace RatScanner.ViewModel
 
 		public ItemScan CurrentItemScan => DataSource?.CurrentItemScan;
 
-		private Item[] MatchedItems => CurrentItemScan?.MatchedItems;
+		private Item MatchedItem => CurrentItemScan?.MatchedItem;
 
-		public string ItemId => MatchedItems[0].Id;
+		public string ItemId => MatchedItem.Id;
 
 		public string IconPath
 		{
@@ -47,48 +47,33 @@ namespace RatScanner.ViewModel
 			}
 		}
 
-		public string Name => MatchedItems[0].Name;
+		public string Name => MatchedItem.Name;
 
-		public string ShortName => MatchedItems[0].ShortName;
+		public string ShortName => MatchedItem.ShortName;
 
-		public bool HasMods => MatchedItems[0] is CompoundItem itemC && itemC.Slots.Count > 0;
+		public bool HasMods => MatchedItem is CompoundItem itemC && itemC.Slots.Count > 0;
 
 		// https://youtrack.jetbrains.com/issue/RSRP-468572
 		// ReSharper disable InconsistentNaming
-		public string Avg24hPrice => PriceToString(GetAvg24hPrice());
-
-		private int GetAvg24hPrice()
-		{
-			return MatchedItems[0].GetAvg24hMarketPrice();
-		}
+		public int Avg24hPrice => MatchedItem.GetAvg24hMarketPrice();
 		// ReSharper restore InconsistentNaming
 
-		public string PricePerSlot => PriceToString(GetAvg24hPrice() / (MatchedItems[0].Width * MatchedItems[0].Height));
+		public int PricePerSlot => MatchedItem.GetAvg24hMarketPrice() / (MatchedItem.Width * MatchedItem.Height);
 
-		public string TraderName => TraderPrice.GetTraderName(GetBestTrader().traderId);
+		public string TraderName => TraderPrice.GetTraderName(MatchedItem.GetBestTrader().traderId);
 
-		public string BestTraderPrice => IntToGroupedString(GetBestTrader().price) + " ₽";
+		public int BestTraderPrice => MatchedItem.GetBestTrader().price;
 
-		private (string traderId, int price) GetBestTrader()
-		{
-			return MatchedItems[0].GetBestTrader();
-		}
-
-		public string MaxTraderPrice => IntToGroupedString(GetMaxTraderPrice()) + " ₽";
-
-		private int GetMaxTraderPrice()
-		{
-			return MatchedItems[0].GetMaxTraderPrice();
-		}
+		public int MaxTraderPrice => MatchedItem.GetMaxTraderPrice();
 
 
-		public NeededItem TrackingNeeds => MatchedItems[0].GetTrackingNeeds();
-		public NeededItem TrackingTeamNeedsSummed => MatchedItems[0].GetSummedTrackingTeamNeeds();
+		public NeededItem TrackingNeeds => MatchedItem.GetTrackingNeeds();
+		public NeededItem TrackingTeamNeedsSummed => MatchedItem.GetSummedTrackingTeamNeeds();
 
 		public string TrackingNeedsQuestRemaining => TrackingNeeds.QuestRemaining.ToString();
 		public string TrackingNeedsHideoutRemaining => TrackingNeeds.QuestRemaining.ToString();
 
-		public List<KeyValuePair<string, NeededItem>> TrackingTeamNeeds => MatchedItems[0].GetTrackingTeamNeeds();
+		public List<KeyValuePair<string, NeededItem>> TrackingTeamNeeds => MatchedItem.GetTrackingTeamNeeds();
 
 		public List<KeyValuePair<string, NeededItem>> TrackingTeamNeedsFiltered => TrackingTeamNeeds?.Where(x => x.Value.Remaining > 0).ToList() ?? new List<KeyValuePair<string, NeededItem>>();
 
@@ -103,7 +88,7 @@ namespace RatScanner.ViewModel
 			get
 			{
 				var dt = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-				var min = MatchedItems[0].GetMarketItem().Timestamp;
+				var min = MatchedItem.GetMarketItem().Timestamp;
 				return dt.AddSeconds(min).ToLocalTime().ToString(CultureInfo.CurrentCulture);
 			}
 		}
@@ -112,7 +97,7 @@ namespace RatScanner.ViewModel
 		{
 			get
 			{
-				var link = MatchedItems[0].GetMarketItem().WikiLink;
+				var link = MatchedItem.GetMarketItem().WikiLink;
 				if (link.Length > 3) return link;
 				return $"https://escapefromtarkov.gamepedia.com/{HttpUtility.UrlEncode(Name.Replace(" ", "_"))}";
 			}
@@ -120,8 +105,8 @@ namespace RatScanner.ViewModel
 
 		public string ToolsLink => $"https://tarkov-tools.com/item/{ItemId}";
 
-		public string IconLink => MatchedItems[0].GetMarketItem().IconLink;
-		public string ImageLink => MatchedItems[0].GetMarketItem().ImageLink;
+		public string IconLink => MatchedItem.GetMarketItem().IconLink;
+		public string ImageLink => MatchedItem.GetMarketItem().ImageLink;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
@@ -141,21 +126,32 @@ namespace RatScanner.ViewModel
 			OnPropertyChanged();
 		}
 
-		private string PriceToString(int price)
+		public string IntToLongPrice(int? value)
 		{
-			if (MatchedItems.Length == 1) return IntToGroupedString(price) + " ₽";
-
-			// TODO make this more informative. Perhaps a value range?
-			return "Uncertain";
-		}
-
-		private static string IntToGroupedString(int? value)
-		{
-			if (value == null) return "ERROR";
+			if (value == null) return "0 ₽";
 
 			var text = $"{value:n0}";
 			var numberGroupSeparator = NumberFormatInfo.CurrentInfo.NumberGroupSeparator;
-			return text.Replace(numberGroupSeparator, RatConfig.ToolTip.DigitGroupingSymbol);
+			return text.Replace(numberGroupSeparator, RatConfig.ToolTip.DigitGroupingSymbol) + " ₽";
+		}
+
+		public string IntToShortPrice(int? value)
+		{
+			if (value == null) return "₽ 0";
+
+			var priceStr = value.ToString();
+			if (priceStr.Length < 4) return "₽ " + priceStr;
+
+			var suffixes = new string[] { "", "K", "M", "B", "T" };
+
+			var result = priceStr.Substring(0, 3);
+
+			var dotPos = priceStr.Length % 3;
+			//if (dotPos != 0) result = result.Insert(dotPos, ".");
+			if (dotPos != 0) result = result[..dotPos];
+
+			result += " " + suffixes[(int)Math.Floor((priceStr.Length - 1) / 3f)];
+			return "₽ " + result;
 		}
 	}
 }

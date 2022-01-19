@@ -1,5 +1,5 @@
 ﻿using RatStash;
-using System.Drawing;
+using RatEye;
 using Icon = RatEye.Processing.Icon;
 
 namespace RatLib.Scan
@@ -15,38 +15,26 @@ namespace RatLib.Scan
 	{
 		public bool Rotated;
 		public ItemExtraInfo ItemExtraInfo;
+		public Icon Icon;
 
-		public Icon _icon;
-		public Vector2 _mousePosition;
+		private Vector2 _toolTipPosition;
 
-		private int _scanWidth;
-		private int _scanHeight;
-
-		public ItemIconScan(Bitmap capture, Vector2 mousePosition, int scanWidth, int scanHeight, int duration)
+		public ItemIconScan(Icon icon, Vector2 toolTipPosition, int duration)
 		{
-			_mousePosition = mousePosition;
-			var inventory = new RatEye.Processing.Inventory(capture);
-			_icon = inventory.LocateIcon();
-			if (_icon == null) return;
+			Icon = icon;
+			MatchedItem = icon.Item;
+			ItemExtraInfo = icon.ItemExtraInfo;
+			Confidence = icon.DetectionConfidence;
+			Rotated = icon.Rotated;
+			IconPath = icon.IconPath;
 
-			MatchedItems = new[] { _icon.Item };
-			ItemExtraInfo = _icon.ItemExtraInfo;
-			Confidence = _icon.DetectionConfidence;
-			Rotated = _icon.Rotated;
-			IconPath = _icon.IconPath;
-			ValidItem = _icon.DetectionConfidence > 0f;
-
-			_scanHeight = scanHeight;
-			_scanWidth = scanWidth;
+			_toolTipPosition = toolTipPosition;
 			DissapearAt = DateTimeOffset.Now.ToUnixTimeMilliseconds() + duration;
 		}
 
 		public override Vector2 GetToolTipPosition()
 		{
-			var pos = _mousePosition;
-			pos += new Vector2(_icon.Position + _icon.ItemPosition);
-			pos -= new Vector2(_scanWidth, _scanHeight) / 2;
-			return pos;
+			return _toolTipPosition;
 		}
 	}
 }

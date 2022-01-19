@@ -1,6 +1,6 @@
-﻿using RatLib.Scan;
-using RatTracking.FetchModels;
+﻿using RatTracking.FetchModels;
 using System.ComponentModel;
+using RatLib.Scan;
 
 namespace RatRazor.Interfaces
 {
@@ -15,10 +15,10 @@ namespace RatRazor.Interfaces
 		public string ToolsLink { get; }
 
 		// Item Information
-		public string Avg24hPrice { get; }
-		public string PricePerSlot { get; }
+		public int Avg24hPrice { get; }
+		public int PricePerSlot { get; }
 		public string TraderName { get; }
-		public string BestTraderPrice { get; }
+		public int BestTraderPrice { get; }
 
 		public string DiscordLink { get; }
 		public string PatreonLink { get; }
@@ -31,5 +31,8 @@ namespace RatRazor.Interfaces
 
 		public ItemScan CurrentItemScan { get; }
 
+		public string IntToShortPrice(int? value);
+
+		public string IntToLongPrice(int? value);
 	}
 }

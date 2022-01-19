@@ -3,9 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-		xmlns:ratrazor="clr-namespace:RatRazor;assembly=RatRazor"
 		xmlns:blazor="clr-namespace:Microsoft.AspNetCore.Components.WebView.Wpf;assembly=Microsoft.AspNetCore.Components.WebView.Wpf"
-        xmlns:local="clr-namespace:RatScanner.View"
+        xmlns:local="clr-namespace:RatScanner.View" 
+        xmlns:ratRazor="clr-namespace:RatRazor;assembly=RatRazor"
         mc:Ignorable="d"
 		Focusable="False"
 		IsTabStop="False"
@@ -19,10 +19,9 @@
         Title="RatScanner Overlay"
 		Height="100" Width="100">
 	<Grid>
-		<blazor:BlazorWebView HostPage="wwwroot/overlay.html" Services="{StaticResource services}" Panel.ZIndex="99" x:Name="blazorOverlayWebView" Loaded="BlazorOverlay_Loaded"
->
+		<blazor:BlazorWebView HostPage="wwwroot/overlay.html" Services="{StaticResource services}" Panel.ZIndex="99" x:Name="blazorOverlayWebView" Loaded="BlazorOverlay_Loaded">
 			<blazor:BlazorWebView.RootComponents>
-				<blazor:RootComponent Selector="#app" ComponentType="{x:Type ratrazor:Overlay}" />
+				<blazor:RootComponent Selector="#app" ComponentType="{x:Type ratRazor:Overlay}" />
 			</blazor:BlazorWebView.RootComponents>
 		</blazor:BlazorWebView>
 	</Grid>

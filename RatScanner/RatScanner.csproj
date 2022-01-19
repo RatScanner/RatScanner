@@ -6,7 +6,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>Resources\RatLogoSmall.ico</ApplicationIcon>
     <StartupObject>RatScanner.App</StartupObject>
-    <Version>3.1.0</Version>
+    <Version>3.2.0</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
@@ -28,14 +28,14 @@
     <Resource Include="Resources\settings.png" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="6.0.101-preview.10.2068" />
-    <PackageReference Include="MudBlazor" Version="6.0.2" />
-    <PackageReference Include="RatEye" Version="1.4.7" />
-    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.256001">
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="6.0.101-preview.11.2349" />
+    <PackageReference Include="MudBlazor" Version="6.0.5" />
+    <PackageReference Include="RatEye" Version="2.0.2" />
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.261602">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.0" />
-    <PackageReference Include="RatStash" Version="1.4.1" />
+    <PackageReference Include="RatStash" Version="1.5.3" />
     <PackageReference Include="SingleInstanceCore" Version="2.2.1" />
   </ItemGroup>
   <ItemGroup>
@@ -64,5 +64,17 @@
   </ItemGroup>
 	<ItemGroup>
 		<None Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Remove="Data\**" />
+	  <Compile Remove="publish\**" />
+	  <Content Remove="Data\**" />
+	  <Content Remove="publish\**" />
+	  <EmbeddedResource Remove="Data\**" />
+	  <EmbeddedResource Remove="publish\**" />
+	  <None Remove="Data\**" />
+	  <None Remove="publish\**" />
+	  <Page Remove="Data\**" />
+	  <Page Remove="publish\**" />
 	</ItemGroup>
 </Project>

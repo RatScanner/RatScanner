@@ -4,6 +4,7 @@
 						 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 						 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 						 xmlns:viewmodel="clr-namespace:RatScanner.ViewModel"
+						 xmlns:view="clr-namespace:RatScanner.View"
 						 d:DataContext="{d:DesignInstance Type=viewmodel:MainWindowVM}"
 						 d:DesignHeight="300"
 						 d:DesignWidth="200"
@@ -75,7 +76,7 @@
 				<Label Grid.Column="0"
 							 Content="Avg. Day Price" />
 				<Label Grid.Column="1"
-							 Content="{Binding Avg24hPrice}"
+							 Content="{Binding Avg24hPrice, Converter={StaticResource IntToLongPriceConverter}}"
 							 d:Content="88.000 ₽" />
 
 				<Grid.ColumnDefinitions>
@@ -88,7 +89,7 @@
 				<Label Grid.Column="0"
 							 Content="Price per Slot" />
 				<Label Grid.Column="1"
-							 Content="{Binding PricePerSlot}"
+							 Content="{Binding PricePerSlot, Converter={StaticResource IntToLongPriceConverter}}"
 							 d:Content="11.000 ₽" />
 
 				<Grid.ColumnDefinitions>
@@ -105,7 +106,7 @@
 							 Content="{Binding TraderName}"
 							 d:Content="Mechanic" />
 				<Label Grid.Column="1"
-							 Content="{Binding BestTraderPrice}"
+							 Content="{Binding BestTraderPrice, Converter={StaticResource IntToLongPriceConverter}}"
 							 d:Content="53.516 ₽" />
 
 				<Grid.ColumnDefinitions>
@@ -132,7 +133,7 @@
 				<Label Grid.Column="0"
 							 Content="Max Buy Price" />
 				<Label Grid.Column="1"
-							 Content="{Binding MaxTraderPrice}"
+							 Content="{Binding MaxTraderPrice, Converter={StaticResource IntToLongPriceConverter}}"
 							 d:Content="56.942 ₽" />
 
 				<Grid.ColumnDefinitions>

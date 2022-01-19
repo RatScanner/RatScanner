@@ -59,6 +59,18 @@ namespace RatScanner
 			}
 		}
 
+		private static void Wrap(Action action)
+		{
+			try
+			{
+				action();
+			}
+			catch (Exception e)
+			{
+				Logger.LogError(e.Message, e);
+			}
+		}
+
 		private void OnNameScanHotkey(object sender, KeyUpEventArgs e)
 		{
 			Wrap(() => RatScannerMain.Instance.NameScan(UserActivityHelper.GetMousePosition()));
