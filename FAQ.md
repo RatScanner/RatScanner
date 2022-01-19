@@ -37,12 +37,7 @@
 # General
 
 ## Can I get banned for using Rat Scanner?
-After over a year of trying to get in contact with BSG, it finally worked out.
-So here it is, the long-awaited response, regarding the use of Rat Scanner:
-
-> "[They (BSG)] checked it [Rat Scanner] and found nothing suspicious. But stay fair and don't give them [BSG/BE] a reason" - Battlestate Games head of PR
-
-I know it's a rather brief response, when considering how long it took. Nevertheless, I hope lots of you who enjoy Rat Scanner can now continue to do so without the feeling of risking a ban.
+While Battlestate Games does not support nor is affiliated with this project, it exists since two years with over 1.000 players using it every day in their games. So far there has not been a single instance in which RatScanner was proven to have caused any ban.
 
 <br/>
 
