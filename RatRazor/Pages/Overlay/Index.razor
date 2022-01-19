@@ -29,9 +29,21 @@
                         <img src="@GetIconURL()" style="position: absolute; left: 0px; top: 0px; z-index: -1; background-color: #121212; outline-offset: -1px; outline: 1px solid #555555; @iconStyle">
                     </div>
                 </div>
-                <div class="stroke">
-                </div>
+
+                @if (RatScannerUI.Avg24hPrice >= RatScannerUI.BestTraderPrice)
+                {
+                    <div class="stroke">
                         @RatScannerUI.IntToShortPrice(RatScannerUI.Avg24hPrice)
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex align-center stroke">
+                        @RatScannerUI.IntToShortPrice(RatScannerUI.BestTraderPrice)
+                        <MudAvatar Image="@($"https://tarkovtracker.io/img/{@RatScannerUI.TraderName}Headshot.jpg")" Size="Size.Small" Style="float: right;" Class="ml-1" />
+                    </div>
+                }
+
                 @if (RatScannerUI.TrackingNeeds.QuestRemaining > 0)
                 {
                     <div class="d-flex align-center stroke">
@@ -49,20 +61,31 @@
     }
     else
     {
-        <div class="d-flex align-center" style="position:absolute;left:@(RatScannerUI.CurrentItemScan.GetToolTipPosition().X - VirtualScreenOffset.XOffset)px;top:@(RatScannerUI.CurrentItemScan.GetToolTipPosition().Y - VirtualScreenOffset.YOffset)px;background:#121212;padding:4px;">
-            <span class="stroke">
-                @RatScannerUI.IntToShortPrice(RatScannerUI.Avg24hPrice)
-            </span>
+	    <div class="d-flex align-enter" style="position: absolute; left: @(RatScannerUI.CurrentItemScan.GetToolTipPosition().X - VirtualScreenOffset.XOffset)px; top: @(RatScannerUI.CurrentItemScan.GetToolTipPosition().Y - VirtualScreenOffset.YOffset)px; background: #121212; padding: 4px;">
 
-            @if (RatScannerUI.TrackingNeeds.QuestRemaining > 0)
-            {
-                <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" />
-            }
-            @if (RatScannerUI.TrackingNeeds.HideoutRemaining > 0)
-            {
-                <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" />
-            }
-        </div>
+		    @if (RatScannerUI.Avg24hPrice >= RatScannerUI.BestTraderPrice)
+		    {
+			    <div class="stroke">
+				    @RatScannerUI.IntToShortPrice(RatScannerUI.Avg24hPrice)
+			    </div>
+		    }
+		    else
+		    {
+			    <div class="d-flex align-center">
+				    @RatScannerUI.IntToShortPrice(RatScannerUI.BestTraderPrice)
+				    <MudAvatar Image="@($"https://tarkovtracker.io/img/{@RatScannerUI.TraderName}Headshot.jpg")" Size="Size.Small" Style="float: right;" Class="ml-1"/>
+			    </div>
+		    }
+
+		    @if (RatScannerUI.TrackingNeeds.QuestRemaining > 0)
+		    {
+			    <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1"/>
+		    }
+		    @if (RatScannerUI.TrackingNeeds.HideoutRemaining > 0)
+		    {
+			    <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1"/>
+		    }
+	    </div>
     }
 }
 
