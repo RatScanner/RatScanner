@@ -20,7 +20,7 @@ namespace RatScanner.View
 	public partial class BlazorUI : UserControl, ISwitchable
 	{
 		public HotkeySelector IconScanHotkeySelector { get; set; }
-		public BlazorOverlay BlazorOverlay { get; set; }
+		public static BlazorOverlay BlazorOverlay { get; set; }
 
 		public BlazorUI()
 		{
@@ -48,7 +48,7 @@ namespace RatScanner.View
 
 			Resources.Add("services", serviceProvider);
 
-			BlazorOverlay = new BlazorOverlay(serviceProvider);
+			BlazorOverlay ??= new BlazorOverlay(serviceProvider);
 			BlazorOverlay.Show();
 
 			InitializeComponent();
@@ -77,9 +77,7 @@ namespace RatScanner.View
 			blazorWebView.WebView.CoreWebView2.Navigate("https://0.0.0.0/app");
 		}
 
-		private void UpdateElements()
-		{
-		}
+		private void UpdateElements() { }
 
 		private void HyperlinkRequestNavigate(object sender, RequestNavigateEventArgs e)
 		{
@@ -97,10 +95,7 @@ namespace RatScanner.View
 			throw new NotImplementedException();
 		}
 
-		protected override void OnPreviewKeyDown(KeyEventArgs e)
-		{
-			//Test
-		}
+		protected override void OnPreviewKeyDown(KeyEventArgs e) { }
 
 		private void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
 		{
@@ -109,15 +104,11 @@ namespace RatScanner.View
 				PageSwitcher.Instance.DragMove();
 				e.Handled = true;
 			}
-
 		}
 
 		public void OnOpen()
 		{
-			//DataContext = new MainWindowVM(RatScannerMain.Instance);
 			UpdateElements();
-			//
-			//blazorWebView.Foreground.Opacity = Math.Clamp(10, 1f / 510f, 1f);
 		}
 
 		public void OnClose() { }
