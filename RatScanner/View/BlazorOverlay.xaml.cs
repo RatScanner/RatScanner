@@ -30,13 +30,11 @@ namespace RatScanner.View
 
 		void WebView_Loaded(object sender, CoreWebView2NavigationCompletedEventArgs e)
 		{
-
 			// If we are running in a development/debugger mode, open dev tools to help out
 			if (Debugger.IsAttached)
 			{
 				blazorOverlayWebView.WebView.CoreWebView2.OpenDevToolsWindow();
 			}
-
 		}
 
 		void CoreWebView_Loaded(object sender, CoreWebView2InitializationCompletedEventArgs e)
