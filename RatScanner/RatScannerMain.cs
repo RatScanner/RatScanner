@@ -180,6 +180,7 @@ namespace RatScanner
 		{
 			RatEye.Config.LogDebug = RatConfig.LogDebug;
 			RatEye.Config.Path.LogFile = "RatEyeLog.txt";
+			RatEye.Config.Path.TesseractLibSearchPath = AppDomain.CurrentDomain.BaseDirectory;
 
 			RatEyeConfig = new RatEye.Config()
 			{
@@ -236,7 +237,7 @@ namespace RatScanner
 				// Scan the item
 				var inventory = RatEyeEngine.NewInventory(screenshot);
 				var icon = inventory.LocateIcon();
-				
+
 				if (icon?.DetectionConfidence <= 0 || icon?.Item == null) return;
 
 				var toolTipPosition = position;
