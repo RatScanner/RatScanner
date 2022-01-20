@@ -18,22 +18,14 @@
 - [Can I get banned for using Rat Scanner?](#can-i-get-banned-for-using-rat-scanner)
 
 ### Program issues
-- [Rat Scanner FAQ](#rat-scanner-faq)
-  - [Table of Contents](#table-of-contents)
-    - [General](#general)
-    - [Program issues](#program-issues)
-    - [Scanning issues](#scanning-issues)
-- [General](#general-1)
-  - [Can I get banned for using Rat Scanner?](#can-i-get-banned-for-using-rat-scanner)
-- [Program issues](#program-issues-1)
-  - [There is no RatScanner.exe file](#there-is-no-ratscannerexe-file)
-  - [Rat Scanner is not starting](#rat-scanner-is-not-starting)
-  - [Nothing happens when scanning](#nothing-happens-when-scanning)
-  - [Could not find icon cache folder at: ...](#could-not-find-icon-cache-folder-at-)
-  - [Could not find dynamic correlation data at: ...](#could-not-find-dynamic-correlation-data-at-)
-  - [The type initializer for 'OpenCvSharp.NativeMethods' threw an exception.](#the-type-initializer-for-opencvsharpnativemethods-threw-an-exception)
-- [Scanning issues](#scanning-issues-1)
-  - [Icon scanning gets a lot of wrong matches](#icon-scanning-gets-a-lot-of-wrong-matches)
+- [There is no RatScanner.exe file](#there-is-no-ratscannerexe-file)
+- [Rat Scanner is not starting](#rat-scanner-is-not-starting)
+- [Nothing happens when scanning](#nothing-happens-when-scanning)
+- [RatUpdater.exe could not be found! Please update manually.](#ratupdaterexe-could-not-be-found-please-update-manually)
+- [Unable to download updater, please update manually.](#unable-to-download-updater-please-update-manually)
+- [Could not find icon cache folder at: ...](#could-not-find-icon-cache-folder-at-)
+- [Could not find dynamic correlation data at: ...](#could-not-find-dynamic-correlation-data-at-)
+- [The type initializer for 'OpenCvSharp.NativeMethods' threw an exception.](#the-type-initializer-for-opencvsharpnativemethods-threw-an-exception)
 
 ### Scanning issues
 - [Icon scanning gets a lot of wrong matches](#icon-scanning-gets-a-lot-of-wrong-matches)
@@ -75,6 +67,12 @@ If you still can't run the application, you are probably missing the WebView2 Ru
 - Check that you set your resolution correctly inside the settings
 - Try to run RatScanner as administrator
 
+## RatUpdater.exe could not be found! Please update manually.
+Downloaded the latest version [here][ratscanner-latest].
+
+## Unable to download updater, please update manually.
+Downloaded the latest version [here][ratscanner-latest].
+
 ## Could not find icon cache folder at: ...
 Please have a look at [the question below](#could-not-find-dynamic-correlation-data-at-).
 
@@ -109,3 +107,4 @@ Also, when in the stash, the light bright in the top center of the screen interf
 [net-download]: https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-6.0.100-windows-x64-installer
 [download-section]: https://github.com/Blightbuster/RatScanner#download
 [windows-media-pack]: https://www.microsoft.com/en-us/software-download/mediafeaturepack
+[ratscanner-latest]: https://github.com/RatScanner/RatScanner/releases/latest/download/RatScanner.zip
