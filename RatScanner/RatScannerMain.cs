@@ -146,7 +146,22 @@ namespace RatScanner
 
 		private void UpdateRatScanner()
 		{
-			if (!File.Exists(RatConfig.Paths.Updater)) Logger.LogError(RatConfig.Paths.Updater + " could not be found! Please update manually.");
+			if (!File.Exists(RatConfig.Paths.Updater))
+			{
+				Logger.LogWarning(RatConfig.Paths.Updater + " could not be found!");
+				try
+				{
+					var updaterLink = ApiManager.GetResource(ApiManager.ResourceType.UpdaterLink);
+					ApiManager.DownloadFile(updaterLink, RatConfig.Paths.Updater);
+					throw new AbandonedMutexException();
+				}
+				catch (Exception e)
+				{
+					Logger.LogError("Unable to download updater, please update manually.", e);
+					return;
+				}
+			}
+
 			var startInfo = new ProcessStartInfo(RatConfig.Paths.Updater);
 			startInfo.UseShellExecute = true;
 			startInfo.ArgumentList.Add("--start");
