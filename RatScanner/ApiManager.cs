@@ -21,6 +21,7 @@ namespace RatScanner
 			FAQLink,
 			ItemDataBundleLink,
 			ItemDataBundleVersion,
+			UpdaterLink,
 		}
 
 		private static readonly Dictionary<ResourceType, string> ResCache = new Dictionary<ResourceType, string>();
@@ -118,6 +119,7 @@ namespace RatScanner
 				ResourceType.FAQLink => "RSFAQLink",
 				ResourceType.ItemDataBundleLink => "RSItemDataBundleLink",
 				ResourceType.ItemDataBundleVersion => "RSItemDataBundleVersion",
+				ResourceType.UpdaterLink => "RSUpdaterLink",
 				_ => throw new NotImplementedException(),
 			};
 		}
