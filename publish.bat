@@ -1,20 +1,12 @@
 @echo off
 
-if "%~1"=="--self-contained" (
-	echo Publishing as self contained
-	set selfContained="true"
-) else (
-	echo Publishing framework dependet
-	set selfContained="false"
-)
-
 :: Remove old publish folder
 echo Removing old publish folder...
 rmdir /s /q publish
 
 :: Publish
 echo Publishing RatScanner project...
-dotnet publish RatScanner/RatScanner.csproj -c Release -o publish --runtime win-x64 --self-contained %selfContained%
+dotnet publish RatScanner/RatScanner.csproj -c Release -o publish --runtime win-x64 -p:PublishSingleFile=true --self-contained true
 
 :: Download Updater
 echo Adding latest updater build...
