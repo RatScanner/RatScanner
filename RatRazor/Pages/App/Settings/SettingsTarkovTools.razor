@@ -1,0 +1,44 @@
+﻿@page "/app/settings/tarkovTools"
+@inject RatRazor.Interfaces.ISettingsUI SettingsUI
+@implements IDisposable
+<div>
+	<MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
+		<MudItem xs="12">
+			<div class="d-flex align-center justify-center mx-2 mb-1">
+				<MudText Typo="Typo.subtitle1" Color="Color.Inherit">Tarkov Tools Settings</MudText>
+			</div>
+		</MudItem>
+		<MudItem xs="12">
+			<MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
+				<MudGrid Spacing="1">
+					<MudItem xs="12">
+						<div class="d-flex justify-center">
+							Remote Control
+						</div>
+					</MudItem>
+					<MudItem xs="12">
+						<MudTextField @bind-Value="SettingsUI.TarkovToolsRemoteControlSessionId" Label="Session ID" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Clear" OnAdornmentClick="ClearSessionId"></MudTextField>
+					</MudItem>
+					<MudItem xs="12">
+						<MudCheckBox @bind-Checked="SettingsUI.TarkovToolsRemoteControlAutoSync" Label="Auto Sync" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+					</MudItem>
+				</MudGrid>
+			</MudPaper>
+		</MudItem>
+	</MudGrid>
+</div>
+@code {
+	protected override void OnInitialized()
+	{
+		SettingsUI.PropertyChanged += PropertyChangeHandler;
+	}
+
+	public void Dispose() => SettingsUI.PropertyChanged -= PropertyChangeHandler;
+
+	private async void PropertyChangeHandler(object sender, EventArgs e)
+	{
+		await InvokeAsync(() => StateHasChanged());
+	}
+
+	private void ClearSessionId() => SettingsUI.TarkovToolsRemoteControlSessionId = string.Empty;
+}

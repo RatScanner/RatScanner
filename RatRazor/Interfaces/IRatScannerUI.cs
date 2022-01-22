@@ -7,6 +7,7 @@ namespace RatRazor.Interfaces;
 public interface IRatScannerUI : INotifyPropertyChanged
 {
 	// Item Metadata
+	public string ItemId { get; }
 	public string Name { get; }
 	public string ShortName { get; }
 	public string ImageLink { get; }

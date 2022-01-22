@@ -96,6 +96,17 @@ internal static class RatConfig
 		}
 	}
 
+	internal static class TarkovTools
+	{
+		internal static class RemoteControl
+		{
+			internal static bool Enable => !string.IsNullOrEmpty(SessionId);
+
+			internal static string SessionId = string.Empty;
+			internal static bool AutoSync = false;
+		}
+	}
+
 	// Other
 #if DEBUG
 	internal static bool LogDebug
@@ -184,6 +195,10 @@ internal static class RatConfig
 		Tracking.TarkovTracker.Token = config.ReadString(nameof(Tracking.TarkovTracker.Token), "");
 		Tracking.TarkovTracker.ShowTeam = config.ReadBool(nameof(Tracking.TarkovTracker.ShowTeam), true);
 
+		config.Section = nameof(TarkovTools.RemoteControl);
+		TarkovTools.RemoteControl.SessionId = config.ReadString(nameof(TarkovTools.RemoteControl.SessionId));
+		TarkovTools.RemoteControl.AutoSync = config.ReadBool(nameof(TarkovTools.RemoteControl.AutoSync));
+
 		config.Section = "Other";
 		if (!SetScreen)
 		{
@@ -233,6 +248,10 @@ internal static class RatConfig
 		config.Section = nameof(Tracking.TarkovTracker);
 		config.WriteString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);
 		config.WriteBool(nameof(Tracking.TarkovTracker.ShowTeam), Tracking.TarkovTracker.ShowTeam);
+
+		config.Section = nameof(TarkovTools.RemoteControl);
+		config.WriteString(nameof(TarkovTools.RemoteControl.SessionId), TarkovTools.RemoteControl.SessionId);
+		config.WriteBool(nameof(TarkovTools.RemoteControl.AutoSync), TarkovTools.RemoteControl.AutoSync);
 
 		config.Section = "Other";
 		config.WriteInt(nameof(ScreenWidth), ScreenWidth);

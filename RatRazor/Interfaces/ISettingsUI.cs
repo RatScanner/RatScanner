@@ -39,7 +39,11 @@ public interface ISettingsUI : INotifyPropertyChanged
 
 	public bool ShowTarkovTrackerTeam { get; set; }
 
-	public void SaveSettings();
+	// Tarkov Tools settings
+	public string TarkovToolsRemoteControlSessionId { get; set; }
+	public bool TarkovToolsRemoteControlAutoSync { get; set; }
+
+	public Task SaveSettingsAsync();
 
 	public void LoadSettings();
 }

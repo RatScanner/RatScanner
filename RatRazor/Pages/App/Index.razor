@@ -3,6 +3,8 @@
 @using RatTracking.FetchModels
 @using System.Diagnostics
 @inject Interfaces.IRatScannerUI RatScannerUI
+@inject RatRazor.Interfaces.ISettingsUI SettingUI
+@inject RatTracking.TarkovTools.ITarkovToolsRemoteController TarkovToolsRemoteController
 @inject RatTracking.TarkovTrackerDB TarkovTrackerDB
 @inject IJSRuntime JSRuntime;
 @implements IDisposable
@@ -98,7 +100,14 @@
 
 	private async void OpenTarkovTools()
 	{
-		OpenURL(RatScannerUI.ToolsLink);
+		if(string.IsNullOrEmpty(SettingUI.TarkovToolsRemoteControlSessionId))
+		{
+			OpenURL(RatScannerUI.ToolsLink);
+		}
+		else
+		{
+			TarkovToolsRemoteController.OpenItem(RatScannerUI.ItemId);
+		}
 	}
 
 	private void OpenURL(string url)
