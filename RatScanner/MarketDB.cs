@@ -2,30 +2,29 @@
 using System;
 using System.Linq;
 
-namespace RatScanner
+namespace RatScanner;
+
+public class MarketDB
 {
-	public class MarketDB
+	private MarketItem[] _items;
+
+	public void Init()
 	{
-		private MarketItem[] _items;
+		_items = ApiManager.GetMarketDB();
+	}
 
-		public void Init()
+	public MarketItem GetItemById(string uid)
+	{
+		if (uid?.Length > 0)
 		{
-			_items = ApiManager.GetMarketDB();
+			var item = _items.FirstOrDefault(i => i.Id == uid);
+			if (item != null) return item.DeepClone();
+
+			Logger.LogWarning("Could not find item with uid: " + uid);
+			return null;
 		}
 
-		public MarketItem GetItemById(string uid)
-		{
-			if (uid?.Length > 0)
-			{
-				var item = _items.FirstOrDefault(i => i.Id == uid);
-				if (item != null) return item.DeepClone();
-
-				Logger.LogWarning("Could not find item with uid: " + uid);
-				return null;
-			}
-
-			Logger.LogWarning("Trying to get item without supplying uid");
-			throw new ArgumentException();
-		}
+		Logger.LogWarning("Trying to get item without supplying uid");
+		throw new ArgumentException();
 	}
 }

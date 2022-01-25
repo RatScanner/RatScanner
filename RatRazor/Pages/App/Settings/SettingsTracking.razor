@@ -1,75 +1,81 @@
 ﻿@page "/app/settings/tracking"
-@inject RatRazor.Interfaces.ISettingsUI SettingsUI
+@inject Interfaces.ISettingsUI SettingsUI
 @inject RatTracking.TarkovTrackerDB TarkovTrackerDB
 @inject IJSRuntime JSRuntime;
 @implements IDisposable
 <div>
-    <MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
-        <MudItem xs="12">
-            <div class="d-flex align-center justify-center mx-2 mb-1">
-                <MudText Typo="Typo.subtitle1" Color="Color.Inherit">Tracking Settings</MudText>
-            </div>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudCheckBox @bind-Checked="SettingsUI.ShowNonFIRNeeds" Label="Show Non-FIR Needs" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudGrid Spacing="1">
-                    <MudItem xs="12">
-                        <div class="d-flex justify-center">
-                            TarkovTracker
-                        </div>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudTextField @bind-Value="SettingsUI.TarkovTrackerToken" Validation="@(new Func<string, IEnumerable<string>>(CheckToken))" Label="API Token" InputType="@PasswordInput" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TokenShowClick"></MudTextField>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudCheckBox @bind-Checked="SettingsUI.ShowTarkovTrackerTeam" Label="Show Teammates" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    </MudItem>
-                </MudGrid>
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
+	<MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
+		<MudItem xs="12">
+			<div class="d-flex align-center justify-center mx-2 mb-1">
+				<MudText Typo="Typo.subtitle1" Color="Color.Inherit">Tracking Settings</MudText>
+			</div>
+		</MudItem>
+		<MudItem xs="12">
+			<MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
+				<MudCheckBox @bind-Checked="SettingsUI.ShowNonFIRNeeds" Label="Show Non-FIR Needs" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+			</MudPaper>
+		</MudItem>
+		<MudItem xs="12">
+			<MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
+				<MudGrid Spacing="1">
+					<MudItem xs="12">
+						<div class="d-flex justify-center">
+							TarkovTracker
+						</div>
+					</MudItem>
+					<MudItem xs="12">
+						<MudTextField @bind-Value="SettingsUI.TarkovTrackerToken" Validation="@(new Func<string, IEnumerable<string>>(CheckToken))" Label="API Token" InputType="@PasswordInput" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TokenShowClick"></MudTextField>
+					</MudItem>
+					<MudItem xs="12">
+						<MudCheckBox @bind-Checked="SettingsUI.ShowTarkovTrackerTeam" Label="Show Teammates" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+					</MudItem>
+				</MudGrid>
+			</MudPaper>
+		</MudItem>
+	</MudGrid>
 </div>
+
 @code {
 
-    protected override void OnInitialized()
-    {
-        SettingsUI.PropertyChanged += PropertyChangeHandler;
-    }
+	protected override void OnInitialized()
+	{
+		SettingsUI.PropertyChanged += PropertyChangeHandler;
+	}
 
-    private async void PropertyChangeHandler(object sender, EventArgs e)
-    {
-        await InvokeAsync(() => StateHasChanged());
-    }
+	private async void PropertyChangeHandler(object sender, EventArgs e)
+	{
+		await InvokeAsync(() => StateHasChanged());
+	}
 
-    public void Dispose() => SettingsUI.PropertyChanged -= PropertyChangeHandler;
+	public void Dispose()
+	{
+		SettingsUI.PropertyChanged -= PropertyChangeHandler;
+	}
 
-    bool isShow;
-    InputType PasswordInput = InputType.Password;
-    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+	bool isShow;
+	InputType PasswordInput = InputType.Password;
+	string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
 
-    private IEnumerable<string> CheckToken(string token)
-    {
-        if (!string.IsNullOrEmpty(token) && !TarkovTrackerDB.TestToken(token))
-            yield return "Invalid token";
-    }
+	private IEnumerable<string> CheckToken(string token)
+	{
+		if (!string.IsNullOrEmpty(token) && !TarkovTrackerDB.TestToken(token))
+			yield return "Invalid token";
+	}
 
-    void TokenShowClick()
-    {
-        @if (isShow)
-        {
-            isShow = false;
-            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
-            PasswordInput = InputType.Password;
-        }
-        else {
-            isShow = true;
-            PasswordInputIcon = Icons.Material.Filled.Visibility;
-            PasswordInput = InputType.Text;
-        }
-    }
+	void TokenShowClick()
+	{
+	@if (isShow)
+	{
+		isShow = false;
+		PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+		PasswordInput = InputType.Password;
+	}
+	else
+	{
+		isShow = true;
+		PasswordInputIcon = Icons.Material.Filled.Visibility;
+		PasswordInput = InputType.Text;
+	}
+	}
+
 }

@@ -5,168 +5,139 @@ using RatTracking.FetchModels.TarkovTracker;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RatScanner
+namespace RatScanner;
+
+public static class ItemExtensions
 {
-	public static class ItemExtensions
+	// This is probably redundant, or can be simplified down based upon what the
+	// output of this information ends up being
+	public static bool IsProgressionItem(this Item item)
 	{
-		// This is probably redundant, or can be simplified down based upon what the
-		// output of this information ends up being
-		public static bool IsProgressionItem(this Item item)
+		return RatScannerMain.Instance.ProgressDB.IsProgressionItem(item.Id);
+	}
+
+	public static bool IsQuestItem(this Item item)
+	{
+		return RatScannerMain.Instance.ProgressDB.IsQuestItem(item.Id);
+	}
+
+	public static bool IsHideoutItem(this Item item)
+	{
+		return RatScannerMain.Instance.ProgressDB.IsHideoutItem(item.Id);
+	}
+
+	public static List<QuestItem> GetQuestRequired(this Item item)
+	{
+		return RatScannerMain.Instance.ProgressDB.GetQuestRequiredById(item.Id);
+	}
+
+	public static List<HideoutItem> GetHideoutRequired(this Item item)
+	{
+		return RatScannerMain.Instance.ProgressDB.GetHideoutRequiredById(item.Id);
+	}
+
+	public static NeededItem GetTrackingNeeds(this Item item)
+	{
+		var requiredQuest = item.GetQuestRequired();
+		var requiredHideout = item.GetHideoutRequired();
+
+		var neededItem = new NeededItem(item.Id);
+
+		Progress progress = null;
+		if (RatConfig.Tracking.TarkovTracker.Enable && RatScannerMain.Instance.TarkovTrackerDB.Progress.Count >= 1)
 		{
-			return RatScannerMain.Instance.ProgressDB.IsProgressionItem(item.Id);
+			var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
+			progress = teamProgress.First(x => x.Self ?? false);
 		}
 
-		public static bool IsQuestItem(this Item item)
-		{
-			return RatScannerMain.Instance.ProgressDB.IsQuestItem(item.Id);
-		}
+		// Set this item as for ourselves if this was our token
+		neededItem.Self = true;
 
-		public static bool IsHideoutItem(this Item item)
-		{
-			return RatScannerMain.Instance.ProgressDB.IsHideoutItem(item.Id);
-		}
+		var (questNeeded, questHave, fir) = GetQuestRequired(requiredQuest, progress);
+		neededItem.QuestNeeded += questNeeded;
+		neededItem.QuestHave += questHave;
+		neededItem.FIR = fir;
 
-		public static List<QuestItem> GetQuestRequired(this Item item)
-		{
-			return RatScannerMain.Instance.ProgressDB.GetQuestRequiredById(item.Id);
-		}
+		var (hideoutNeeded, hideoutHave) = GetHideoutRequired(requiredHideout, progress);
+		neededItem.HideoutNeeded += hideoutNeeded;
+		neededItem.HideoutHave += hideoutHave;
+		return neededItem;
+	}
 
-		public static List<HideoutItem> GetHideoutRequired(this Item item)
-		{
-			return RatScannerMain.Instance.ProgressDB.GetHideoutRequiredById(item.Id);
-		}
+	public static List<KeyValuePair<string, NeededItem>> GetTrackingTeamNeeds(this Item item)
+	{
+		if (!RatConfig.Tracking.TarkovTracker.Enable) return null;
 
-		public static NeededItem GetTrackingNeeds(this Item item)
-		{
-			var requiredQuest = item.GetQuestRequired();
-			var requiredHideout = item.GetHideoutRequired();
+		var requiredQuest = item.GetQuestRequired();
+		var requiredHideout = item.GetHideoutRequired();
 
+		var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
+
+		var trackedNeeds = new Dictionary<string, NeededItem>();
+
+		foreach (var memberProgress in teamProgress)
+		{
 			var neededItem = new NeededItem(item.Id);
-
-			Progress progress = null;
-			if (RatConfig.Tracking.TarkovTracker.Enable && RatScannerMain.Instance.TarkovTrackerDB.Progress.Count >= 1)
-			{
-				var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
-				progress = teamProgress.First(x => x.Self ?? false);
-			}
-
-			// Set this item as for ourselves if this was our token
-			neededItem.Self = true;
-
-			var (questNeeded, questHave, fir) = GetQuestRequired(requiredQuest, progress);
+			var (questNeeded, questHave, fir) = GetQuestRequired(requiredQuest, memberProgress);
 			neededItem.QuestNeeded += questNeeded;
 			neededItem.QuestHave += questHave;
 			neededItem.FIR = fir;
 
-			var (hideoutNeeded, hideoutHave) = GetHideoutRequired(requiredHideout, progress);
+			var (hideoutNeeded, hideoutHave) = GetHideoutRequired(requiredHideout, memberProgress);
 			neededItem.HideoutNeeded += hideoutNeeded;
 			neededItem.HideoutHave += hideoutHave;
-			return neededItem;
+
+			var name = memberProgress.DisplayName ?? "Unknown";
+			for (var i = 2; i < 99; i++)
+			{
+				if (!trackedNeeds.ContainsKey(name)) break;
+				name = $"{memberProgress.DisplayName} #{i}";
+			}
+
+			trackedNeeds.Add(name, neededItem);
 		}
 
-		public static List<KeyValuePair<string, NeededItem>> GetTrackingTeamNeeds(this Item item)
+		return trackedNeeds.OrderBy(x => -x.Value.Remaining).ToList();
+	}
+
+	public static NeededItem GetSummedTrackingTeamNeeds(this Item item)
+	{
+		var result = new NeededItem(item.Id);
+		var teamData = item.GetTrackingTeamNeeds();
+		if (teamData == null)
 		{
-			if (!RatConfig.Tracking.TarkovTracker.Enable) return null;
-
-			var requiredQuest = item.GetQuestRequired();
-			var requiredHideout = item.GetHideoutRequired();
-
-			var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
-
-			var trackedNeeds = new Dictionary<string, NeededItem>();
-
-			foreach (var memberProgress in teamProgress)
-			{
-				var neededItem = new NeededItem(item.Id);
-				var (questNeeded, questHave, fir) = GetQuestRequired(requiredQuest, memberProgress);
-				neededItem.QuestNeeded += questNeeded;
-				neededItem.QuestHave += questHave;
-				neededItem.FIR = fir;
-
-				var (hideoutNeeded, hideoutHave) = GetHideoutRequired(requiredHideout, memberProgress);
-				neededItem.HideoutNeeded += hideoutNeeded;
-				neededItem.HideoutHave += hideoutHave;
-
-				var name = memberProgress.DisplayName ?? "Unknown";
-				for (var i = 2; i < 99; i++)
-				{
-					if (!trackedNeeds.ContainsKey(name)) break;
-					name = $"{memberProgress.DisplayName} #{i}";
-				}
-
-				trackedNeeds.Add(name, neededItem);
-			}
-
-			return trackedNeeds.OrderBy(x => -x.Value.Remaining).ToList();
-		}
-
-		public static NeededItem GetSummedTrackingTeamNeeds(this Item item)
-		{
-			var result = new NeededItem(item.Id);
-			var teamData = item.GetTrackingTeamNeeds();
-			if (teamData == null)
-			{
-				result.HideoutNeeded = 0;
-				result.QuestNeeded = 0;
-				result.HideoutHave = 0;
-				result.QuestHave = 0;
-				return result;
-			}
-			foreach (var (_, value) in teamData)
-			{
-				result.HideoutNeeded += value.HideoutNeeded;
-				result.QuestNeeded += value.QuestNeeded;
-				result.HideoutHave += value.HideoutHave;
-				result.QuestHave += value.QuestHave;
-			}
+			result.HideoutNeeded = 0;
+			result.QuestNeeded = 0;
+			result.HideoutHave = 0;
+			result.QuestHave = 0;
 			return result;
 		}
 
-		private static (int need, int have, bool FIR) GetQuestRequired(IEnumerable<QuestItem> requiredQuestItems, Progress progress)
+		foreach (var (_, value) in teamData)
 		{
-			var need = 0;
-			var have = 0;
-			var fir = false;
-
-			// Add up all the quest requirements
-			foreach (var requirement in requiredQuestItems)
-				// Add the item if its FIR or we want to show non FIR
-				if (requirement.FIR || RatConfig.Tracking.ShowNonFIRNeeds)
-				{
-					// Update FIR flag to true if any quest is FIR
-					if (requirement.FIR) fir = true;
-
-					if (progress == null)
-					{
-						need += requirement.Needed;
-						continue;
-					}
-
-					// If the progress data doesn't have this requirement, then it should be a needed item
-					if (!progress.QuestObjectives.ContainsKey(requirement.QuestObjectiveId.ToString()))
-					{
-						need += requirement.Needed;
-					}
-					// Else if we have the requirement in our progress data but its not complete, it might have metadata
-					else if (progress.QuestObjectives[requirement.QuestObjectiveId.ToString()].Complete != true)
-					{
-						// Check if we have completed this quest need
-						need += requirement.Needed;
-						have += progress.QuestObjectives[requirement.QuestObjectiveId.ToString()].Have ?? 0;
-					}
-				}
-
-			return (need, have, fir);
+			result.HideoutNeeded += value.HideoutNeeded;
+			result.QuestNeeded += value.QuestNeeded;
+			result.HideoutHave += value.HideoutHave;
+			result.QuestHave += value.QuestHave;
 		}
 
-		private static (int need, int have) GetHideoutRequired(IEnumerable<HideoutItem> requiredHideoutItems, Progress progress)
-		{
-			var need = 0;
-			var have = 0;
+		return result;
+	}
 
-			// Add up all the hideout requirements
-			foreach (var requirement in requiredHideoutItems)
+	private static (int need, int have, bool FIR) GetQuestRequired(IEnumerable<QuestItem> requiredQuestItems, Progress progress)
+	{
+		var need = 0;
+		var have = 0;
+		var fir = false;
+
+		// Add up all the quest requirements
+		foreach (var requirement in requiredQuestItems)
+			// Add the item if its FIR or we want to show non FIR
+			if (requirement.FIR || RatConfig.Tracking.ShowNonFIRNeeds)
 			{
+				// Update FIR flag to true if any quest is FIR
+				if (requirement.FIR) fir = true;
+
 				if (progress == null)
 				{
 					need += requirement.Needed;
@@ -174,63 +145,93 @@ namespace RatScanner
 				}
 
 				// If the progress data doesn't have this requirement, then it should be a needed item
-				if (!progress.HideoutObjectives.ContainsKey(requirement.HideoutObjectiveId.ToString()))
+				if (!progress.QuestObjectives.ContainsKey(requirement.QuestObjectiveId.ToString()))
 				{
 					need += requirement.Needed;
 				}
 				// Else if we have the requirement in our progress data but its not complete, it might have metadata
-				else if (progress.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Complete != true)
+				else if (progress.QuestObjectives[requirement.QuestObjectiveId.ToString()].Complete != true)
 				{
-					// Check if we have completed this hideout need
+					// Check if we have completed this quest need
 					need += requirement.Needed;
-					have += progress.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Have ?? 0;
+					have += progress.QuestObjectives[requirement.QuestObjectiveId.ToString()].Have ?? 0;
 				}
 			}
 
-			return (need, have);
-		}
+		return (need, have, fir);
+	}
 
-		public static MarketItem GetMarketItem(this Item item)
+	private static (int need, int have) GetHideoutRequired(IEnumerable<HideoutItem> requiredHideoutItems, Progress progress)
+	{
+		var need = 0;
+		var have = 0;
+
+		// Add up all the hideout requirements
+		foreach (var requirement in requiredHideoutItems)
 		{
-			var marketItem = RatScannerMain.Instance.MarketDB.GetItemById(item.Id);
-			return marketItem ?? new MarketItem(item.Id);
-		}
-
-		public static int GetAvg24hMarketPrice(this Item item)
-		{
-			var total = item.GetMarketItem().Avg24hPrice;
-			if (item is CompoundItem itemC) total += itemC.Slots.Sum(slot => slot.ContainedItem?.GetAvg24hMarketPrice() ?? 0);
-			return total;
-		}
-
-		public static int GetMaxTraderPrice(this Item item)
-		{
-			var traderPrices = item.GetMarketItem().TraderPrices;
-			var total = traderPrices.Length > 0 ? traderPrices.Max(trader => trader.Price) : 0;
-			if (item is CompoundItem itemC) total += itemC.Slots.Sum(slot => slot.ContainedItem?.GetMaxTraderPrice() ?? 0);
-			return total;
-		}
-
-		private static int GetTraderPrice(this Item item, string traderId)
-		{
-			var traderPrices = item.GetMarketItem().TraderPrices;
-			var total = traderPrices?.FirstOrDefault(price => price.TraderId == traderId)?.Price ?? 0;
-
-			if (item is CompoundItem itemC) total += itemC.Slots.Sum(slot => slot.ContainedItem?.GetTraderPrice(traderId) ?? 0);
-
-			return total;
-		}
-
-		public static (string traderId, int price) GetBestTrader(this Item item)
-		{
-			(string traderId, int price) result = ("", 0);
-			foreach (var traderId in TraderPrice.TraderIds)
+			if (progress == null)
 			{
-				var traderPrice = item.GetTraderPrice(traderId);
-				if (traderPrice > result.price) result = (traderId, traderPrice);
+				need += requirement.Needed;
+				continue;
 			}
 
-			return result;
+			// If the progress data doesn't have this requirement, then it should be a needed item
+			if (!progress.HideoutObjectives.ContainsKey(requirement.HideoutObjectiveId.ToString()))
+			{
+				need += requirement.Needed;
+			}
+			// Else if we have the requirement in our progress data but its not complete, it might have metadata
+			else if (progress.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Complete != true)
+			{
+				// Check if we have completed this hideout need
+				need += requirement.Needed;
+				have += progress.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Have ?? 0;
+			}
 		}
+
+		return (need, have);
+	}
+
+	public static MarketItem GetMarketItem(this Item item)
+	{
+		var marketItem = RatScannerMain.Instance.MarketDB.GetItemById(item.Id);
+		return marketItem ?? new MarketItem(item.Id);
+	}
+
+	public static int GetAvg24hMarketPrice(this Item item)
+	{
+		var total = item.GetMarketItem().Avg24hPrice;
+		if (item is CompoundItem itemC) total += itemC.Slots.Sum(slot => slot.ContainedItem?.GetAvg24hMarketPrice() ?? 0);
+		return total;
+	}
+
+	public static int GetMaxTraderPrice(this Item item)
+	{
+		var traderPrices = item.GetMarketItem().TraderPrices;
+		var total = traderPrices.Length > 0 ? traderPrices.Max(trader => trader.Price) : 0;
+		if (item is CompoundItem itemC) total += itemC.Slots.Sum(slot => slot.ContainedItem?.GetMaxTraderPrice() ?? 0);
+		return total;
+	}
+
+	private static int GetTraderPrice(this Item item, string traderId)
+	{
+		var traderPrices = item.GetMarketItem().TraderPrices;
+		var total = traderPrices?.FirstOrDefault(price => price.TraderId == traderId)?.Price ?? 0;
+
+		if (item is CompoundItem itemC) total += itemC.Slots.Sum(slot => slot.ContainedItem?.GetTraderPrice(traderId) ?? 0);
+
+		return total;
+	}
+
+	public static (string traderId, int price) GetBestTrader(this Item item)
+	{
+		(string traderId, int price) result = ("", 0);
+		foreach (var traderId in TraderPrice.TraderIds)
+		{
+			var traderPrice = item.GetTraderPrice(traderId);
+			if (traderPrice > result.price) result = (traderId, traderPrice);
+		}
+
+		return result;
 	}
 }

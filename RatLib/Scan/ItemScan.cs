@@ -1,19 +1,17 @@
-﻿using System.Net;
-using RatStash;
+﻿using RatStash;
 using RatEye;
 
-namespace RatLib.Scan
+namespace RatLib.Scan;
+
+public abstract class ItemScan
 {
-	public abstract class ItemScan
-	{
-		public Item MatchedItem;
+	public Item MatchedItem;
 
-		public float Confidence;
+	public float Confidence;
 
-		public string IconPath;
+	public string IconPath;
 
-		public long? DissapearAt;
+	public long? DissapearAt;
 
-		public abstract Vector2 GetToolTipPosition();
-	}
+	public abstract Vector2 GetToolTipPosition();
 }

@@ -1,62 +1,67 @@
 ﻿@page "/app/settings/general"
 @layout SettingsLayout
-@inject RatRazor.Interfaces.ISettingsUI SettingsUI
+@inject Interfaces.ISettingsUI SettingsUI
 @inject IJSRuntime JSRuntime;
 @implements IDisposable
 <div>
-    <MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
-        <MudItem xs="12">
-            <div class="d-flex align-center justify-center mx-2 mb-1">
-                <MudText Typo="Typo.subtitle1" Color="Color.Inherit">General Settings</MudText>
-            </div>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudSlider @bind-Value="SettingsUI.ToolTipMilli" Min="0" Max="10000" Step="100" Color="Color.Info">
-                    <MudText Typo="Typo.subtitle2">Tooltip Duration: @SettingsUI.ToolTipMilli.ToString()</MudText>
-                </MudSlider>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudGrid Spacing="1">
-                    <MudItem xs="6">
-                        <MudTextField @bind-Value="SettingsUI.ScreenWidth" Label="Game Width" Variant="Variant.Outlined" Margin="Margin.Dense"></MudTextField>
-                    </MudItem>
-                    <MudItem xs="6">
-                        <MudTextField @bind-Value="SettingsUI.ScreenHeight" Label="Game Height" Variant="Variant.Outlined" Margin="Margin.Dense"></MudTextField>
-                    </MudItem>
-                </MudGrid>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudGrid Spacing="0" Class="pa-0 ma-0">
-                    <MudItem xs="12" Class="pa-0 ma-0">
-                        <MudCheckBox @bind-Checked="@SettingsUI.MinimizeToTray" Label="Minimize to tray" Size="Size.Small" Class="pa-0 ma-0" Style="font-size:8px !important;"></MudCheckBox>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudCheckBox @bind-Checked="@SettingsUI.AlwaysOnTop" Label="Always on top" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudCheckBox @bind-Checked="@SettingsUI.LogDebug" Label="Log debug info" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    </MudItem>
-                </MudGrid>
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
+	<MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
+		<MudItem xs="12">
+			<div class="d-flex align-center justify-center mx-2 mb-1">
+				<MudText Typo="Typo.subtitle1" Color="Color.Inherit">General Settings</MudText>
+			</div>
+		</MudItem>
+		<MudItem xs="12">
+			<MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
+				<MudSlider @bind-Value="SettingsUI.ToolTipMilli" Min="0" Max="10000" Step="100" Color="Color.Info">
+					<MudText Typo="Typo.subtitle2">Tooltip Duration: @SettingsUI.ToolTipMilli.ToString()</MudText>
+				</MudSlider>
+			</MudPaper>
+		</MudItem>
+		<MudItem xs="12">
+			<MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
+				<MudGrid Spacing="1">
+					<MudItem xs="6">
+						<MudTextField @bind-Value="SettingsUI.ScreenWidth" Label="Game Width" Variant="Variant.Outlined" Margin="Margin.Dense"></MudTextField>
+					</MudItem>
+					<MudItem xs="6">
+						<MudTextField @bind-Value="SettingsUI.ScreenHeight" Label="Game Height" Variant="Variant.Outlined" Margin="Margin.Dense"></MudTextField>
+					</MudItem>
+				</MudGrid>
+			</MudPaper>
+		</MudItem>
+		<MudItem xs="12">
+			<MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
+				<MudGrid Spacing="0" Class="pa-0 ma-0">
+					<MudItem xs="12" Class="pa-0 ma-0">
+						<MudCheckBox @bind-Checked="@SettingsUI.MinimizeToTray" Label="Minimize to tray" Size="Size.Small" Class="pa-0 ma-0" Style="font-size: 8px !important;"></MudCheckBox>
+					</MudItem>
+					<MudItem xs="12">
+						<MudCheckBox @bind-Checked="@SettingsUI.AlwaysOnTop" Label="Always on top" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+					</MudItem>
+					<MudItem xs="12">
+						<MudCheckBox @bind-Checked="@SettingsUI.LogDebug" Label="Log debug info" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+					</MudItem>
+				</MudGrid>
+			</MudPaper>
+		</MudItem>
+	</MudGrid>
 </div>
+
 @code {
 
-    protected override void OnInitialized()
-    {
-        SettingsUI.PropertyChanged += PropertyChangeHandler;
-    }
+	protected override void OnInitialized()
+	{
+		SettingsUI.PropertyChanged += PropertyChangeHandler;
+	}
 
-    private async void PropertyChangeHandler(object sender, EventArgs e)
-    {
-        await InvokeAsync(() => StateHasChanged());
-    }
+	private async void PropertyChangeHandler(object sender, EventArgs e)
+	{
+		await InvokeAsync(() => StateHasChanged());
+	}
 
-    public void Dispose() => SettingsUI.PropertyChanged -= PropertyChangeHandler;
+	public void Dispose()
+	{
+		SettingsUI.PropertyChanged -= PropertyChangeHandler;
+	}
+
 }

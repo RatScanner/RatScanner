@@ -1,158 +1,162 @@
 ﻿@page "/app/settings/scanning"
-@inject RatRazor.Interfaces.ISettingsUI SettingsUI
-@inject RatRazor.Interfaces.IHotkeySelector HotkeySelector
+@inject Interfaces.ISettingsUI SettingsUI
+@inject Interfaces.IHotkeySelector HotkeySelector
 @inject IJSRuntime JSRuntime;
 @implements IDisposable
 <div>
-    <MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
-        <MudItem xs="12">
-            <div class="d-flex align-center justify-center mx-2 mb-1">
-                <MudText Typo="Typo.subtitle1" Color="Color.Inherit">Scanning Settings</MudText>
-            </div>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudGrid Spacing="0" Class="pa-0 ma-0">
-                    <MudItem xs="12" Class="pa-0 ma-0">
-                        <MudCheckBox @bind-Checked="@SettingsUI.EnableNameScan" Label="Enable Name Scan" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudSelect @bind-Value="@SettingsUI.NameScanLanguage" T="int" Label="Name Scan Language" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.BottomCenter" Variant="Variant.Text" OffsetY="true" Margin="Margin.Dense" Dense="true" Class="mx-1">
-                            <MudSelectItem T="int" Value="0">
-                                Chinese
-                            </MudSelectItem>
-                            <MudSelectItem T="int" Value="1">
-                                Czech
-                            </MudSelectItem>
-                            <MudSelectItem T="int" Value="2">
-                                English
-                            </MudSelectItem>
-                            <MudSelectItem T="int" Value="3">
-                                Spanish
-                            </MudSelectItem>
-                            <MudSelectItem T="int" Value="4">
-                                Spanish-Mexican
-                            </MudSelectItem>
-	                        <MudSelectItem T="int" Value="5">
-		                        French
-	                        </MudSelectItem>
-	                        <MudSelectItem T="int" Value="6">
-		                        German
-	                        </MudSelectItem>
-	                        <MudSelectItem T="int" Value="7">
-		                        Hungarian
-	                        </MudSelectItem>
-	                        <MudSelectItem T="int" Value="8">
-		                        Italian
-	                        </MudSelectItem>
-	                        <MudSelectItem T="int" Value="9">
-		                        Japanese
-	                        </MudSelectItem>
-	                        <MudSelectItem T="int" Value="10">
-		                        Korean
-	                        </MudSelectItem>
-	                        <MudSelectItem T="int" Value="11">
-		                        Polish
-	                        </MudSelectItem>
-	                        <MudSelectItem T="int" Value="12">
-		                        Portuguese
-	                        </MudSelectItem>
-	                        <MudSelectItem T="int" Value="13">
-		                        Russian
-	                        </MudSelectItem>
-	                        <MudSelectItem T="int" Value="14">
-		                        Slovak
-	                        </MudSelectItem>
-	                        <MudSelectItem T="int" Value="15">
-		                        Turkish
-	                        </MudSelectItem>
-                        </MudSelect>
-                    </MudItem>
-                </MudGrid>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudGrid Spacing="0" Class="pa-0 ma-0">
-                    <MudItem xs="12" Class="pa-0 ma-0">
-                        <MudCheckBox @bind-Checked="@SettingsUI.EnableIconScan" Label="Enable Icon Scan" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    </MudItem>
-                    <MudItem xs="12" Class="pa-0 ma-0">
-                        <MudCheckBox @bind-Checked="@SettingsUI.ScanRotatedIcons" Label="Scan Rotated Icons" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    </MudItem>
-                    <MudItem xs="12" Class="pa-0 ma-0">
-                        <MudCheckBox @bind-Checked="@SettingsUI.UseCachedIcons" Label="Use Cached Icons" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    </MudItem>
-                </MudGrid>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudGrid Spacing="0" Class="pa-0 ma-0">
-                    <MudItem xs="12" Class="pa-0 ma-0 ">
-                        <div class="d-flex justify-center">
-                            <MudText>
-                                Icon Scan Hotkey
-                            </MudText>
-                        </div>
-                        <div class="d-flex justify-center">
-                            <MudButton Size="Size.Small" Variant="Variant.Filled" Dense="true" DisableElevation="true" Color="@(HotkeySelector.Listening==true?Color.Info:Color.Primary)" @onclick="HotkeyClickEventHandler">
-                                @if (HotkeySelector.Listening)
-                                {
-                                    <MudProgressCircular Class="ms-n1 mr-1" Size="Size.Small" Indeterminate="true"/>
-                                    @HotkeySelector.HotkeyInterface.HotkeyString;
-                                }
-                                else
-                                {
-                                    @HotkeySelector.HotkeyInterface.HotkeyString;
-                                }
-                            </MudButton>
-                        </div>
-                    </MudItem>
-                </MudGrid>
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
+	<MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
+		<MudItem xs="12">
+			<div class="d-flex align-center justify-center mx-2 mb-1">
+				<MudText Typo="Typo.subtitle1" Color="Color.Inherit">Scanning Settings</MudText>
+			</div>
+		</MudItem>
+		<MudItem xs="12">
+			<MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
+				<MudGrid Spacing="0" Class="pa-0 ma-0">
+					<MudItem xs="12" Class="pa-0 ma-0">
+						<MudCheckBox @bind-Checked="@SettingsUI.EnableNameScan" Label="Enable Name Scan" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+					</MudItem>
+					<MudItem xs="12">
+						<MudSelect @bind-Value="@SettingsUI.NameScanLanguage" T="int" Label="Name Scan Language" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.BottomCenter" Variant="Variant.Text" OffsetY="true" Margin="Margin.Dense" Dense="true" Class="mx-1">
+							<MudSelectItem T="int" Value="0">
+								Chinese
+							</MudSelectItem>
+							<MudSelectItem T="int" Value="1">
+								Czech
+							</MudSelectItem>
+							<MudSelectItem T="int" Value="2">
+								English
+							</MudSelectItem>
+							<MudSelectItem T="int" Value="3">
+								Spanish
+							</MudSelectItem>
+							<MudSelectItem T="int" Value="4">
+								Spanish-Mexican
+							</MudSelectItem>
+							<MudSelectItem T="int" Value="5">
+								French
+							</MudSelectItem>
+							<MudSelectItem T="int" Value="6">
+								German
+							</MudSelectItem>
+							<MudSelectItem T="int" Value="7">
+								Hungarian
+							</MudSelectItem>
+							<MudSelectItem T="int" Value="8">
+								Italian
+							</MudSelectItem>
+							<MudSelectItem T="int" Value="9">
+								Japanese
+							</MudSelectItem>
+							<MudSelectItem T="int" Value="10">
+								Korean
+							</MudSelectItem>
+							<MudSelectItem T="int" Value="11">
+								Polish
+							</MudSelectItem>
+							<MudSelectItem T="int" Value="12">
+								Portuguese
+							</MudSelectItem>
+							<MudSelectItem T="int" Value="13">
+								Russian
+							</MudSelectItem>
+							<MudSelectItem T="int" Value="14">
+								Slovak
+							</MudSelectItem>
+							<MudSelectItem T="int" Value="15">
+								Turkish
+							</MudSelectItem>
+						</MudSelect>
+					</MudItem>
+				</MudGrid>
+			</MudPaper>
+		</MudItem>
+		<MudItem xs="12">
+			<MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
+				<MudGrid Spacing="0" Class="pa-0 ma-0">
+					<MudItem xs="12" Class="pa-0 ma-0">
+						<MudCheckBox @bind-Checked="@SettingsUI.EnableIconScan" Label="Enable Icon Scan" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+					</MudItem>
+					<MudItem xs="12" Class="pa-0 ma-0">
+						<MudCheckBox @bind-Checked="@SettingsUI.ScanRotatedIcons" Label="Scan Rotated Icons" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+					</MudItem>
+					<MudItem xs="12" Class="pa-0 ma-0">
+						<MudCheckBox @bind-Checked="@SettingsUI.UseCachedIcons" Label="Use Cached Icons" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+					</MudItem>
+				</MudGrid>
+			</MudPaper>
+		</MudItem>
+		<MudItem xs="12">
+			<MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
+				<MudGrid Spacing="0" Class="pa-0 ma-0">
+					<MudItem xs="12" Class="pa-0 ma-0 ">
+						<div class="d-flex justify-center">
+							<MudText>
+								Icon Scan Hotkey
+							</MudText>
+						</div>
+						<div class="d-flex justify-center">
+							<MudButton Size="Size.Small" Variant="Variant.Filled" Dense="true" DisableElevation="true" Color="@(HotkeySelector.Listening == true ? Color.Info : Color.Primary)" @onclick="HotkeyClickEventHandler">
+								@if (HotkeySelector.Listening)
+								{
+									<MudProgressCircular Class="ms-n1 mr-1" Size="Size.Small" Indeterminate="true"/>
+									@HotkeySelector.HotkeyInterface.HotkeyString
+								}
+								else
+								{
+									@HotkeySelector.HotkeyInterface.HotkeyString
+								}
+							</MudButton>
+						</div>
+					</MudItem>
+				</MudGrid>
+			</MudPaper>
+		</MudItem>
+	</MudGrid>
 </div>
+
 @code {
 
-    protected override void OnInitialized()
-    {
-        SettingsUI.PropertyChanged += PropertyChangeHandler;
-        HotkeySelector.PropertyChanged += PropertyChangeHandler;
-        HotkeySelector.HotkeyInterface.PropertyChanged += PropertyChangeHandler;
-    }
+	protected override void OnInitialized()
+	{
+		SettingsUI.PropertyChanged += PropertyChangeHandler;
+		HotkeySelector.PropertyChanged += PropertyChangeHandler;
+		HotkeySelector.HotkeyInterface.PropertyChanged += PropertyChangeHandler;
+	}
 
-    private async void PropertyChangeHandler(object sender, EventArgs e)
-    {
-        await InvokeAsync(() => StateHasChanged());
-    }
+	private async void PropertyChangeHandler(object sender, EventArgs e)
+	{
+		await InvokeAsync(() => StateHasChanged());
+	}
 
-    public void Dispose()
-    {
-        SettingsUI.PropertyChanged -= PropertyChangeHandler;
-        HotkeySelector.PropertyChanged -= PropertyChangeHandler;
-        HotkeySelector.HotkeyInterface.PropertyChanged -= PropertyChangeHandler;
-    }
+	public void Dispose()
+	{
+		SettingsUI.PropertyChanged -= PropertyChangeHandler;
+		HotkeySelector.PropertyChanged -= PropertyChangeHandler;
+		HotkeySelector.HotkeyInterface.PropertyChanged -= PropertyChangeHandler;
+	}
 
-    public async Task LogAsync(string message)
-    {
-        await JSRuntime.InvokeVoidAsync("console.log", message);
-    }
+	public async Task LogAsync(string message)
+	{
+		await JSRuntime.InvokeVoidAsync("console.log", message);
+	}
 
-    bool RegisterHotkey = false;
+	bool RegisterHotkey = false;
 
-    private void HotkeyClickEventHandler(MouseEventArgs args) {
-        if (!HotkeySelector.Listening) {
-            //KeyboardKeys.Clear();
-            //MouseButtons.Clear();
-            HotkeySelector.StartListening();
-        }
-        else
-        {
-            HotkeySelector.StopListening();
-            SettingsUI.IconScanHotkey = HotkeySelector.HotkeyInterface;
-            //MouseButtons.Add(args.Button.ToString());
-        }
-    }
+	private void HotkeyClickEventHandler(MouseEventArgs args)
+	{
+		if (!HotkeySelector.Listening)
+		{
+	//KeyboardKeys.Clear();
+	//MouseButtons.Clear();
+			HotkeySelector.StartListening();
+		}
+		else
+		{
+			HotkeySelector.StopListening();
+			SettingsUI.IconScanHotkey = HotkeySelector.HotkeyInterface;
+	//MouseButtons.Add(args.Button.ToString());
+		}
+	}
+
 }

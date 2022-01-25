@@ -1,11 +1,10 @@
-﻿namespace RatScanner
+﻿namespace RatScanner;
+
+internal interface ISwitchable
 {
-	internal interface ISwitchable
-	{
-		void UtilizeState(object state);
+	void UtilizeState(object state);
 
-		void OnClose();
+	void OnClose();
 
-		void OnOpen();
-	}
+	void OnOpen();
 }

@@ -3,82 +3,81 @@ using System;
 using System.Windows.Input;
 using static RatScanner.RatConfig;
 
-namespace RatScanner
+namespace RatScanner;
+
+internal class HotkeyManager
 {
-	internal class HotkeyManager
+	internal ActiveHotkey NameScanHotkey;
+	internal ActiveHotkey IconScanHotkey;
+
+	internal HotkeyManager()
 	{
-		internal ActiveHotkey NameScanHotkey;
-		internal ActiveHotkey IconScanHotkey;
+		UserActivityHelper.Start(true, true);
+		RegisterHotkeys();
+	}
 
-		internal HotkeyManager()
+	~HotkeyManager()
+	{
+		UnregisterHotkeys();
+		UserActivityHelper.Stop(true, true, false);
+	}
+
+	/// <summary>
+	/// Register hotkeys so the event handlers receive hotkey presses
+	/// </summary>
+	/// <remarks>
+	/// Called by the constructor
+	/// </remarks>
+	internal void RegisterHotkeys()
+	{
+		// Unregister hotkeys to prevent multiple listeners for the same hotkey
+		UnregisterHotkeys();
+
+		var nameScanHotkey = new Hotkey(null, new[] { MouseButton.Left });
+		NameScanHotkey = new ActiveHotkey(nameScanHotkey, OnNameScanHotkey, ref NameScan.Enable);
+		IconScanHotkey = new ActiveHotkey(IconScan.Hotkey, OnIconScanHotkey, ref IconScan.Enable);
+	}
+
+	/// <summary>
+	/// Unregister hotkeys
+	/// </summary>
+	internal void UnregisterHotkeys()
+	{
+		NameScanHotkey?.Dispose();
+		IconScanHotkey?.Dispose();
+	}
+
+	private static void Wrap<T>(Func<T> func)
+	{
+		try
 		{
-			UserActivityHelper.Start(true, true);
-			RegisterHotkeys();
+			func();
 		}
-
-		~HotkeyManager()
+		catch (Exception e)
 		{
-			UnregisterHotkeys();
-			UserActivityHelper.Stop(true, true, false);
+			Logger.LogError(e.Message, e);
 		}
+	}
 
-		/// <summary>
-		/// Register hotkeys so the event handlers receive hotkey presses
-		/// </summary>
-		/// <remarks>
-		/// Called by the constructor
-		/// </remarks>
-		internal void RegisterHotkeys()
+	private static void Wrap(Action action)
+	{
+		try
 		{
-			// Unregister hotkeys to prevent multiple listeners for the same hotkey
-			UnregisterHotkeys();
-
-			var nameScanHotkey = new Hotkey(null, new[] { MouseButton.Left });
-			NameScanHotkey = new ActiveHotkey(nameScanHotkey, OnNameScanHotkey, ref NameScan.Enable);
-			IconScanHotkey = new ActiveHotkey(IconScan.Hotkey, OnIconScanHotkey, ref IconScan.Enable);
+			action();
 		}
-
-		/// <summary>
-		/// Unregister hotkeys
-		/// </summary>
-		internal void UnregisterHotkeys()
+		catch (Exception e)
 		{
-			NameScanHotkey?.Dispose();
-			IconScanHotkey?.Dispose();
+			Logger.LogError(e.Message, e);
 		}
+	}
 
-		private static void Wrap<T>(Func<T> func)
-		{
-			try
-			{
-				func();
-			}
-			catch (Exception e)
-			{
-				Logger.LogError(e.Message, e);
-			}
-		}
+	private void OnNameScanHotkey(object sender, KeyUpEventArgs e)
+	{
+		Wrap(() => RatScannerMain.Instance.NameScan(UserActivityHelper.GetMousePosition()));
+	}
 
-		private static void Wrap(Action action)
-		{
-			try
-			{
-				action();
-			}
-			catch (Exception e)
-			{
-				Logger.LogError(e.Message, e);
-			}
-		}
-
-		private void OnNameScanHotkey(object sender, KeyUpEventArgs e)
-		{
-			Wrap(() => RatScannerMain.Instance.NameScan(UserActivityHelper.GetMousePosition()));
-		}
-
-		private void OnIconScanHotkey(object sender, KeyUpEventArgs e)
-		{
-			Wrap(() => RatScannerMain.Instance.IconScan(UserActivityHelper.GetMousePosition()));
-		}
+	private void OnIconScanHotkey(object sender, KeyUpEventArgs e)
+	{
+		Wrap(() => RatScannerMain.Instance.IconScan(UserActivityHelper.GetMousePosition()));
 	}
 }
