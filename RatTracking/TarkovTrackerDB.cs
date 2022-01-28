@@ -93,6 +93,10 @@ public class TarkovTrackerDB
 			{
 				// We have an unauthorized token exception, it could be that we don't have permissions for this call
 			}
+			catch (JsonReaderException)
+			{
+				// We do not want to crash an entire application just because of invalid 3rd party api response
+			}
 		}
 		else if (SoloProgressAvailable == true)
 		{
@@ -110,6 +114,10 @@ public class TarkovTrackerDB
 			catch (UnauthorizedTokenException)
 			{
 				// We have an unauthorized token exception, it could be that we don't have permissions for this call
+			}
+			catch (JsonReaderException)
+			{
+				// We do not want to crash an entire application just because of invalid 3rd party api response
 			}
 		}
 		else
