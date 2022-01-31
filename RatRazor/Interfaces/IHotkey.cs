@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel;
 
-namespace RatRazor.Interfaces
+namespace RatRazor.Interfaces;
+
+public interface IHotkey : INotifyPropertyChanged
 {
-	public interface IHotkey : INotifyPropertyChanged
-	{
-		public string HotkeyString { get; }
-	}
+	public string HotkeyString { get; }
 }

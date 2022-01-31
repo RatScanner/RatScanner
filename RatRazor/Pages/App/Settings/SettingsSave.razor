@@ -1,41 +1,46 @@
-﻿@inject RatRazor.Interfaces.ISettingsUI SettingsUI
+﻿@inject Interfaces.ISettingsUI SettingsUI
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime;
 @implements IDisposable
 
-<MudGrid Class="px-2 my-2" Spacing="0" Style="position:fixed;bottom:0">
-    <MudItem xs="6" Class="d-flex justify-start pr-1">
-        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Class="light-green darken-3" FullWidth="true" OnClick="SaveSettings">Save</MudButton>
-    </MudItem>
-    <MudItem xs="6" Class="d-flex justify-end pl-1">
-        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" FullWidth="true" OnClick="DiscardSettings">Cancel</MudButton>
-    </MudItem>
+<MudGrid Class="px-2 my-2" Spacing="0" Style="position: fixed; bottom: 0">
+	<MudItem xs="6" Class="d-flex justify-start pr-1">
+		<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Class="light-green darken-3" FullWidth="true" OnClick="SaveSettings">Save</MudButton>
+	</MudItem>
+	<MudItem xs="6" Class="d-flex justify-end pl-1">
+		<MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" FullWidth="true" OnClick="DiscardSettings">Cancel</MudButton>
+	</MudItem>
 </MudGrid>
 
 @code {
-    private void SaveSettings()
-    {
-        SettingsUI.SaveSettings();
-        StateHasChanged();
-        NavigationManager.NavigateTo("/app");
-    }
 
-    private void DiscardSettings()
-    {
-        SettingsUI.LoadSettings();
-        StateHasChanged();
-        NavigationManager.NavigateTo("/app");
-    }
+	private void SaveSettings()
+	{
+		SettingsUI.SaveSettings();
+		StateHasChanged();
+		NavigationManager.NavigateTo("/app");
+	}
 
-    protected override void OnInitialized()
-    {
-        SettingsUI.PropertyChanged += PropertyChangeHandler;
-    }
+	private void DiscardSettings()
+	{
+		SettingsUI.LoadSettings();
+		StateHasChanged();
+		NavigationManager.NavigateTo("/app");
+	}
 
-    private async void PropertyChangeHandler(object sender, EventArgs e)
-    {
-        await InvokeAsync(() => StateHasChanged());
-    }
+	protected override void OnInitialized()
+	{
+		SettingsUI.PropertyChanged += PropertyChangeHandler;
+	}
 
-    public void Dispose() => SettingsUI.PropertyChanged -= PropertyChangeHandler;
+	private async void PropertyChangeHandler(object sender, EventArgs e)
+	{
+		await InvokeAsync(() => StateHasChanged());
+	}
+
+	public void Dispose()
+	{
+		SettingsUI.PropertyChanged -= PropertyChangeHandler;
+	}
+
 }

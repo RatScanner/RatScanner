@@ -8,6 +8,6 @@
 
 .stroke {
 	/* ReSharper disable InvalidValue */
-	filter: drop-shadow(-1px -1px 0px #000000) drop-shadow(1px -1px 0px #000000) drop-shadow(1px 1px 0px #000000) drop-shadow(-1px 1px 0px #000000);
+	filter: drop-shadow(-1px - 1px 0px #000000) drop-shadow(1px - 1px 0px #000000) drop-shadow(1px 1px 0px #000000) drop-shadow(-1px 1px 0px #000000);
 	/* ReSharper restore InvalidValue */
 }

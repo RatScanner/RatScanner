@@ -1,11 +1,5 @@
-﻿::deep .mud-button-root.mud-icon-button.mud-icon-button-color-default.mud-ripple.mud-ripple-checkbox {
-    padding: 4px;
-}
+﻿::deep .mud-button-root.mud-icon-button.mud-icon-button-color-default.mud-ripple.mud-ripple-checkbox { padding: 4px; }
 
-::deep .mud-typography.mud-typography-body1.mud-inherit-text {
-    font-size:small;
-}
+::deep .mud-typography.mud-typography-body1.mud-inherit-text { font-size: small; }
 
-::deep .mud-typography.mud-typography-body1.mud-inherit-text {
-    margin-top: 0px;
-}
+::deep .mud-typography.mud-typography-body1.mud-inherit-text { margin-top: 0px; }

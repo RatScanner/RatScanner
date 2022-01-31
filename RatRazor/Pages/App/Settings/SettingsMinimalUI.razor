@@ -1,62 +1,67 @@
 ﻿@page "/app/settings/minimal"
-@inject RatRazor.Interfaces.ISettingsUI SettingsUI
+@inject Interfaces.ISettingsUI SettingsUI
 @inject IJSRuntime JSRuntime;
 @implements IDisposable
 <div>
-    <MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
-        <MudItem xs="12">
-            <div class="d-flex align-center justify-center mx-2 mb-1">
-                <MudText Typo="Typo.subtitle1" Color="Color.Inherit">Minimal UI Settings</MudText>
-            </div>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudGrid Spacing="0">
-                    <MudItem xs="12">
-                        <MudCheckBox @bind-Checked="SettingsUI.ShowName" Label="Name" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudCheckBox @bind-Checked="SettingsUI.ShowAvgDayPrice" Label="Avg. Daily Price" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudCheckBox @bind-Checked="SettingsUI.ShowPricePerSlot" Label="Price per Slot" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudCheckBox @bind-Checked="SettingsUI.ShowTraderPrice" Label="Trader Price" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudCheckBox @bind-Checked="SettingsUI.ShowTraderMaxPrice" Label="Max Trader Price" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudCheckBox @bind-Checked="SettingsUI.ShowQuestHideoutTracker" Label="Needed Quest & Hideout" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudCheckBox @bind-Checked="SettingsUI.ShowQuestHideoutTeamTracker" Label="Needed Quest & Hideout Team" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudCheckBox @bind-Checked="SettingsUI.ShowUpdated" Label="Updated Timestamp" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    </MudItem>
-                    <MudItem xs="12">
-                        <MudSlider Step="10" @bind-Value="SettingsUI.Opacity" Min="0" Max="100" Color="Color.Primary">
-                            <MudText Typo="Typo.subtitle2" Class="mt-0">Opacity: @SettingsUI.Opacity.ToString()</MudText>
-                        </MudSlider>
-                    </MudItem>
-                </MudGrid>
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
+	<MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
+		<MudItem xs="12">
+			<div class="d-flex align-center justify-center mx-2 mb-1">
+				<MudText Typo="Typo.subtitle1" Color="Color.Inherit">Minimal UI Settings</MudText>
+			</div>
+		</MudItem>
+		<MudItem xs="12">
+			<MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
+				<MudGrid Spacing="0">
+					<MudItem xs="12">
+						<MudCheckBox @bind-Checked="SettingsUI.ShowName" Label="Name" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+					</MudItem>
+					<MudItem xs="12">
+						<MudCheckBox @bind-Checked="SettingsUI.ShowAvgDayPrice" Label="Avg. Daily Price" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+					</MudItem>
+					<MudItem xs="12">
+						<MudCheckBox @bind-Checked="SettingsUI.ShowPricePerSlot" Label="Price per Slot" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+					</MudItem>
+					<MudItem xs="12">
+						<MudCheckBox @bind-Checked="SettingsUI.ShowTraderPrice" Label="Trader Price" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+					</MudItem>
+					<MudItem xs="12">
+						<MudCheckBox @bind-Checked="SettingsUI.ShowTraderMaxPrice" Label="Max Trader Price" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+					</MudItem>
+					<MudItem xs="12">
+						<MudCheckBox @bind-Checked="SettingsUI.ShowQuestHideoutTracker" Label="Needed Quest & Hideout" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+					</MudItem>
+					<MudItem xs="12">
+						<MudCheckBox @bind-Checked="SettingsUI.ShowQuestHideoutTeamTracker" Label="Needed Quest & Hideout Team" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+					</MudItem>
+					<MudItem xs="12">
+						<MudCheckBox @bind-Checked="SettingsUI.ShowUpdated" Label="Updated Timestamp" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+					</MudItem>
+					<MudItem xs="12">
+						<MudSlider Step="10" @bind-Value="SettingsUI.Opacity" Min="0" Max="100" Color="Color.Primary">
+							<MudText Typo="Typo.subtitle2" Class="mt-0">Opacity: @SettingsUI.Opacity.ToString()</MudText>
+						</MudSlider>
+					</MudItem>
+				</MudGrid>
+			</MudPaper>
+		</MudItem>
+	</MudGrid>
 </div>
+
 @code {
 
-    protected override void OnInitialized()
-    {
-        SettingsUI.PropertyChanged += PropertyChangeHandler;
-    }
+	protected override void OnInitialized()
+	{
+		SettingsUI.PropertyChanged += PropertyChangeHandler;
+	}
 
-    private async void PropertyChangeHandler(object sender, EventArgs e)
-    {
-        await InvokeAsync(() => StateHasChanged());
-    }
+	private async void PropertyChangeHandler(object sender, EventArgs e)
+	{
+		await InvokeAsync(() => StateHasChanged());
+	}
 
-    public void Dispose() => SettingsUI.PropertyChanged -= PropertyChangeHandler;
+	public void Dispose()
+	{
+		SettingsUI.PropertyChanged -= PropertyChangeHandler;
+	}
+
 }

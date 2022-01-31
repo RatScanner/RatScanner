@@ -1,23 +1,25 @@
 ﻿@inject NavigationManager NavigationManager
 
 <Error>
-    <Router AppAssembly="@typeof(Overlay).Assembly">
-        <Found Context="routeData">
-            <RouteView RouteData="@routeData" DefaultLayout="@typeof(OverlayLayout)" />
-            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-        </Found>
-        <NotFound>
-            <PageTitle>Not found</PageTitle>
-            <LayoutView Layout="@typeof(OverlayLayout)">
-                <p role="alert">Sorry, there's nothing at this address.</p>
-            </LayoutView>
-        </NotFound>
-    </Router>
+	<Router AppAssembly="@typeof(Overlay).Assembly">
+		<Found Context="routeData">
+			<RouteView RouteData="@routeData" DefaultLayout="@typeof(OverlayLayout)"/>
+			<FocusOnNavigate RouteData="@routeData" Selector="h1"/>
+		</Found>
+		<NotFound>
+			<PageTitle>Not found</PageTitle>
+			<LayoutView Layout="@typeof(OverlayLayout)">
+				<p role="alert">Sorry, there's nothing at this address.</p>
+			</LayoutView>
+		</NotFound>
+	</Router>
 </Error>
 
 @code {
-    protected override void OnInitialized()
-    {
-        NavigationManager.NavigateTo("/overlay");
-    }
+
+	protected override void OnInitialized()
+	{
+		NavigationManager.NavigateTo("/overlay");
+	}
+
 }

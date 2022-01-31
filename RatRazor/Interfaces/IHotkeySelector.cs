@@ -1,17 +1,16 @@
 ﻿using System.ComponentModel;
 
-namespace RatRazor.Interfaces
+namespace RatRazor.Interfaces;
+
+public interface IHotkeySelector : INotifyPropertyChanged
 {
-	public interface IHotkeySelector : INotifyPropertyChanged
-	{
-		public void StartListening();
-		public void StopListening();
-		public string ToString();
+	public void StartListening();
+	public void StopListening();
+	public string ToString();
 
-		public IHotkey HotkeyInterface { get; }
+	public IHotkey HotkeyInterface { get; }
 
-		public string HotkeyString { get; }
+	public string HotkeyString { get; }
 
-		public bool Listening { get; }
-	}
+	public bool Listening { get; }
 }

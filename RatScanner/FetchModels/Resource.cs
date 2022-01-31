@@ -1,8 +1,7 @@
-﻿namespace RatScanner.FetchModels
+﻿namespace RatScanner.FetchModels;
+
+public class Resource
 {
-	public class Resource
-	{
-		public string Key;
-		public string Value;
-	}
+	public string Key;
+	public string Value;
 }

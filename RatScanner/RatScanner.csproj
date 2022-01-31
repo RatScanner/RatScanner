@@ -6,7 +6,7 @@
     <UseWindowsForms>True</UseWindowsForms>
     <ApplicationIcon>Resources\RatLogoSmall.ico</ApplicationIcon>
     <StartupObject>RatScanner.App</StartupObject>
-    <Version>3.2.1</Version>
+    <Version>3.2.2</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
@@ -30,12 +30,12 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="6.0.200-preview.12.2441" />
     <PackageReference Include="MudBlazor" Version="6.0.5" />
-    <PackageReference Include="RatEye" Version="2.1.0" />
+    <PackageReference Include="RatEye" Version="2.2.0" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.261602">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.0" />
-    <PackageReference Include="RatStash" Version="1.5.3" />
+    <PackageReference Include="RatStash" Version="1.6.0" />
     <PackageReference Include="SingleInstanceCore" Version="2.2.1" />
     <PackageReference Include="Tesseract" Version="4.1.1" />
   </ItemGroup>
