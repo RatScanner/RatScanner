@@ -2,6 +2,7 @@
 @page "/app"
 @using RatTracking.FetchModels
 @using System.Diagnostics
+@using RatTracking.TarkovTools
 @inject Interfaces.IRatScannerUI RatScannerUI
 @inject RatRazor.Interfaces.ISettingsUI SettingUI
 @inject RatTracking.TarkovTools.ITarkovToolsRemoteController TarkovToolsRemoteController
@@ -98,15 +99,27 @@
 		OpenURL(RatScannerUI.WikiLink);
 	}
 
-	private async void OpenTarkovTools()
+	private async Task OpenTarkovTools()
 	{
-		if(string.IsNullOrEmpty(SettingUI.TarkovToolsRemoteControlSessionId))
+		if (await OpenRemoteTarkovToolsItemAsync())
+			return;
+
+		OpenURL(RatScannerUI.ToolsLink);
+	}
+
+	private async Task<bool> OpenRemoteTarkovToolsItemAsync()
+	{
+		if (string.IsNullOrEmpty(SettingUI.TarkovToolsRemoteControlSessionId))
+			return false;
+
+		try
 		{
-			OpenURL(RatScannerUI.ToolsLink);
+			await TarkovToolsRemoteController.OpenItemAsync(RatScannerUI.ItemId);
+			return true;
 		}
-		else
+		catch (TarkovToolsRemoteControllerException e)
 		{
-			TarkovToolsRemoteController.OpenItem(RatScannerUI.ItemId);
+			return false;
 		}
 	}
 

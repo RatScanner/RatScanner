@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using RatStash;
 using System.Threading.Tasks;
+using RatTracking.TarkovTools;
 
 namespace RatScanner.ViewModel;
 
@@ -172,9 +173,20 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 	{
 		var controller = RatScannerMain.Instance.TarkovToolsRemoteController;
 		if (RatConfig.TarkovTools.RemoteControl.Enable)
-			await controller.ConnectAsync(RatConfig.TarkovTools.RemoteControl.SessionId);
+		{
+			try
+			{
+				await controller.ConnectAsync(RatConfig.TarkovTools.RemoteControl.SessionId);
+			}
+			catch (TarkovToolsRemoteControllerException e)
+			{
+				Logger.LogWarning(e.Message, e);
+			}
+		}
 		else
+		{
 			await controller.DisconnectAsync();
+		}
 	}
 
 	public event PropertyChangedEventHandler PropertyChanged;

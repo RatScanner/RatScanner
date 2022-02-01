@@ -1,5 +1,6 @@
 ﻿using System.Net.WebSockets;
 using System.Reactive.Linq;
+using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -12,7 +13,7 @@ namespace RatTracking.TarkovTools
 	{
 		Task ConnectAsync(string sessionId);
 		Task DisconnectAsync();
-		void OpenItem(string itemId);
+		Task OpenItemAsync(string itemId);
 	}
 
 	public class TarkovToolsRemoteController : ITarkovToolsRemoteController
@@ -27,6 +28,8 @@ namespace RatTracking.TarkovTools
 				new StringEnumConverter(new CamelCaseNamingStrategy())
 			}
 		};
+		private static readonly Lazy<PropertyInfo> WebsocketClientIsRunningProperty = new Lazy<PropertyInfo>(
+			() => typeof(WebsocketClient).GetProperty(nameof(WebsocketClient.IsRunning)));
 
 		private readonly IWebsocketClient _client;
 		private string? _sessionId;
@@ -41,13 +44,18 @@ namespace RatTracking.TarkovTools
 				.Subscribe(_ => SendPong());
 		}
 
-		public async Task ConnectAsync(string sessionId)
+		public Task ConnectAsync(string sessionId)
 		{
 			if (string.IsNullOrEmpty(sessionId))
-				throw new TarkovToolsRemoteControllerException("Invalid ID for remote control");
+				throw new ArgumentException("Invalid session ID", nameof(sessionId));
 
 			_sessionId = sessionId;
 
+			return ConnectInternalAsync();
+		}
+
+		private async Task ConnectInternalAsync()
+		{
 			try
 			{
 				await _client.StartOrFail().ConfigureAwait(false);
@@ -55,16 +63,39 @@ namespace RatTracking.TarkovTools
 			}
 			catch (WebsocketException e)
 			{
+				await ForceDisconnectAsync().ConfigureAwait(false);
 				throw new TarkovToolsRemoteControllerException("Unable to connect to Tarkov Tools", e);
 			}
 		}
 
-		public Task DisconnectAsync() => _client.Stop(WebSocketCloseStatus.Empty, string.Empty);
-
-		public void OpenItem(string itemId)
+		public Task DisconnectAsync()
 		{
-			if (!_client.IsStarted)
+			_sessionId = string.Empty;
+			return DisconnectInternalAsync();
+		}
+
+		private Task DisconnectInternalAsync() => _client.Stop(WebSocketCloseStatus.Empty, string.Empty);
+
+		private Task ForceDisconnectAsync()
+		{
+			// If the WebsocketClient.Start method fails to open web socket then:
+			// - any subsequent WebsocketClient.Start calls do nothing, because IsStarted is true
+			// - any subsequent WebsocketClient.Stop calls do nothing, because IsRunning is false
+			// Workaround: update the IsRunning property via reflection.
+			WebsocketClientIsRunningProperty.Value.SetValue(_client, true);
+			return DisconnectInternalAsync();
+		}
+
+		public async Task OpenItemAsync(string itemId)
+		{
+			if (string.IsNullOrEmpty(itemId))
+				throw new ArgumentException("Invalid item ID", nameof(itemId));
+
+			if (string.IsNullOrEmpty(_sessionId))
 				throw new TarkovToolsRemoteControllerException("Controller is not connected");
+
+			if (!_client.IsStarted)
+				await ConnectInternalAsync().ConfigureAwait(false);
 
 			Send(PayloadType.Command, new CommandData
 			{

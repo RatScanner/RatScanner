@@ -71,8 +71,7 @@ public class RatScannerMain : INotifyPropertyChanged
 			_currentItemScan = value;
 			OnPropertyChanged();
 
-			if (RatConfig.TarkovTools.RemoteControl.Enable && RatConfig.TarkovTools.RemoteControl.AutoSync)
-				TarkovToolsRemoteController.OpenItem(value?.MatchedItem.Id);
+			OpenRemoteTarkovToolsItemAsync().Wait();
 		}
 	}
 
@@ -205,7 +204,35 @@ public class RatScannerMain : INotifyPropertyChanged
 		if (!RatConfig.TarkovTools.RemoteControl.Enable)
 			return;
 
-		await TarkovToolsRemoteController.ConnectAsync(RatConfig.TarkovTools.RemoteControl.SessionId).ConfigureAwait(false);
+		try
+		{
+			await TarkovToolsRemoteController.ConnectAsync(RatConfig.TarkovTools.RemoteControl.SessionId).ConfigureAwait(false);
+		}
+		catch (TarkovToolsRemoteControllerException e)
+		{
+			Logger.LogWarning(e.Message, e);
+		}
+	}
+
+	private async Task OpenRemoteTarkovToolsItemAsync()
+	{
+		if (!RatConfig.TarkovTools.RemoteControl.Enable)
+			return;
+		if (!RatConfig.TarkovTools.RemoteControl.AutoSync)
+			return;
+
+		var itemId = CurrentItemScan?.MatchedItem?.Id;
+		if (string.IsNullOrEmpty(itemId))
+			return;
+
+		try
+		{
+			await TarkovToolsRemoteController.OpenItemAsync(itemId).ConfigureAwait(false);
+		}
+		catch (TarkovToolsRemoteControllerException e)
+		{
+			Logger.LogWarning(e.Message, e);
+		}
 	}
 
 	internal void SetupRatEye()
