@@ -104,6 +104,7 @@ internal static class RatConfig
 
 			internal static string SessionId = string.Empty;
 			internal static bool AutoSync = false;
+			internal static bool OpenAmmoChart = false;
 		}
 	}
 
@@ -198,6 +199,7 @@ internal static class RatConfig
 		config.Section = nameof(TarkovTools.RemoteControl);
 		TarkovTools.RemoteControl.SessionId = config.ReadString(nameof(TarkovTools.RemoteControl.SessionId));
 		TarkovTools.RemoteControl.AutoSync = config.ReadBool(nameof(TarkovTools.RemoteControl.AutoSync));
+		TarkovTools.RemoteControl.OpenAmmoChart = config.ReadBool(nameof(TarkovTools.RemoteControl.OpenAmmoChart));
 
 		config.Section = "Other";
 		if (!SetScreen)
@@ -252,6 +254,7 @@ internal static class RatConfig
 		config.Section = nameof(TarkovTools.RemoteControl);
 		config.WriteString(nameof(TarkovTools.RemoteControl.SessionId), TarkovTools.RemoteControl.SessionId);
 		config.WriteBool(nameof(TarkovTools.RemoteControl.AutoSync), TarkovTools.RemoteControl.AutoSync);
+		config.WriteBool(nameof(TarkovTools.RemoteControl.OpenAmmoChart), TarkovTools.RemoteControl.OpenAmmoChart);
 
 		config.Section = "Other";
 		config.WriteInt(nameof(ScreenWidth), ScreenWidth);

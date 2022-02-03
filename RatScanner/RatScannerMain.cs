@@ -221,13 +221,11 @@ public class RatScannerMain : INotifyPropertyChanged
 		if (!RatConfig.TarkovTools.RemoteControl.AutoSync)
 			return;
 
-		var itemId = CurrentItemScan?.MatchedItem?.Id;
-		if (string.IsNullOrEmpty(itemId))
-			return;
-
 		try
 		{
-			await TarkovToolsRemoteController.OpenItemAsync(itemId).ConfigureAwait(false);
+			await TarkovToolsRemoteController.OpenRemoteTarkovToolsAsync(
+				CurrentItemScan?.MatchedItem,
+				RatConfig.TarkovTools.RemoteControl.OpenAmmoChart).ConfigureAwait(false);
 		}
 		catch (TarkovToolsRemoteControllerException e)
 		{

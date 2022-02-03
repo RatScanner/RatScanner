@@ -42,6 +42,7 @@ public interface ISettingsUI : INotifyPropertyChanged
 	// Tarkov Tools settings
 	public string TarkovToolsRemoteControlSessionId { get; set; }
 	public bool TarkovToolsRemoteControlAutoSync { get; set; }
+	public bool TarkovToolsRemoteControlOpenAmmoChart { get; set; }
 
 	public Task SaveSettingsAsync();
 

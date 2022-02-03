@@ -114,10 +114,13 @@
 
 		try
 		{
-			await TarkovToolsRemoteController.OpenItemAsync(RatScannerUI.ItemId);
+			await TarkovToolsRemoteController.OpenRemoteTarkovToolsAsync(
+				RatScannerUI.CurrentItemScan?.MatchedItem,
+				SettingUI.TarkovToolsRemoteControlOpenAmmoChart);
+
 			return true;
 		}
-		catch (TarkovToolsRemoteControllerException e)
+		catch (TarkovToolsRemoteControllerException)
 		{
 			return false;
 		}
