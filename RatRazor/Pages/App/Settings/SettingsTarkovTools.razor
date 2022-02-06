@@ -19,7 +19,14 @@
 						</div>
 					</MudItem>
 					<MudItem xs="12">
-						<MudTextField @bind-Value="SettingsUI.TarkovToolsRemoteControlSessionId" Label="Session ID" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Refresh" OnAdornmentClick="ResetSessionId"></MudTextField>
+						<MudTextField @bind-Value="SettingsUI.TarkovToolsRemoteControlSessionId"
+						              Label="Session ID"
+						              Variant="Variant.Outlined"
+						              Margin="Margin.Dense"
+						              MaxLength="16"
+						              Adornment="Adornment.End"
+						              AdornmentIcon="@Icons.Material.Filled.Refresh"
+						              OnAdornmentClick="ResetSessionId"></MudTextField>
 					</MudItem>
 					<MudItem xs="12">
 						<MudCheckBox @bind-Checked="SettingsUI.TarkovToolsRemoteControlAutoSync" Label="Synchronize Item Scan" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
