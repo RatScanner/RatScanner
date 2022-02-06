@@ -104,9 +104,10 @@ internal class MainWindowVM : INotifyPropertyChanged, IRatScannerUI
 		}
 	}
 
-	public string ToolsLink => $"https://tarkov-tools.com/item/{ItemId}";
+	public string TarkovToolsLink => $"https://tarkov-tools.com/item/{ItemId}";
 
 	public string IconLink => MatchedItem.GetMarketItem().IconLink;
+
 	public string ImageLink => MatchedItem.GetMarketItem().ImageLink;
 
 	public event PropertyChangedEventHandler PropertyChanged;

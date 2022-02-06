@@ -2,9 +2,10 @@
 @page "/app"
 @using RatTracking.FetchModels
 @using System.Diagnostics
+@using RatRazor.Interfaces
 @using RatTracking.TarkovTools
 @inject Interfaces.IRatScannerUI RatScannerUI
-@inject RatRazor.Interfaces.ISettingsUI SettingUI
+@inject RatRazor.Interfaces.ISettingsUI SettingsUI
 @inject RatTracking.TarkovTools.ITarkovToolsRemoteController TarkovToolsRemoteController
 @inject RatTracking.TarkovTrackerDB TarkovTrackerDB
 @inject IJSRuntime JSRuntime;
@@ -57,11 +58,11 @@
 	<MudItem xs="12">
 		<MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">
 			@*<div class="d-flex align-center">
-                        @RatScannerUI.TrackingNeedsQuestRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" /> Quest
-                    </div>
-                    <div class="d-flex align-center">
-                        @RatScannerUI.TrackingNeedsHideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
-                    </div>*@
+						@RatScannerUI.TrackingNeedsQuestRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" /> Quest
+					</div>
+					<div class="d-flex align-center">
+						@RatScannerUI.TrackingNeedsHideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
+					</div>*@
 			@if (RatScannerUI.TrackingTeamNeeds != null && (RatScannerUI.TrackingTeamNeedsSummed.QuestRemaining > 0 || RatScannerUI.TrackingTeamNeedsSummed.HideoutRemaining > 0))
 			{
 				<MudGrid Spacing="0" Class="pa-0 ma-0">
@@ -101,29 +102,8 @@
 
 	private async Task OpenTarkovTools()
 	{
-		if (await OpenRemoteTarkovToolsItemAsync())
-			return;
-
-		OpenURL(RatScannerUI.ToolsLink);
-	}
-
-	private async Task<bool> OpenRemoteTarkovToolsItemAsync()
-	{
-		if (string.IsNullOrEmpty(SettingUI.TarkovToolsRemoteControlSessionId))
-			return false;
-
-		try
-		{
-			await TarkovToolsRemoteController.OpenRemoteTarkovToolsAsync(
-				RatScannerUI.CurrentItemScan?.MatchedItem,
-				SettingUI.TarkovToolsRemoteControlOpenAmmoChart);
-
-			return true;
-		}
-		catch (TarkovToolsRemoteControllerException)
-		{
-			return false;
-		}
+		var sessionId = SettingsUI.TarkovToolsRemoteControlSessionId;
+		OpenURL($"{RatScannerUI.TarkovToolsLink}?connection={sessionId}");
 	}
 
 	private void OpenURL(string url)

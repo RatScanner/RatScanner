@@ -109,7 +109,7 @@ public class RatScannerMain : INotifyPropertyChanged
 		}
 
 		TarkovToolsRemoteController = new TarkovToolsRemoteController();
-		InitTarkovToolsRemoteControllerAsync().Wait();
+		TarkovToolsRemoteController.ConnectAsync(RatConfig.TarkovTools.RemoteControl.SessionId);
 
 		// Grab quest and hideout requirements from tarkovdata
 		Logger.LogInfo("Loading progress data...");
@@ -199,33 +199,16 @@ public class RatScannerMain : INotifyPropertyChanged
 		}
 	}
 
-	private async Task InitTarkovToolsRemoteControllerAsync()
-	{
-		if (!RatConfig.TarkovTools.RemoteControl.Enable)
-			return;
-
-		try
-		{
-			await TarkovToolsRemoteController.ConnectAsync(RatConfig.TarkovTools.RemoteControl.SessionId).ConfigureAwait(false);
-		}
-		catch (TarkovToolsRemoteControllerException e)
-		{
-			Logger.LogWarning(e.Message, e);
-		}
-	}
-
 	private async Task OpenRemoteTarkovToolsItemAsync()
 	{
-		if (!RatConfig.TarkovTools.RemoteControl.Enable)
-			return;
 		if (!RatConfig.TarkovTools.RemoteControl.AutoSync)
 			return;
 
 		try
 		{
-			await TarkovToolsRemoteController.OpenRemoteTarkovToolsAsync(
-				CurrentItemScan?.MatchedItem,
-				RatConfig.TarkovTools.RemoteControl.OpenAmmoChart).ConfigureAwait(false);
+			var openAmmoChart = RatConfig.TarkovTools.RemoteControl.OpenAmmoChart;
+			var item = CurrentItemScan?.MatchedItem;
+			await TarkovToolsRemoteController.OpenRemoteTarkovToolsAsync(item, openAmmoChart).ConfigureAwait(false);
 		}
 		catch (TarkovToolsRemoteControllerException e)
 		{

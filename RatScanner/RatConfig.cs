@@ -100,10 +100,17 @@ internal static class RatConfig
 	{
 		internal static class RemoteControl
 		{
-			internal static bool Enable => !string.IsNullOrEmpty(SessionId);
-
-			internal static string SessionId = string.Empty;
 			internal static bool AutoSync = false;
+			private static string _sessionId;
+			internal static string SessionId
+			{
+				get
+				{
+					if (string.IsNullOrEmpty(_sessionId)) _sessionId = RandomAlphaNumString(16);
+					return _sessionId;
+				}
+				set => _sessionId = value;
+			}
 			internal static bool OpenAmmoChart = false;
 		}
 	}
@@ -197,9 +204,9 @@ internal static class RatConfig
 		Tracking.TarkovTracker.ShowTeam = config.ReadBool(nameof(Tracking.TarkovTracker.ShowTeam), true);
 
 		config.Section = nameof(TarkovTools.RemoteControl);
-		TarkovTools.RemoteControl.SessionId = config.ReadString(nameof(TarkovTools.RemoteControl.SessionId));
 		TarkovTools.RemoteControl.AutoSync = config.ReadBool(nameof(TarkovTools.RemoteControl.AutoSync));
-		TarkovTools.RemoteControl.OpenAmmoChart = config.ReadBool(nameof(TarkovTools.RemoteControl.OpenAmmoChart));
+		TarkovTools.RemoteControl.SessionId = config.ReadString(nameof(TarkovTools.RemoteControl.SessionId), "");
+		TarkovTools.RemoteControl.OpenAmmoChart = config.ReadBool(nameof(TarkovTools.RemoteControl.OpenAmmoChart), true);
 
 		config.Section = "Other";
 		if (!SetScreen)
@@ -277,5 +284,19 @@ internal static class RatConfig
 		var message = $"Detected {ScreenWidth}x{ScreenHeight} Resolution.\n\n";
 		message += "You can adjust this inside the settings.";
 		Logger.ShowMessage(message);
+	}
+
+	private static string RandomAlphaNumString(int length)
+	{
+		const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		var stringChars = new char[length];
+		var random = new Random();
+
+		for (var i = 0; i < stringChars.Length; i++)
+		{
+			stringChars[i] = chars[random.Next(chars.Length)];
+		}
+
+		return new string(stringChars);
 	}
 }
