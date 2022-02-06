@@ -106,10 +106,14 @@ internal static class RatConfig
 			{
 				get
 				{
-					if (string.IsNullOrEmpty(_sessionId)) _sessionId = RandomAlphaNumString(16);
+					if (string.IsNullOrEmpty(_sessionId)) _sessionId = RandomAlphaNumString(12);
 					return _sessionId;
 				}
-				set => _sessionId = value;
+				set
+				{
+					if (string.IsNullOrEmpty(value)) value = RandomAlphaNumString(12);
+					_sessionId = value;
+				}
 			}
 			internal static bool OpenAmmoChart = false;
 		}

@@ -16,6 +16,7 @@
 	private async Task SaveSettingsAsync()
 	{
 		await SettingsUI.SaveSettingsAsync();
+		SettingsUI.LoadSettings();
 		StateHasChanged();
 		NavigationManager.NavigateTo("/app");
 	}
