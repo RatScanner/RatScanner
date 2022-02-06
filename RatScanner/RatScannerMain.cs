@@ -56,7 +56,7 @@ public class RatScannerMain : INotifyPropertyChanged
 	internal MarketDB MarketDB;
 	internal ProgressDB ProgressDB;
 	public TarkovTrackerDB TarkovTrackerDB;
-	internal ITarkovToolsRemoteController TarkovToolsRemoteController { get;}
+	internal ITarkovToolsRemoteController TarkovToolsRemoteController { get; }
 
 	internal RatEyeEngine RatEyeEngine;
 	internal Config RatEyeConfig;
@@ -201,8 +201,7 @@ public class RatScannerMain : INotifyPropertyChanged
 
 	private async Task OpenRemoteTarkovToolsItemAsync()
 	{
-		if (!RatConfig.TarkovTools.RemoteControl.AutoSync)
-			return;
+		if (!RatConfig.TarkovTools.RemoteControl.AutoSync) return;
 
 		try
 		{

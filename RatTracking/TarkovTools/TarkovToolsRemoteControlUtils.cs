@@ -1,4 +1,5 @@
 using RatStash;
+using System.Runtime.CompilerServices;
 
 namespace RatTracking.TarkovTools;
 
@@ -31,22 +32,22 @@ public static class TarkovToolsRemoteControlUtils
 
 	public static Task OpenRemoteTarkovToolsAsync(this ITarkovToolsRemoteController controller, Item? item, bool openAmmoChart)
 	{
-		if (item == null)
-			return Task.CompletedTask;
+		if (item == null) return Task.CompletedTask;
 
-		return item switch
+		if (openAmmoChart
+			&& item is Ammo ammo
+			&& GetAmmoChartType(ammo) is { } ammoType)
 		{
-			Ammo ammo when openAmmoChart && GetAmmoChartType(ammo) is { } ammoType => controller.OpenAmmoChartAsync(ammoType),
-			_ => controller.OpenItemAsync(item.Id)
-		};
+			return controller.OpenAmmoChartAsync(ammoType);
+		}
+
+		return controller.OpenItemAsync(item.Id);
 	}
 
 	private static string? GetAmmoChartType(Ammo ammo)
 	{
-		if (AmmoMap.TryGetValue((ammo.Caliber, null), out var result) ||
-		    AmmoMap.TryGetValue((ammo.Caliber, ammo.AmmoType), out result))
-			return result;
-
-		return null;
+		AmmoMap.TryGetValue((ammo.Caliber, null), out var result);
+		AmmoMap.TryGetValue((ammo.Caliber, ammo.AmmoType), out var secondaryResult);
+		return result ?? secondaryResult;
 	}
 }
