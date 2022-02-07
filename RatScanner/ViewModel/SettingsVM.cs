@@ -146,7 +146,7 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 		if (updateMarketDB) RatScannerMain.Instance.MarketDB.Init();
 		if (updateTarkovTrackerToken) UpdateTarkovTrackerToken();
 		if (updateResolution || updateLanguage) RatScannerMain.Instance.SetupRatEye();
-		if (updateSessionId) await UpdateTarkovToolsRemoteControllerAsync();
+		if (updateSessionId) UpdateTarkovToolsRemoteController();
 
 		RatEye.Config.LogDebug = RatConfig.LogDebug;
 		RatScannerMain.Instance.HotkeyManager.RegisterHotkeys();
@@ -172,12 +172,12 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 		RatConfig.Tracking.TarkovTracker.Token = "";
 	}
 
-	private static async Task UpdateTarkovToolsRemoteControllerAsync()
+	private static void UpdateTarkovToolsRemoteController()
 	{
 		var controller = RatScannerMain.Instance.TarkovToolsRemoteController;
 		try
 		{
-			await controller.ConnectAsync(RatConfig.TarkovTools.RemoteControl.SessionId);
+			controller.Connect(RatConfig.TarkovTools.RemoteControl.SessionId);
 		}
 		catch (TarkovToolsRemoteControllerException e)
 		{

@@ -10,7 +10,7 @@ namespace RatTracking.TarkovTools;
 
 public interface ITarkovToolsRemoteController : IDisposable
 {
-	Task ConnectAsync(string sessionId);
+	void Connect(string sessionId);
 	Task OpenItemAsync(string itemId);
 	Task OpenAmmoChartAsync(string ammoType);
 }
@@ -63,13 +63,12 @@ public class TarkovToolsRemoteController : ITarkovToolsRemoteController
 	/// </param>
 	/// <returns>Task</returns>
 	/// <exception cref="ArgumentException">Test</exception>
-	public Task ConnectAsync(string sessionId)
+	public void Connect(string sessionId)
 	{
 		if (string.IsNullOrEmpty(sessionId))
 			throw new ArgumentException("Invalid session ID", nameof(sessionId));
 
 		_sessionId = sessionId;
-		return Task.CompletedTask;
 	}
 
 	private async Task ConnectInternalAsync()

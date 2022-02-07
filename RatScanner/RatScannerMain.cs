@@ -109,7 +109,7 @@ public class RatScannerMain : INotifyPropertyChanged
 		}
 
 		TarkovToolsRemoteController = new TarkovToolsRemoteController();
-		TarkovToolsRemoteController.ConnectAsync(RatConfig.TarkovTools.RemoteControl.SessionId);
+		TarkovToolsRemoteController.Connect(RatConfig.TarkovTools.RemoteControl.SessionId);
 
 		// Grab quest and hideout requirements from tarkovdata
 		Logger.LogInfo("Loading progress data...");
