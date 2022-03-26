@@ -6,7 +6,7 @@
     <UseWindowsForms>True</UseWindowsForms>
     <ApplicationIcon>Resources\RatLogoSmall.ico</ApplicationIcon>
     <StartupObject>RatScanner.App</StartupObject>
-    <Version>3.2.2</Version>
+    <Version>3.2.3</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
