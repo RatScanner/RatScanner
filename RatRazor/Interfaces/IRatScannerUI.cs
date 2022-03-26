@@ -12,7 +12,7 @@ public interface IRatScannerUI : INotifyPropertyChanged
 	public string ImageLink { get; }
 	public string IconLink { get; }
 	public string WikiLink { get; }
-	public string ToolsLink { get; }
+	public string TarkovDevLink { get; }
 
 	// Item Information
 	public int Avg24hPrice { get; }

@@ -19,13 +19,13 @@
 		</div>
 	</MudItem>
 	<MudItem xs="6">
-		<MudPaper Class="d-flex align-center justify-center pa-1 ml-2 mr-1 my-1 mud-grey-darken4" Elevation="2" @onclick="OpenWiki" Style="cursor: pointer;">
+		<MudPaper Class="d-flex align-center justify-center pa-1 ml-2 mr-1 my-1 mud-grey-darken4" Elevation="2" @onclick="OpenWiki" Style="cursor: pointer;" MinHeight="32px">
 			<img src="https://static.wikia.nocookie.net/escapefromtarkov_gamepedia/images/e/e6/Site-logo.png" height="24px"/>
 		</MudPaper>
 	</MudItem>
 	<MudItem xs="6">
-		<MudPaper Class="d-flex align-center justify-center pa-1 ml-1 mr-2 my-1" Elevation="2" @onclick="OpenTarkovTools" Style="cursor: pointer;">
-			<img src="https://tarkovtracker.io/img/tarkovtoolslogo.png" height="24px"/><MudText Typo="Typo.subtitle2" Style="@($"color:{Colors.Amber.Lighten5};")">Tarkov Tools</MudText>
+		<MudPaper Class="d-flex align-center justify-center pa-1 ml-1 mr-2 my-1" Elevation="2" @onclick="OpenTarkovDev" Style="cursor: pointer;" MinHeight="32px">
+			<img src="https://api.ratscanner.com/v3/file/tarkov-dev-logo.png" height="18px"/>
 		</MudPaper>
 	</MudItem>
 	<MudItem xs="12">
@@ -96,9 +96,9 @@
 		OpenURL(RatScannerUI.WikiLink);
 	}
 
-	private async void OpenTarkovTools()
+	private async void OpenTarkovDev()
 	{
-		OpenURL(RatScannerUI.ToolsLink);
+		OpenURL(RatScannerUI.TarkovDevLink);
 	}
 
 	private void OpenURL(string url)
