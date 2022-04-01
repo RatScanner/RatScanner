@@ -109,7 +109,7 @@ public class RatScannerMain : INotifyPropertyChanged
 		}
 
 		TarkovToolsRemoteController = new TarkovToolsRemoteController();
-		TarkovToolsRemoteController.Connect(RatConfig.TarkovTools.RemoteControl.SessionId);
+		InitTarkovToolsRemoteController();
 
 		// Grab quest and hideout requirements from tarkovdata
 		Logger.LogInfo("Loading progress data...");
@@ -199,9 +199,27 @@ public class RatScannerMain : INotifyPropertyChanged
 		}
 	}
 
+	private void InitTarkovToolsRemoteController()
+	{
+		if (!RatConfig.TarkovTools.RemoteControl.Enable)
+			return;
+
+		try
+		{
+			TarkovToolsRemoteController.Connect(RatConfig.TarkovTools.RemoteControl.SessionId);
+		}
+		catch (TarkovToolsRemoteControllerException e)
+		{
+			Logger.LogWarning(e.Message, e);
+		}
+	}
+
 	private async Task OpenRemoteTarkovToolsItemAsync()
 	{
-		if (!RatConfig.TarkovTools.RemoteControl.AutoSync) return;
+		if (!RatConfig.TarkovTools.RemoteControl.AutoSync)
+			return;
+		if (!RatConfig.TarkovTools.RemoteControl.AutoSync)
+			return;
 
 		try
 		{

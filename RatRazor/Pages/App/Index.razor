@@ -102,8 +102,29 @@
 
 	private async Task OpenTarkovDev()
 	{
-		var sessionId = SettingsUI.TarkovToolsRemoteControlSessionId;
-		OpenURL($"{RatScannerUI.TarkovDevLink}?connection={sessionId}");
+		if (await OpenRemoteTarkovToolsItemAsync())
+			return;
+
+		OpenURL(RatScannerUI.TarkovDevLink);
+	}
+
+	private async Task<bool> OpenRemoteTarkovToolsItemAsync()
+	{
+		if (string.IsNullOrEmpty(SettingsUI.TarkovToolsRemoteControlSessionId))
+			return false;
+
+		try
+		{
+			await TarkovToolsRemoteController.OpenRemoteTarkovToolsAsync(
+				RatScannerUI.CurrentItemScan?.MatchedItem,
+				SettingsUI.TarkovToolsRemoteControlOpenAmmoChart);
+
+			return true;
+		}
+		catch (TarkovToolsRemoteControllerException)
+		{
+			return false;
+		}
 	}
 
 	private void OpenURL(string url)

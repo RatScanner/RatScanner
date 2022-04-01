@@ -11,6 +11,7 @@ namespace RatTracking.TarkovTools;
 public interface ITarkovToolsRemoteController : IDisposable
 {
 	void Connect(string sessionId);
+	void Disconnect();
 	Task OpenItemAsync(string itemId);
 	Task OpenAmmoChartAsync(string ammoType);
 }
@@ -71,6 +72,11 @@ public class TarkovToolsRemoteController : ITarkovToolsRemoteController
 		_sessionId = sessionId;
 	}
 
+	public void Disconnect()
+	{
+		_sessionId = string.Empty;
+	}
+
 	private async Task ConnectInternalAsync()
 	{
 		try
@@ -87,6 +93,9 @@ public class TarkovToolsRemoteController : ITarkovToolsRemoteController
 
 	private Task EnsureConnected()
 	{
+		if (string.IsNullOrEmpty(_sessionId))
+			throw new TarkovToolsRemoteControllerException("Controller is not connected");
+
 		if (!_client.IsStarted) return ConnectInternalAsync();
 		return Task.CompletedTask;
 	}

@@ -175,13 +175,20 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 	private static void UpdateTarkovToolsRemoteController()
 	{
 		var controller = RatScannerMain.Instance.TarkovToolsRemoteController;
-		try
+		if (RatConfig.TarkovTools.RemoteControl.Enable)
 		{
-			controller.Connect(RatConfig.TarkovTools.RemoteControl.SessionId);
+			try
+			{
+				controller.Connect(RatConfig.TarkovTools.RemoteControl.SessionId);
+			}
+			catch (TarkovToolsRemoteControllerException e)
+			{
+				Logger.LogWarning(e.Message, e);
+			}
 		}
-		catch (TarkovToolsRemoteControllerException e)
+		else
 		{
-			Logger.LogWarning(e.Message, e);
+			 controller.Disconnect();
 		}
 	}
 
