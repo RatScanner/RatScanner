@@ -17,7 +17,7 @@ public interface ITarkovToolsRemoteController : IDisposable
 
 public class TarkovToolsRemoteController : ITarkovToolsRemoteController
 {
-	private const string wssUri = "wss://tarkov-tools-live.herokuapp.com";
+	private const string wssUri = "wss://hideout-socket-server.herokuapp.com";
 
 	private static readonly JsonSerializerSettings jsonSettings = new()
 	{
