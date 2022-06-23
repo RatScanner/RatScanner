@@ -18,7 +18,7 @@
 
 Rat Scanner is a open source tool for [Escape from Tarkov][escape-from-tarkov].
 
-Please consider [supporting](#Support-the-project) the project to help finance the backend server as well as the [API][tarkov-tools].
+Please consider [supporting](#Support-the-project) the project to help finance the backend server as well as the [API][tarkov-dev].
 
 [Tutorial / Demo Video][demo-video] - [Frequently asked Questions][faq-page]
 
@@ -34,7 +34,7 @@ While Battlestate Games does not support nor is affiliated with this project, it
 
 Rat Scanner allows you to scan items in the game and provides you with data about items (average price, value per slot, ...).
 
-The information is taken from a [third-party API][tarkov-tools] which takes the data directly from the game.
+The information is taken from a [third-party API][tarkov-dev] which takes the data directly from the game.
 
 <br/>
 
@@ -84,6 +84,7 @@ Limitations
 <br/>
 
 ## Minimal UI
+
 Switch to the minimal ui by clicking the dedicated button inside the titlebar.
 Get back to the standard view by **double clicking** anywhere inside the window.
 
@@ -129,13 +130,13 @@ Please read `CONTRIBUTING.md` before contributing.
 
 ## Support the project
 
-This will help to finance the backend server as well as the [API][tarkov-tools] which provides the backend with data.
+This will help to finance the backend server as well as the [API][tarkov-dev] which provides the backend with data.
 
 [![Patreon](https://img.shields.io/badge/dynamic/json?color=%23e85b46&label=Patreon&query=data.attributes.patron_count&suffix=%20patrons&url=https%3A%2F%2Fwww.patreon.com%2Fapi%2Fcampaigns%2F4117180&style=for-the-badge&logo=patreon)](https://patreon.com/RatScanner)
 [![PayPal](https://img.shields.io/static/v1?&label=PayPal&message=Donate&color=0079C1&style=for-the-badge&logo=paypal)](https://paypal.me/mscheve)
 
 [escape-from-tarkov]: https://www.escapefromtarkov.com/
-[tarkov-tools]: https://tarkov-tools.com/
+[tarkov-dev]: https://tarkov.dev/
 [eft-icons-repo]: https://github.com/RatScanner/EfTIcons
 [latest-release]: https://github.com/RatScanner/RatScanner/releases/latest/download/RatScanner.zip
 [releases]: https://github.com/RatScanner/RatScanner/releases/
@@ -143,4 +144,4 @@ This will help to finance the backend server as well as the [API][tarkov-tools] 
 [faq-page]: FAQ.md
 [faq-page-can-i-get-banned]: FAQ.md#can-i-get-banned-for-using-rat-scanner
 [discord]: https://discord.com/invite/aHZf7aP
-[common-issues]:https://github.com/RatScanner/RatScanner/blob/master/FAQ.md#program-issues-1
+[common-issues]: https://github.com/RatScanner/RatScanner/blob/master/FAQ.md#program-issues-1
