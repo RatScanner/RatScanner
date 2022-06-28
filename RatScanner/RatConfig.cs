@@ -96,6 +96,29 @@ internal static class RatConfig
 		}
 	}
 
+	internal static class TarkovTools
+	{
+		internal static class RemoteControl
+		{
+			internal static bool AutoSync = false;
+			private static string _sessionId;
+			internal static string SessionId
+			{
+				get
+				{
+					if (string.IsNullOrEmpty(_sessionId)) _sessionId = RandomAlphaNumString(12);
+					return _sessionId;
+				}
+				set
+				{
+					if (string.IsNullOrEmpty(value)) value = RandomAlphaNumString(12);
+					_sessionId = value;
+				}
+			}
+			internal static bool OpenAmmoChart = false;
+		}
+	}
+
 	// Other
 #if DEBUG
 	internal static bool LogDebug
@@ -184,6 +207,11 @@ internal static class RatConfig
 		Tracking.TarkovTracker.Token = config.ReadString(nameof(Tracking.TarkovTracker.Token), "");
 		Tracking.TarkovTracker.ShowTeam = config.ReadBool(nameof(Tracking.TarkovTracker.ShowTeam), true);
 
+		config.Section = nameof(TarkovTools.RemoteControl);
+		TarkovTools.RemoteControl.AutoSync = config.ReadBool(nameof(TarkovTools.RemoteControl.AutoSync));
+		TarkovTools.RemoteControl.SessionId = config.ReadString(nameof(TarkovTools.RemoteControl.SessionId), "");
+		TarkovTools.RemoteControl.OpenAmmoChart = config.ReadBool(nameof(TarkovTools.RemoteControl.OpenAmmoChart), true);
+
 		config.Section = "Other";
 		if (!SetScreen)
 		{
@@ -234,6 +262,11 @@ internal static class RatConfig
 		config.WriteString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);
 		config.WriteBool(nameof(Tracking.TarkovTracker.ShowTeam), Tracking.TarkovTracker.ShowTeam);
 
+		config.Section = nameof(TarkovTools.RemoteControl);
+		config.WriteString(nameof(TarkovTools.RemoteControl.SessionId), TarkovTools.RemoteControl.SessionId);
+		config.WriteBool(nameof(TarkovTools.RemoteControl.AutoSync), TarkovTools.RemoteControl.AutoSync);
+		config.WriteBool(nameof(TarkovTools.RemoteControl.OpenAmmoChart), TarkovTools.RemoteControl.OpenAmmoChart);
+
 		config.Section = "Other";
 		config.WriteInt(nameof(ScreenWidth), ScreenWidth);
 		config.WriteInt(nameof(ScreenHeight), ScreenHeight);
@@ -255,5 +288,19 @@ internal static class RatConfig
 		var message = $"Detected {ScreenWidth}x{ScreenHeight} Resolution.\n\n";
 		message += "You can adjust this inside the settings.";
 		Logger.ShowMessage(message);
+	}
+
+	private static string RandomAlphaNumString(int length)
+	{
+		const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		var stringChars = new char[length];
+		var random = new Random();
+
+		for (var i = 0; i < stringChars.Length; i++)
+		{
+			stringChars[i] = chars[random.Next(chars.Length)];
+		}
+
+		return new string(stringChars);
 	}
 }

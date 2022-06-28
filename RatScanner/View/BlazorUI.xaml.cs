@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
 using RatLib;
+using RatTracking.TarkovTools;
 
 namespace RatScanner.View;
 
@@ -44,6 +45,8 @@ public partial class BlazorUI : UserControl, ISwitchable
 			new VirtualScreenOffset((int)SystemParameters.VirtualScreenLeft, (int)SystemParameters.VirtualScreenTop));
 
 		serviceCollection.AddSingleton<TarkovTrackerDB>(s => RatScannerMain.Instance.TarkovTrackerDB);
+
+		serviceCollection.AddSingleton<ITarkovToolsRemoteController>(s => RatScannerMain.Instance.TarkovToolsRemoteController);
 
 		var serviceProvider = serviceCollection.BuildServiceProvider();
 

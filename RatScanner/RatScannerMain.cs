@@ -16,6 +16,8 @@ using Color = System.Drawing.Color;
 using MessageBox = System.Windows.MessageBox;
 using Size = System.Drawing.Size;
 using Timer = System.Threading.Timer;
+using RatTracking.TarkovTools;
+using System.Threading.Tasks;
 
 namespace RatScanner;
 
@@ -54,6 +56,7 @@ public class RatScannerMain : INotifyPropertyChanged
 	internal MarketDB MarketDB;
 	internal ProgressDB ProgressDB;
 	public TarkovTrackerDB TarkovTrackerDB;
+	internal ITarkovToolsRemoteController TarkovToolsRemoteController { get; }
 
 	internal RatEyeEngine RatEyeEngine;
 	internal Config RatEyeConfig;
@@ -67,6 +70,8 @@ public class RatScannerMain : INotifyPropertyChanged
 		{
 			_currentItemScan = value;
 			OnPropertyChanged();
+
+			OpenRemoteTarkovToolsItemAsync().Wait();
 		}
 	}
 
@@ -102,6 +107,9 @@ public class RatScannerMain : INotifyPropertyChanged
 				RatConfig.SaveConfig();
 			}
 		}
+
+		TarkovToolsRemoteController = new TarkovToolsRemoteController();
+		TarkovToolsRemoteController.Connect(RatConfig.TarkovTools.RemoteControl.SessionId);
 
 		// Grab quest and hideout requirements from tarkovdata
 		Logger.LogInfo("Loading progress data...");
@@ -188,6 +196,22 @@ public class RatScannerMain : INotifyPropertyChanged
 			RatConfig.SaveConfig();
 
 			Logger.LogInfo("Successfully updated to the latest item data bundle");
+		}
+	}
+
+	private async Task OpenRemoteTarkovToolsItemAsync()
+	{
+		if (!RatConfig.TarkovTools.RemoteControl.AutoSync) return;
+
+		try
+		{
+			var openAmmoChart = RatConfig.TarkovTools.RemoteControl.OpenAmmoChart;
+			var item = CurrentItemScan?.MatchedItem;
+			await TarkovToolsRemoteController.OpenRemoteTarkovToolsAsync(item, openAmmoChart).ConfigureAwait(false);
+		}
+		catch (TarkovToolsRemoteControllerException e)
+		{
+			Logger.LogWarning(e.Message, e);
 		}
 	}
 
