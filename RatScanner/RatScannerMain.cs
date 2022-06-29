@@ -16,6 +16,8 @@ using Color = System.Drawing.Color;
 using MessageBox = System.Windows.MessageBox;
 using Size = System.Drawing.Size;
 using Timer = System.Threading.Timer;
+using System.Collections.Generic;
+using RatScanner.FetchModels;
 
 namespace RatScanner;
 
@@ -27,8 +29,6 @@ public class RatScannerMain : INotifyPropertyChanged
 	internal readonly HotkeyManager HotkeyManager;
 
 	private readonly BlazorOverlay _blazorOverlay;
-
-	private ItemScan _currentItemScan;
 
 	private Timer _marketDBRefreshTimer;
 	private Timer _tarkovTrackerDBRefreshTimer;
@@ -60,15 +60,7 @@ public class RatScannerMain : INotifyPropertyChanged
 
 	public event PropertyChangedEventHandler PropertyChanged;
 
-	internal ItemScan CurrentItemScan
-	{
-		get => _currentItemScan;
-		set
-		{
-			_currentItemScan = value;
-			OnPropertyChanged();
-		}
-	}
+	internal ItemQueue ItemScans;
 
 	public RatScannerMain()
 	{
@@ -117,7 +109,7 @@ public class RatScannerMain : INotifyPropertyChanged
 
 		Logger.LogInfo("Setting default item...");
 		var inspection = RatEyeEngine.NewInspection(new Bitmap(50, 50));
-		CurrentItemScan = new ItemNameScan(inspection);
+		ItemScans.Enqueue(new ItemNameScan(inspection));
 
 		Logger.LogInfo("Initializing hotkey manager...");
 		HotkeyManager = new HotkeyManager();
@@ -252,14 +244,24 @@ public class RatScannerMain : INotifyPropertyChanged
 			// Scan the item
 			var inventory = RatEyeEngine.NewInventory(screenshot);
 			var icon = inventory.LocateIcon();
-
+			
 			if (icon?.DetectionConfidence <= 0 || icon?.Item == null) return;
 
 			var toolTipPosition = position;
 			toolTipPosition += icon.Position + icon.ItemPosition;
 			toolTipPosition -= new Vector2(RatConfig.IconScan.ScanWidth, RatConfig.IconScan.ScanHeight) / 2;
 
-			CurrentItemScan = new ItemIconScan(icon, toolTipPosition, RatConfig.ToolTip.Duration);
+			var tempIconScan = new ItemIconScan(icon, toolTipPosition, RatConfig.ToolTip.Duration);
+			tempIconScan.ImageLink = tempIconScan.MatchedItem.GetMarketItem().ImageLink;
+			tempIconScan.IconLink = tempIconScan.MatchedItem.GetMarketItem().IconLink;
+			tempIconScan.WikiLink = tempIconScan.MatchedItem.GetMarketItem().WikiLink;
+			tempIconScan.TarkovDevLink = $"https://tarkov.dev/item/{tempIconScan.MatchedItem.Id}";
+			tempIconScan.Avg24hPrice = tempIconScan.MatchedItem.GetMarketItem().Avg24hPrice;
+			tempIconScan.PricePerSlot = tempIconScan.MatchedItem.GetMarketItem().Avg24hPrice / (tempIconScan.MatchedItem.Width * tempIconScan.MatchedItem.Height);
+			tempIconScan.TraderName = TraderPrice.GetTraderName(tempIconScan.MatchedItem.GetBestTrader().traderId);
+			tempIconScan.BestTraderPrice = tempIconScan.MatchedItem.GetBestTrader().price;
+
+			ItemScans.Enqueue(tempIconScan);
 			SetOverlayRefresh();
 		}
 	}
@@ -296,10 +298,20 @@ public class RatScannerMain : INotifyPropertyChanged
 			toolTipPosition += position - new Vector2(scanSize, scanSize) / 2;
 			toolTipPosition += new Vector2(0, (int)(19f * scale));
 
-			CurrentItemScan = new ItemNameScan(
+			var tempNameScan = new ItemNameScan(
 				inspection,
 				toolTipPosition,
 				RatConfig.ToolTip.Duration);
+			tempNameScan.ImageLink = tempNameScan.MatchedItem.GetMarketItem().ImageLink;
+			tempNameScan.IconLink = tempNameScan.MatchedItem.GetMarketItem().IconLink;
+			tempNameScan.WikiLink = tempNameScan.MatchedItem.GetMarketItem().WikiLink;
+			tempNameScan.TarkovDevLink = $"https://tarkov.dev/item/{tempNameScan.MatchedItem.Id}";
+			tempNameScan.Avg24hPrice = tempNameScan.MatchedItem.GetMarketItem().Avg24hPrice;
+			tempNameScan.PricePerSlot = tempNameScan.MatchedItem.GetMarketItem().Avg24hPrice / (tempNameScan.MatchedItem.Width * tempNameScan.MatchedItem.Height);
+			tempNameScan.TraderName = TraderPrice.GetTraderName(tempNameScan.MatchedItem.GetBestTrader().traderId);
+			tempNameScan.BestTraderPrice = tempNameScan.MatchedItem.GetBestTrader().price;
+
+			ItemScans.Enqueue(tempNameScan);
 
 			SetOverlayRefresh();
 		}
@@ -319,16 +331,26 @@ public class RatScannerMain : INotifyPropertyChanged
 			var inspection = RatEyeEngine.NewInspection(screenshot);
 
 			if (!inspection.ContainsMarker || inspection.Item == null) return;
-
+			
 			var scale = RatEyeConfig.ProcessingConfig.Scale;
 			var toolTipPosition = inspection.MarkerPosition;
 			toolTipPosition += position;
 			toolTipPosition += new Vector2(0, (int)(19f * scale));
 
-			CurrentItemScan = new ItemNameScan(
+			var tempNameScan = new ItemNameScan(
 				inspection,
 				toolTipPosition,
 				RatConfig.ToolTip.Duration);
+			tempNameScan.ImageLink = tempNameScan.MatchedItem.GetMarketItem().ImageLink;
+			tempNameScan.IconLink = tempNameScan.MatchedItem.GetMarketItem().IconLink;
+			tempNameScan.WikiLink = tempNameScan.MatchedItem.GetMarketItem().WikiLink;
+			tempNameScan.TarkovDevLink = $"https://tarkov.dev/item/{tempNameScan.MatchedItem.Id}";
+			tempNameScan.Avg24hPrice = tempNameScan.MatchedItem.GetMarketItem().Avg24hPrice;
+			tempNameScan.PricePerSlot = tempNameScan.MatchedItem.GetMarketItem().Avg24hPrice / (tempNameScan.MatchedItem.Width * tempNameScan.MatchedItem.Height);
+			tempNameScan.TraderName = TraderPrice.GetTraderName(tempNameScan.MatchedItem.GetBestTrader().traderId);
+			tempNameScan.BestTraderPrice = tempNameScan.MatchedItem.GetBestTrader().price;
+
+			ItemScans.Enqueue(tempNameScan);
 
 			SetOverlayRefresh();
 		}
