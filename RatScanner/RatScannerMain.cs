@@ -60,7 +60,7 @@ public class RatScannerMain : INotifyPropertyChanged
 
 	public event PropertyChangedEventHandler PropertyChanged;
 
-	internal ItemQueue ItemScans;
+	internal ItemQueue ItemScans = new();
 
 	public RatScannerMain()
 	{
