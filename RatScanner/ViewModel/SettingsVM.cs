@@ -9,6 +9,7 @@ namespace RatScanner.ViewModel;
 internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 {
 	public bool EnableNameScan { get; set; }
+	public bool EnableAutoNameScan { get; set; }
 	public int NameScanLanguage { get; set; }
 
 	public bool EnableIconScan { get; set; }
@@ -43,7 +44,6 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 
 	public bool ShowTarkovTrackerTeam { get; set; }
 
-
 	internal SettingsVM()
 	{
 		LoadSettings();
@@ -52,6 +52,7 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 	public void LoadSettings()
 	{
 		EnableNameScan = RatConfig.NameScan.Enable;
+		EnableAutoNameScan = RatConfig.NameScan.EnableAuto;
 		NameScanLanguage = (int)RatConfig.NameScan.Language;
 
 		EnableIconScan = RatConfig.IconScan.Enable;
@@ -94,6 +95,7 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 
 		// Save config
 		RatConfig.NameScan.Enable = EnableNameScan;
+		RatConfig.NameScan.EnableAuto = EnableAutoNameScan;
 		RatConfig.NameScan.Language = (Language)NameScanLanguage;
 
 		RatConfig.IconScan.Enable = EnableIconScan;

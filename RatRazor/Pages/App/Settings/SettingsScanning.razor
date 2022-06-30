@@ -16,6 +16,9 @@
 					<MudItem xs="12" Class="pa-0 ma-0">
 						<MudCheckBox @bind-Checked="@SettingsUI.EnableNameScan" Label="Enable Name Scan" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
 					</MudItem>
+					<MudItem xs="12" Class="pa-0 ma-0">
+						<MudCheckBox @bind-Checked="@SettingsUI.EnableAutoNameScan" Label="Automatic Scanning" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+					</MudItem>
 					<MudItem xs="12">
 						<MudSelect @bind-Value="@SettingsUI.NameScanLanguage" T="int" Label="Name Scan Language" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.BottomCenter" Variant="Variant.Text" OffsetY="true" Margin="Margin.Dense" Dense="true" Class="mx-1">
 							<MudSelectItem T="int" Value="0">

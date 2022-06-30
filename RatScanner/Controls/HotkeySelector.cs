@@ -157,7 +157,7 @@ public class HotkeySelector : Button, IHotkeySelector, INotifyPropertyChanged
 		Hotkey.KeyboardKeys.Add(e.Key);
 		OnPropertyChanged();
 		UpdateControl();
-		Console.WriteLine($"Adding Key: {e.Key}");
+		Logger.LogDebug($"Adding Key: {e.Key}");
 
 		e.Handled = true;
 	}

@@ -16,6 +16,8 @@ using Color = System.Drawing.Color;
 using MessageBox = System.Windows.MessageBox;
 using Size = System.Drawing.Size;
 using Timer = System.Threading.Timer;
+using RatScanner.FetchModels;
+using System.Collections.Generic;
 
 namespace RatScanner;
 
@@ -28,12 +30,9 @@ public class RatScannerMain : INotifyPropertyChanged
 
 	private readonly BlazorOverlay _blazorOverlay;
 
-	private ItemScan _currentItemScan;
-
 	private Timer _marketDBRefreshTimer;
 	private Timer _tarkovTrackerDBRefreshTimer;
 	private Timer _scanRefreshTimer;
-	private Timer _nameScanTimer;
 
 	/// <summary>
 	/// Lock for name scanning
@@ -56,19 +55,10 @@ public class RatScannerMain : INotifyPropertyChanged
 	public TarkovTrackerDB TarkovTrackerDB;
 
 	internal RatEyeEngine RatEyeEngine;
-	internal Config RatEyeConfig;
 
 	public event PropertyChangedEventHandler PropertyChanged;
 
-	internal ItemScan CurrentItemScan
-	{
-		get => _currentItemScan;
-		set
-		{
-			_currentItemScan = value;
-			OnPropertyChanged();
-		}
-	}
+	internal ItemQueue ItemScans = new();
 
 	public RatScannerMain()
 	{
@@ -117,16 +107,15 @@ public class RatScannerMain : INotifyPropertyChanged
 
 		Logger.LogInfo("Setting default item...");
 		var inspection = RatEyeEngine.NewInspection(new Bitmap(50, 50));
-		CurrentItemScan = new ItemNameScan(inspection);
+		ItemScans.Enqueue(new ItemNameScan(inspection));
 
 		Logger.LogInfo("Initializing hotkey manager...");
 		HotkeyManager = new HotkeyManager();
 
-		Logger.LogInfo("Setting up data update routines...");
+		Logger.LogInfo("Setting up timer routines...");
 		_marketDBRefreshTimer = new Timer(RefreshMarketDB, null, RatConfig.MarketDBRefreshTime, Timeout.Infinite);
 		_tarkovTrackerDBRefreshTimer = new Timer(RefreshTarkovTrackerDB, null, RatConfig.Tracking.TarkovTracker.RefreshTime, Timeout.Infinite);
-		_scanRefreshTimer = new Timer(RefreshOverlay);
-		//_nameScanTimer = new Timer(NameScanContinuous, null, 500, 1000);
+		_scanRefreshTimer = new Timer(RefreshOverlay, null, 1000, 100);
 
 		Logger.LogInfo("Ready!");
 	}
@@ -196,8 +185,12 @@ public class RatScannerMain : INotifyPropertyChanged
 		Config.LogDebug = RatConfig.LogDebug;
 		Config.Path.LogFile = "RatEyeLog.txt";
 		Config.Path.TesseractLibSearchPath = AppDomain.CurrentDomain.BaseDirectory;
+		RatEyeEngine = new RatEyeEngine(GetRatEyeConfig());
+	}
 
-		RatEyeConfig = new Config()
+	private RatEye.Config GetRatEyeConfig(bool highlighted = true)
+	{
+		return new Config()
 		{
 			PathConfig = new Config.Path()
 			{
@@ -218,18 +211,115 @@ public class RatScannerMain : INotifyPropertyChanged
 				},
 				InventoryConfig = new Config.Processing.Inventory()
 				{
-					OptimizeHighlighted = true,
+					OptimizeHighlighted = highlighted,
 					MaxGridColor = Color.FromArgb(89, 100, 100),
 				},
 				InspectionConfig = new Config.Processing.Inspection()
 				{
 					MarkerThreshold = 0.9f,
-					EnableContainers = false,
 				},
 			},
 		};
+	}
 
-		RatEyeEngine = new RatEyeEngine(RatEyeConfig);
+
+	/// <summary>
+	/// Perform a name scan at the give position
+	/// </summary>
+	/// <param name="position">Position on the screen at which to perform the scan</param>
+	internal void NameScan(Vector2 position)
+	{
+		lock (NameScanLock)
+		{
+			Logger.LogDebug("Name scanning at: " + position);
+			// Wait for game ui to update the click
+			Thread.Sleep(50);
+
+			// Get raw screenshot which includes the icon and text
+			var markerScanSize = RatConfig.NameScan.MarkerScanSize;
+			var screenshotPosX = position.X - markerScanSize / 2;
+			var screenshotPosY = position.Y - markerScanSize / 2;
+			var screenhotPos = new Vector2(screenshotPosX, screenshotPosY);
+			var sizeWidth = markerScanSize + RatConfig.NameScan.TextWidth;
+			var sizeHeight = markerScanSize;
+			var screenshot = GetScreenshot(screenhotPos, new Size(sizeWidth, sizeHeight));
+
+			// Scan the item
+			var inspection = RatEyeEngine.NewInspection(screenshot);
+
+			if (!inspection.ContainsMarker || inspection.Item == null) return;
+
+			var scale = RatEyeEngine.Config.ProcessingConfig.Scale;
+			var marker = RatEyeEngine.Config.ProcessingConfig.InspectionConfig.Marker;
+			var toolTipPosition = inspection.MarkerPosition;
+			toolTipPosition += screenhotPos;
+			toolTipPosition += new Vector2(-(int)(marker.Width * scale), (int)(marker.Height * scale));
+
+			var tempNameScan = new ItemNameScan(
+				inspection,
+				toolTipPosition,
+				RatConfig.ToolTip.Duration);
+			tempNameScan.ImageLink = tempNameScan.MatchedItem.GetMarketItem().ImageLink;
+			tempNameScan.IconLink = tempNameScan.MatchedItem.GetMarketItem().IconLink;
+			tempNameScan.WikiLink = tempNameScan.MatchedItem.GetMarketItem().WikiLink;
+			tempNameScan.TarkovDevLink = $"https://tarkov.dev/item/{tempNameScan.MatchedItem.Id}";
+			tempNameScan.Avg24hPrice = tempNameScan.MatchedItem.GetMarketItem().Avg24hPrice;
+			tempNameScan.PricePerSlot = tempNameScan.MatchedItem.GetMarketItem().Avg24hPrice / (tempNameScan.MatchedItem.Width * tempNameScan.MatchedItem.Height);
+			tempNameScan.TraderName = TraderPrice.GetTraderName(tempNameScan.MatchedItem.GetBestTrader().traderId);
+			tempNameScan.BestTraderPrice = tempNameScan.MatchedItem.GetBestTrader().price;
+
+			ItemScans.Enqueue(tempNameScan);
+
+			RefreshOverlay();
+		}
+	}
+
+	/// <summary>
+	/// Perform a name scan over the entire active screen
+	/// </summary>
+	internal void NameScanScreen(object? _ = null)
+	{
+		lock (NameScanLock)
+		{
+			Logger.LogDebug("Name scanning screen");
+			var mousePosition = UserActivityHelper.GetMousePosition();
+			var bounds = Screen.AllScreens.First(screen => screen.Bounds.Contains(mousePosition)).Bounds;
+
+			var position = new Vector2(bounds.X, bounds.Y);
+			var screenshot = GetScreenshot(position, bounds.Size);
+
+			// Scan the item
+			var multiInspection = RatEyeEngine.NewMultiInspection(screenshot);
+
+			if (multiInspection.Inspections.Count == 0) return;
+
+			foreach (var inspection in multiInspection.Inspections)
+			{
+				var scale = RatEyeEngine.Config.ProcessingConfig.Scale;
+				var toolTipPosition = inspection.MarkerPosition;
+				toolTipPosition += position;
+				var marker = RatEyeEngine.Config.ProcessingConfig.InspectionConfig.Marker;
+				toolTipPosition += new Vector2(0, (int)(marker.Height * scale));
+
+				var tempNameScan = new ItemNameScan(
+						inspection,
+						toolTipPosition,
+						RatConfig.ToolTip.Duration)
+				{
+					ImageLink = inspection.Item.GetMarketItem().ImageLink,
+					IconLink = inspection.Item.GetMarketItem().IconLink,
+					WikiLink = inspection.Item.GetMarketItem().WikiLink,
+					TarkovDevLink = $"https://tarkov.dev/item/{inspection.Item.Id}",
+					Avg24hPrice = inspection.Item.GetMarketItem().Avg24hPrice,
+					PricePerSlot = inspection.Item.GetMarketItem().Avg24hPrice / (inspection.Item.Width * inspection.Item.Height),
+					TraderName = TraderPrice.GetTraderName(inspection.Item.GetBestTrader().traderId),
+					BestTraderPrice = inspection.Item.GetBestTrader().price,
+				};
+
+				ItemScans.Enqueue(tempNameScan);
+			}
+			RefreshOverlay();
+		}
 	}
 
 	/// <summary>
@@ -239,9 +329,9 @@ public class RatScannerMain : INotifyPropertyChanged
 	/// <returns><see langword="true"/> if a item was scanned successfully</returns>
 	internal void IconScan(Vector2 position)
 	{
-		Logger.LogDebug("Icon scanning at: " + position);
 		lock (IconScanLock)
 		{
+			Logger.LogDebug("Icon scanning at: " + position);
 			var x = position.X - RatConfig.IconScan.ScanWidth / 2;
 			var y = position.Y - RatConfig.IconScan.ScanHeight / 2;
 
@@ -259,78 +349,20 @@ public class RatScannerMain : INotifyPropertyChanged
 			toolTipPosition += icon.Position + icon.ItemPosition;
 			toolTipPosition -= new Vector2(RatConfig.IconScan.ScanWidth, RatConfig.IconScan.ScanHeight) / 2;
 
-			CurrentItemScan = new ItemIconScan(icon, toolTipPosition, RatConfig.ToolTip.Duration);
-			SetOverlayRefresh();
-		}
-	}
+			var tempIconScan = new ItemIconScan(icon, toolTipPosition, RatConfig.ToolTip.Duration)
+			{
+				ImageLink = icon.Item.GetMarketItem().ImageLink,
+				IconLink = icon.Item.GetMarketItem().IconLink,
+				WikiLink = icon.Item.GetMarketItem().WikiLink,
+				TarkovDevLink = $"https://tarkov.dev/item/{icon.Item.Id}",
+				Avg24hPrice = icon.Item.GetMarketItem().Avg24hPrice,
+				PricePerSlot = icon.Item.GetMarketItem().Avg24hPrice / (icon.Item.Width * icon.Item.Height),
+				TraderName = TraderPrice.GetTraderName(icon.Item.GetBestTrader().traderId),
+				BestTraderPrice = icon.Item.GetBestTrader().price,
+			};
 
-	/// <summary>
-	/// Perform a name scan at the give position
-	/// </summary>
-	/// <param name="position">Position on the screen at which to perform the scan</param>
-	/// <returns></returns>
-	internal void NameScan(Vector2 position)
-	{
-		Logger.LogDebug("Name scanning at: " + position);
-		lock (NameScanLock)
-		{
-			// Wait for game ui to update the click
-			Thread.Sleep(50);
-
-			// Get raw screenshot which includes the icon and text
-			var markerScanSize = RatConfig.NameScan.MarkerScanSize;
-			var screenshotPosX = position.X - markerScanSize / 2;
-			var screenshotPosY = position.Y - markerScanSize / 2;
-			var sizeWidth = markerScanSize + RatConfig.NameScan.TextWidth;
-			var sizeHeight = markerScanSize;
-			var screenshot = GetScreenshot(new Vector2(screenshotPosX, screenshotPosY), new Size(sizeWidth, sizeHeight));
-
-			// Scan the item
-			var inspection = RatEyeEngine.NewInspection(screenshot);
-
-			if (!inspection.ContainsMarker || inspection.Item == null) return;
-
-			var scanSize = RatConfig.NameScan.MarkerScanSize;
-			var scale = RatEyeConfig.ProcessingConfig.Scale;
-			var toolTipPosition = inspection.MarkerPosition;
-			toolTipPosition += position - new Vector2(scanSize, scanSize) / 2;
-			toolTipPosition += new Vector2(0, (int)(19f * scale));
-
-			CurrentItemScan = new ItemNameScan(
-				inspection,
-				toolTipPosition,
-				RatConfig.ToolTip.Duration);
-
-			SetOverlayRefresh();
-		}
-	}
-
-	internal void NameScanContinuous(object? o = null)
-	{
-		lock (NameScanLock)
-		{
-			var mousePosition = UserActivityHelper.GetMousePosition();
-			var bounds = Screen.AllScreens.Where(screen => screen.Bounds.Contains(mousePosition)).First().Bounds;
-
-			var position = new Vector2(bounds.X, bounds.Y);
-			var screenshot = GetScreenshot(position, bounds.Size);
-
-			// Scan the item
-			var inspection = RatEyeEngine.NewInspection(screenshot);
-
-			if (!inspection.ContainsMarker || inspection.Item == null) return;
-
-			var scale = RatEyeConfig.ProcessingConfig.Scale;
-			var toolTipPosition = inspection.MarkerPosition;
-			toolTipPosition += position;
-			toolTipPosition += new Vector2(0, (int)(19f * scale));
-
-			CurrentItemScan = new ItemNameScan(
-				inspection,
-				toolTipPosition,
-				RatConfig.ToolTip.Duration);
-
-			SetOverlayRefresh();
+			ItemScans.Enqueue(tempIconScan);
+			RefreshOverlay();
 		}
 	}
 
@@ -352,14 +384,8 @@ public class RatScannerMain : INotifyPropertyChanged
 		return bmp;
 	}
 
-	private void SetOverlayRefresh()
-	{
-		_scanRefreshTimer.Change(RatConfig.ToolTip.Duration, Timeout.Infinite);
-	}
-
 	private void RefreshOverlay(object? o = null)
 	{
-		// Overlay will react to event
 		OnPropertyChanged();
 	}
 

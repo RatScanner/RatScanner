@@ -6,107 +6,110 @@
 @inject IJSRuntime JSRuntime;
 @implements IDisposable
 
-@if (RatScannerUI.CurrentItemScan != null
-    && RatScannerUI.CurrentItemScan.GetToolTipPosition() != null
-    && RatScannerUI.CurrentItemScan.DissapearAt > DateTimeOffset.Now.ToUnixTimeMilliseconds())
+@foreach (var itemScan in RatScannerUI.ItemScans)
 {
-    @if (RatScannerUI.CurrentItemScan is ItemIconScan iconScan)
+    @if (itemScan != null
+        && itemScan.GetToolTipPosition() != null
+        && itemScan.DissapearAt > DateTimeOffset.Now.ToUnixTimeMilliseconds())
     {
-        <div style="font-size: smaller; position: absolute;
-		            left: @(RatScannerUI.CurrentItemScan.GetToolTipPosition().X - VirtualScreenOffset.XOffset)px;
-		            top: @(RatScannerUI.CurrentItemScan.GetToolTipPosition().Y - VirtualScreenOffset.YOffset)px;
-		            width: @(iconScan.Icon.ItemSize.X)px;
-		            height: @(iconScan.Icon.ItemSize.Y)px;
-	            ">
-            <div style="height: 100%; width: 100%; position: relative;
-			            text-shadow: 0px 0px 5px black;
-			            outline-offset: -1px;
-			            outline: 1px solid #555555;" class="pa-1">
-                <div style="position: absolute; left: 0px; top: 0px;">
-                    <div style="position: relative;">
-                        @{
-                            var iconStyle = "transform-origin: top left;";
-                            if (iconScan.Rotated)
-                            {
-                                iconStyle += "transform: rotate(0.25turn) translate(0%, -100%);";
+        @if (itemScan is ItemIconScan iconScan)
+        {
+            <div style="font-size: smaller; position: absolute;
+		                left: @(iconScan.GetToolTipPosition().X - VirtualScreenOffset.XOffset)px;
+		                top: @(iconScan.GetToolTipPosition().Y - VirtualScreenOffset.YOffset)px;
+		                width: @(iconScan.Icon.ItemSize.X)px;
+		                height: @(iconScan.Icon.ItemSize.Y)px;
+	                ">
+                <div style="height: 100%; width: 100%; position: relative;
+			                text-shadow: 0px 0px 5px black;
+			                outline-offset: -1px;
+			                outline: 1px solid #555555;" class="pa-1">
+                    <div style="position: absolute; left: 0px; top: 0px;">
+                        <div style="position: relative;">
+                            @{
+                                var iconStyle = "transform-origin: top left;";
+                                if (iconScan.Rotated)
+                                {
+                                    iconStyle += "transform: rotate(0.25turn) translate(0%, -100%);";
+                                }
+                                else
+                                {
+                                }
                             }
-                            else
-                            {
-                            }
+                            <img src="@GetIconURL(iconScan)" style="position: absolute; left: 0px; top: 0px; z-index: -1; background-color: #121212; @iconStyle">
+                        </div>
+                    </div>
+                    <div style="overflow: hidden;">
+                        @if (iconScan.Avg24hPrice >= iconScan.BestTraderPrice)
+                        {
+                            <div class="stroke">
+                                @RatScannerUI.IntToShortPrice(iconScan.Avg24hPrice)
+                            </div>
                         }
-                        <img src="@GetIconURL()" style="position: absolute; left: 0px; top: 0px; z-index: -1; background-color: #121212; @iconStyle">
+                        else
+                        {
+                            <div class="d-flex align-center stroke">
+                                @RatScannerUI.IntToShortPrice(iconScan.BestTraderPrice)
+                                <MudAvatar Image="@($"https://tarkovtracker.io/img/{@iconScan.TraderName}Headshot.jpg")" Size="Size.Small" Style="float: right;" Class="ml-1" />
+                            </div>
+                        }
+
+                        @if (RatScannerUI.GetItemNeeds(iconScan).QuestRemaining > 0)
+                        {
+                            <div class="d-flex align-center stroke">
+                                @RatScannerUI.GetItemNeeds(iconScan).QuestRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" />
+                            </div>
+                        }
+                        @if (RatScannerUI.GetItemNeeds(iconScan).HideoutRemaining > 0)
+                        {
+                            <div class="d-flex align-center stroke">
+                                @RatScannerUI.GetItemNeeds(iconScan).HideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" />
+                            </div>
+                        }
                     </div>
                 </div>
-                <div style="overflow: hidden;">
-                    @if (RatScannerUI.Avg24hPrice >= RatScannerUI.BestTraderPrice)
-                    {
-                        <div class="stroke">
-                            @RatScannerUI.IntToShortPrice(RatScannerUI.Avg24hPrice)
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="d-flex align-center stroke">
-                            @RatScannerUI.IntToShortPrice(RatScannerUI.BestTraderPrice)
-                            <MudAvatar Image="@($"https://tarkovtracker.io/img/{@RatScannerUI.TraderName}Headshot.jpg")" Size="Size.Small" Style="float: right;" Class="ml-1" />
-                        </div>
-                    }
-
-                    @if (RatScannerUI.TrackingNeeds.QuestRemaining > 0)
-                    {
-                        <div class="d-flex align-center stroke">
-                            @RatScannerUI.TrackingNeeds.QuestRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" />
-                        </div>
-                    }
-                    @if (RatScannerUI.TrackingNeeds.HideoutRemaining > 0)
-                    {
-                        <div class="d-flex align-center stroke">
-                            @RatScannerUI.TrackingNeeds.HideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" />
-                        </div>
-                    }
-                </div>
             </div>
-        </div>
-    }
-    else
-    {
-        <div class="d-flex align-enter" style="position: absolute; left: @(RatScannerUI.CurrentItemScan.GetToolTipPosition().X - VirtualScreenOffset.XOffset)px; top: @(RatScannerUI.CurrentItemScan.GetToolTipPosition().Y - VirtualScreenOffset.YOffset)px; background: #121212; padding: 4px;">
+        }
+        else
+        {
+            <div class="d-flex align-enter" style="position: absolute; left: @(itemScan.GetToolTipPosition().X - VirtualScreenOffset.XOffset)px; top: @(itemScan.GetToolTipPosition().Y - VirtualScreenOffset.YOffset)px; background: #121212; padding: 4px;">
 
-            @if (RatScannerUI.Avg24hPrice >= RatScannerUI.BestTraderPrice)
-            {
-                <div class="stroke">
-                    @RatScannerUI.IntToShortPrice(RatScannerUI.Avg24hPrice)
-                </div>
-            }
-            else
-            {
-                <div class="d-flex align-center">
-                    @RatScannerUI.IntToShortPrice(RatScannerUI.BestTraderPrice)
-                    <MudAvatar Image="@($"https://tarkovtracker.io/img/{@RatScannerUI.TraderName}Headshot.jpg")" Size="Size.Small" Style="float: right;" Class="ml-1" />
-                </div>
-            }
+                @if (itemScan.Avg24hPrice >= itemScan.BestTraderPrice)
+                {
+                    <div class="stroke">
+                        @RatScannerUI.IntToShortPrice(itemScan.Avg24hPrice)
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex align-center">
+                        @RatScannerUI.IntToShortPrice(itemScan.BestTraderPrice)
+                        <MudAvatar Image="@($"https://tarkovtracker.io/img/{@itemScan.TraderName}Headshot.jpg")" Size="Size.Small" Style="float: right;" Class="ml-1" />
+                    </div>
+                }
 
-            @if (RatScannerUI.TrackingNeeds.QuestRemaining > 0)
-            {
-                <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" />
-            }
-            @if (RatScannerUI.TrackingNeeds.HideoutRemaining > 0)
-            {
-                <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" />
-            }
-        </div>
+                @if (RatScannerUI.GetItemNeeds(itemScan).QuestRemaining > 0)
+                {
+                    <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" />
+                }
+                @if (RatScannerUI.GetItemNeeds(itemScan).HideoutRemaining > 0)
+                {
+                    <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" />
+                }
+            </div>
+        }
     }
 }
 
 @code {
 
-    private string GetIconURL()
+    private string GetIconURL(ItemIconScan itemScan)
     {
-        var path = RatScannerUI.CurrentItemScan.IconPath;
+        var path = itemScan.IconPath;
 
         if (string.IsNullOrEmpty(path))
         {
-            return $"https://assets.tarkov.dev/{RatScannerUI.CurrentItemScan.MatchedItem.Id}-base-image.png";
+            return $"https://assets.tarkov.dev/{itemScan.MatchedItem.Id}-base-image.png";
         }
 
         path = path.Replace("\\", "/");
@@ -115,7 +118,7 @@
         var url = "https://local.data/" + pathEnd;
         return url;
     }
-
+    
     protected override void OnInitialized()
     {
         RatScannerUI.PropertyChanged += PropertyChangeHandler;
