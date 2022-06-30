@@ -210,7 +210,7 @@ internal class MainWindowVM : INotifyPropertyChanged, IRatScannerUI
 				// Update FIR flag to true if any quest is FIR
 				if (requirement.FIR) fir = true;
 
-				if (progress == null)
+				if (progress == null || progress.QuestObjectives == null)
 				{
 					need += requirement.Needed;
 					continue;
@@ -241,7 +241,7 @@ internal class MainWindowVM : INotifyPropertyChanged, IRatScannerUI
 		// Add up all the hideout requirements
 		foreach (var requirement in requiredHideoutItems)
 		{
-			if (progress == null)
+			if (progress == null || progress.HideoutObjectives == null)
 			{
 				need += requirement.Needed;
 				continue;
