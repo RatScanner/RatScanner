@@ -154,4 +154,72 @@ internal class MainWindowVM : INotifyPropertyChanged, IRatScannerUI
 		result += " " + suffixes[(int)Math.Floor((priceStr.Length - 1) / 3f)];
 		return "₽ " + result;
 	}
+
+	private static (int need, int have, bool FIR) GetQuestRequired(IEnumerable<QuestItem> requiredQuestItems, Progress progress)
+	{
+		var need = 0;
+		var have = 0;
+		var fir = false;
+
+		// Add up all the quest requirements
+		foreach (var requirement in requiredQuestItems)
+			// Add the item if its FIR or we want to show non FIR
+			if (requirement.FIR || RatConfig.Tracking.ShowNonFIRNeeds)
+			{
+				// Update FIR flag to true if any quest is FIR
+				if (requirement.FIR) fir = true;
+
+				if (progress == null || progress.QuestObjectives == null)
+				{
+					need += requirement.Needed;
+					continue;
+				}
+
+				// If the progress data doesn't have this requirement, then it should be a needed item
+				if (!progress.QuestObjectives.ContainsKey(requirement.QuestObjectiveId.ToString()))
+				{
+					need += requirement.Needed;
+				}
+				// Else if we have the requirement in our progress data but its not complete, it might have metadata
+				else if (progress.QuestObjectives[requirement.QuestObjectiveId.ToString()].Complete != true)
+				{
+					// Check if we have completed this quest need
+					need += requirement.Needed;
+					have += progress.QuestObjectives[requirement.QuestObjectiveId.ToString()].Have ?? 0;
+				}
+			}
+
+		return (need, have, fir);
+	}
+
+	private static (int need, int have) GetHideoutRequired(IEnumerable<HideoutItem> requiredHideoutItems, Progress progress)
+	{
+		var need = 0;
+		var have = 0;
+
+		// Add up all the hideout requirements
+		foreach (var requirement in requiredHideoutItems)
+		{
+			if (progress == null || progress.HideoutObjectives == null)
+			{
+				need += requirement.Needed;
+				continue;
+			}
+
+			// If the progress data doesn't have this requirement, then it should be a needed item
+			if (!progress.HideoutObjectives.ContainsKey(requirement.HideoutObjectiveId.ToString()))
+			{
+				need += requirement.Needed;
+			}
+			// Else if we have the requirement in our progress data but its not complete, it might have metadata
+			else if (progress.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Complete != true)
+			{
+				// Check if we have completed this hideout need
+				need += requirement.Needed;
+				have += progress.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Have ?? 0;
+			}
+		}
+
+		return (need, have);
+	}
 }
