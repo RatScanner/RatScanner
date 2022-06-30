@@ -42,6 +42,7 @@ internal static class RatConfig
 	internal static class NameScan
 	{
 		internal static bool Enable = true;
+		internal static bool EnableAuto = true;
 		internal static Language Language = Language.English;
 		internal static float ConfWarnThreshold = 0.85f;
 		internal static int MarkerScanSize => (int)(50 * ScreenScale);
@@ -116,7 +117,7 @@ internal static class RatConfig
 	internal static int ScreenHeight = 1080;
 	internal static bool SetScreen = false;
 
-	internal static float ScreenScale => RatScannerMain.Instance.RatEyeConfig.ProcessingConfig.Scale;
+	internal static float ScreenScale => RatScannerMain.Instance.RatEyeEngine.Config.ProcessingConfig.Scale;
 
 	private static bool IsSupportedConfigVersion()
 	{
@@ -152,6 +153,7 @@ internal static class RatConfig
 
 		config.Section = nameof(NameScan);
 		NameScan.Enable = config.ReadBool(nameof(NameScan.Enable), true);
+		NameScan.EnableAuto = config.ReadBool(nameof(NameScan.EnableAuto), false);
 		NameScan.Language = (Language)config.ReadInt(nameof(NameScan.Language), (int)Language.English);
 
 		config.Section = nameof(IconScan);
@@ -203,6 +205,7 @@ internal static class RatConfig
 
 		config.Section = nameof(NameScan);
 		config.WriteBool(nameof(NameScan.Enable), NameScan.Enable);
+		config.WriteBool(nameof(NameScan.EnableAuto), NameScan.EnableAuto);
 		config.WriteInt(nameof(NameScan.Language), (int)NameScan.Language);
 
 		config.Section = nameof(IconScan);

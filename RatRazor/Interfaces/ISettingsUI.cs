@@ -5,6 +5,7 @@ namespace RatRazor.Interfaces;
 public interface ISettingsUI : INotifyPropertyChanged
 {
 	public bool EnableNameScan { get; set; }
+	public bool EnableAutoNameScan { get; set; }
 	public int NameScanLanguage { get; set; }
 
 	public bool EnableIconScan { get; set; }
