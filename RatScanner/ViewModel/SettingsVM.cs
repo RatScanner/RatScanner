@@ -32,6 +32,7 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 
 	public int ScreenWidth { get; set; }
 	public int ScreenHeight { get; set; }
+	public float ScreenScale { get; set; }
 	public bool MinimizeToTray { get; set; }
 	public bool AlwaysOnTop { get; set; }
 	public bool LogDebug { get; set; }
@@ -75,6 +76,7 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 
 		ScreenWidth = RatConfig.ScreenWidth;
 		ScreenHeight = RatConfig.ScreenHeight;
+		ScreenScale = RatConfig.ScreenScale;
 		MinimizeToTray = RatConfig.MinimizeToTray;
 		AlwaysOnTop = RatConfig.AlwaysOnTop;
 		LogDebug = RatConfig.LogDebug;
@@ -123,6 +125,7 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 
 		RatConfig.ScreenWidth = ScreenWidth;
 		RatConfig.ScreenHeight = ScreenHeight;
+		RatConfig.ScreenScale = ScreenScale;
 		RatConfig.MinimizeToTray = MinimizeToTray;
 		RatConfig.AlwaysOnTop = AlwaysOnTop;
 		RatConfig.LogDebug = LogDebug;

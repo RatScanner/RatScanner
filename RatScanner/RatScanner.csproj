@@ -7,6 +7,7 @@
     <ApplicationIcon>Resources\RatLogoSmall.ico</ApplicationIcon>
     <StartupObject>RatScanner.App</StartupObject>
     <Version>3.2.3</Version>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>

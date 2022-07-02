@@ -5,7 +5,6 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -17,7 +16,7 @@ using MessageBox = System.Windows.MessageBox;
 using Size = System.Drawing.Size;
 using Timer = System.Threading.Timer;
 using RatScanner.FetchModels;
-using System.Collections.Generic;
+using PixelFormat = System.Drawing.Imaging.PixelFormat;
 
 namespace RatScanner;
 
@@ -222,7 +221,6 @@ public class RatScannerMain : INotifyPropertyChanged
 		};
 	}
 
-
 	/// <summary>
 	/// Perform a name scan at the give position
 	/// </summary>
@@ -237,12 +235,12 @@ public class RatScannerMain : INotifyPropertyChanged
 
 			// Get raw screenshot which includes the icon and text
 			var markerScanSize = RatConfig.NameScan.MarkerScanSize;
-			var screenshotPosX = position.X - markerScanSize / 2;
-			var screenshotPosY = position.Y - markerScanSize / 2;
-			var screenhotPos = new Vector2(screenshotPosX, screenshotPosY);
 			var sizeWidth = markerScanSize + RatConfig.NameScan.TextWidth;
 			var sizeHeight = markerScanSize;
-			var screenshot = GetScreenshot(screenhotPos, new Size(sizeWidth, sizeHeight));
+			
+			position -= new Vector2(markerScanSize / 2, markerScanSize / 2);
+
+			var screenshot = GetScreenshot(position, new Size(sizeWidth, sizeHeight));
 
 			// Scan the item
 			var inspection = RatEyeEngine.NewInspection(screenshot);
@@ -252,8 +250,8 @@ public class RatScannerMain : INotifyPropertyChanged
 			var scale = RatEyeEngine.Config.ProcessingConfig.Scale;
 			var marker = RatEyeEngine.Config.ProcessingConfig.InspectionConfig.Marker;
 			var toolTipPosition = inspection.MarkerPosition;
-			toolTipPosition += screenhotPos;
 			toolTipPosition += new Vector2(-(int)(marker.Width * scale), (int)(marker.Height * scale));
+			toolTipPosition += position;
 
 			var tempNameScan = new ItemNameScan(
 				inspection,

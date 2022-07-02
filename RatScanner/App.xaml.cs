@@ -64,7 +64,7 @@ public partial class App : Application, ISingleInstance
 		startInfo.UseShellExecute = false;
 		startInfo.FileName = "MicrosoftEdgeWebview2Setup.exe";
 		startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-		startInfo.Arguments = "/silent /install";
+		startInfo.Arguments = "/install";
 
 		try
 		{
