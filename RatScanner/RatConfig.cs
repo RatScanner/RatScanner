@@ -42,7 +42,7 @@ internal static class RatConfig
 	internal static class NameScan
 	{
 		internal static bool Enable = true;
-		internal static bool EnableAuto = true;
+		internal static bool EnableAuto = false;
 		internal static Language Language = Language.English;
 		internal static float ConfWarnThreshold = 0.85f;
 		internal static int MarkerScanSize => (int)(50 * GameScale);
