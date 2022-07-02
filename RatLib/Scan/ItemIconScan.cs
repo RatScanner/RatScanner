@@ -3,12 +3,6 @@ using RatEye;
 using Icon = RatEye.Processing.Icon;
 
 namespace RatLib.Scan;
-/*
-* Ideas to improve performance:
-*
-* - Detect item background color and against equals
-* - Cache item masks
-*/
 
 public class ItemIconScan : ItemScan
 {

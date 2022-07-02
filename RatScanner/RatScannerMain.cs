@@ -75,6 +75,9 @@ public class RatScannerMain : INotifyPropertyChanged
 		Logger.LogInfo("Loading config...");
 		RatConfig.LoadConfig();
 
+		Logger.LogInfo("Setting temporary default item...");
+		ItemScans.Enqueue(new DefaultItemScan(true));
+
 		Logger.LogInfo("Checking for item data updates...");
 		CheckForItemDataUpdates();
 
@@ -92,31 +95,41 @@ public class RatScannerMain : INotifyPropertyChanged
 			}
 		}
 
-		// Grab quest and hideout requirements from tarkovdata
-		Logger.LogInfo("Loading progress data...");
-		ProgressDB = new ProgressDB();
-		ProgressDB.Init();
-
-		Logger.LogInfo("Loading price data...");
-		MarketDB = new MarketDB();
-		MarketDB.Init();
-
-		Logger.LogInfo("Initializing RatEye...");
-		SetupRatEye();
-
-		Logger.LogInfo("Setting default item...");
-		var inspection = RatEyeEngine.NewInspection(new Bitmap(50, 50));
-		ItemScans.Enqueue(new ItemNameScan(inspection));
-
 		Logger.LogInfo("Initializing hotkey manager...");
 		HotkeyManager = new HotkeyManager();
+		HotkeyManager.UnregisterHotkeys();
 
-		Logger.LogInfo("Setting up timer routines...");
-		_marketDBRefreshTimer = new Timer(RefreshMarketDB, null, RatConfig.MarketDBRefreshTime, Timeout.Infinite);
-		_tarkovTrackerDBRefreshTimer = new Timer(RefreshTarkovTrackerDB, null, RatConfig.Tracking.TarkovTracker.RefreshTime, Timeout.Infinite);
-		_scanRefreshTimer = new Timer(RefreshOverlay, null, 1000, 100);
+		Logger.LogInfo("UI Ready!");
 
-		Logger.LogInfo("Ready!");
+		new Thread(() =>
+		{
+			// Grab quest and hideout requirements from tarkovdata
+			Logger.LogInfo("Loading progress data...");
+			ProgressDB = new ProgressDB();
+			ProgressDB.Init();
+
+			Logger.LogInfo("Loading price data...");
+			MarketDB = new MarketDB();
+			MarketDB.Init();
+
+			Logger.LogInfo("Initializing RatEye...");
+			SetupRatEye();
+
+			Logger.LogInfo("Setting up timer routines...");
+			_marketDBRefreshTimer = new Timer(RefreshMarketDB, null, RatConfig.MarketDBRefreshTime, Timeout.Infinite);
+			_tarkovTrackerDBRefreshTimer = new Timer(RefreshTarkovTrackerDB, null, RatConfig.Tracking.TarkovTracker.RefreshTime, Timeout.Infinite);
+			_scanRefreshTimer = new Timer(RefreshOverlay, null, 1000, 100);
+
+			Logger.LogInfo("Setting default item...");
+			var itemScan = new DefaultItemScan(false);
+			itemScan.BestTraderPrice = itemScan.MatchedItem.GetMaxTraderPrice();
+			ItemScans.Enqueue(itemScan);
+
+			Logger.LogInfo("Enabling hotkeys...");
+			HotkeyManager.RegisterHotkeys();
+
+			Logger.LogInfo("Ready!");
+		}).Start();
 	}
 
 	private void CheckForUpdates()
@@ -237,7 +250,7 @@ public class RatScannerMain : INotifyPropertyChanged
 			var markerScanSize = RatConfig.NameScan.MarkerScanSize;
 			var sizeWidth = markerScanSize + RatConfig.NameScan.TextWidth;
 			var sizeHeight = markerScanSize;
-			
+
 			position -= new Vector2(markerScanSize / 2, markerScanSize / 2);
 
 			var screenshot = GetScreenshot(position, new Size(sizeWidth, sizeHeight));
