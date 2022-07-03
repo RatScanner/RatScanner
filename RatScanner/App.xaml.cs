@@ -29,7 +29,9 @@ public partial class App : Application, ISingleInstance
 		// Set current working directory to executable location
 		Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
+#if !DEBUG
 		SetupExceptionHandling();
+#endif
 
 		// Install webview2 runtime if it is not already
 		var existing = _webview2RegKeys.Any(key => Registry.GetValue(key, "pv", null) != null);
