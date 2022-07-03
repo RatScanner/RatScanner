@@ -3,6 +3,7 @@ using SingleInstanceCore;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,8 +15,12 @@ namespace RatScanner;
 /// </summary>
 public partial class App : Application, ISingleInstance
 {
-	private const string webview2regKey =
-		"HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\EdgeUpdate\\Clients\\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}";
+	private readonly string[] _webview2RegKeys = new[]
+	{
+		@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}",
+		@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}",
+		@"HKEY_CURRENT_USER\Software\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}",
+	};
 
 	protected override void OnStartup(StartupEventArgs e)
 	{
@@ -27,8 +32,8 @@ public partial class App : Application, ISingleInstance
 		SetupExceptionHandling();
 
 		// Install webview2 runtime if it is not already
-		var winLogonKey = Registry.GetValue(webview2regKey, "pv", null);
-		if (winLogonKey == null) InstallWebview2Runtime();
+		var existing = _webview2RegKeys.Any(key => Registry.GetValue(key, "pv", null) != null);
+		if (!existing) InstallWebview2Runtime();
 
 		// Setup single instance mode
 		var guid = "{a057bb64-c126-4ef4-a4ed-3037c2e7bc89}";
