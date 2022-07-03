@@ -1,17 +1,17 @@
 ﻿using System.Collections;
+using System.Collections.Concurrent;
 using RatLib.Scan;
 
 public class ItemQueue : IEnumerable<ItemScan>
 {
-	private readonly Queue<ItemScan> queue = new();
+	private readonly ConcurrentQueue<ItemScan> queue = new();
 	public event EventHandler Changed;
 
 	protected virtual void OnChanged()
 	{
 		while (queue.Count > 1 && !(DateTimeOffset.Now.ToUnixTimeMilliseconds() > queue.First().DissapearAt))
 		{
-			queue.Dequeue();
-		Console.WriteLine(queue.Count);
+			if (!queue.TryDequeue(out _)) break;
 		}
 		Changed?.Invoke(this, EventArgs.Empty);
 	}
@@ -22,20 +22,13 @@ public class ItemQueue : IEnumerable<ItemScan>
 		OnChanged();
 	}
 
-	public void EnqueueRange<T>(List<T> items) where T: ItemScan
+	public void EnqueueRange<T>(List<T> items) where T : ItemScan
 	{
 		items.ForEach(queue.Enqueue);
 		OnChanged();
 	}
 
 	public int Count => queue.Count;
-
-	public virtual ItemScan Dequeue()
-	{
-		ItemScan item = queue.Dequeue();
-		OnChanged();
-		return item;
-	}
 
 	IEnumerator IEnumerable.GetEnumerator() => queue.GetEnumerator();
 
