@@ -9,6 +9,7 @@ namespace RatScanner.ViewModel;
 internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 {
 	public bool EnableNameScan { get; set; }
+	public bool EnableAutoNameScan { get; set; }
 	public int NameScanLanguage { get; set; }
 
 	public bool EnableIconScan { get; set; }
@@ -31,6 +32,7 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 
 	public int ScreenWidth { get; set; }
 	public int ScreenHeight { get; set; }
+	public float ScreenScale { get; set; }
 	public bool MinimizeToTray { get; set; }
 	public bool AlwaysOnTop { get; set; }
 	public bool LogDebug { get; set; }
@@ -43,7 +45,6 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 
 	public bool ShowTarkovTrackerTeam { get; set; }
 
-
 	internal SettingsVM()
 	{
 		LoadSettings();
@@ -52,6 +53,7 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 	public void LoadSettings()
 	{
 		EnableNameScan = RatConfig.NameScan.Enable;
+		EnableAutoNameScan = RatConfig.NameScan.EnableAuto;
 		NameScanLanguage = (int)RatConfig.NameScan.Language;
 
 		EnableIconScan = RatConfig.IconScan.Enable;
@@ -74,6 +76,7 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 
 		ScreenWidth = RatConfig.ScreenWidth;
 		ScreenHeight = RatConfig.ScreenHeight;
+		ScreenScale = RatConfig.ScreenScale;
 		MinimizeToTray = RatConfig.MinimizeToTray;
 		AlwaysOnTop = RatConfig.AlwaysOnTop;
 		LogDebug = RatConfig.LogDebug;
@@ -94,6 +97,7 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 
 		// Save config
 		RatConfig.NameScan.Enable = EnableNameScan;
+		RatConfig.NameScan.EnableAuto = EnableAutoNameScan;
 		RatConfig.NameScan.Language = (Language)NameScanLanguage;
 
 		RatConfig.IconScan.Enable = EnableIconScan;
@@ -121,6 +125,7 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 
 		RatConfig.ScreenWidth = ScreenWidth;
 		RatConfig.ScreenHeight = ScreenHeight;
+		RatConfig.ScreenScale = ScreenScale;
 		RatConfig.MinimizeToTray = MinimizeToTray;
 		RatConfig.AlwaysOnTop = AlwaysOnTop;
 		RatConfig.LogDebug = LogDebug;

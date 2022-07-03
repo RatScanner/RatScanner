@@ -1,5 +1,7 @@
-﻿using RatScanner.Controls;
+﻿using Microsoft.VisualBasic.ApplicationServices;
+using RatScanner.Controls;
 using System;
+using System.Threading;
 using System.Windows.Input;
 using static RatScanner.RatConfig;
 
@@ -7,6 +9,8 @@ namespace RatScanner;
 
 internal class HotkeyManager
 {
+	private long _last_mouse_click = 0;
+
 	internal ActiveHotkey NameScanHotkey;
 	internal ActiveHotkey IconScanHotkey;
 
@@ -73,7 +77,16 @@ internal class HotkeyManager
 
 	private void OnNameScanHotkey(object sender, KeyUpEventArgs e)
 	{
-		Wrap(() => RatScannerMain.Instance.NameScan(UserActivityHelper.GetMousePosition()));
+		Wrap(() =>
+		{
+			RatScannerMain.Instance.NameScan(UserActivityHelper.GetMousePosition());
+			if (_last_mouse_click + 500 < DateTimeOffset.Now.ToUnixTimeMilliseconds() && NameScan.EnableAuto)
+			{
+				Thread.Sleep(200);	// wait for double click and ui
+				RatScannerMain.Instance.NameScanScreen();
+				_last_mouse_click = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+			}
+		});
 	}
 
 	private void OnIconScanHotkey(object sender, KeyUpEventArgs e)

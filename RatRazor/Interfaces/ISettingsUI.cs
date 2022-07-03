@@ -5,6 +5,7 @@ namespace RatRazor.Interfaces;
 public interface ISettingsUI : INotifyPropertyChanged
 {
 	public bool EnableNameScan { get; set; }
+	public bool EnableAutoNameScan { get; set; }
 	public int NameScanLanguage { get; set; }
 
 	public bool EnableIconScan { get; set; }
@@ -27,6 +28,8 @@ public interface ISettingsUI : INotifyPropertyChanged
 
 	public int ScreenWidth { get; set; }
 	public int ScreenHeight { get; set; }
+	public float ScreenScale { get; set; }
+	
 	public bool MinimizeToTray { get; set; }
 	public bool AlwaysOnTop { get; set; }
 	public bool LogDebug { get; set; }

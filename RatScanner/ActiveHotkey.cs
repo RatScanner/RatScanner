@@ -16,7 +16,7 @@ internal class ActiveHotkey : Hotkey, IDisposable
 	/// </summary>
 	internal bool SuppressHotkey = false;
 
-	internal bool Enabled = false;
+	internal bool Enabled = true;
 
 	/// <summary>
 	/// Create a new active hotkey which will notify the event handler, when the hotkey is pressed

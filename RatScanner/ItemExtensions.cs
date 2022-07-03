@@ -138,12 +138,12 @@ public static class ItemExtensions
 				// Update FIR flag to true if any quest is FIR
 				if (requirement.FIR) fir = true;
 
-				if (progress == null)
+				if (progress == null || progress.QuestObjectives == null)
 				{
 					need += requirement.Needed;
 					continue;
 				}
-
+				
 				// If the progress data doesn't have this requirement, then it should be a needed item
 				if (!progress.QuestObjectives.ContainsKey(requirement.QuestObjectiveId.ToString()))
 				{
@@ -169,7 +169,7 @@ public static class ItemExtensions
 		// Add up all the hideout requirements
 		foreach (var requirement in requiredHideoutItems)
 		{
-			if (progress == null)
+			if (progress == null || progress.HideoutObjectives == null)
 			{
 				need += requirement.Needed;
 				continue;

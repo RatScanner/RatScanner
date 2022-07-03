@@ -42,10 +42,11 @@ internal static class RatConfig
 	internal static class NameScan
 	{
 		internal static bool Enable = true;
+		internal static bool EnableAuto = false;
 		internal static Language Language = Language.English;
 		internal static float ConfWarnThreshold = 0.85f;
-		internal static int MarkerScanSize => (int)(50 * ScreenScale);
-		internal static int TextWidth => (int)(600 * ScreenScale);
+		internal static int MarkerScanSize => (int)(50 * GameScale);
+		internal static int TextWidth => (int)(600 * GameScale);
 	}
 
 	// Icon Scan options
@@ -54,8 +55,8 @@ internal static class RatConfig
 		internal static bool Enable = true;
 		internal static float ConfWarnThreshold = 0.8f;
 		internal static bool ScanRotatedIcons = true;
-		internal static int ScanWidth => (int)(ScreenScale * 896);
-		internal static int ScanHeight => (int)(ScreenScale * 896);
+		internal static int ScanWidth => (int)(GameScale * 896);
+		internal static int ScanHeight => (int)(GameScale * 896);
 		internal static Hotkey Hotkey = new(new[] { Key.LeftShift }.ToList(), new[] { MouseButton.Left });
 		internal static bool UseCachedIcons = true;
 	}
@@ -114,9 +115,10 @@ internal static class RatConfig
 
 	internal static int ScreenWidth = 1920;
 	internal static int ScreenHeight = 1080;
+	internal static float ScreenScale = 1f;
 	internal static bool SetScreen = false;
 
-	internal static float ScreenScale => RatScannerMain.Instance.RatEyeConfig.ProcessingConfig.Scale;
+	internal static float GameScale => RatScannerMain.Instance.RatEyeEngine.Config.ProcessingConfig.Scale;
 
 	private static bool IsSupportedConfigVersion()
 	{
@@ -152,6 +154,7 @@ internal static class RatConfig
 
 		config.Section = nameof(NameScan);
 		NameScan.Enable = config.ReadBool(nameof(NameScan.Enable), true);
+		NameScan.EnableAuto = config.ReadBool(nameof(NameScan.EnableAuto), false);
 		NameScan.Language = (Language)config.ReadInt(nameof(NameScan.Language), (int)Language.English);
 
 		config.Section = nameof(IconScan);
@@ -189,6 +192,7 @@ internal static class RatConfig
 		{
 			ScreenWidth = config.ReadInt(nameof(ScreenWidth), 1920);
 			ScreenHeight = config.ReadInt(nameof(ScreenHeight), 1080);
+			ScreenScale = config.ReadFloat(nameof(ScreenScale), 1f);
 		}
 
 		MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), false);
@@ -203,6 +207,7 @@ internal static class RatConfig
 
 		config.Section = nameof(NameScan);
 		config.WriteBool(nameof(NameScan.Enable), NameScan.Enable);
+		config.WriteBool(nameof(NameScan.EnableAuto), NameScan.EnableAuto);
 		config.WriteInt(nameof(NameScan.Language), (int)NameScan.Language);
 
 		config.Section = nameof(IconScan);
@@ -237,6 +242,7 @@ internal static class RatConfig
 		config.Section = "Other";
 		config.WriteInt(nameof(ScreenWidth), ScreenWidth);
 		config.WriteInt(nameof(ScreenHeight), ScreenHeight);
+		config.WriteFloat(nameof(ScreenScale), ScreenScale);
 		config.WriteBool(nameof(MinimizeToTray), MinimizeToTray);
 		config.WriteBool(nameof(AlwaysOnTop), AlwaysOnTop);
 		config.WriteString(nameof(ItemDataBundleVersion), ItemDataBundleVersion);
@@ -251,6 +257,7 @@ internal static class RatConfig
 	{
 		ScreenWidth = Screen.PrimaryScreen.Bounds.Width;
 		ScreenHeight = Screen.PrimaryScreen.Bounds.Height;
+		ScreenScale = 1f;
 		SetScreen = true;
 		var message = $"Detected {ScreenWidth}x{ScreenHeight} Resolution.\n\n";
 		message += "You can adjust this inside the settings.";

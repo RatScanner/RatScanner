@@ -32,7 +32,7 @@ internal class SimpleConfig
 
 	internal void WriteInt(string key, int value)
 	{
-		WriteString(key, value.ToString());
+		WriteString(key, value.ToString(CultureInfo.InvariantCulture));
 	}
 
 	internal void WriteFloat(string key, float value)
@@ -42,7 +42,7 @@ internal class SimpleConfig
 
 	internal void WriteBool(string key, bool value)
 	{
-		WriteString(key, value.ToString());
+		WriteString(key, value.ToString(CultureInfo.InvariantCulture));
 	}
 
 	internal void WriteEnumerableEnum<T>(string key, IEnumerable<T> value) where T : struct, IConvertible
@@ -68,7 +68,7 @@ internal class SimpleConfig
 	{
 		try
 		{
-			return int.Parse(ReadString(key));
+			return int.Parse(ReadString(key), CultureInfo.InvariantCulture);
 		}
 		catch (Exception)
 		{
@@ -80,7 +80,7 @@ internal class SimpleConfig
 	{
 		try
 		{
-			return float.Parse(ReadString(key));
+			return float.Parse(ReadString(key), CultureInfo.InvariantCulture);
 		}
 		catch (Exception)
 		{

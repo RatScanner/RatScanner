@@ -7,8 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="RatEye" Version="2.2.0" />
+    <PackageReference Include="RatEye" Version="2.3.1" />
     <PackageReference Include="RatStash" Version="1.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RatTracking\RatTracking.csproj" />
   </ItemGroup>
 
 </Project>

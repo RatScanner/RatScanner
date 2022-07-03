@@ -8,7 +8,9 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Web;
+using RatTracking;
 using RatLib.Scan;
+using RatTracking.FetchModels.TarkovTracker;
 
 namespace RatScanner.ViewModel;
 
@@ -29,54 +31,104 @@ internal class MainWindowVM : INotifyPropertyChanged, IRatScannerUI
 		}
 	}
 
-	public ItemScan CurrentItemScan => DataSource?.CurrentItemScan;
+	public TarkovTrackerDB TarkovTrackerDB => DataSource?.TarkovTrackerDB;
 
-	private Item MatchedItem => CurrentItemScan?.MatchedItem;
+	public ProgressDB ProgressDB => DataSource?.ProgressDB;
 
-	public string ItemId => MatchedItem.Id;
+	public ItemQueue ItemScans => DataSource?.ItemScans;
 
-	public string IconPath
+	public NeededItem GetItemNeeds(ItemScan itemScan)
 	{
-		get
+		var item = itemScan.MatchedItem;
+		var requiredQuest = item.GetQuestRequired();
+		var requiredHideout = item.GetHideoutRequired();
+
+		var neededItem = new NeededItem(item.Id);
+
+		Progress progress = null;
+		if (RatConfig.Tracking.TarkovTracker.Enable && RatScannerMain.Instance.TarkovTrackerDB.Progress.Count >= 1)
 		{
-			ItemExtraInfo itemExtraInfo;
-			if (CurrentItemScan is ItemIconScan scan) itemExtraInfo = scan.ItemExtraInfo;
-			else itemExtraInfo = new ItemExtraInfo();
-			var path = CurrentItemScan.IconPath;
-			return path ?? RatConfig.Paths.UnknownIcon;
+			var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
+			progress = teamProgress.First(x => x.Self ?? false);
 		}
+
+		// Set this item as for ourselves if this was our token
+		neededItem.Self = true;
+
+		var (questNeeded, questHave, fir) = GetQuestRequired(requiredQuest, progress);
+		neededItem.QuestNeeded += questNeeded;
+		neededItem.QuestHave += questHave;
+		neededItem.FIR = fir;
+
+		var (hideoutNeeded, hideoutHave) = GetHideoutRequired(requiredHideout, progress);
+		neededItem.HideoutNeeded += hideoutNeeded;
+		neededItem.HideoutHave += hideoutHave;
+		return neededItem;
 	}
 
-	public string Name => MatchedItem.Name;
+	public List<KeyValuePair<string, NeededItem>> GetItemTeamNeeds(ItemScan itemScan)
+	{
+		if (!RatConfig.Tracking.TarkovTracker.Enable) return null;
 
-	public string ShortName => MatchedItem.ShortName;
+		var item = itemScan.MatchedItem;
 
-	public bool HasMods => MatchedItem is CompoundItem itemC && itemC.Slots.Count > 0;
+		var requiredQuest = item.GetQuestRequired();
+		var requiredHideout = item.GetHideoutRequired();
 
-	// https://youtrack.jetbrains.com/issue/RSRP-468572
-	// ReSharper disable InconsistentNaming
-	public int Avg24hPrice => MatchedItem.GetAvg24hMarketPrice();
-	// ReSharper restore InconsistentNaming
+		var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
 
-	public int PricePerSlot => MatchedItem.GetAvg24hMarketPrice() / (MatchedItem.Width * MatchedItem.Height);
+		var trackedNeeds = new Dictionary<string, NeededItem>();
 
-	public string TraderName => TraderPrice.GetTraderName(MatchedItem.GetBestTrader().traderId);
+		foreach (var memberProgress in teamProgress)
+		{
+			var neededItem = new NeededItem(item.Id);
+			var (questNeeded, questHave, fir) = GetQuestRequired(requiredQuest, memberProgress);
+			neededItem.QuestNeeded += questNeeded;
+			neededItem.QuestHave += questHave;
+			neededItem.FIR = fir;
 
-	public int BestTraderPrice => MatchedItem.GetBestTrader().price;
+			var (hideoutNeeded, hideoutHave) = GetHideoutRequired(requiredHideout, memberProgress);
+			neededItem.HideoutNeeded += hideoutNeeded;
+			neededItem.HideoutHave += hideoutHave;
 
-	public int MaxTraderPrice => MatchedItem.GetMaxTraderPrice();
+			var name = memberProgress.DisplayName ?? "Unknown";
+			for (var i = 2; i < 99; i++)
+			{
+				if (!trackedNeeds.ContainsKey(name)) break;
+				name = $"{memberProgress.DisplayName} #{i}";
+			}
 
+			trackedNeeds.Add(name, neededItem);
+		}
 
-	public NeededItem TrackingNeeds => MatchedItem.GetTrackingNeeds();
-	public NeededItem TrackingTeamNeedsSummed => MatchedItem.GetSummedTrackingTeamNeeds();
+		return trackedNeeds.OrderBy(x => -x.Value.Remaining).ToList();
+	}
 
-	public string TrackingNeedsQuestRemaining => TrackingNeeds.QuestRemaining.ToString();
-	public string TrackingNeedsHideoutRemaining => TrackingNeeds.QuestRemaining.ToString();
+	public NeededItem GetItemTeamNeedsSummed(ItemScan itemScan)
+	{
+		var item = itemScan.MatchedItem;
+		
+		var result = new NeededItem(item.Id);
+		var teamData = item.GetTrackingTeamNeeds();
+		if (teamData == null)
+		{
+			result.HideoutNeeded = 0;
+			result.QuestNeeded = 0;
+			result.HideoutHave = 0;
+			result.QuestHave = 0;
+			return result;
+		}
 
-	public List<KeyValuePair<string, NeededItem>> TrackingTeamNeeds => MatchedItem.GetTrackingTeamNeeds();
+		foreach (var (_, value) in teamData)
+		{
+			result.HideoutNeeded += value.HideoutNeeded;
+			result.QuestNeeded += value.QuestNeeded;
+			result.HideoutHave += value.HideoutHave;
+			result.QuestHave += value.QuestHave;
+		}
 
-	public List<KeyValuePair<string, NeededItem>> TrackingTeamNeedsFiltered =>
-		TrackingTeamNeeds?.Where(x => x.Value.Remaining > 0).ToList() ?? new List<KeyValuePair<string, NeededItem>>();
+		return result;
+	}
 
 	public string DiscordLink => ApiManager.GetResource(ApiManager.ResourceType.DiscordLink);
 
@@ -84,30 +136,19 @@ internal class MainWindowVM : INotifyPropertyChanged, IRatScannerUI
 
 	public string PatreonLink => ApiManager.GetResource(ApiManager.ResourceType.PatreonLink);
 
-	public string Updated
+	public string Updated(ItemScan itemScan)
 	{
-		get
-		{
 			var dt = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-			var min = MatchedItem.GetMarketItem().Timestamp;
+			var min = itemScan.MatchedItem.GetMarketItem().Timestamp;
 			return dt.AddSeconds(min).ToLocalTime().ToString(CultureInfo.CurrentCulture);
-		}
 	}
 
-	public string WikiLink
+	public string WikiLink(ItemScan itemScan)
 	{
-		get
-		{
-			var link = MatchedItem.GetMarketItem().WikiLink;
+			var link = itemScan.MatchedItem.GetMarketItem().WikiLink;
 			if (link.Length > 3) return link;
-			return $"https://escapefromtarkov.gamepedia.com/{HttpUtility.UrlEncode(Name.Replace(" ", "_"))}";
-		}
+			return $"https://escapefromtarkov.gamepedia.com/{HttpUtility.UrlEncode(itemScan.MatchedItem.Name.Replace(" ", "_"))}";
 	}
-
-	public string TarkovDevLink => $"https://tarkov.dev/item/{ItemId}";
-
-	public string IconLink => MatchedItem.GetMarketItem().IconLink;
-	public string ImageLink => MatchedItem.GetMarketItem().ImageLink;
 
 	public event PropertyChangedEventHandler PropertyChanged;
 
@@ -116,7 +157,7 @@ internal class MainWindowVM : INotifyPropertyChanged, IRatScannerUI
 		DataSource = ratScanner;
 		DataSource.PropertyChanged += ModelPropertyChanged;
 	}
-
+	
 	protected virtual void OnPropertyChanged(string propertyName = null)
 	{
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -153,5 +194,73 @@ internal class MainWindowVM : INotifyPropertyChanged, IRatScannerUI
 
 		result += " " + suffixes[(int)Math.Floor((priceStr.Length - 1) / 3f)];
 		return "₽ " + result;
+	}
+
+	private static (int need, int have, bool FIR) GetQuestRequired(IEnumerable<QuestItem> requiredQuestItems, Progress progress)
+	{
+		var need = 0;
+		var have = 0;
+		var fir = false;
+
+		// Add up all the quest requirements
+		foreach (var requirement in requiredQuestItems)
+			// Add the item if its FIR or we want to show non FIR
+			if (requirement.FIR || RatConfig.Tracking.ShowNonFIRNeeds)
+			{
+				// Update FIR flag to true if any quest is FIR
+				if (requirement.FIR) fir = true;
+
+				if (progress == null || progress.QuestObjectives == null)
+				{
+					need += requirement.Needed;
+					continue;
+				}
+
+				// If the progress data doesn't have this requirement, then it should be a needed item
+				if (!progress.QuestObjectives.ContainsKey(requirement.QuestObjectiveId.ToString()))
+				{
+					need += requirement.Needed;
+				}
+				// Else if we have the requirement in our progress data but its not complete, it might have metadata
+				else if (progress.QuestObjectives[requirement.QuestObjectiveId.ToString()].Complete != true)
+				{
+					// Check if we have completed this quest need
+					need += requirement.Needed;
+					have += progress.QuestObjectives[requirement.QuestObjectiveId.ToString()].Have ?? 0;
+				}
+			}
+
+		return (need, have, fir);
+	}
+
+	private static (int need, int have) GetHideoutRequired(IEnumerable<HideoutItem> requiredHideoutItems, Progress progress)
+	{
+		var need = 0;
+		var have = 0;
+
+		// Add up all the hideout requirements
+		foreach (var requirement in requiredHideoutItems)
+		{
+			if (progress == null || progress.HideoutObjectives == null)
+			{
+				need += requirement.Needed;
+				continue;
+			}
+
+			// If the progress data doesn't have this requirement, then it should be a needed item
+			if (!progress.HideoutObjectives.ContainsKey(requirement.HideoutObjectiveId.ToString()))
+			{
+				need += requirement.Needed;
+			}
+			// Else if we have the requirement in our progress data but its not complete, it might have metadata
+			else if (progress.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Complete != true)
+			{
+				// Check if we have completed this hideout need
+				need += requirement.Needed;
+				have += progress.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Have ?? 0;
+			}
+		}
+
+		return (need, have);
 	}
 }
