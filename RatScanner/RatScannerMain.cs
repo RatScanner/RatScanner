@@ -154,7 +154,6 @@ public class RatScannerMain : INotifyPropertyChanged
 			{
 				var updaterLink = ApiManager.GetResource(ApiManager.ResourceType.UpdaterLink);
 				ApiManager.DownloadFile(updaterLink, RatConfig.Paths.Updater);
-				throw new AbandonedMutexException();
 			}
 			catch (Exception e)
 			{
