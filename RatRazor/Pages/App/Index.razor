@@ -1,11 +1,8 @@
 ﻿@page "/"
 @page "/app"
-@using RatTracking.FetchModels
 @using RatLib.Scan
 @using System.Diagnostics
 @inject Interfaces.IRatScannerUI RatScannerUI
-@inject RatTracking.TarkovTrackerDB TarkovTrackerDB
-@inject IJSRuntime JSRuntime;
 @implements IDisposable
 
 <MudGrid Class="pa-0" Spacing="0">

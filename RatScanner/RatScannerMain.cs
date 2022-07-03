@@ -49,8 +49,8 @@ public class RatScannerMain : INotifyPropertyChanged
 	/// </remarks>
 	internal static object IconScanLock = new();
 
-	internal MarketDB MarketDB;
-	internal ProgressDB ProgressDB;
+	internal MarketDB MarketDB = new();
+	internal ProgressDB ProgressDB = new();
 	public TarkovTrackerDB TarkovTrackerDB;
 
 	internal RatEyeEngine RatEyeEngine;
@@ -69,9 +69,6 @@ public class RatScannerMain : INotifyPropertyChanged
 		Logger.LogInfo("----- RatScanner " + RatConfig.Version + " -----");
 		Logger.LogInfo("Starting RatScanner...");
 
-		Logger.LogInfo("Checking for updates...");
-		CheckForUpdates();
-
 		Logger.LogInfo("Loading config...");
 		RatConfig.LoadConfig();
 
@@ -81,19 +78,8 @@ public class RatScannerMain : INotifyPropertyChanged
 		Logger.LogInfo("Checking for item data updates...");
 		CheckForItemDataUpdates();
 
-		// Check for TarkovTracker data
+		Logger.LogInfo("Initializing tarkov tracker database");
 		TarkovTrackerDB = new TarkovTrackerDB();
-		if (RatConfig.Tracking.TarkovTracker.Enable)
-		{
-			TarkovTrackerDB.Token = RatConfig.Tracking.TarkovTracker.Token;
-			Logger.LogInfo("Loading TarkovTracker...");
-			if (!TarkovTrackerDB.Init())
-			{
-				Logger.ShowWarning("TarkovTracker API Token invalid!\n\nPlease provide a new token.");
-				RatConfig.Tracking.TarkovTracker.Token = "";
-				RatConfig.SaveConfig();
-			}
-		}
 
 		Logger.LogInfo("Initializing hotkey manager...");
 		HotkeyManager = new HotkeyManager();
@@ -103,14 +89,29 @@ public class RatScannerMain : INotifyPropertyChanged
 
 		new Thread(() =>
 		{
+			Thread.Sleep(1000);
+			Logger.LogInfo("Checking for updates...");
+			CheckForUpdates();
+
 			// Grab quest and hideout requirements from tarkovdata
 			Logger.LogInfo("Loading progress data...");
-			ProgressDB = new ProgressDB();
 			ProgressDB.Init();
 
 			Logger.LogInfo("Loading price data...");
-			MarketDB = new MarketDB();
 			MarketDB.Init();
+
+			Logger.LogInfo("Loading TarkovTracker data...");
+			if (RatConfig.Tracking.TarkovTracker.Enable)
+			{
+				TarkovTrackerDB.Token = RatConfig.Tracking.TarkovTracker.Token;
+				Logger.LogInfo("Loading TarkovTracker...");
+				if (!TarkovTrackerDB.Init())
+				{
+					Logger.ShowWarning("TarkovTracker API Token invalid!\n\nPlease provide a new token.");
+					RatConfig.Tracking.TarkovTracker.Token = "";
+					RatConfig.SaveConfig();
+				}
+			}
 
 			Logger.LogInfo("Initializing RatEye...");
 			SetupRatEye();
