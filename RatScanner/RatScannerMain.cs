@@ -138,6 +138,13 @@ public class RatScannerMain : INotifyPropertyChanged
 		if (RatConfig.Version == mostRecentVersion) return;
 		Logger.LogInfo("A new version is available: " + mostRecentVersion);
 
+		var forceVersions = ApiManager.GetResource(ApiManager.ResourceType.ClientForceUpdateVersions);
+		if (forceVersions.Contains($"[{RatConfig.Version}]"))
+		{
+			UpdateRatScanner();
+			return;
+		}
+
 		var message = "Version " + mostRecentVersion + " is available!\n";
 		message += "You are using: " + RatConfig.Version + "\n\n";
 		message += "Do you want to install it now?";

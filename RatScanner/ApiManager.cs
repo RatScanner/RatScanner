@@ -13,6 +13,7 @@ public static class ApiManager
 	public enum ResourceType
 	{
 		ClientVersion,
+		ClientForceUpdateVersions,
 		DownloadLink,
 		PatreonLink,
 		GithubLink,
@@ -111,6 +112,7 @@ public static class ApiManager
 		return resourceType switch
 		{
 			ResourceType.ClientVersion => "RSClientVersion",
+			ResourceType.ClientForceUpdateVersions => "RSClientForceUpdateVersions",
 			ResourceType.DownloadLink => "RSDownloadLink",
 			ResourceType.PatreonLink => "RSPatreonLink",
 			ResourceType.GithubLink => "RSGithubLink",
