@@ -24,7 +24,6 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 	public bool ShowAvgDayPrice { get; set; }
 	public bool ShowPricePerSlot { get; set; }
 	public bool ShowTraderPrice { get; set; }
-	public bool ShowTraderMaxPrice { get; set; }
 	public bool ShowUpdated { get; set; }
 	public bool ShowQuestHideoutTracker { get; set; }
 	public bool ShowQuestHideoutTeamTracker { get; set; }
@@ -68,7 +67,6 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 		ShowAvgDayPrice = RatConfig.MinimalUi.ShowAvgDayPrice;
 		ShowPricePerSlot = RatConfig.MinimalUi.ShowPricePerSlot;
 		ShowTraderPrice = RatConfig.MinimalUi.ShowTraderPrice;
-		ShowTraderMaxPrice = RatConfig.MinimalUi.ShowTraderMaxPrice;
 		ShowQuestHideoutTracker = RatConfig.MinimalUi.ShowQuestHideoutTracker;
 		ShowQuestHideoutTeamTracker = RatConfig.MinimalUi.ShowQuestHideoutTeamTracker;
 		ShowUpdated = RatConfig.MinimalUi.ShowUpdated;
@@ -112,7 +110,6 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 		RatConfig.MinimalUi.ShowAvgDayPrice = ShowAvgDayPrice;
 		RatConfig.MinimalUi.ShowPricePerSlot = ShowPricePerSlot;
 		RatConfig.MinimalUi.ShowTraderPrice = ShowTraderPrice;
-		RatConfig.MinimalUi.ShowTraderMaxPrice = ShowTraderMaxPrice;
 		RatConfig.MinimalUi.ShowQuestHideoutTracker = ShowQuestHideoutTracker;
 		RatConfig.MinimalUi.ShowQuestHideoutTeamTracker = ShowQuestHideoutTeamTracker;
 		RatConfig.MinimalUi.ShowUpdated = ShowUpdated;

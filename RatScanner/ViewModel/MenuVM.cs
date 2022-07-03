@@ -14,7 +14,7 @@ using RatTracking.FetchModels.TarkovTracker;
 
 namespace RatScanner.ViewModel;
 
-internal class MainWindowVM : INotifyPropertyChanged, IRatScannerUI
+internal class MenuVM : INotifyPropertyChanged, IRatScannerUI
 {
 	private const string UpSymbol = "▲";
 	private const string DownSymbol = "▼";
@@ -36,6 +36,21 @@ internal class MainWindowVM : INotifyPropertyChanged, IRatScannerUI
 	public ProgressDB ProgressDB => DataSource?.ProgressDB;
 
 	public ItemQueue ItemScans => DataSource?.ItemScans;
+
+	public ItemScan LastItemScan => ItemScans.Last();
+
+	public Item LastItem => LastItemScan.MatchedItem;
+
+	public NeededItem TrackingNeeds => LastItem.GetTrackingNeeds();
+	public NeededItem TrackingTeamNeedsSummed => LastItem.GetSummedTrackingTeamNeeds();
+
+	public int TrackingNeedsQuestRemaining => TrackingNeeds.QuestRemaining;
+	public int TrackingNeedsHideoutRemaining => TrackingNeeds.QuestRemaining;
+
+	public List<KeyValuePair<string, NeededItem>> TrackingTeamNeeds => LastItem.GetTrackingTeamNeeds();
+
+	public List<KeyValuePair<string, NeededItem>> TrackingTeamNeedsFiltered =>
+		TrackingTeamNeeds?.Where(x => x.Value.Remaining > 0).ToList() ?? new List<KeyValuePair<string, NeededItem>>();
 
 	public NeededItem GetItemNeeds(ItemScan itemScan)
 	{
@@ -107,7 +122,7 @@ internal class MainWindowVM : INotifyPropertyChanged, IRatScannerUI
 	public NeededItem GetItemTeamNeedsSummed(ItemScan itemScan)
 	{
 		var item = itemScan.MatchedItem;
-		
+
 		var result = new NeededItem(item.Id);
 		var teamData = item.GetTrackingTeamNeeds();
 		if (teamData == null)
@@ -136,28 +151,34 @@ internal class MainWindowVM : INotifyPropertyChanged, IRatScannerUI
 
 	public string PatreonLink => ApiManager.GetResource(ApiManager.ResourceType.PatreonLink);
 
-	public string Updated(ItemScan itemScan)
+	public string Updated
 	{
+		get
+		{
 			var dt = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-			var min = itemScan.MatchedItem.GetMarketItem().Timestamp;
+			var min = LastItem.GetMarketItem().Timestamp;
 			return dt.AddSeconds(min).ToLocalTime().ToString(CultureInfo.CurrentCulture);
+		}
 	}
 
-	public string WikiLink(ItemScan itemScan)
+	public string WikiLink
 	{
-			var link = itemScan.MatchedItem.GetMarketItem().WikiLink;
+		get
+		{
+			var link = LastItem.GetMarketItem().WikiLink;
 			if (link.Length > 3) return link;
-			return $"https://escapefromtarkov.gamepedia.com/{HttpUtility.UrlEncode(itemScan.MatchedItem.Name.Replace(" ", "_"))}";
+			return $"https://escapefromtarkov.gamepedia.com/{HttpUtility.UrlEncode(LastItem.Name.Replace(" ", "_"))}";
+		}
 	}
 
 	public event PropertyChangedEventHandler PropertyChanged;
 
-	public MainWindowVM(RatScannerMain ratScanner)
+	public MenuVM(RatScannerMain ratScanner)
 	{
 		DataSource = ratScanner;
 		DataSource.PropertyChanged += ModelPropertyChanged;
 	}
-	
+
 	protected virtual void OnPropertyChanged(string propertyName = null)
 	{
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -186,7 +207,7 @@ internal class MainWindowVM : INotifyPropertyChanged, IRatScannerUI
 
 		var suffixes = new string[] { "", "K", "M", "B", "T" };
 
-		var result = priceStr.Substring(0, 3);
+		var result = priceStr[..3];
 
 		var dotPos = priceStr.Length % 3;
 		//if (dotPos != 0) result = result.Insert(dotPos, ".");
@@ -204,6 +225,7 @@ internal class MainWindowVM : INotifyPropertyChanged, IRatScannerUI
 
 		// Add up all the quest requirements
 		foreach (var requirement in requiredQuestItems)
+		{
 			// Add the item if its FIR or we want to show non FIR
 			if (requirement.FIR || RatConfig.Tracking.ShowNonFIRNeeds)
 			{
@@ -229,6 +251,7 @@ internal class MainWindowVM : INotifyPropertyChanged, IRatScannerUI
 					have += progress.QuestObjectives[requirement.QuestObjectiveId.ToString()].Have ?? 0;
 				}
 			}
+		}
 
 		return (need, have, fir);
 	}

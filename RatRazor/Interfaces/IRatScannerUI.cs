@@ -17,6 +17,7 @@ public interface IRatScannerUI : INotifyPropertyChanged
 	//public NeededItem TrackingTeamNeedsSummed { get; }
 
 	public ItemQueue ItemScans { get; }
+	public ItemScan LastItemScan { get; }
 
 	public TarkovTrackerDB TarkovTrackerDB { get; }
 	public ProgressDB ProgressDB { get; }

@@ -20,7 +20,6 @@ public interface ISettingsUI : INotifyPropertyChanged
 	public bool ShowAvgDayPrice { get; set; }
 	public bool ShowPricePerSlot { get; set; }
 	public bool ShowTraderPrice { get; set; }
-	public bool ShowTraderMaxPrice { get; set; }
 	public bool ShowUpdated { get; set; }
 	public bool ShowQuestHideoutTracker { get; set; }
 	public bool ShowQuestHideoutTeamTracker { get; set; }

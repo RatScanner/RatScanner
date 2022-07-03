@@ -75,7 +75,6 @@ internal static class RatConfig
 		internal static bool ShowAvgDayPrice = true;
 		internal static bool ShowPricePerSlot = true;
 		internal static bool ShowTraderPrice = true;
-		internal static bool ShowTraderMaxPrice = false;
 		internal static bool ShowUpdated = false;
 		internal static bool ShowQuestHideoutTracker = true;
 		internal static bool ShowQuestHideoutTeamTracker = false;
@@ -174,7 +173,6 @@ internal static class RatConfig
 		MinimalUi.ShowAvgDayPrice = config.ReadBool(nameof(MinimalUi.ShowAvgDayPrice), true);
 		MinimalUi.ShowPricePerSlot = config.ReadBool(nameof(MinimalUi.ShowPricePerSlot), true);
 		MinimalUi.ShowTraderPrice = config.ReadBool(nameof(MinimalUi.ShowTraderPrice), true);
-		MinimalUi.ShowTraderMaxPrice = config.ReadBool(nameof(MinimalUi.ShowTraderMaxPrice), true);
 		MinimalUi.ShowUpdated = config.ReadBool(nameof(MinimalUi.ShowUpdated), true);
 		MinimalUi.ShowQuestHideoutTracker = config.ReadBool(nameof(MinimalUi.ShowQuestHideoutTracker), true);
 		MinimalUi.ShowQuestHideoutTeamTracker = config.ReadBool(nameof(MinimalUi.ShowQuestHideoutTeamTracker), true);
@@ -226,7 +224,6 @@ internal static class RatConfig
 		config.WriteBool(nameof(MinimalUi.ShowAvgDayPrice), MinimalUi.ShowAvgDayPrice);
 		config.WriteBool(nameof(MinimalUi.ShowPricePerSlot), MinimalUi.ShowPricePerSlot);
 		config.WriteBool(nameof(MinimalUi.ShowTraderPrice), MinimalUi.ShowTraderPrice);
-		config.WriteBool(nameof(MinimalUi.ShowTraderMaxPrice), MinimalUi.ShowTraderMaxPrice);
 		config.WriteBool(nameof(MinimalUi.ShowUpdated), MinimalUi.ShowUpdated);
 		config.WriteBool(nameof(MinimalUi.ShowQuestHideoutTracker), MinimalUi.ShowQuestHideoutTracker);
 		config.WriteBool(nameof(MinimalUi.ShowQuestHideoutTeamTracker), MinimalUi.ShowQuestHideoutTeamTracker);

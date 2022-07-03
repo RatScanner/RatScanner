@@ -4,7 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewmodel="clr-namespace:RatScanner.ViewModel"
-             d:DataContext="{d:DesignInstance Type=viewmodel:MainWindowVM}"
+             d:DataContext="{d:DesignInstance Type=viewmodel:MenuVM}"
              d:DesignHeight="300"
              d:DesignWidth="200"
              MouseDoubleClick="OnMouseDoubleClick"
@@ -17,57 +17,15 @@
 			                  ShadowDepth="1"
 			                  Color="#000000" />
 		</StackPanel.Effect>
-		<StackPanel x:Name="NameDisplay">
-			<StackPanel Margin="5,10"
-			            VerticalAlignment="Center"
-			            Orientation="Horizontal">
-				<WrapPanel VerticalAlignment="Center">
-					<Rectangle Width="20"
-					           Height="20">
-						<Rectangle.Fill>
-							<SolidColorBrush Color="#EEEEEE" />
-						</Rectangle.Fill>
-						<Rectangle.OpacityMask>
-							<ImageBrush ImageSource="../Resources/iconMods.png" />
-						</Rectangle.OpacityMask>
-					</Rectangle>
-
-					<Separator Margin="1,1,3,1">
-						<Separator.LayoutTransform>
-							<RotateTransform Angle="90" />
-						</Separator.LayoutTransform>
-					</Separator>
-
-					<WrapPanel.ToolTip>
-						<TextBlock>
-							Prices include attached mods
-						</TextBlock>
-					</WrapPanel.ToolTip>
-
-					<WrapPanel.Style>
-						<Style TargetType="WrapPanel">
-							<Style.Triggers>
-								<DataTrigger Binding="{Binding Path=HasMods}"
-								             Value="True">
-									<Setter Property="Visibility"
-									        Value="Visible" />
-								</DataTrigger>
-								<DataTrigger Binding="{Binding Path=HasMods}"
-								             Value="False">
-									<Setter Property="Visibility"
-									        Value="Collapsed" />
-								</DataTrigger>
-							</Style.Triggers>
-						</Style>
-					</WrapPanel.Style>
-				</WrapPanel>
-				<Label Padding="0"
+		<StackPanel x:Name="NameDisplay" Margin="2"
+		            VerticalAlignment="Center"
+		            Orientation="Horizontal">
+			<Label Padding="0"
 				       VerticalAlignment="Center"
-				       Content="{Binding Name}"
+				       Content="{Binding LastItem.Name}"
 				       d:Content="AKMN 7.62x39 assault rifle" />
-			</StackPanel>
-			<Separator />
 		</StackPanel>
+			<Separator />
 
 		<StackPanel>
 			<Grid x:Name="AvgDayPriceDisplay"
@@ -75,7 +33,7 @@
 				<Label Grid.Column="0"
 				       Content="Avg. Day Price" />
 				<Label Grid.Column="1"
-				       Content="{Binding Avg24hPrice, Converter={StaticResource IntToLongPriceConverter}}"
+				       Content="{Binding LastItemScan.Avg24hPrice, Converter={StaticResource IntToLongPriceConverter}}"
 				       d:Content="88.000 ₽" />
 
 				<Grid.ColumnDefinitions>
@@ -88,7 +46,7 @@
 				<Label Grid.Column="0"
 				       Content="Price per Slot" />
 				<Label Grid.Column="1"
-				       Content="{Binding PricePerSlot, Converter={StaticResource IntToLongPriceConverter}}"
+				       Content="{Binding LastItemScan.PricePerSlot, Converter={StaticResource IntToLongPriceConverter}}"
 				       d:Content="11.000 ₽" />
 
 				<Grid.ColumnDefinitions>
@@ -102,10 +60,10 @@
 			<Separator />
 			<Grid>
 				<Label Grid.Column="0"
-				       Content="{Binding TraderName}"
+				       Content="{Binding LastItemScan.TraderName}"
 				       d:Content="Mechanic" />
 				<Label Grid.Column="1"
-				       Content="{Binding BestTraderPrice, Converter={StaticResource IntToLongPriceConverter}}"
+				       Content="{Binding LastItemScan.BestTraderPrice, Converter={StaticResource IntToLongPriceConverter}}"
 				       d:Content="53.516 ₽" />
 
 				<Grid.ColumnDefinitions>
@@ -117,40 +75,8 @@
 			<StackPanel.Style>
 				<Style TargetType="StackPanel">
 					<Style.Triggers>
-						<DataTrigger Binding="{Binding TraderName}"
+						<DataTrigger Binding="{Binding LastItemScan.TraderName}"
 						             Value="">
-							<Setter Property="Visibility"
-							        Value="Collapsed" />
-						</DataTrigger>
-					</Style.Triggers>
-				</Style>
-			</StackPanel.Style>
-		</StackPanel>
-
-		<StackPanel x:Name="TraderMaxPriceDisplay">
-			<Grid>
-				<Label Grid.Column="0"
-				       Content="Max Buy Price" />
-				<Label Grid.Column="1"
-				       Content="{Binding MaxTraderPrice, Converter={StaticResource IntToLongPriceConverter}}"
-				       d:Content="56.942 ₽" />
-
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="*" />
-					<ColumnDefinition Width="Auto" />
-				</Grid.ColumnDefinitions>
-			</Grid>
-
-			<StackPanel.Style>
-				<Style TargetType="StackPanel">
-					<Style.Triggers>
-						<DataTrigger Binding="{Binding Path=HasMods}"
-						             Value="True">
-							<Setter Property="Visibility"
-							        Value="Visible" />
-						</DataTrigger>
-						<DataTrigger Binding="{Binding Path=HasMods}"
-						             Value="False">
 							<Setter Property="Visibility"
 							        Value="Collapsed" />
 						</DataTrigger>
@@ -193,7 +119,7 @@
 						<Setter Property="Visibility"
 						        Value="Visible" />
 						<Style.Triggers>
-							<DataTrigger Binding="{Binding Path=TrackingNeeds.Remaining}"
+							<DataTrigger Binding="{Binding TrackingNeeds.Remaining}"
 							             Value="0">
 								<Setter Property="Visibility"
 								        Value="Collapsed" />
@@ -272,7 +198,7 @@
 						<Setter Property="Visibility"
 						        Value="Visible" />
 						<Style.Triggers>
-							<DataTrigger Binding="{Binding Path=TrackingTeamNeedsSummed.Remaining}"
+							<DataTrigger Binding="{Binding TrackingTeamNeedsSummed.Remaining}"
 							             Value="0">
 								<Setter Property="Visibility"
 								        Value="Collapsed" />
