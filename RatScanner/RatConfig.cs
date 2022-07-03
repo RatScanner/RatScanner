@@ -78,7 +78,7 @@ internal static class RatConfig
 		internal static bool ShowUpdated = false;
 		internal static bool ShowQuestHideoutTracker = true;
 		internal static bool ShowQuestHideoutTeamTracker = false;
-		internal static int Opacity = 10;
+		internal static int Opacity = 0;
 	}
 
 	// Progress Tracking options
@@ -176,7 +176,7 @@ internal static class RatConfig
 		MinimalUi.ShowUpdated = config.ReadBool(nameof(MinimalUi.ShowUpdated), true);
 		MinimalUi.ShowQuestHideoutTracker = config.ReadBool(nameof(MinimalUi.ShowQuestHideoutTracker), true);
 		MinimalUi.ShowQuestHideoutTeamTracker = config.ReadBool(nameof(MinimalUi.ShowQuestHideoutTeamTracker), true);
-		MinimalUi.Opacity = config.ReadInt(nameof(MinimalUi.Opacity), 50);
+		MinimalUi.Opacity = config.ReadInt(nameof(MinimalUi.Opacity), 0);
 
 		config.Section = nameof(Tracking);
 		Tracking.ShowNonFIRNeeds = config.ReadBool(nameof(Tracking.ShowNonFIRNeeds), true);
