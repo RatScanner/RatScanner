@@ -28,6 +28,12 @@ internal static class Logger
 		if (e != null) AppendToLog(e.ToString());
 	}
 
+	internal static void LogError(Exception e)
+	{
+		var message = e.GetBaseException().GetBaseException();
+		LogError(message.Message, e);
+	}
+
 	internal static void LogError(string message, Exception e = null)
 	{
 		// Log the error

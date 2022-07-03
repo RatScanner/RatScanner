@@ -54,8 +54,8 @@ public partial class App : Application, ISingleInstance
 			MainWindow.Activate();
 			MainWindow.WindowState = WindowState.Normal;
 
-			// Invert the topmost state twice to bring the window on
-			// top if it wasnt previously or do nothing
+			// Invert the topmost state twice to bring
+			// the window on top if it wasn't already
 			MainWindow.Topmost = !MainWindow.Topmost;
 			MainWindow.Topmost = !MainWindow.Topmost;
 		});
@@ -114,7 +114,7 @@ public partial class App : Application, ISingleInstance
 
 	private void LogUnhandledException(Exception exception, string source)
 	{
-		var message = $"Unhandled exception ({source})";
-		Logger.LogError(message, exception);
+		exception.Data.Add("Source", source);
+		Logger.LogError(exception);
 	}
 }
