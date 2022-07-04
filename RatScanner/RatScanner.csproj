@@ -29,15 +29,15 @@
     <Resource Include="Resources\settings.png" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="6.0.200-preview.12.2441" />
-    <PackageReference Include="MudBlazor" Version="6.0.5" />
-    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.261602">
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="6.0.400" />
+    <PackageReference Include="MudBlazor" Version="6.0.11" />
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.330701">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.0" />
-    <PackageReference Include="RatEye" Version="2.3.1" />
-    <PackageReference Include="RatStash" Version="1.6.0" />
-    <PackageReference Include="SingleInstanceCore" Version="2.2.1" />
+    <PackageReference Include="RatEye" Version="2.3.3" />
+    <PackageReference Include="RatStash" Version="1.7.3" />
+    <PackageReference Include="SingleInstanceCore" Version="2.2.2" />
     <PackageReference Include="Tesseract" Version="4.1.1" />
   </ItemGroup>
   <ItemGroup>

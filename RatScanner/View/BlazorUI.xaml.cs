@@ -27,7 +27,7 @@ public partial class BlazorUI : UserControl, ISwitchable
 	public BlazorUI()
 	{
 		var serviceCollection = new ServiceCollection();
-		serviceCollection.AddBlazorWebView();
+		serviceCollection.AddWpfBlazorWebView();
 		serviceCollection.AddMudServices();
 		RatConfig.LoadConfig();
 
