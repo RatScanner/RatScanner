@@ -1,6 +1,7 @@
 name: Draft Release
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - v*
@@ -9,7 +10,7 @@ on:
       - v*
 
 jobs:
-  build:
+  draft-release:
     runs-on: windows-latest
     steps:
     - name: Checkout
@@ -21,11 +22,16 @@ jobs:
     - name: Restore Dependencies
       run: dotnet restore
     - name: Publish
-      run: dotnet publish RatScanner/RatScanner.csproj -c Release -o publish --runtime win-x64 --self-contained false
+      run: dotnet publish RatScanner/RatScanner.csproj -c Release -o publish -p:PublishSingleFile=true --runtime win-x64 --self-contained
+    - name: Include Data
+      run: |
+        curl -L "https://github.com/RatScanner/RatScannerData/releases/latest/download/Data.zip" --output "publish/Data.zip"
+        7z x publish/Data.zip -opublish/Data
+        Remove-Item publish/Data.zip
     - name: Include Updater
       run: curl -L "https://github.com/RatScanner/RatUpdater/releases/latest/download/RatUpdater.exe" --output "publish/RatUpdater.exe"
     - name: Zip Content
-      run: 7z a -r RatScanner.zip ./publish/*
+      run: 7z a -r RatScanner.zip publish/*
     - name: Draft Release
       uses: softprops/action-gh-release@v1
       with:
