@@ -3,9 +3,15 @@ name: Draft Release
 on:
   workflow_dispatch:
   push:
+    branches:
+      - master
+      - main
     tags:
       - v*
   pull_request:
+    branches:
+      - master
+      - main
     tags:
       - v*
 
