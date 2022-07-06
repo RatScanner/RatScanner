@@ -15,38 +15,26 @@
         <MudItem xs="12">
             <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
                 <MudGrid Spacing="0" Class="pa-0 ma-0">
-                    <MudItem xs="12">
                         <MudSelect @bind-Value="@SettingsUI.NameScanLanguage" T="int" Label="Name Scan Language" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Text" Margin="Margin.Dense" Dense="true" Class="mx-1">
-	                        @foreach (var language in GetLanguages())
+                            @foreach (var language in GetLanguages())
                             {
                                 <MudSelectItem T="int" Value="@language.ordinal">
                                     @language.name
                                 </MudSelectItem>
                             }
                         </MudSelect>
-                    </MudItem>
-                    <MudItem xs="12" Class="pa-0 ma-0">
-                        <MudCheckBox @bind-Checked="@SettingsUI.EnableNameScan" Label="Enable Name Scan" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    </MudItem>
-                    <MudItem xs="12" Class="pa-0 ma-0">
-                        <MudCheckBox @bind-Checked="@SettingsUI.EnableAutoNameScan" Label="Automatic Scanning" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    </MudItem>
+                        <MudCheckBox @bind-Checked="@SettingsUI.EnableNameScan" Label="Enable Name Scan" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+                    <MudCheckBox @bind-Checked="@SettingsUI.EnableAutoNameScan" Label="Automatic Scanning" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
                 </MudGrid>
             </MudPaper>
         </MudItem>
         <MudItem xs="12">
             <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudGrid Spacing="0" Class="pa-0 ma-0">
-                    <MudItem xs="12" Class="pa-0 ma-0">
-                        <MudCheckBox @bind-Checked="@SettingsUI.EnableIconScan" Label="Enable Icon Scan" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    </MudItem>
-                    <MudItem xs="12" Class="pa-0 ma-0">
-                        <MudCheckBox @bind-Checked="@SettingsUI.ScanRotatedIcons" Label="Scan Rotated Icons" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    </MudItem>
-                    <MudItem xs="12" Class="pa-0 ma-0">
-                        <MudCheckBox @bind-Checked="@SettingsUI.UseCachedIcons" Label="Use Cached Icons" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    </MudItem>
-                </MudGrid>
+                <MudStack Spacing="0" Class="pa-0 ma-0">
+                    <MudCheckBox @bind-Checked="@SettingsUI.EnableIconScan" Label="Enable Icon Scan" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+                    <MudCheckBox @bind-Checked="@SettingsUI.ScanRotatedIcons" Label="Scan Rotated Icons" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+                    <MudCheckBox @bind-Checked="@SettingsUI.UseCachedIcons" Label="Use Cached Icons" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+                </MudStack>
             </MudPaper>
         </MudItem>
         <MudItem xs="12">
@@ -80,13 +68,13 @@
 
 @code {
 
-	private (string name, int ordinal)[] GetLanguages()
-	{
-		// Sort all elements of the enum RatStash.Language
-		var values = Enum.GetValues(typeof(RatStash.Language)).Cast<RatStash.Language>();
-		var languages = values.Select(language => (name: language.ToString(), ordinal: (int)language));
+    private (string name, int ordinal)[] GetLanguages()
+    {
+        // Sort all elements of the enum RatStash.Language
+        var values = Enum.GetValues(typeof(RatStash.Language)).Cast<RatStash.Language>();
+        var languages = values.Select(language => (name: language.ToString(), ordinal: (int)language));
         return languages.OrderBy(language => language.name).ToArray();
-	}
+    }
 
     protected override void OnInitialized()
     {
