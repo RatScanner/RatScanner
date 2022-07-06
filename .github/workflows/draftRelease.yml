@@ -37,7 +37,7 @@ jobs:
     - name: Include Updater
       run: curl -L "https://github.com/RatScanner/RatUpdater/releases/latest/download/RatUpdater.exe" --output "publish/RatUpdater.exe"
     - name: Zip Content
-      run: 7z a -r RatScanner.zip publish/*
+      run: 7z a -r RatScanner.zip ./publish/*
     - name: Draft Release
       uses: softprops/action-gh-release@v1
       with:
