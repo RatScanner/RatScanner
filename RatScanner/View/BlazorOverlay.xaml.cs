@@ -30,6 +30,14 @@ public partial class BlazorOverlay : Window
 		blazorOverlayWebView.WebView.CoreWebView2InitializationCompleted += CoreWebView_Loaded;
 	}
 
+	// Used to hide the overlay from the alt+tab switcher
+	[DllImport("user32.dll", SetLastError = true)]
+	static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+	[DllImport("user32.dll")]
+	static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+	private const int GWL_EX_STYLE = -20;
+	private const int WS_EX_APPWINDOW = 0x00040000, WS_EX_TOOLWINDOW = 0x00000080;
+
 	[DllImport("user32.dll", SetLastError = true)]
 	static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, UInt32 uFlags);
 
@@ -50,6 +58,9 @@ public partial class BlazorOverlay : Window
 		
 		var handle = new WindowInteropHelper(this).Handle;
 		SetWindowPos(handle, (IntPtr)0, left, top, right - left, bottom - top, 0);
+
+		// Set the  overlay window style such that alt+tab does not show it in the switcher
+		SetWindowLong(handle, GWL_EX_STYLE, (GetWindowLong(handle, GWL_EX_STYLE) | WS_EX_TOOLWINDOW) & ~WS_EX_APPWINDOW);		
 	}
 
 	private void WebView_Loaded(object sender, CoreWebView2NavigationCompletedEventArgs e)
