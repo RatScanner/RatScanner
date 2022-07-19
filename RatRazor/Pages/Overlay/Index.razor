@@ -1,9 +1,7 @@
 ﻿@page "/overlay"
 @using RatLib.Scan
 @using System.Globalization
-@using System.Diagnostics
 @inject Interfaces.IRatScannerUI RatScannerUI
-@inject RatLib.VirtualScreenOffset VirtualScreenOffset
 @inject Interfaces.ISettingsUI SettingsUI;
 @inject IJSRuntime JSRuntime;
 @implements IDisposable
@@ -121,7 +119,6 @@
     private async void PropertyChangeHandler(object sender, EventArgs e)
     {
         await InvokeAsync(() => StateHasChanged());
-        Debug.WriteLine("Testing");
     }
 
     public void Dispose()
