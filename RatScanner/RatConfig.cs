@@ -114,7 +114,6 @@ internal static class RatConfig
 
 	internal static int ScreenWidth = 1920;
 	internal static int ScreenHeight = 1080;
-	internal static float ScreenScale = 1f;
 	internal static bool SetScreen = false;
 
 	internal static float GameScale => RatScannerMain.Instance.RatEyeEngine.Config.ProcessingConfig.Scale;
@@ -190,7 +189,6 @@ internal static class RatConfig
 		{
 			ScreenWidth = config.ReadInt(nameof(ScreenWidth), 1920);
 			ScreenHeight = config.ReadInt(nameof(ScreenHeight), 1080);
-			ScreenScale = config.ReadFloat(nameof(ScreenScale), 1f);
 		}
 
 		MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), false);
@@ -239,7 +237,6 @@ internal static class RatConfig
 		config.Section = "Other";
 		config.WriteInt(nameof(ScreenWidth), ScreenWidth);
 		config.WriteInt(nameof(ScreenHeight), ScreenHeight);
-		config.WriteFloat(nameof(ScreenScale), ScreenScale);
 		config.WriteBool(nameof(MinimizeToTray), MinimizeToTray);
 		config.WriteBool(nameof(AlwaysOnTop), AlwaysOnTop);
 		config.WriteString(nameof(ItemDataBundleVersion), ItemDataBundleVersion);
@@ -254,7 +251,6 @@ internal static class RatConfig
 	{
 		ScreenWidth = Screen.PrimaryScreen.Bounds.Width;
 		ScreenHeight = Screen.PrimaryScreen.Bounds.Height;
-		ScreenScale = 1f;
 		SetScreen = true;
 		var message = $"Detected {ScreenWidth}x{ScreenHeight} Resolution.\n\n";
 		message += "You can adjust this inside the settings.";
