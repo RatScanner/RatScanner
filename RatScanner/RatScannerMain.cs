@@ -240,10 +240,13 @@ public class RatScannerMain : INotifyPropertyChanged
 		try
 		{
 			ScreenScale? gameScale = ScreenInfo.GameWindowScreenScale();
-			System.Drawing.Rectangle gameRect = gameScale.bounds;
-			// Set ScreenWidth and ScreenHeight to the dimensions of the gameRect rectangle
-			ScreenWidth = gameRect.Width;
-			ScreenHeight = gameRect.Height;
+			if (gameScale != null)
+			{
+				System.Drawing.Rectangle gameRect = GameWindowLocator.GetWindowLocation();
+				// Set ScreenWidth and ScreenHeight to the dimensions of the gameRect rectangle
+				ScreenWidth = gameRect.Width;
+				ScreenHeight = gameRect.Height;
+			}
 		}
 		catch {
 			// We must not have been able to find the game window, use the primary screen's dimensions as placeholder

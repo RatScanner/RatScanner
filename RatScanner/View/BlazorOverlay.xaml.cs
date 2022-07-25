@@ -65,13 +65,17 @@ public partial class BlazorOverlay : Window
 			ScreenScale? gameScreenScale = RatScannerMain.Instance?.GameScreenScale;
 			// Set the size of the overlay now that we have the rect of EFT
 			//SetSize(rect.Left, rect.Top, rect.Width, rect.Height);
-			Dispatcher.Invoke(() =>
+			if (gameScreenScale != null)
 			{
-				this.Left = gameScreenScale.bounds.Left;
-				this.Top = gameScreenScale.bounds.Top;
-				this.Width = gameScreenScale.bounds.Width / gameScreenScale.Scale;
-				this.Height = gameScreenScale.bounds.Height / gameScreenScale.Scale;
-			});
+				Rectangle gameRect = GameWindowLocator.GetWindowLocation();
+				Dispatcher.Invoke(() =>
+				{
+					this.Left = gameRect.Left;
+					this.Top = gameRect.Top;
+					this.Width = gameRect.Width / gameScreenScale.Scale;
+					this.Height = gameRect.Height / gameScreenScale.Scale;
+				});
+			}
 		}
 		catch
 		{

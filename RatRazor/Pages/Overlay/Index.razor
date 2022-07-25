@@ -127,8 +127,9 @@
         ScreenScale? gameWindow = RatScannerUI.GameScreenScale;
         if (gameWindow != null)
         {
-            int xPosition = itemScan.GetToolTipPosition().X - gameWindow.bounds.X;
-            int yPosition = itemScan.GetToolTipPosition().Y - gameWindow.bounds.Y;
+            Rectangle gameRect = GameWindowLocator.GetWindowLocation();
+            int xPosition = itemScan.GetToolTipPosition().X - gameRect.X;
+            int yPosition = itemScan.GetToolTipPosition().Y - gameRect.Y;
             return new Point(xPosition, yPosition);
         }
         return new Point(0, 0);
