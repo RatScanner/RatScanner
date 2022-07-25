@@ -10,7 +10,9 @@ using System.Linq;
 using System.Web;
 using RatTracking;
 using RatLib.Scan;
+using RatLib;
 using RatTracking.FetchModels.TarkovTracker;
+using System.Diagnostics;
 
 namespace RatScanner.ViewModel;
 
@@ -30,6 +32,10 @@ internal class MenuVM : INotifyPropertyChanged, IRatScannerUI
 			OnPropertyChanged();
 		}
 	}
+
+	public List<ScreenScale> ScreenScales => ScreenInfo.GetScreenScales();
+
+	public ScreenScale? GameScreenScale => DataSource?.GameScreenScale;
 
 	public TarkovTrackerDB TarkovTrackerDB => DataSource?.TarkovTrackerDB;
 

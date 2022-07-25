@@ -29,8 +29,6 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 	public bool ShowQuestHideoutTeamTracker { get; set; }
 	public int Opacity { get; set; }
 
-	public int ScreenWidth { get; set; }
-	public int ScreenHeight { get; set; }
 	public bool MinimizeToTray { get; set; }
 	public bool AlwaysOnTop { get; set; }
 	public bool LogDebug { get; set; }
@@ -71,8 +69,6 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 		ShowUpdated = RatConfig.MinimalUi.ShowUpdated;
 		Opacity = RatConfig.MinimalUi.Opacity;
 
-		ScreenWidth = RatConfig.ScreenWidth;
-		ScreenHeight = RatConfig.ScreenHeight;
 		MinimizeToTray = RatConfig.MinimizeToTray;
 		AlwaysOnTop = RatConfig.AlwaysOnTop;
 		LogDebug = RatConfig.LogDebug;
@@ -88,7 +84,6 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 	{
 		var updateMarketDB = NameScanLanguage != (int)RatConfig.NameScan.Language;
 		var updateTarkovTrackerToken = TarkovTrackerToken != RatConfig.Tracking.TarkovTracker.Token;
-		var updateResolution = ScreenWidth != RatConfig.ScreenWidth || ScreenHeight != RatConfig.ScreenHeight;
 		var updateLanguage = RatConfig.NameScan.Language != (Language)NameScanLanguage;
 
 		// Save config
@@ -118,8 +113,6 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 		RatConfig.Tracking.TarkovTracker.Token = TarkovTrackerToken.Trim();
 		RatConfig.Tracking.TarkovTracker.ShowTeam = ShowTarkovTrackerTeam;
 
-		RatConfig.ScreenWidth = ScreenWidth;
-		RatConfig.ScreenHeight = ScreenHeight;
 		RatConfig.MinimizeToTray = MinimizeToTray;
 		RatConfig.AlwaysOnTop = AlwaysOnTop;
 		RatConfig.LogDebug = LogDebug;
@@ -128,7 +121,6 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 		PageSwitcher.Instance.Topmost = RatConfig.AlwaysOnTop;
 		if (updateMarketDB) RatScannerMain.Instance.MarketDB.Init();
 		if (updateTarkovTrackerToken) UpdateTarkovTrackerToken();
-		if (updateResolution || updateLanguage) RatScannerMain.Instance.SetupRatEye();
 
 		RatEye.Config.LogDebug = RatConfig.LogDebug;
 		RatScannerMain.Instance.HotkeyManager.RegisterHotkeys();

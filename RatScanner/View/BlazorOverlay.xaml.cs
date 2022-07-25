@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Windows.Interop;
 using System.Drawing;
 using System.Timers;
+using RatLib;
 
 namespace RatScanner.View;
 
@@ -59,32 +60,20 @@ public partial class BlazorOverlay : Window
 	private void checkWindowEvent(Object source, ElapsedEventArgs e)
 	{
 		// Used to find the area of the EFT game client to set up the overlay location and size
-		IntPtr hwnd = FindWindow("UnityWndClass", "EscapeFromTarkov");
-
-		// Check if we found the EFT window
-		if (hwnd != IntPtr.Zero)
+		try
 		{
-			// Nonzero intptr means we found it
-			Rectangle rect;
-			GetWindowRect(hwnd, out rect);
-
-			Debug.WriteLine($"Found the EFT Window at {rect.X}, {rect.Y}, {rect.Width}, {rect.Height}");
-
+			ScreenScale? gameScreenScale = RatScannerMain.Instance?.GameScreenScale;
 			// Set the size of the overlay now that we have the rect of EFT
 			//SetSize(rect.Left, rect.Top, rect.Width, rect.Height);
 			Dispatcher.Invoke(() =>
 			{
-				this.Left = rect.Left;
-				this.Top = rect.Top;
-				this.Width = Math.Abs(rect.Right - rect.Left) / scaleFactor;
-				this.Height = Math.Abs(rect.Bottom - rect.Top) / scaleFactor;
-
-				// We get the scale factor of the latest screen that we've moved onto
-				// So this will take one invocation before it becomes correct if the user either resizes or moves the window
-				scaleFactor = System.Windows.PresentationSource.FromVisual(this).CompositionTarget.TransformToDevice.M11;
+				this.Left = gameScreenScale.bounds.Left;
+				this.Top = gameScreenScale.bounds.Top;
+				this.Width = gameScreenScale.bounds.Width / gameScreenScale.Scale;
+				this.Height = gameScreenScale.bounds.Height / gameScreenScale.Scale;
 			});
 		}
-		else
+		catch
 		{
 			Debug.WriteLine("Did not find the EFT window for the overlay");
 		}
@@ -97,22 +86,13 @@ public partial class BlazorOverlay : Window
 	static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 	private const int GWL_EX_STYLE = -20;
 	private const int WS_EX_APPWINDOW = 0x00040000, WS_EX_TOOLWINDOW = 0x00000080;
-
+	
 	// Used for setting window position
 	[DllImport("user32.dll", SetLastError = true)]
 	static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, UInt32 uFlags);
 
-	// Used to find the EscapeFromTarkov window to position the overlay
-	[DllImport("user32.dll")]
-	private static extern IntPtr FindWindow(string className, string windowName);
-	[DllImport("user32.dll")]
-	private static extern int GetWindowRect(IntPtr hwnd, out Rectangle rect);
-
 	// Repeat timer to check for the EFT window and resize if necessary
 	private static System.Timers.Timer windowCheckTimer;
-
-	// Used for display scaling calculations
-	private double scaleFactor = 1.0;
 
 	private void WebView_Loaded(object sender, CoreWebView2NavigationCompletedEventArgs e)
 	{

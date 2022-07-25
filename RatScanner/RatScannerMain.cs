@@ -17,6 +17,7 @@ using Size = System.Drawing.Size;
 using Timer = System.Threading.Timer;
 using RatScanner.FetchModels;
 using PixelFormat = System.Drawing.Imaging.PixelFormat;
+using RatLib;
 
 namespace RatScanner;
 
@@ -32,6 +33,10 @@ public class RatScannerMain : INotifyPropertyChanged
 	private Timer _marketDBRefreshTimer;
 	private Timer _tarkovTrackerDBRefreshTimer;
 	private Timer _scanRefreshTimer;
+
+	// Check for game screen changes every 10 seconds
+	private int _gameScreenRefreshInterval = 10000;
+	private Timer _gameScreenRefreshTimer;
 
 	/// <summary>
 	/// Lock for name scanning
@@ -58,6 +63,8 @@ public class RatScannerMain : INotifyPropertyChanged
 	public event PropertyChangedEventHandler PropertyChanged;
 
 	internal ItemQueue ItemScans = new();
+
+	public ScreenScale? GameScreenScale => ScreenInfo.GameWindowScreenScale();
 
 	public RatScannerMain()
 	{
@@ -120,6 +127,7 @@ public class RatScannerMain : INotifyPropertyChanged
 			_marketDBRefreshTimer = new Timer(RefreshMarketDB, null, RatConfig.MarketDBRefreshTime, Timeout.Infinite);
 			_tarkovTrackerDBRefreshTimer = new Timer(RefreshTarkovTrackerDB, null, RatConfig.Tracking.TarkovTracker.RefreshTime, Timeout.Infinite);
 			_scanRefreshTimer = new Timer(RefreshOverlay, null, 1000, 100);
+			_gameScreenRefreshTimer = new Timer(CheckGameScreen, null, _gameScreenRefreshInterval, Timeout.Infinite);
 
 			Logger.LogInfo("Setting default item...");
 			var itemScan = new DefaultItemScan(false);
@@ -131,6 +139,23 @@ public class RatScannerMain : INotifyPropertyChanged
 
 			Logger.LogInfo("Ready!");
 		}).Start();
+	}
+
+	// Check if RatEye needs to be updated to the latest ScreenScale data
+	private void CheckGameScreen(object? o = null)
+	{
+		ScreenScale? gameScale = GameScreenScale;
+		if (
+			gameScale != null &&
+			RatEyeEngine != null &&
+			Config.Processing.Resolution2Scale(gameScale.bounds.Width, gameScale.bounds.Height) != RatEyeEngine.Config.ProcessingConfig.Scale
+		)
+		{
+			// We have a new ScreenScale, update RatEye
+			// RatEye config will use the game's actual size, but we want to trigger based upon any scaling changes as well
+			SetupRatEye();
+		}
+		_gameScreenRefreshTimer.Change(_gameScreenRefreshInterval, Timeout.Infinite);
 	}
 
 	private void CheckForUpdates()
@@ -209,6 +234,20 @@ public class RatScannerMain : INotifyPropertyChanged
 
 	private RatEye.Config GetRatEyeConfig(bool highlighted = true)
 	{
+		// Default to our primary screen, then try to set it to game window if we can.
+		int ScreenWidth = Screen.PrimaryScreen.Bounds.Width;
+		int ScreenHeight = Screen.PrimaryScreen.Bounds.Height;
+		try
+		{
+			ScreenScale? gameScale = ScreenInfo.GameWindowScreenScale();
+			System.Drawing.Rectangle gameRect = gameScale.bounds;
+			// Set ScreenWidth and ScreenHeight to the dimensions of the gameRect rectangle
+			ScreenWidth = gameRect.Width;
+			ScreenHeight = gameRect.Height;
+		}
+		catch {
+			// We must not have been able to find the game window, use the primary screen's dimensions as placeholder
+		}
 		return new Config()
 		{
 			PathConfig = new Config.Path()
@@ -221,7 +260,7 @@ public class RatScannerMain : INotifyPropertyChanged
 			},
 			ProcessingConfig = new Config.Processing()
 			{
-				Scale = Config.Processing.Resolution2Scale(RatConfig.ScreenWidth, RatConfig.ScreenHeight),
+				Scale = Config.Processing.Resolution2Scale(ScreenWidth, ScreenHeight),
 				Language = RatConfig.NameScan.Language,
 				IconConfig = new Config.Processing.Icon()
 				{

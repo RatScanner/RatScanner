@@ -112,8 +112,6 @@ internal static class RatConfig
 	internal static string ItemDataBundleVersion = "20220704";
 	private static int ConfigVersion => 2;
 
-	internal static int ScreenWidth = 1920;
-	internal static int ScreenHeight = 1080;
 	internal static bool SetScreen = false;
 
 	internal static float GameScale => RatScannerMain.Instance.RatEyeEngine.Config.ProcessingConfig.Scale;
@@ -139,12 +137,10 @@ internal static class RatConfig
 			Logger.ShowMessage(message);
 
 			File.Delete(Paths.ConfigFile);
-			TrySetScreenResolution();
 			SaveConfig();
 		}
 		else if (!configFileExists)
 		{
-			TrySetScreenResolution();
 			SaveConfig();
 		}
 
@@ -185,12 +181,6 @@ internal static class RatConfig
 		Tracking.TarkovTracker.ShowTeam = config.ReadBool(nameof(Tracking.TarkovTracker.ShowTeam), true);
 
 		config.Section = "Other";
-		if (!SetScreen)
-		{
-			ScreenWidth = config.ReadInt(nameof(ScreenWidth), 1920);
-			ScreenHeight = config.ReadInt(nameof(ScreenHeight), 1080);
-		}
-
 		MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), false);
 		AlwaysOnTop = config.ReadBool(nameof(AlwaysOnTop), false);
 		ItemDataBundleVersion = config.ReadString(nameof(ItemDataBundleVersion), "20220118");
@@ -235,25 +225,10 @@ internal static class RatConfig
 		config.WriteBool(nameof(Tracking.TarkovTracker.ShowTeam), Tracking.TarkovTracker.ShowTeam);
 
 		config.Section = "Other";
-		config.WriteInt(nameof(ScreenWidth), ScreenWidth);
-		config.WriteInt(nameof(ScreenHeight), ScreenHeight);
 		config.WriteBool(nameof(MinimizeToTray), MinimizeToTray);
 		config.WriteBool(nameof(AlwaysOnTop), AlwaysOnTop);
 		config.WriteString(nameof(ItemDataBundleVersion), ItemDataBundleVersion);
 		config.WriteBool(nameof(LogDebug), LogDebug);
 		config.WriteInt(nameof(ConfigVersion), ConfigVersion);
-	}
-
-	/// <summary>
-	/// Converts PrimaryScreen resolution to Resolution enum, sets screenResolution if a match is found
-	/// </summary>
-	internal static void TrySetScreenResolution()
-	{
-		ScreenWidth = Screen.PrimaryScreen.Bounds.Width;
-		ScreenHeight = Screen.PrimaryScreen.Bounds.Height;
-		SetScreen = true;
-		var message = $"Detected {ScreenWidth}x{ScreenHeight} Resolution.\n\n";
-		message += "You can adjust this inside the settings.";
-		Logger.ShowMessage(message);
 	}
 }

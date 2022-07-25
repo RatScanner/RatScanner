@@ -19,19 +19,6 @@
         </MudItem>
         <MudItem xs="12">
             <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudText Style="margin-bottom: 4px">Screen Resolution</MudText>
-                <MudGrid Spacing="1">
-                    <MudItem xs="4">
-                        <MudNumericField @bind-Value="SettingsUI.ScreenWidth" HideSpinButtons="true" Label="Width" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0"></MudNumericField>
-                    </MudItem>
-                    <MudItem xs="4">
-                        <MudNumericField @bind-Value="SettingsUI.ScreenHeight" HideSpinButtons="true" Label="Height" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0"></MudNumericField>
-                    </MudItem>
-                </MudGrid>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
                 <MudGrid Spacing="0" Class="pa-0 ma-0">
                     <MudItem xs="12" Class="pa-0 ma-0">
                         <MudCheckBox @bind-Checked="@SettingsUI.MinimizeToTray" Label="Minimize to tray" Size="Size.Small" Class="pa-0 ma-0" Style="font-size: 8px !important;"></MudCheckBox>

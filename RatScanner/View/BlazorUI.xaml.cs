@@ -42,16 +42,6 @@ public partial class BlazorUI : UserControl, ISwitchable
 		IconScanHotkeySelector.Height = 0;
 		serviceCollection.AddSingleton<IHotkeySelector>(s => IconScanHotkeySelector);
 
-		var bounds = System.Windows.Forms.Screen.AllScreens.Select(screen => screen.Bounds);
-		var left = 0;
-		var top = 0;
-		foreach (var bound in bounds)
-		{
-			if (bound.Left < left) left = bound.Left;
-			if (bound.Top < top) top = bound.Top;
-		}
-		serviceCollection.AddSingleton<VirtualScreenOffset>(s => new VirtualScreenOffset(left, top));
-
 		serviceCollection.AddSingleton<TarkovTrackerDB>(s => RatScannerMain.Instance.TarkovTrackerDB);
 
 		var serviceProvider = serviceCollection.BuildServiceProvider();
