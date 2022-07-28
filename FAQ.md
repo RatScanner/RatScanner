@@ -64,7 +64,6 @@ If you still can't run the application, you are probably missing the WebView2 Ru
 [Download WebView2 Runtime](https://go.microsoft.com/fwlink/p/?LinkId=2124703)
 
 ## Nothing happens when scanning
-- Check that you set your resolution correctly inside the settings
 - Try to run RatScanner as administrator
 
 ## RatUpdater.exe could not be found! Please update manually.

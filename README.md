@@ -98,8 +98,6 @@ You can directly download the latest version [here][latest-release] or choose a 
 
 After you downloaded the Zip-Archive (you only need `RatScanner.zip`) extract it anywhere on your PC and run `RatScanner.exe`.
 
-Once it has launched, go into the settings menu (bottom right corner) and check that your resolution is set properly (default is FullHD).
-
 If you have any problems with the process please checkout the [FAQ][faq-page] or join the [Discord][discord] if you need further help.
 
 **Important:** If the tool does not seem to start, here's some [common issues][common-issues]
