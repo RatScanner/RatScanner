@@ -23,8 +23,6 @@ public interface IRatScannerUI : INotifyPropertyChanged
 	public TarkovTrackerDB TarkovTrackerDB { get; }
 	public ProgressDB ProgressDB { get; }
 
-	public List<ScreenScale> ScreenScales { get; }
-
 	public ScreenScale? GameScreenScale { get; }
 
 	public string IntToShortPrice(int? value);

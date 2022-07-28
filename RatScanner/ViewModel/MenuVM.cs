@@ -33,8 +33,6 @@ internal class MenuVM : INotifyPropertyChanged, IRatScannerUI
 		}
 	}
 
-	public List<ScreenScale> ScreenScales => ScreenInfo.GetScreenScales();
-
 	public ScreenScale? GameScreenScale => DataSource?.GameScreenScale;
 
 	public TarkovTrackerDB TarkovTrackerDB => DataSource?.TarkovTrackerDB;
