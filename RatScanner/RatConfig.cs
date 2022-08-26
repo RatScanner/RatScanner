@@ -109,7 +109,7 @@ internal static class RatConfig
 	internal static bool MinimizeToTray = false;
 	internal static bool AlwaysOnTop = true;
 	internal static int MarketDBRefreshTime = 30 * 60 * 1000; // 30 minutes
-	internal static string ItemDataBundleVersion = "20220704";
+	internal static string ItemDataBundleVersion = "20220822";
 	private static int ConfigVersion => 2;
 
 	internal static int ScreenWidth = 1920;
@@ -195,7 +195,7 @@ internal static class RatConfig
 
 		MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), false);
 		AlwaysOnTop = config.ReadBool(nameof(AlwaysOnTop), false);
-		ItemDataBundleVersion = config.ReadString(nameof(ItemDataBundleVersion), "20220118");
+		ItemDataBundleVersion = config.ReadString(nameof(ItemDataBundleVersion), "20220822");
 		LogDebug = config.ReadBool(nameof(LogDebug), false);
 	}
 
