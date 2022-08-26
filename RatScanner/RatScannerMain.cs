@@ -250,10 +250,14 @@ public class RatScannerMain : INotifyPropertyChanged
 		var excludeTypes = new[]
 		{
 			typeof(LootContainer),
+			typeof(StationaryContainer),
 			typeof(Pockets),
 		};
 
-		itemDB = itemDB.Filter(item => !item.IsQuestItem() && !excludeTypes.Contains(item.GetType()));
+		itemDB = itemDB.Filter(item =>
+		{
+			return !item.QuestItem && !excludeTypes.Contains(item.GetType());
+		});
 
 		return itemDB;
 	}
