@@ -6,7 +6,7 @@
     <UseWindowsForms>True</UseWindowsForms>
     <ApplicationIcon>Resources\RatLogoSmall.ico</ApplicationIcon>
     <StartupObject>RatScanner.App</StartupObject>
-    <Version>3.3.5</Version>
+    <Version>3.3.8</Version>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -32,14 +32,14 @@
     <Resource Include="Resources\settings.png" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="6.0.400" />
-    <PackageReference Include="MudBlazor" Version="6.0.11" />
-    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.330701">
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="6.0.486" />
+    <PackageReference Include="MudBlazor" Version="6.0.14" />
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.336902">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.0" />
-    <PackageReference Include="RatEye" Version="2.3.3" />
-    <PackageReference Include="RatStash" Version="1.7.3" />
+    <PackageReference Include="RatEye" Version="2.4.0" />
+    <PackageReference Include="RatStash" Version="1.8.0" />
     <PackageReference Include="SingleInstanceCore" Version="2.2.2" />
     <PackageReference Include="Tesseract" Version="4.1.1" />
   </ItemGroup>

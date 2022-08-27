@@ -16,12 +16,12 @@ public static class ItemExtensions
 		return RatScannerMain.Instance.ProgressDB.IsProgressionItem(item.Id);
 	}
 
-	public static bool IsQuestItem(this Item item)
+	public static bool IsUsedInQuest(this Item item)
 	{
 		return RatScannerMain.Instance.ProgressDB.IsQuestItem(item.Id);
 	}
 
-	public static bool IsHideoutItem(this Item item)
+	public static bool IsUsedInHideout(this Item item)
 	{
 		return RatScannerMain.Instance.ProgressDB.IsHideoutItem(item.Id);
 	}

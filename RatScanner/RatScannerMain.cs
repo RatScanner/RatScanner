@@ -16,6 +16,7 @@ using MessageBox = System.Windows.MessageBox;
 using Size = System.Drawing.Size;
 using Timer = System.Threading.Timer;
 using RatScanner.FetchModels;
+using RatStash;
 using PixelFormat = System.Drawing.Imaging.PixelFormat;
 using RatLib;
 
@@ -229,7 +230,7 @@ public class RatScannerMain : INotifyPropertyChanged
 		Config.LogDebug = RatConfig.LogDebug;
 		Config.Path.LogFile = "RatEyeLog.txt";
 		Config.Path.TesseractLibSearchPath = AppDomain.CurrentDomain.BaseDirectory;
-		RatEyeEngine = new RatEyeEngine(GetRatEyeConfig());
+		RatEyeEngine = new RatEyeEngine(GetRatEyeConfig(), GetRatStashDatabase());
 	}
 
 	private RatEye.Config GetRatEyeConfig(bool highlighted = true)
@@ -258,8 +259,6 @@ public class RatScannerMain : INotifyPropertyChanged
 				TrainedData = RatConfig.Paths.TrainedData,
 				StaticIcons = RatConfig.Paths.StaticIcon,
 				StaticCorrelationData = RatConfig.Paths.StaticCorrelation,
-				ItemLocales = RatConfig.Paths.Locales,
-				ItemData = RatConfig.Paths.ItemData,
 			},
 			ProcessingConfig = new Config.Processing()
 			{
@@ -281,6 +280,28 @@ public class RatScannerMain : INotifyPropertyChanged
 				},
 			},
 		};
+	}
+
+	private Database GetRatStashDatabase()
+	{
+		var langFile = RatConfig.NameScan.Language.ToBSGCode() + ".json";
+		var itemLocale = Path.Combine(RatConfig.Paths.Locales, langFile);
+		var itemDB = Database.FromFile(RatConfig.Paths.ItemData, true, itemLocale);
+
+		// Filter unwanted items from the database
+		var excludeTypes = new[]
+		{
+			typeof(LootContainer),
+			typeof(StationaryContainer),
+			typeof(Pockets),
+		};
+
+		itemDB = itemDB.Filter(item =>
+		{
+			return !item.QuestItem && !excludeTypes.Contains(item.GetType());
+		});
+
+		return itemDB;
 	}
 
 	/// <summary>
