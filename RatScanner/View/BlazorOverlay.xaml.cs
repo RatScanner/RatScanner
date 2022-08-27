@@ -18,14 +18,22 @@ namespace RatScanner.View;
 /// </summary>
 public partial class BlazorOverlay : Window
 {
-	private IntPtr overlayHandle;
+	[DllImport("user32.dll", SetLastError = true)]
+	static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+	[DllImport("user32.dll")]
+	static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+
+	private const int GWL_EX_STYLE = -20;
+	private const int WS_EX_APPWINDOW = 0x00040000, WS_EX_TOOLWINDOW = 0x00000080;
+
 	public BlazorOverlay(ServiceProvider serviceProvider)
 	{
 		Resources.Add("services", serviceProvider);
 
-		overlayHandle = new WindowInteropHelper(this).Handle;
-		// Set the  overlay window style such that alt+tab does not show it in the switcher
-		SetWindowLong(overlayHandle, GWL_EX_STYLE, (GetWindowLong(overlayHandle, GWL_EX_STYLE) | WS_EX_TOOLWINDOW) & ~WS_EX_APPWINDOW);
+		// Hide overlay from alt+tab
+		var helper = new WindowInteropHelper(this).Handle;
+		SetWindowLong(helper, GWL_EX_STYLE, (GetWindowLong(helper, GWL_EX_STYLE) | WS_EX_TOOLWINDOW) & ~WS_EX_APPWINDOW);
 
 		InitializeComponent();
 	}
@@ -43,8 +51,9 @@ public partial class BlazorOverlay : Window
 
 		// Other customizations
 		this.IsHitTestVisible = false;
+
 	}
-	
+
 	private void initializeWindowCheckTimer()
 	{
 		// Set up the timer with interval
@@ -83,14 +92,6 @@ public partial class BlazorOverlay : Window
 		}
 	}
 
-	// Used to hide the overlay from the alt+tab switcher
-	[DllImport("user32.dll", SetLastError = true)]
-	static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-	[DllImport("user32.dll")]
-	static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
-	private const int GWL_EX_STYLE = -20;
-	private const int WS_EX_APPWINDOW = 0x00040000, WS_EX_TOOLWINDOW = 0x00000080;
-	
 	// Used for setting window position
 	[DllImport("user32.dll", SetLastError = true)]
 	static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, UInt32 uFlags);
