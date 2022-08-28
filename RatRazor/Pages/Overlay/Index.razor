@@ -5,7 +5,7 @@
 @using System.Globalization
 @inject Interfaces.IRatScannerUI RatScannerUI
 @inject Interfaces.ISettingsUI SettingsUI;
-@inject IJSRuntime JSRuntime;
+@inject IJSRuntime JsRuntime;
 @implements IDisposable
 
 <div style="transform-origin: top left; transform: scale(@((1f / GetGameWindowScale()).ToString(CultureInfo.InvariantCulture)));">
@@ -37,14 +37,14 @@
                                         iconHeight = iconScan.Icon.ItemSize.Y.ToString();
                                     }
                                 }
-                                <img src="@GetIconURL(iconScan)" style="position: absolute; left: 0px; top: 0px; z-index: -1; width: @(iconWidth)px; height: @(iconHeight)px; background-color: #121212; @iconStyle">
+                                <img src="@GetIconUrl(iconScan)" style="position: absolute; left: 0px; top: 0px; z-index: -1; width: @(iconWidth)px; height: @(iconHeight)px; background-color: #121212; @iconStyle">
                             </div>
                         </div>
                         <div style="overflow: hidden;">
-                            @if (iconScan.Avg24hPrice >= iconScan.BestTraderPrice)
+                            @if (iconScan.Avg24HPrice >= iconScan.BestTraderPrice)
                             {
                                 <div class="stroke">
-                                    @RatScannerUI.IntToShortPrice(iconScan.Avg24hPrice)
+                                    @RatScannerUI.IntToShortPrice(iconScan.Avg24HPrice)
                                 </div>
                             }
                             else
@@ -75,10 +75,10 @@
             {
                 <div class="d-flex align-enter" style="position: absolute; left: @(GetItemOverlayPosition(itemScan).X)px; top: @(GetItemOverlayPosition(itemScan).Y)px; background: #121212; padding: 4px;">
 
-                    @if (itemScan.Avg24hPrice >= itemScan.BestTraderPrice)
+                    @if (itemScan.Avg24HPrice >= itemScan.BestTraderPrice)
                     {
                         <div class="stroke">
-                            @RatScannerUI.IntToShortPrice(itemScan.Avg24hPrice)
+                            @RatScannerUI.IntToShortPrice(itemScan.Avg24HPrice)
                         </div>
                     }
                     else
@@ -105,7 +105,7 @@
 
 @code {
 
-    private string GetIconURL(ItemIconScan itemScan)
+    private string GetIconUrl(ItemIconScan itemScan)
     {
         var path = itemScan.IconPath;
 

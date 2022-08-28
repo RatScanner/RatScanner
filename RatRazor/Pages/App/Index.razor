@@ -8,10 +8,10 @@
 <MudGrid Class="pa-0" Spacing="0">
 	<MudItem xs="12">
 		<div class="d-flex align-center justify-start mx-2 mt-2 mb-1">
-			<img src="@item.IconLink" class="mr-2 mud-elevation-1" style="border-style: solid; border-width: 1px; border-color: #585D60; display: block; max-width: 64px; max-height: 64px; width: auto; height: auto;"/>
+			<img src="@Item.IconLink" class="mr-2 mud-elevation-1" style="border-style: solid; border-width: 1px; border-color: #585D60; display: block; max-width: 64px; max-height: 64px; width: auto; height: auto;"/>
 			<div style="text-shadow: 2px 2px 5px black;">
 				<MudText Typo="Typo.subtitle1" Color="Color.Inherit">
-					@(item.MatchedItem.Name[0..Math.Min(item.MatchedItem.Name.Length, 60)] + (item.MatchedItem.Name.Length > 60 ? "..." : ""))
+					@(Item.MatchedItem.Name[0..Math.Min(Item.MatchedItem.Name.Length, 60)] + (Item.MatchedItem.Name.Length > 60 ? "..." : ""))
 				</MudText>
 			</div>
 		</div>
@@ -30,22 +30,22 @@
 		<MudPaper Class="align-center justify-center pa-2 mx-2 my-1" Elevation="2">
 			<div class="d-flex justify-space-between align-center mt-2">
 				<MudText Typo="Typo.subtitle2">Recent Avg. Price</MudText>
-				<MudText Typo="Typo.subtitle2">@RatScannerUI.IntToLongPrice(item.Avg24hPrice)</MudText>
+				<MudText Typo="Typo.subtitle2">@RatScannerUI.IntToLongPrice(Item.Avg24HPrice)</MudText>
 			</div>
 			<div class="d-flex justify-space-between align-center my-1">
 				<MudText Typo="Typo.subtitle2">Value per Slot</MudText>
-				<MudText Typo="Typo.subtitle2">@RatScannerUI.IntToLongPrice(item.PricePerSlot)</MudText>
+				<MudText Typo="Typo.subtitle2">@RatScannerUI.IntToLongPrice(Item.PricePerSlot)</MudText>
 			</div>
 			<MudDivider DividerType="DividerType.FullWidth"/>
 			<div class="d-flex justify-space-between align-center mt-2">
 				<MudText Typo="Typo.subtitle2">Best Trader</MudText>
 				<div class="d-flex align-center">
-					<MudAvatar Image="@($"https://tarkovtracker.io/img/{item.TraderName}Headshot.jpg")" Size="Size.Small" Style="float: left;" Class="mr-1" Elevation="1"/><MudText Typo="Typo.subtitle2" Style="float: right;">@item.TraderName</MudText>
+					<MudAvatar Image="@($"https://tarkovtracker.io/img/{Item.TraderName}Headshot.jpg")" Size="Size.Small" Style="float: left;" Class="mr-1" Elevation="1"/><MudText Typo="Typo.subtitle2" Style="float: right;">@Item.TraderName</MudText>
 				</div>
 			</div>
 			<div class="d-flex justify-space-between align-center my-1">
 				<MudText Typo="Typo.subtitle2">Trader Price</MudText>
-				<MudText Typo="Typo.subtitle2">@RatScannerUI.IntToLongPrice(item.BestTraderPrice)</MudText>
+				<MudText Typo="Typo.subtitle2">@RatScannerUI.IntToLongPrice(Item.BestTraderPrice)</MudText>
 			</div>
 		</MudPaper>
 	</MudItem>
@@ -57,10 +57,10 @@
                     <div class="d-flex align-center">
                         @RatScannerUI.TrackingNeedsHideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
                     </div>*@
-			@if (RatScannerUI.GetItemTeamNeeds(item) != null && (RatScannerUI.GetItemTeamNeedsSummed(item).QuestRemaining > 0 || RatScannerUI.GetItemTeamNeedsSummed(item).HideoutRemaining > 0))
+			@if (RatScannerUI.GetItemTeamNeeds(Item) != null && (RatScannerUI.GetItemTeamNeedsSummed(Item).QuestRemaining > 0 || RatScannerUI.GetItemTeamNeedsSummed(Item).HideoutRemaining > 0))
 			{
 				<MudGrid Spacing="0" Class="pa-0 ma-0">
-					@foreach (var teammate in RatScannerUI.GetItemTeamNeeds(item).Where(t => t.Value.QuestRemaining > 0 || t.Value.HideoutRemaining > 0).ToList())
+					@foreach (var teammate in RatScannerUI.GetItemTeamNeeds(Item).Where(t => t.Value.QuestRemaining > 0 || t.Value.HideoutRemaining > 0).ToList())
 					{
 						<MudItem xs="12" Class="pa-0 ma-0">
 							<div class="d-flex justify-space-between">
@@ -77,10 +77,10 @@
 			else
 			{
 				<div class="d-flex align-center">
-					@RatScannerUI.GetItemNeeds(item).QuestRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1"/> Quest
+					@RatScannerUI.GetItemNeeds(Item).QuestRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1"/> Quest
 				</div>
 				<div class="d-flex align-center">
-					@RatScannerUI.GetItemNeeds(item).HideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1"/> Hideout
+					@RatScannerUI.GetItemNeeds(Item).HideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1"/> Hideout
 				</div>
 			}
 		</MudPaper>
@@ -88,25 +88,25 @@
 </MudGrid>
 
 @code {
-    private ItemScan item => RatScannerUI.LastItemScan;
+    private ItemScan Item => RatScannerUI.LastItemScan;
 
 	private async void OpenWiki()
 	{
-        if (item.WikiLink != null)
+        if (Item.WikiLink != null)
         {
-            OpenURL(item.WikiLink);
+            OpenUrl(Item.WikiLink);
         }
 	}
 
 	private async void OpenTarkovDev()
 	{
-        if (item.TarkovDevLink != null)
+        if (Item.TarkovDevLink != null)
         {
-            OpenURL(item.TarkovDevLink);
+            OpenUrl(Item.TarkovDevLink);
         }
 	}
 
-	private void OpenURL(string url)
+	private void OpenUrl(string url)
 	{
 		var psi = new ProcessStartInfo
 		{

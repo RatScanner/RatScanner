@@ -1,7 +1,7 @@
 ﻿@page "/app/settings/scanning"
 @inject Interfaces.ISettingsUI SettingsUI
 @inject Interfaces.IHotkeySelector HotkeySelector
-@inject IJSRuntime JSRuntime
+@inject IJSRuntime JsRuntime
 @implements IDisposable
 @using System.Linq
 
@@ -97,10 +97,10 @@
 
     public async Task LogAsync(string message)
     {
-        await JSRuntime.InvokeVoidAsync("console.log", message);
+        await JsRuntime.InvokeVoidAsync("console.log", message);
     }
 
-    bool RegisterHotkey = false;
+    bool _registerHotkey = false;
 
     private void HotkeyClickEventHandler(MouseEventArgs args)
     {

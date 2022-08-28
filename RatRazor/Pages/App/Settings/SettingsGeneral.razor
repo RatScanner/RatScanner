@@ -1,7 +1,7 @@
 ﻿@page "/app/settings/general"
 @layout SettingsLayout
 @inject Interfaces.ISettingsUI SettingsUI
-@inject IJSRuntime JSRuntime;
+@inject IJSRuntime JsRuntime;
 @implements IDisposable
 <div>
     <MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
@@ -37,7 +37,7 @@
 
 @code {
 
-    Converter<float> percentageConverter = new Converter<float>
+    Converter<float> _percentageConverter = new Converter<float>
         {
             SetFunc = value => (int)(value * 100) + "%",
             GetFunc = text =>

@@ -24,8 +24,11 @@ public partial class BlazorOverlay : Window
 	[DllImport("user32.dll")]
 	static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
-	private const int GWL_EX_STYLE = -20;
-	private const int WS_EX_APPWINDOW = 0x00040000, WS_EX_TOOLWINDOW = 0x00000080;
+	private const int GwlExStyle = -20;
+	private const int WsExAppWindow = 0x00040000, WsExToolWindow = 0x00000080;
+
+	// Repeat timer to check for the EFT window and resize if necessary
+	private static System.Timers.Timer _windowCheckTimer;
 
 	public BlazorOverlay(ServiceProvider serviceProvider)
 	{
@@ -33,7 +36,7 @@ public partial class BlazorOverlay : Window
 
 		// Hide overlay from alt+tab
 		var helper = new WindowInteropHelper(this).Handle;
-		SetWindowLong(helper, GWL_EX_STYLE, (GetWindowLong(helper, GWL_EX_STYLE) | WS_EX_TOOLWINDOW) & ~WS_EX_APPWINDOW);
+		SetWindowLong(helper, GwlExStyle, (GetWindowLong(helper, GwlExStyle) | WsExToolWindow) & ~WsExAppWindow);
 
 		InitializeComponent();
 	}
@@ -43,7 +46,7 @@ public partial class BlazorOverlay : Window
 		blazorOverlayWebView.WebView.DefaultBackgroundColor = System.Drawing.Color.Transparent;
 
 		// Set up the window check timer
-		initializeWindowCheckTimer();
+		InitializeWindowCheckTimer();
 
 		// Finish loading the webview
 		blazorOverlayWebView.WebView.NavigationCompleted += WebView_Loaded;
@@ -54,19 +57,19 @@ public partial class BlazorOverlay : Window
 
 	}
 
-	private void initializeWindowCheckTimer()
+	private void InitializeWindowCheckTimer()
 	{
 		// Set up the timer with interval
-		windowCheckTimer = new System.Timers.Timer(10000);
-		windowCheckTimer.Elapsed += checkWindowEvent;
-		windowCheckTimer.AutoReset = true;
-		windowCheckTimer.Enabled = true;
+		_windowCheckTimer = new System.Timers.Timer(10000);
+		_windowCheckTimer.Elapsed += CheckWindowEvent;
+		_windowCheckTimer.AutoReset = true;
+		_windowCheckTimer.Enabled = true;
 
 		// Trigger the timer immediately at initialization
-		checkWindowEvent(null, null);
+		CheckWindowEvent(null, null);
 	}
 
-	private void checkWindowEvent(Object source, ElapsedEventArgs e)
+	private void CheckWindowEvent(Object source, ElapsedEventArgs e)
 	{
 		// Used to find the area of the EFT game client to set up the overlay location and size
 		try
@@ -91,13 +94,6 @@ public partial class BlazorOverlay : Window
 			Debug.WriteLine("Did not find the EFT window for the overlay");
 		}
 	}
-
-	// Used for setting window position
-	[DllImport("user32.dll", SetLastError = true)]
-	static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, UInt32 uFlags);
-
-	// Repeat timer to check for the EFT window and resize if necessary
-	private static System.Timers.Timer windowCheckTimer;
 
 	private void WebView_Loaded(object sender, CoreWebView2NavigationCompletedEventArgs e)
 	{

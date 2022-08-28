@@ -149,7 +149,7 @@ public class RatScannerMain : INotifyPropertyChanged
 		if (
 			gameScale != null &&
 			RatEyeEngine != null &&
-			Config.Processing.Resolution2Scale(gameScale.bounds.Width, gameScale.bounds.Height) != RatEyeEngine.Config.ProcessingConfig.Scale
+			Config.Processing.Resolution2Scale(gameScale.Bounds.Width, gameScale.Bounds.Height) != RatEyeEngine.Config.ProcessingConfig.Scale
 		)
 		{
 			// We have a new ScreenScale, update RatEye
@@ -236,8 +236,8 @@ public class RatScannerMain : INotifyPropertyChanged
 	private RatEye.Config GetRatEyeConfig(bool highlighted = true)
 	{
 		// Default to our primary screen, then try to set it to game window if we can.
-		int ScreenWidth = Screen.PrimaryScreen.Bounds.Width;
-		int ScreenHeight = Screen.PrimaryScreen.Bounds.Height;
+		int screenWidth = Screen.PrimaryScreen.Bounds.Width;
+		int screenHeight = Screen.PrimaryScreen.Bounds.Height;
 		try
 		{
 			ScreenScale? gameScale = ScreenInfo.GameWindowScreenScale();
@@ -245,8 +245,8 @@ public class RatScannerMain : INotifyPropertyChanged
 			{
 				System.Drawing.Rectangle gameRect = GameWindowLocator.GetWindowLocation();
 				// Set ScreenWidth and ScreenHeight to the dimensions of the gameRect rectangle
-				ScreenWidth = gameRect.Width;
-				ScreenHeight = gameRect.Height;
+				screenWidth = gameRect.Width;
+				screenHeight = gameRect.Height;
 			}
 		}
 		catch {
@@ -262,7 +262,7 @@ public class RatScannerMain : INotifyPropertyChanged
 			},
 			ProcessingConfig = new Config.Processing()
 			{
-				Scale = Config.Processing.Resolution2Scale(ScreenWidth, ScreenHeight),
+				Scale = Config.Processing.Resolution2Scale(screenWidth, screenHeight),
 				Language = RatConfig.NameScan.Language,
 				IconConfig = new Config.Processing.Icon()
 				{
@@ -344,7 +344,7 @@ public class RatScannerMain : INotifyPropertyChanged
 			tempNameScan.IconLink = tempNameScan.MatchedItem.GetMarketItem().IconLink;
 			tempNameScan.WikiLink = tempNameScan.MatchedItem.GetMarketItem().WikiLink;
 			tempNameScan.TarkovDevLink = $"https://tarkov.dev/item/{tempNameScan.MatchedItem.Id}";
-			tempNameScan.Avg24hPrice = tempNameScan.MatchedItem.GetMarketItem().Avg24hPrice;
+			tempNameScan.Avg24HPrice = tempNameScan.MatchedItem.GetMarketItem().Avg24hPrice;
 			tempNameScan.PricePerSlot = tempNameScan.MatchedItem.GetMarketItem().Avg24hPrice / (tempNameScan.MatchedItem.Width * tempNameScan.MatchedItem.Height);
 			tempNameScan.TraderName = TraderPrice.GetTraderName(tempNameScan.MatchedItem.GetBestTrader().traderId);
 			tempNameScan.BestTraderPrice = tempNameScan.MatchedItem.GetBestTrader().price;
@@ -391,7 +391,7 @@ public class RatScannerMain : INotifyPropertyChanged
 					IconLink = inspection.Item.GetMarketItem().IconLink,
 					WikiLink = inspection.Item.GetMarketItem().WikiLink,
 					TarkovDevLink = $"https://tarkov.dev/item/{inspection.Item.Id}",
-					Avg24hPrice = inspection.Item.GetMarketItem().Avg24hPrice,
+					Avg24HPrice = inspection.Item.GetMarketItem().Avg24hPrice,
 					PricePerSlot = inspection.Item.GetMarketItem().Avg24hPrice / (inspection.Item.Width * inspection.Item.Height),
 					TraderName = TraderPrice.GetTraderName(inspection.Item.GetBestTrader().traderId),
 					BestTraderPrice = inspection.Item.GetBestTrader().price,
@@ -436,7 +436,7 @@ public class RatScannerMain : INotifyPropertyChanged
 				IconLink = icon.Item.GetMarketItem().IconLink,
 				WikiLink = icon.Item.GetMarketItem().WikiLink,
 				TarkovDevLink = $"https://tarkov.dev/item/{icon.Item.Id}",
-				Avg24hPrice = icon.Item.GetMarketItem().Avg24hPrice,
+				Avg24HPrice = icon.Item.GetMarketItem().Avg24hPrice,
 				PricePerSlot = icon.Item.GetMarketItem().Avg24hPrice / (icon.Item.Width * icon.Item.Height),
 				TraderName = TraderPrice.GetTraderName(icon.Item.GetBestTrader().traderId),
 				BestTraderPrice = icon.Item.GetBestTrader().price,

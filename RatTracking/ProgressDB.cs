@@ -7,7 +7,7 @@ namespace RatTracking;
 // Storing information about items needed for EFT progression
 public class ProgressDB
 {
-	private static readonly string[] _questObjectiveItemTypes = { "collect", "find", "mark", "key" };
+	private static readonly string[] QuestObjectiveItemTypes = { "collect", "find", "mark", "key" };
 
 	private const string TarkovDataUrl = "https://tarkovtracker.github.io/tarkovdata";
 
@@ -20,8 +20,8 @@ public class ProgressDB
 	// Set up the Item DB
 	public void Init()
 	{
-		var questBlob = getProgressDataQuest();
-		var hideoutBlob = getProgressDataHideout();
+		var questBlob = GetProgressDataQuest();
+		var hideoutBlob = GetProgressDataHideout();
 
 		// Deserialize the quests.json schema into RatScanner.FetchModels.tarkovdata model
 		var quests = JsonConvert.DeserializeObject<List<Quest>>(questBlob);
@@ -34,7 +34,7 @@ public class ProgressDB
 			// Loop through all of our objectives within each quest
 		foreach (var objective in quest.Objectives)
 			// Check if the objective is a type that requires an item
-			if (_questObjectiveItemTypes.Contains(objective.Type))
+			if (QuestObjectiveItemTypes.Contains(objective.Type))
 				// Some objectives can have array of targets (one-of-keys are currently only example), so add each
 				foreach (var item in objective.Target)
 					_questItems.Add(new QuestItem
@@ -105,7 +105,7 @@ public class ProgressDB
 	}
 
 	// Pulls the whole quest data file from tarkovdata for processing
-	private static string getProgressDataQuest()
+	private static string GetProgressDataQuest()
 	{
 		try
 		{
@@ -118,7 +118,7 @@ public class ProgressDB
 	}
 
 	// Pulls the whole hideout file form tarkovdata for processing
-	private static string getProgressDataHideout()
+	private static string GetProgressDataHideout()
 	{
 		try
 		{

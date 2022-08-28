@@ -32,7 +32,7 @@ public class DefaultItemScan : ItemScan
 		TarkovDevLink = fake ? "" : "https://tarkov.dev/item/physical-bitcoin";
 
 		// Item Information
-		Avg24hPrice = 0;
+		Avg24HPrice = 0;
 		PricePerSlot = 0;
 		TraderName = fake ? "Fence" : "Therapist";
 		BestTraderPrice = 0;

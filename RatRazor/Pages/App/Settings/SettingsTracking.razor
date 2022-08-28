@@ -23,7 +23,7 @@
 						</div>
 					</MudItem>
 					<MudItem xs="12">
-						<MudTextField @bind-Value="SettingsUI.TarkovTrackerToken" Validation="@(new Func<string, IEnumerable<string>>(CheckToken))" Label="API Token" InputType="@PasswordInput" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TokenShowClick"></MudTextField>
+						<MudTextField @bind-Value="SettingsUI.TarkovTrackerToken" Validation="@(new Func<string, IEnumerable<string>>(CheckToken))" Label="API Token" InputType="@_passwordInput" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@_passwordInputIcon" OnAdornmentClick="TokenShowClick"></MudTextField>
 					</MudItem>
 					<MudItem xs="12">
 						<MudCheckBox @bind-Checked="SettingsUI.ShowTarkovTrackerTeam" Label="Show Teammates" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
@@ -51,9 +51,9 @@
 		SettingsUI.PropertyChanged -= PropertyChangeHandler;
 	}
 
-	bool isShow;
-	InputType PasswordInput = InputType.Password;
-	string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+	bool _isShow;
+	InputType _passwordInput = InputType.Password;
+	string _passwordInputIcon = Icons.Material.Filled.VisibilityOff;
 
 	private IEnumerable<string> CheckToken(string token)
 	{
@@ -63,17 +63,17 @@
 
 	void TokenShowClick()
 	{
-	@if (isShow)
+	@if (_isShow)
 	{
-		isShow = false;
-		PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
-		PasswordInput = InputType.Password;
+		_isShow = false;
+		_passwordInputIcon = Icons.Material.Filled.VisibilityOff;
+		_passwordInput = InputType.Password;
 	}
 	else
 	{
-		isShow = true;
-		PasswordInputIcon = Icons.Material.Filled.Visibility;
-		PasswordInput = InputType.Text;
+		_isShow = true;
+		_passwordInputIcon = Icons.Material.Filled.Visibility;
+		_passwordInput = InputType.Text;
 	}
 	}
 
