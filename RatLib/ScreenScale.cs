@@ -13,12 +13,4 @@ public class ScreenScale
 		Scale = scale;
 		Bounds = bounds;
 	}
-
-	public bool Equals(ScreenScale screenScale)
-	{
-		if (screenScale == null) return false;
-		if (Scale != screenScale.Scale) return false;
-		if (Bounds.Width != screenScale.Bounds.Width || Bounds.Height != screenScale.Bounds.Height) return false;
-		return true;
-	}
 }
