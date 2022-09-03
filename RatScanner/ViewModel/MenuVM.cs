@@ -1,5 +1,4 @@
 ﻿using RatRazor.Interfaces;
-using RatScanner.FetchModels;
 using RatStash;
 using RatTracking.FetchModels;
 using System;
@@ -12,7 +11,6 @@ using RatTracking;
 using RatLib.Scan;
 using RatLib;
 using RatTracking.FetchModels.TarkovTracker;
-using System.Diagnostics;
 
 namespace RatScanner.ViewModel;
 

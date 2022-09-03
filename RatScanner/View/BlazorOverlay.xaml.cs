@@ -3,11 +3,8 @@ using System.Diagnostics;
 using System.Windows;
 using Microsoft.Web.WebView2.Core;
 using System;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 using System.Windows.Interop;
-using System.Drawing;
 using System.Timers;
 using RatLib;
 
@@ -25,7 +22,7 @@ public partial class BlazorOverlay : Window
 	static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
 	private const int GwlExStyle = -20;
-	private const int WsExAppWindow = 0x00040000, WsExToolWindow = 0x00000080;
+	private const int WsExToolWindow = 0x00000080;
 
 	// Repeat timer to check for the EFT window and resize if necessary
 	private static System.Timers.Timer _windowCheckTimer;
@@ -33,10 +30,6 @@ public partial class BlazorOverlay : Window
 	public BlazorOverlay(ServiceProvider serviceProvider)
 	{
 		Resources.Add("services", serviceProvider);
-
-		// Hide overlay from alt+tab
-		var helper = new WindowInteropHelper(this).Handle;
-		SetWindowLong(helper, GwlExStyle, (GetWindowLong(helper, GwlExStyle) | WsExToolWindow) & ~WsExAppWindow);
 
 		InitializeComponent();
 	}
@@ -48,13 +41,13 @@ public partial class BlazorOverlay : Window
 		// Set up the window check timer
 		InitializeWindowCheckTimer();
 
-		// Finish loading the webview
+		// Finish loading the WebView
 		blazorOverlayWebView.WebView.NavigationCompleted += WebView_Loaded;
 		blazorOverlayWebView.WebView.CoreWebView2InitializationCompleted += CoreWebView_Loaded;
 
-		// Other customizations
-		this.IsHitTestVisible = false;
-
+		// Hide overlay from alt+tab
+		var handle = new WindowInteropHelper(this).Handle;
+		SetWindowLong(handle, GwlExStyle, GetWindowLong(handle, GwlExStyle) | WsExToolWindow);
 	}
 
 	private void InitializeWindowCheckTimer()
@@ -74,12 +67,12 @@ public partial class BlazorOverlay : Window
 		// Used to find the area of the EFT game client to set up the overlay location and size
 		try
 		{
-			ScreenScale? gameScreenScale = RatScannerMain.Instance?.GameScreenScale;
+			var gameScreenScale = RatScannerMain.Instance?.GameScreenScale;
 			// Set the size of the overlay now that we have the rect of EFT
 			//SetSize(rect.Left, rect.Top, rect.Width, rect.Height);
 			if (gameScreenScale != null)
 			{
-				Rectangle gameRect = GameWindowLocator.GetWindowLocation();
+				var gameRect = GameWindowLocator.GetWindowLocation();
 				Dispatcher.Invoke(() =>
 				{
 					this.Left = gameRect.Left;

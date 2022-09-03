@@ -145,7 +145,7 @@ public class RatScannerMain : INotifyPropertyChanged
 	// Check if RatEye needs to be updated to the latest ScreenScale data
 	private void CheckGameScreen(object? o = null)
 	{
-		ScreenScale? gameScale = GameScreenScale;
+		var gameScale = GameScreenScale;
 		if (
 			gameScale != null &&
 			RatEyeEngine != null &&
@@ -236,14 +236,14 @@ public class RatScannerMain : INotifyPropertyChanged
 	private RatEye.Config GetRatEyeConfig(bool highlighted = true)
 	{
 		// Default to our primary screen, then try to set it to game window if we can.
-		int screenWidth = Screen.PrimaryScreen.Bounds.Width;
-		int screenHeight = Screen.PrimaryScreen.Bounds.Height;
+		var screenWidth = Screen.PrimaryScreen.Bounds.Width;
+		var screenHeight = Screen.PrimaryScreen.Bounds.Height;
 		try
 		{
-			ScreenScale? gameScale = ScreenInfo.GameWindowScreenScale();
+			var gameScale = ScreenInfo.GameWindowScreenScale();
 			if (gameScale != null)
 			{
-				System.Drawing.Rectangle gameRect = GameWindowLocator.GetWindowLocation();
+				var gameRect = GameWindowLocator.GetWindowLocation();
 				// Set ScreenWidth and ScreenHeight to the dimensions of the gameRect rectangle
 				screenWidth = gameRect.Width;
 				screenHeight = gameRect.Height;

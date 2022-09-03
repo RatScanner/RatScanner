@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Windows.Forms;
 using System.Windows.Input;
 using RatStash;
 using Key = System.Windows.Input.Key;
@@ -111,8 +110,6 @@ internal static class RatConfig
 	internal static int MarketDBRefreshTime = 30 * 60 * 1000; // 30 minutes
 	internal static string ItemDataBundleVersion = "20220822";
 	private static int ConfigVersion => 2;
-
-	internal static bool SetScreen = false;
 
 	internal static float GameScale => RatScannerMain.Instance.RatEyeEngine.Config.ProcessingConfig.Scale;
 

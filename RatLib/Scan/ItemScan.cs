@@ -1,6 +1,5 @@
 ﻿using RatStash;
 using RatEye;
-using RatTracking;
 
 namespace RatLib.Scan;
 

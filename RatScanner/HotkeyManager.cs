@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualBasic.ApplicationServices;
-using RatScanner.Controls;
+﻿using RatScanner.Controls;
 using System;
 using System.Threading;
 using System.Windows.Input;

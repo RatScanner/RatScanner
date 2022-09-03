@@ -124,12 +124,12 @@
     // We need to offset the tooltip position by the absolute position of the game (thus the overlay)
     private Point GetItemOverlayPosition(ItemScan itemScan)
     {
-        ScreenScale? gameWindow = RatScannerUI.GameScreenScale;
+        var gameWindow = RatScannerUI.GameScreenScale;
         if (gameWindow != null)
         {
-            Rectangle gameRect = GameWindowLocator.GetWindowLocation();
-            int xPosition = itemScan.GetToolTipPosition().X - gameRect.X;
-            int yPosition = itemScan.GetToolTipPosition().Y - gameRect.Y;
+            var gameRect = GameWindowLocator.GetWindowLocation();
+            var xPosition = itemScan.GetToolTipPosition().X - gameRect.X;
+            var yPosition = itemScan.GetToolTipPosition().Y - gameRect.Y;
             return new Point(xPosition, yPosition);
         }
         return new Point(0, 0);

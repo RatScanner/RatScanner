@@ -32,6 +32,4 @@ public interface IRatScannerUI : INotifyPropertyChanged
 	public NeededItem GetItemNeeds(ItemScan item);
 	public List<KeyValuePair<string, NeededItem>> GetItemTeamNeeds(ItemScan item);
 	public NeededItem GetItemTeamNeedsSummed(ItemScan item);
-
-	
 }

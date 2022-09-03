@@ -10,9 +10,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
-using RatLib;
-
-using System.Linq;
 
 namespace RatScanner.View;
 
