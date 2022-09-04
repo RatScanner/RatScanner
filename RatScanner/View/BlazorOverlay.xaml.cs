@@ -55,7 +55,7 @@ public partial class BlazorOverlay : Window
 		// Set up the timer with interval
 		_windowCheckTimer = new System.Timers.Timer(10000);
 		_windowCheckTimer.Elapsed += CheckWindowEvent;
-		_windowCheckTimer.AutoReset = true;
+		_windowCheckTimer.AutoReset = false;
 		_windowCheckTimer.Enabled = true;
 
 		// Trigger the timer immediately at initialization
@@ -68,24 +68,28 @@ public partial class BlazorOverlay : Window
 		try
 		{
 			var gameScreenScale = RatScannerMain.Instance?.GameScreenScale;
-			// Set the size of the overlay now that we have the rect of EFT
-			//SetSize(rect.Left, rect.Top, rect.Width, rect.Height);
-			if (gameScreenScale != null)
+
+			if (gameScreenScale == null)
 			{
-				var gameRect = GameWindowLocator.GetWindowLocation();
-				Dispatcher.Invoke(() =>
-				{
-					this.Left = gameRect.Left;
-					this.Top = gameRect.Top;
-					this.Width = gameRect.Width / gameScreenScale.Scale;
-					this.Height = gameRect.Height / gameScreenScale.Scale;
-				});
+				Logger.LogWarning("Unable to determine the games screen scale!");
+				_windowCheckTimer.Start();
+				return;
 			}
+
+			var gameRect = GameWindowLocator.GetWindowLocation();
+			Dispatcher.Invoke(() =>
+			{
+				this.Left = gameRect.Left;
+				this.Top = gameRect.Top;
+				this.Width = gameRect.Width / gameScreenScale.Scale;
+				this.Height = gameRect.Height / gameScreenScale.Scale;
+			});
 		}
 		catch
 		{
-			Debug.WriteLine("Did not find the EFT window for the overlay");
+			Logger.LogWarning("Did not find the EFT window for the overlay");
 		}
+		_windowCheckTimer.Start();
 	}
 
 	private void WebView_Loaded(object sender, CoreWebView2NavigationCompletedEventArgs e)
