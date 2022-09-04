@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Windows.Interop;
+using MudBlazor.Extensions;
 
 namespace RatScanner.View;
 
@@ -26,12 +27,10 @@ public partial class BlazorOverlay : Window
 	{
 		blazorOverlayWebView.WebView.DefaultBackgroundColor = System.Drawing.Color.Transparent;
 		SetSize();
+		SetWindowStyle();
 		blazorOverlayWebView.WebView.NavigationCompleted += WebView_Loaded;
 		blazorOverlayWebView.WebView.CoreWebView2InitializationCompleted += CoreWebView_Loaded;
 	}
-
-	[DllImport("user32.dll", SetLastError = true)]
-	static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, UInt32 uFlags);
 
 	private void SetSize()
 	{
@@ -49,7 +48,16 @@ public partial class BlazorOverlay : Window
 		}
 		
 		var handle = new WindowInteropHelper(this).Handle;
-		SetWindowPos(handle, (IntPtr)0, left, top, right - left, bottom - top, 0);
+		NativeMethods.SetWindowPos(handle, 0, left, top, right - left, bottom - top, 0);
+	}
+
+	private void SetWindowStyle()
+	{
+		const int gwlExStyle = -20; // GWL_EXSTYLE
+		const uint wsExToolWindow = 0x00000080; // WS_EX_TOOLWINDOW
+
+		var handle = new WindowInteropHelper(this).Handle;
+		NativeMethods.SetWindowLongPtr(handle, gwlExStyle, NativeMethods.GetWindowLongPtr(handle, gwlExStyle) | (nint)wsExToolWindow);
 	}
 
 	private void WebView_Loaded(object sender, CoreWebView2NavigationCompletedEventArgs e)
@@ -61,5 +69,17 @@ public partial class BlazorOverlay : Window
 	private void CoreWebView_Loaded(object sender, CoreWebView2InitializationCompletedEventArgs e)
 	{
 		blazorOverlayWebView.WebView.CoreWebView2.SetVirtualHostNameToFolderMapping("local.data", "Data", CoreWebView2HostResourceAccessKind.Allow);
+	}
+
+	private static class NativeMethods
+	{
+		[DllImport("user32.dll", EntryPoint = "GetWindowLongPtr")]
+		public static extern nint GetWindowLongPtr(nint hWnd, int nIndex);
+
+		[DllImport("user32.dll", EntryPoint = "SetWindowLongPtr")]
+		public static extern nint SetWindowLongPtr(nint hWnd, int nIndex, nint dwNewLong);
+
+		[DllImport("user32.dll", SetLastError = true)]
+		public static extern bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 	}
 }
