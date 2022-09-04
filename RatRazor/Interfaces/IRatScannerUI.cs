@@ -2,6 +2,7 @@
 using RatTracking;
 using System.ComponentModel;
 using RatLib.Scan;
+using RatLib;
 
 namespace RatRazor.Interfaces;
 
@@ -21,6 +22,8 @@ public interface IRatScannerUI : INotifyPropertyChanged
 
 	public TarkovTrackerDB TarkovTrackerDB { get; }
 	public ProgressDB ProgressDB { get; }
+
+	public ScreenScale? GameScreenScale { get; }
 
 	public string IntToShortPrice(int? value);
 

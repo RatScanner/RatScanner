@@ -4,33 +4,33 @@ using RatLib.Scan;
 
 public class ItemQueue : IEnumerable<ItemScan>
 {
-	private readonly ConcurrentQueue<ItemScan> queue = new();
+	private readonly ConcurrentQueue<ItemScan> _queue = new();
 	public event EventHandler Changed;
 
 	protected virtual void OnChanged()
 	{
-		while (queue.Count > 1 && !(DateTimeOffset.Now.ToUnixTimeMilliseconds() > queue.First().DissapearAt))
+		while (_queue.Count > 1 && !(DateTimeOffset.Now.ToUnixTimeMilliseconds() > _queue.First().DissapearAt))
 		{
-			if (!queue.TryDequeue(out _)) break;
+			if (!_queue.TryDequeue(out _)) break;
 		}
 		Changed?.Invoke(this, EventArgs.Empty);
 	}
 
 	public virtual void Enqueue(ItemScan item)
 	{
-		queue.Enqueue(item);
+		_queue.Enqueue(item);
 		OnChanged();
 	}
 
 	public void EnqueueRange<T>(List<T> items) where T : ItemScan
 	{
-		items.ForEach(queue.Enqueue);
+		items.ForEach(_queue.Enqueue);
 		OnChanged();
 	}
 
-	public int Count => queue.Count;
+	public int Count => _queue.Count;
 
-	IEnumerator IEnumerable.GetEnumerator() => queue.GetEnumerator();
+	IEnumerator IEnumerable.GetEnumerator() => _queue.GetEnumerator();
 
-	public IEnumerator<ItemScan> GetEnumerator() => queue.GetEnumerator();
+	public IEnumerator<ItemScan> GetEnumerator() => _queue.GetEnumerator();
 }

@@ -33,7 +33,7 @@
 				<Label Grid.Column="0"
 				       Content="Avg. Day Price" />
 				<Label Grid.Column="1"
-				       Content="{Binding LastItemScan.Avg24hPrice, Converter={StaticResource IntToLongPriceConverter}}"
+				       Content="{Binding LastItemScan.Avg24HPrice, Converter={StaticResource IntToLongPriceConverter}}"
 				       d:Content="88.000 ₽" />
 
 				<Grid.ColumnDefinitions>

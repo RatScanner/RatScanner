@@ -155,7 +155,7 @@ internal static class Logger
 		message = message.Split(':')[0];
 		var url = ApiManager.GetResource(ApiManager.ResourceType.FAQLink);
 		url += "#:~:text=" + WebUtility.HtmlEncode(message);
-		OpenURL(url);
+		OpenUrl(url);
 	}
 
 	private static void CreateGitHubIssue(string message, Exception e)
@@ -177,7 +177,7 @@ internal static class Logger
 		url += "&title=" + WebUtility.UrlEncode(title);
 		url += "&labels=" + WebUtility.UrlEncode(labels);
 
-		OpenURL(url);
+		OpenUrl(url);
 	}
 
 	private static string LimitLength(string input, int length)
@@ -185,7 +185,7 @@ internal static class Logger
 		return input.Substring(0, input.Length > length ? length : input.Length);
 	}
 
-	private static void OpenURL(string url)
+	private static void OpenUrl(string url)
 	{
 		var psi = new ProcessStartInfo
 		{

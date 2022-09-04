@@ -18,6 +18,7 @@ using Timer = System.Threading.Timer;
 using RatScanner.FetchModels;
 using RatStash;
 using PixelFormat = System.Drawing.Imaging.PixelFormat;
+using RatLib;
 
 namespace RatScanner;
 
@@ -33,6 +34,10 @@ public class RatScannerMain : INotifyPropertyChanged
 	private Timer _marketDBRefreshTimer;
 	private Timer _tarkovTrackerDBRefreshTimer;
 	private Timer _scanRefreshTimer;
+
+	// Check for game screen changes every 10 seconds
+	private int _gameScreenRefreshInterval = 10000;
+	private Timer _gameScreenRefreshTimer;
 
 	/// <summary>
 	/// Lock for name scanning
@@ -59,6 +64,8 @@ public class RatScannerMain : INotifyPropertyChanged
 	public event PropertyChangedEventHandler PropertyChanged;
 
 	internal ItemQueue ItemScans = new();
+
+	public ScreenScale? GameScreenScale => ScreenInfo.GameWindowScreenScale();
 
 	public RatScannerMain()
 	{
@@ -121,6 +128,7 @@ public class RatScannerMain : INotifyPropertyChanged
 			_marketDBRefreshTimer = new Timer(RefreshMarketDB, null, RatConfig.MarketDBRefreshTime, Timeout.Infinite);
 			_tarkovTrackerDBRefreshTimer = new Timer(RefreshTarkovTrackerDB, null, RatConfig.Tracking.TarkovTracker.RefreshTime, Timeout.Infinite);
 			_scanRefreshTimer = new Timer(RefreshOverlay, null, 1000, 100);
+			_gameScreenRefreshTimer = new Timer(CheckGameScreen, null, _gameScreenRefreshInterval, Timeout.Infinite);
 
 			Logger.LogInfo("Setting default item...");
 			var itemScan = new DefaultItemScan(false);
@@ -132,6 +140,23 @@ public class RatScannerMain : INotifyPropertyChanged
 
 			Logger.LogInfo("Ready!");
 		}).Start();
+	}
+
+	// Check if RatEye needs to be updated to the latest ScreenScale data
+	private void CheckGameScreen(object? o = null)
+	{
+		var gameScale = GameScreenScale;
+		if (
+			gameScale != null &&
+			RatEyeEngine != null &&
+			Config.Processing.Resolution2Scale(gameScale.Bounds.Width, gameScale.Bounds.Height) != RatEyeEngine.Config.ProcessingConfig.Scale
+		)
+		{
+			// We have a new ScreenScale, update RatEye
+			// RatEye config will use the game's actual size, but we want to trigger based upon any scaling changes as well
+			SetupRatEye();
+		}
+		_gameScreenRefreshTimer.Change(_gameScreenRefreshInterval, Timeout.Infinite);
 	}
 
 	private void CheckForUpdates()
@@ -210,6 +235,23 @@ public class RatScannerMain : INotifyPropertyChanged
 
 	private RatEye.Config GetRatEyeConfig(bool highlighted = true)
 	{
+		// Default to our primary screen, then try to set it to game window if we can.
+		var screenWidth = Screen.PrimaryScreen.Bounds.Width;
+		var screenHeight = Screen.PrimaryScreen.Bounds.Height;
+		try
+		{
+			var gameScale = ScreenInfo.GameWindowScreenScale();
+			if (gameScale != null)
+			{
+				var gameRect = GameWindowLocator.GetWindowLocation();
+				// Set ScreenWidth and ScreenHeight to the dimensions of the gameRect rectangle
+				screenWidth = gameRect.Width;
+				screenHeight = gameRect.Height;
+			}
+		}
+		catch {
+			// We must not have been able to find the game window, use the primary screen's dimensions as placeholder
+		}
 		return new Config()
 		{
 			PathConfig = new Config.Path()
@@ -220,7 +262,7 @@ public class RatScannerMain : INotifyPropertyChanged
 			},
 			ProcessingConfig = new Config.Processing()
 			{
-				Scale = Config.Processing.Resolution2Scale(RatConfig.ScreenWidth, RatConfig.ScreenHeight),
+				Scale = Config.Processing.Resolution2Scale(screenWidth, screenHeight),
 				Language = RatConfig.NameScan.Language,
 				IconConfig = new Config.Processing.Icon()
 				{
@@ -250,10 +292,14 @@ public class RatScannerMain : INotifyPropertyChanged
 		var excludeTypes = new[]
 		{
 			typeof(LootContainer),
+			typeof(StationaryContainer),
 			typeof(Pockets),
 		};
 
-		itemDB = itemDB.Filter(item => !item.IsQuestItem() && !excludeTypes.Contains(item.GetType()));
+		itemDB = itemDB.Filter(item =>
+		{
+			return !item.QuestItem && !excludeTypes.Contains(item.GetType());
+		});
 
 		return itemDB;
 	}
@@ -298,7 +344,7 @@ public class RatScannerMain : INotifyPropertyChanged
 			tempNameScan.IconLink = tempNameScan.MatchedItem.GetMarketItem().IconLink;
 			tempNameScan.WikiLink = tempNameScan.MatchedItem.GetMarketItem().WikiLink;
 			tempNameScan.TarkovDevLink = $"https://tarkov.dev/item/{tempNameScan.MatchedItem.Id}";
-			tempNameScan.Avg24hPrice = tempNameScan.MatchedItem.GetMarketItem().Avg24hPrice;
+			tempNameScan.Avg24HPrice = tempNameScan.MatchedItem.GetMarketItem().Avg24hPrice;
 			tempNameScan.PricePerSlot = tempNameScan.MatchedItem.GetMarketItem().Avg24hPrice / (tempNameScan.MatchedItem.Width * tempNameScan.MatchedItem.Height);
 			tempNameScan.TraderName = TraderPrice.GetTraderName(tempNameScan.MatchedItem.GetBestTrader().traderId);
 			tempNameScan.BestTraderPrice = tempNameScan.MatchedItem.GetBestTrader().price;
@@ -345,7 +391,7 @@ public class RatScannerMain : INotifyPropertyChanged
 					IconLink = inspection.Item.GetMarketItem().IconLink,
 					WikiLink = inspection.Item.GetMarketItem().WikiLink,
 					TarkovDevLink = $"https://tarkov.dev/item/{inspection.Item.Id}",
-					Avg24hPrice = inspection.Item.GetMarketItem().Avg24hPrice,
+					Avg24HPrice = inspection.Item.GetMarketItem().Avg24hPrice,
 					PricePerSlot = inspection.Item.GetMarketItem().Avg24hPrice / (inspection.Item.Width * inspection.Item.Height),
 					TraderName = TraderPrice.GetTraderName(inspection.Item.GetBestTrader().traderId),
 					BestTraderPrice = inspection.Item.GetBestTrader().price,
@@ -390,7 +436,7 @@ public class RatScannerMain : INotifyPropertyChanged
 				IconLink = icon.Item.GetMarketItem().IconLink,
 				WikiLink = icon.Item.GetMarketItem().WikiLink,
 				TarkovDevLink = $"https://tarkov.dev/item/{icon.Item.Id}",
-				Avg24hPrice = icon.Item.GetMarketItem().Avg24hPrice,
+				Avg24HPrice = icon.Item.GetMarketItem().Avg24hPrice,
 				PricePerSlot = icon.Item.GetMarketItem().Avg24hPrice / (icon.Item.Width * icon.Item.Height),
 				TraderName = TraderPrice.GetTraderName(icon.Item.GetBestTrader().traderId),
 				BestTraderPrice = icon.Item.GetBestTrader().price,

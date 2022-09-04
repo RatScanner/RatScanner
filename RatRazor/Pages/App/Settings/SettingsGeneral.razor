@@ -1,7 +1,7 @@
 ﻿@page "/app/settings/general"
 @layout SettingsLayout
 @inject Interfaces.ISettingsUI SettingsUI
-@inject IJSRuntime JSRuntime;
+@inject IJSRuntime JsRuntime;
 @implements IDisposable
 <div>
     <MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
@@ -15,22 +15,6 @@
                 <MudSlider @bind-Value="SettingsUI.ToolTipMilli" Min="0" Max="10000" Step="100" Color="Color.Info">
                     <MudText Typo="Typo.subtitle2">Tooltip Duration: @SettingsUI.ToolTipMilli.ToString()</MudText>
                 </MudSlider>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudText Style="margin-bottom: 4px">Screen Resolution</MudText>
-                <MudGrid Spacing="1">
-                    <MudItem xs="4">
-                        <MudNumericField @bind-Value="SettingsUI.ScreenWidth" HideSpinButtons="true" Label="Width" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0"></MudNumericField>
-                    </MudItem>
-                    <MudItem xs="4">
-                        <MudNumericField @bind-Value="SettingsUI.ScreenHeight" HideSpinButtons="true" Label="Height" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0"></MudNumericField>
-                    </MudItem>
-                    <MudItem xs="4">
-                        <MudNumericField @bind-Value="SettingsUI.ScreenScale" Label="Scale" Variant="Variant.Outlined" HideSpinButtons="true" Converter="@percentageConverter" Margin="Margin.Dense" Min="0" Max="8"></MudNumericField>
-                    </MudItem>
-                </MudGrid>
             </MudPaper>
         </MudItem>
         <MudItem xs="12">
@@ -53,7 +37,7 @@
 
 @code {
 
-    Converter<float> percentageConverter = new Converter<float>
+    Converter<float> _percentageConverter = new Converter<float>
         {
             SetFunc = value => (int)(value * 100) + "%",
             GetFunc = text =>

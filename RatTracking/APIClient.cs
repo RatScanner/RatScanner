@@ -5,12 +5,12 @@ namespace RatTracking;
 
 internal static class APIClient
 {
-	private static readonly HttpClient httpClient = new(new HttpClientHandler
+	private static readonly HttpClient HttpClient = new(new HttpClientHandler
 	{
 		AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
 	});
 
-	private static HttpRequestMessage formRequest(HttpMethod method, string url, string bearerToken = null)
+	private static HttpRequestMessage FormRequest(HttpMethod method, string url, string bearerToken = null)
 	{
 		var request = new HttpRequestMessage(method, url);
 		request.Headers.Add("User-Agent", "RatScanner-Client/3");
@@ -21,8 +21,8 @@ internal static class APIClient
 
 	public static string Get(string url, string bearerToken = null)
 	{
-		var request = formRequest(HttpMethod.Get, url, bearerToken);
-		var responseTask = httpClient.SendAsync(request);
+		var request = FormRequest(HttpMethod.Get, url, bearerToken);
+		var responseTask = HttpClient.SendAsync(request);
 		responseTask.Wait();
 		if (responseTask.Result.StatusCode == HttpStatusCode.Unauthorized)
 			throw new UnauthorizedTokenException("Token was rejected by the API");

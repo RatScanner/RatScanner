@@ -1,13 +1,14 @@
 ﻿@page "/overlay"
 @using RatLib.Scan
+@using RatLib
+@using System.Drawing
 @using System.Globalization
 @inject Interfaces.IRatScannerUI RatScannerUI
-@inject RatLib.VirtualScreenOffset VirtualScreenOffset
 @inject Interfaces.ISettingsUI SettingsUI;
-@inject IJSRuntime JSRuntime;
+@inject IJSRuntime JsRuntime;
 @implements IDisposable
 
-<div style="transform-origin: top left; transform: scale(@((1f / SettingsUI.ScreenScale).ToString(CultureInfo.InvariantCulture)));">
+<div style="transform-origin: top left; transform: scale(@((1f / GetGameWindowScale()).ToString(CultureInfo.InvariantCulture)));">
     @foreach (var itemScan in RatScannerUI.ItemScans)
     {
         @if (itemScan != null
@@ -16,46 +17,54 @@
         {
             @if (itemScan is ItemIconScan iconScan)
             {
-                <div style="font-size: smaller; position: absolute; left: @(iconScan.GetToolTipPosition().X - VirtualScreenOffset.XOffset)px; top: @(iconScan.GetToolTipPosition().Y - VirtualScreenOffset.YOffset)px; width: @(iconScan.Icon.ItemSize.X)px; height: @(iconScan.Icon.ItemSize.Y)px; ">
+                <div style="font-size: smaller; position: absolute; left: @(GetItemOverlayPosition(itemScan).X + 3)px; top: @(GetItemOverlayPosition(itemScan).Y + 3)px; width: @(iconScan.Icon.ItemSize.X)px; height: @(iconScan.Icon.ItemSize.Y)px; ">
                     <div style="height: 100%; width: 100%; position: relative; text-shadow: 0px 0px 5px black; outline-offset: -1px; outline: 1px solid #555555;" class="pa-1">
                         <div style="position: absolute; left: 0px; top: 0px;">
                             <div style="position: relative;">
                                 @{
                                     var iconStyle = "transform-origin: top left;";
+                                    string iconWidth, iconHeight;
                                     if (iconScan.Rotated)
                                     {
-                                        iconStyle += "transform: rotate(0.25turn) translate(0%, -100%);";
+                                        // Its necessary to explicitly define the width and height before the transform in the style property.
+                                        iconWidth = iconScan.Icon.ItemSize.Y.ToString();
+                                        iconHeight = iconScan.Icon.ItemSize.X.ToString();
+                                        iconStyle += "transform: rotate(0.25turn) translate(0%, -100%); ";
                                     }
-                                    else { }
+                                    else
+                                    {
+                                        iconWidth = iconScan.Icon.ItemSize.X.ToString();
+                                        iconHeight = iconScan.Icon.ItemSize.Y.ToString();
+                                    }
                                 }
-                                <img src="@GetIconURL(iconScan)" style="position: absolute; left: 0px; top: 0px; z-index: -1; background-color: #121212; @iconStyle">
+                                <img src="@GetIconUrl(iconScan)" style="position: absolute; left: 0px; top: 0px; z-index: -1; width: @(iconWidth)px; height: @(iconHeight)px; background-color: #121212; @iconStyle">
                             </div>
                         </div>
                         <div style="overflow: hidden;">
-                            @if (iconScan.Avg24hPrice >= iconScan.BestTraderPrice)
+                            @if (iconScan.Avg24HPrice >= iconScan.BestTraderPrice)
                             {
                                 <div class="stroke">
-                                    @RatScannerUI.IntToShortPrice(iconScan.Avg24hPrice)
+                                    @RatScannerUI.IntToShortPrice(iconScan.Avg24HPrice)
                                 </div>
                             }
                             else
                             {
                                 <div class="d-flex align-center stroke">
                                     @RatScannerUI.IntToShortPrice(iconScan.BestTraderPrice)
-                                    <MudAvatar Image="@($"https://tarkovtracker.io/img/{@iconScan.TraderName}Headshot.jpg")" Size="Size.Small" Style="float: right;" Class="ml-1" />
+                                    <MudAvatar Image="@($"https://tarkovtracker.io/img/{@iconScan.TraderName}Headshot.jpg")" MudBlazor.Size="Size.Small" Style="float: right;" Class="ml-1" />
                                 </div>
                             }
 
                             @if (RatScannerUI.GetItemNeeds(iconScan).QuestRemaining > 0)
                             {
                                 <div class="d-flex align-center stroke">
-                                    @RatScannerUI.GetItemNeeds(iconScan).QuestRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" />
+                                    @RatScannerUI.GetItemNeeds(iconScan).QuestRemaining <MudIcon Icon="@Icons.Filled.Checklist" MudBlazor.Size="Size.Small" Class="ml-1" />
                                 </div>
                             }
                             @if (RatScannerUI.GetItemNeeds(iconScan).HideoutRemaining > 0)
                             {
                                 <div class="d-flex align-center stroke">
-                                    @RatScannerUI.GetItemNeeds(iconScan).HideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" />
+                                    @RatScannerUI.GetItemNeeds(iconScan).HideoutRemaining <MudIcon Icon="@Icons.Filled.House" MudBlazor.Size="Size.Small" Class="ml-1" />
                                 </div>
                             }
                         </div>
@@ -64,29 +73,29 @@
             }
             else
             {
-                <div class="d-flex align-enter" style="position: absolute; left: @(itemScan.GetToolTipPosition().X - VirtualScreenOffset.XOffset)px; top: @(itemScan.GetToolTipPosition().Y - VirtualScreenOffset.YOffset)px; background: #121212; padding: 4px;">
+                <div class="d-flex align-enter" style="position: absolute; left: @(GetItemOverlayPosition(itemScan).X)px; top: @(GetItemOverlayPosition(itemScan).Y)px; background: #121212; padding: 4px;">
 
-                    @if (itemScan.Avg24hPrice >= itemScan.BestTraderPrice)
+                    @if (itemScan.Avg24HPrice >= itemScan.BestTraderPrice)
                     {
                         <div class="stroke">
-                            @RatScannerUI.IntToShortPrice(itemScan.Avg24hPrice)
+                            @RatScannerUI.IntToShortPrice(itemScan.Avg24HPrice)
                         </div>
                     }
                     else
                     {
                         <div class="d-flex align-center">
                             @RatScannerUI.IntToShortPrice(itemScan.BestTraderPrice)
-                            <MudAvatar Image="@($"https://tarkovtracker.io/img/{@itemScan.TraderName}Headshot.jpg")" Size="Size.Small" Style="float: right;" Class="ml-1" />
+                            <MudAvatar Image="@($"https://tarkovtracker.io/img/{@itemScan.TraderName}Headshot.jpg")" MudBlazor.Size="Size.Small" Style="float: right;" Class="ml-1" />
                         </div>
                     }
 
                     @if (RatScannerUI.GetItemNeeds(itemScan).QuestRemaining > 0)
                     {
-                        <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" />
+                        <MudIcon Icon="@Icons.Filled.Checklist" MudBlazor.Size="Size.Small" Class="ml-1" />
                     }
                     @if (RatScannerUI.GetItemNeeds(itemScan).HideoutRemaining > 0)
                     {
-                        <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" />
+                        <MudIcon Icon="@Icons.Filled.House" MudBlazor.Size="Size.Small" Class="ml-1" />
                     }
                 </div>
             }
@@ -96,7 +105,7 @@
 
 @code {
 
-    private string GetIconURL(ItemIconScan itemScan)
+    private string GetIconUrl(ItemIconScan itemScan)
     {
         var path = itemScan.IconPath;
 
@@ -110,6 +119,26 @@
         pathEnd = pathEnd[5..pathEnd.Length];
         var url = "https://local.data/" + pathEnd;
         return url;
+    }
+
+    // We need to offset the tooltip position by the absolute position of the game (thus the overlay)
+    private Point GetItemOverlayPosition(ItemScan itemScan)
+    {
+        var gameWindow = RatScannerUI.GameScreenScale;
+        if (gameWindow != null)
+        {
+            var gameRect = GameWindowLocator.GetWindowLocation();
+            var xPosition = itemScan.GetToolTipPosition().X - gameRect.X;
+            var yPosition = itemScan.GetToolTipPosition().Y - gameRect.Y;
+            return new Point(xPosition, yPosition);
+        }
+        return new Point(0, 0);
+    }
+
+    // Return the Game Windows scaling if exists, else default to 1
+    private double GetGameWindowScale()
+    {
+            return RatScannerUI.GameScreenScale?.Scale ?? 1.0f;
     }
 
     protected override void OnInitialized()

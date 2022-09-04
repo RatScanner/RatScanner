@@ -14,6 +14,7 @@
         Topmost="True"
         WindowStyle="None"
         AllowsTransparency="true"
+        IsHitTestVisible="False"
         Background="Transparent"
         Title="RatScanner Overlay"
         Height="100" Width="100">

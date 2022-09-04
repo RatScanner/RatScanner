@@ -51,7 +51,7 @@ public class TarkovTrackerDB
 		// Attempt to verify the token
 		try
 		{
-			var newToken = getTarkovTrackerToken();
+			var newToken = GetTarkovTrackerToken();
 			_badToken = newToken == null;
 			if (!_badToken)
 				// We have a valid token
@@ -82,7 +82,7 @@ public class TarkovTrackerDB
 		{
 			try
 			{
-				var rawProgress = JsonConvert.DeserializeObject<List<Progress>>(getTarkovTrackerTeam());
+				var rawProgress = JsonConvert.DeserializeObject<List<Progress>>(GetTarkovTrackerTeam());
 				Progress = rawProgress?.Where(x => (x.Hide ?? false) == false).ToList();
 			}
 			catch (RateLimitExceededException)
@@ -104,7 +104,7 @@ public class TarkovTrackerDB
 
 			try
 			{
-				var soloProgress = JsonConvert.DeserializeObject<Progress>(getTarkovTrackerSolo());
+				var soloProgress = JsonConvert.DeserializeObject<Progress>(GetTarkovTrackerSolo());
 				Progress = new List<Progress> { soloProgress };
 			}
 			catch (RateLimitExceededException)
@@ -127,7 +127,7 @@ public class TarkovTrackerDB
 	}
 
 	// Checks the token metadata endpoint for TarkovTracker
-	private string? getTarkovTrackerTeam()
+	private string? GetTarkovTrackerTeam()
 	{
 		try
 		{
@@ -148,7 +148,7 @@ public class TarkovTrackerDB
 	}
 
 	// Checks the token metadata endpoint for TarkovTracker
-	private string getTarkovTrackerSolo()
+	private string GetTarkovTrackerSolo()
 	{
 		try
 		{
@@ -164,11 +164,11 @@ public class TarkovTrackerDB
 		}
 	}
 
-	public bool TestToken(string test_token)
+	public bool TestToken(string testToken)
 	{
 		try
 		{
-			getTarkovTrackerToken(test_token);
+			GetTarkovTrackerToken(testToken);
 		}
 		catch (Exception)
 		{
@@ -179,14 +179,14 @@ public class TarkovTrackerDB
 	}
 
 	// Checks the token metadata endpoint for TarkovTracker
-	private Token? getTarkovTrackerToken(string custom_token = null)
+	private Token? GetTarkovTrackerToken(string customToken = null)
 	{
-		var working_token = Token;
-		if (custom_token != null) working_token = custom_token;
+		var workingToken = Token;
+		if (customToken != null) workingToken = customToken;
 
 		try
 		{
-			var response = APIClient.Get($"{TarkovTrackerUrl}/token", working_token);
+			var response = APIClient.Get($"{TarkovTrackerUrl}/token", workingToken);
 			if (response == null) return null;
 			try
 			{

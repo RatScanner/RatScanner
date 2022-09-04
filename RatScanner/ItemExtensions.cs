@@ -16,12 +16,12 @@ public static class ItemExtensions
 		return RatScannerMain.Instance.ProgressDB.IsProgressionItem(item.Id);
 	}
 
-	public static bool IsQuestItem(this Item item)
+	public static bool IsUsedInQuest(this Item item)
 	{
 		return RatScannerMain.Instance.ProgressDB.IsQuestItem(item.Id);
 	}
 
-	public static bool IsHideoutItem(this Item item)
+	public static bool IsUsedInHideout(this Item item)
 	{
 		return RatScannerMain.Instance.ProgressDB.IsHideoutItem(item.Id);
 	}
@@ -198,10 +198,10 @@ public static class ItemExtensions
 		return marketItem ?? new MarketItem(item.Id);
 	}
 
-	public static int GetAvg24hMarketPrice(this Item item)
+	public static int GetAvg24HMarketPrice(this Item item)
 	{
 		var total = item.GetMarketItem().Avg24hPrice;
-		if (item is CompoundItem itemC) total += itemC.Slots.Sum(slot => slot.ContainedItem?.GetAvg24hMarketPrice() ?? 0);
+		if (item is CompoundItem itemC) total += itemC.Slots.Sum(slot => slot.ContainedItem?.GetAvg24HMarketPrice() ?? 0);
 		return total;
 	}
 

@@ -1,7 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @inject Interfaces.IRatScannerUI RatScannerUI
-@inject IJSRuntime JSRuntime;
-<MudThemeProvider Theme="currentTheme"/>
+@inject IJSRuntime JsRuntime;
+<MudThemeProvider Theme="_currentTheme"/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
 
@@ -11,12 +11,12 @@
 
 	protected override void OnInitialized()
 	{
-		currentTheme = darkTheme;
+		_currentTheme = _darkTheme;
 	}
 
-	MudTheme currentTheme = new();
+	MudTheme _currentTheme = new();
 
-	MudTheme defaultTheme = new()
+	MudTheme _defaultTheme = new()
 	{
 		Palette = new Palette()
 		{
@@ -43,7 +43,7 @@
 		},
 	};
 
-	MudTheme darkTheme = new()
+	MudTheme _darkTheme = new()
 	{
 		Palette = new Palette()
 		{

@@ -24,10 +24,6 @@ public interface ISettingsUI : INotifyPropertyChanged
 	public bool ShowQuestHideoutTracker { get; set; }
 	public bool ShowQuestHideoutTeamTracker { get; set; }
 	public int Opacity { get; set; }
-
-	public int ScreenWidth { get; set; }
-	public int ScreenHeight { get; set; }
-	public float ScreenScale { get; set; }
 	
 	public bool MinimizeToTray { get; set; }
 	public bool AlwaysOnTop { get; set; }

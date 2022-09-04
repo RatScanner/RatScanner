@@ -1,6 +1,5 @@
 ﻿using RatStash;
 using RatEye;
-using RatTracking;
 
 namespace RatLib.Scan;
 
@@ -23,7 +22,7 @@ public abstract class ItemScan
 	public string? TarkovDevLink{ get; set; }
 
 	// Item Information
-	public int? Avg24hPrice { get; set; }
+	public int? Avg24HPrice { get; set; }
 	public int? PricePerSlot{ get; set; }
 	public string? TraderName{ get; set; }
 	public int? BestTraderPrice{ get; set; }

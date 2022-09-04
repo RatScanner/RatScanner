@@ -20,7 +20,7 @@ public partial class PageSwitcher : Window
 	private static PageSwitcher _instance;
 	public static PageSwitcher Instance => _instance ??= new PageSwitcher();
 
-	private UserControl activeControl;
+	private UserControl _activeControl;
 
 	public PageSwitcher()
 	{
@@ -55,14 +55,14 @@ public partial class PageSwitcher : Window
 	{
 		if (!(nextControl is ISwitchable)) throw new ArgumentException("NextPage is not ISwitchable! " + nextControl.Name);
 
-		if (activeControl != null)
+		if (_activeControl != null)
 		{
-			var activeControlSwitchable = (ISwitchable)activeControl;
+			var activeControlSwitchable = (ISwitchable)_activeControl;
 			activeControlSwitchable.OnClose();
 		}
 
 		ContentControl.Content = nextControl;
-		activeControl = nextControl;
+		_activeControl = nextControl;
 
 		var nextControlSwitchable = (ISwitchable)nextControl;
 		if (state != null) nextControlSwitchable.UtilizeState(state);
