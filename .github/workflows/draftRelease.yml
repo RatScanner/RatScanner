@@ -12,8 +12,7 @@ on:
     branches:
       - master
       - main
-    tags:
-      - v*
+      - dev
 
 jobs:
   draft-release:
@@ -38,6 +37,10 @@ jobs:
       run: curl -L "https://github.com/RatScanner/RatUpdater/releases/latest/download/RatUpdater.exe" --output "publish/RatUpdater.exe"
     - name: Zip Content
       run: 7z a -r RatScanner.zip ./publish/*
+    - uses: actions/upload-artifact@v3
+      with:
+        name: RatScanner
+        path: RatScanner.zip
     - name: Draft Release
       uses: softprops/action-gh-release@v1
       with:
@@ -45,3 +48,5 @@ jobs:
         draft: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      if: startsWith(github.ref, 'refs/tags/v') && github.event_name != 'pull_request'
+      
