@@ -53,11 +53,11 @@ public partial class BlazorOverlay : Window
 
 	private void SetWindowStyle()
 	{
-		const int GWL_EXSTYLE = -20;
-		const uint WS_EX_TOOLWINDOW = 0x00000080;
+		const int gwlExStyle = -20; // GWL_EXSTYLE
+		const uint wsExToolWindow = 0x00000080; // WS_EX_TOOLWINDOW
 
 		var handle = new WindowInteropHelper(this).Handle;
-		NativeMethods.SetWindowLongPtr(handle, GWL_EXSTYLE, NativeMethods.GetWindowLongPtr(handle, GWL_EXSTYLE) | (nint)WS_EX_TOOLWINDOW);
+		NativeMethods.SetWindowLongPtr(handle, gwlExStyle, NativeMethods.GetWindowLongPtr(handle, gwlExStyle) | (nint)wsExToolWindow);
 	}
 
 	private void WebView_Loaded(object sender, CoreWebView2NavigationCompletedEventArgs e)
@@ -71,7 +71,7 @@ public partial class BlazorOverlay : Window
 		blazorOverlayWebView.WebView.CoreWebView2.SetVirtualHostNameToFolderMapping("local.data", "Data", CoreWebView2HostResourceAccessKind.Allow);
 	}
 
-	private class NativeMethods
+	private static class NativeMethods
 	{
 		[DllImport("user32.dll", EntryPoint = "GetWindowLongPtr")]
 		public static extern nint GetWindowLongPtr(nint hWnd, int nIndex);
