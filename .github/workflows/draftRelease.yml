@@ -1,13 +1,10 @@
-name: Draft Release
+name: Build
 
 on:
   workflow_dispatch:
   push:
-    branches:
-      - master
-      - main
     tags:
-      - 'v*'
+      - v*
   pull_request:
     branches:
       - master
@@ -15,11 +12,11 @@ on:
       - dev
 
 jobs:
-  draft-release:
+  build:
     runs-on: windows-latest
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - run: echo "🔎 The name of the branch is ${{ github.ref }} and the repository is ${{ github.repository }}."
       - name: Checkout
         uses: actions/checkout@v2
       - name: Setup .NET
@@ -42,7 +39,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: RatScanner
-          path: RatScanner.zip
+          path: ./publish/
       - name: Draft Release
         uses: softprops/action-gh-release@v1
         with:
