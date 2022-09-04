@@ -57,11 +57,11 @@ public static class ScreenInfo
 			// Find the ScreenScale where the bounds of the EFT game window are within the bounds of the ScreenScale
 			// The gameRect is screwed up. The Width is actually the right hand bound, and the Height is the lower bound
 			// So we have tod so some special checks instead of a .Contains(gameRect) call.
-			return GetScreenScales().Where(s => s.Bounds.Contains(gameRect)).First();
+			return GetScreenScales().FirstOrDefault(s => s.Bounds.Contains(gameRect));
 		}
 		catch
 		{
-			// Did not find the screen, or we dont have tarkov
+			// Did not find the screen, or we don't have tarkov open
 			return null;
 		}
 	}
