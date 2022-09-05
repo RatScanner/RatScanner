@@ -1,11 +1,15 @@
 ﻿using RatScanner.Controls;
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 using System.Windows.Input;
+using Newtonsoft.Json.Linq;
 using RatStash;
 using Key = System.Windows.Input.Key;
 
@@ -13,6 +17,12 @@ namespace RatScanner;
 
 internal static class RatConfig
 {
+	[DllImport("user32.dll")]
+	private static extern IntPtr MonitorFromPoint([In] Point pt, [In] uint dwFlags);
+
+	[DllImport("Shcore.dll")]
+	private static extern IntPtr GetDpiForMonitor([In] IntPtr hmonitor, [In] DpiType dpiType, [Out] out uint dpiX, [Out] out uint dpiY);
+
 	// Version
 	public static string Version => Process.GetCurrentProcess().MainModule.FileVersionInfo.ProductVersion;
 
@@ -140,12 +150,12 @@ internal static class RatConfig
 			Logger.ShowMessage(message);
 
 			File.Delete(Paths.ConfigFile);
-			TrySetScreenResolution();
+			TrySetScreenConfig();
 			SaveConfig();
 		}
 		else if (!configFileExists)
 		{
-			TrySetScreenResolution();
+			TrySetScreenConfig();
 			SaveConfig();
 		}
 
@@ -248,16 +258,65 @@ internal static class RatConfig
 	}
 
 	/// <summary>
-	/// Converts PrimaryScreen resolution to Resolution enum, sets screenResolution if a match is found
+	/// Get the current screen config from tarkov's config files or default to the primary screen
 	/// </summary>
-	internal static void TrySetScreenResolution()
+	internal static void TrySetScreenConfig()
 	{
-		ScreenWidth = Screen.PrimaryScreen.Bounds.Width;
-		ScreenHeight = Screen.PrimaryScreen.Bounds.Height;
-		ScreenScale = 1f;
+		var (width, height, scale) = GetTarkovScreenConfig();
+		ScreenWidth = width;
+		ScreenHeight = height;
+		ScreenScale = (float)scale;
 		SetScreen = true;
-		var message = $"Detected {ScreenWidth}x{ScreenHeight} Resolution.\n\n";
-		message += "You can adjust this inside the settings.";
-		Logger.ShowMessage(message);
+	}
+
+	public enum DpiType
+	{
+		Effective = 0,
+		Angular = 1,
+		Raw = 2,
+	}
+
+	public static double GetScalingForScreen(Screen screen)
+	{
+		var pointOnScreen = new Point(screen.Bounds.X + 1, screen.Bounds.Y + 1);
+		var mon = MonitorFromPoint(pointOnScreen, 2 /*MONITOR_DEFAULTTONEAREST*/);
+		GetDpiForMonitor(mon, DpiType.Effective, out var dpiX, out _);
+		return dpiX / 96.0;
+	}
+
+	private static (int widht, int height, double scale) GetTarkovScreenConfig()
+	{
+		var configPath = Environment.ExpandEnvironmentVariables(@"%AppData%\Battlestate Games\Escape From Tarkov\Settings\Graphics.ini");
+		try
+		{
+			using var file = new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+			using var reader = new StreamReader(file, Encoding.UTF8);
+
+			var json = JObject.Parse(reader.ReadToEnd());
+
+			var activeDisplay = json["DisplaySettings"]["Display"].ToObject<int>();
+			var windowRes = json["Stored"][activeDisplay.ToString()]["WindowResolution"];
+			var width = windowRes["Width"].ToObject<int>();
+			var height = windowRes["Height"].ToObject<int>();
+
+			var usedScreen = Screen.AllScreens[activeDisplay];
+			var scale = GetScalingForScreen(usedScreen);
+
+			return (width, height, scale);
+		}
+		catch (FileNotFoundException e)
+		{
+			Logger.LogWarning("Unable to find Escape From Tarkov graphic settings.", e);
+
+			var width = Screen.PrimaryScreen.Bounds.Width;
+			var height = Screen.PrimaryScreen.Bounds.Height;
+			var scale = GetScalingForScreen(Screen.PrimaryScreen);
+
+			var message = $"Detected {width}x{height} Resolution at {scale} Scale.\n\n";
+			message += "You can adjust this inside the settings.";
+			Logger.ShowMessage(message);
+
+			return (width, height, scale);
+		}
 	}
 }
