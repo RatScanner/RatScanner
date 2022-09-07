@@ -16,21 +16,22 @@
         {
             @if (itemScan is ItemIconScan iconScan)
             {
-                <div style="font-size: smaller; position: absolute; left: @(iconScan.GetToolTipPosition().X - VirtualScreenOffset.XOffset)px; top: @(iconScan.GetToolTipPosition().Y - VirtualScreenOffset.YOffset)px; width: @(iconScan.Icon.ItemSize.X)px; height: @(iconScan.Icon.ItemSize.Y)px; ">
-                    <div style="height: 100%; width: 100%; position: relative; text-shadow: 0px 0px 5px black; outline-offset: -1px; outline: 1px solid #555555;" class="pa-1">
-                        <div style="position: absolute; left: 0px; top: 0px;">
-                            <div style="position: relative;">
-                                @{
-                                    var iconStyle = "transform-origin: top left;";
-                                    if (iconScan.Rotated)
-                                    {
-                                        iconStyle += "transform: rotate(0.25turn) translate(0%, -100%);";
-                                    }
-                                    else { }
-                                }
-                                <img src="@GetIconURL(iconScan)" style="position: absolute; left: 0px; top: 0px; z-index: -1; background-color: #121212; @iconStyle">
-                            </div>
+                var leftPos = iconScan.GetToolTipPosition().X - VirtualScreenOffset.XOffset;
+                var topPos = iconScan.GetToolTipPosition().Y - VirtualScreenOffset.YOffset;
+                var width = iconScan.Icon.ItemSize.X;
+                var height = iconScan.Icon.ItemSize.Y;
+
+                <div style="font-size: smaller; position: absolute; left: @(leftPos)px; top: @(topPos)px; width: @(width)px; height: @(height)px; ">
+                    <div style="position: relative; width: 100%; height: 100%; text-shadow: 0px 0px 5px black; outline-offset: -1px; outline: 1px solid #555555;" class="pa-1">
+                        @{
+	                        var iconStyle = iconScan.Rotated ? "transform: rotate(90deg) translate(0%, -100%);" : "";
+                            var mWidth = iconScan.Rotated ? height : width;
+	                        var mHeight = iconScan.Rotated ? width : height;
+                        }
+                        <div style="position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; z-index: -1;">
+	                        <img src="@GetIconURL(iconScan)" style="width: @(mWidth)px; height: @(mHeight)px; background-color: #121212; transform-origin: top left; @iconStyle">
                         </div>
+
                         <div style="overflow: hidden;">
                             @if (iconScan.Avg24hPrice >= iconScan.BestTraderPrice)
                             {
