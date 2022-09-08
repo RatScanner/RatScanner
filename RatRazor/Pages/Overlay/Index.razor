@@ -43,7 +43,7 @@
                             {
                                 <div class="d-flex align-center stroke">
                                     @RatScannerUI.IntToShortPrice(iconScan.BestTraderPrice)
-                                    <MudAvatar Image="@($"https://tarkovtracker.io/img/{@iconScan.TraderName}Headshot.jpg")" Size="Size.Small" Style="float: right;" Class="ml-1" />
+                                    <MudAvatar Image="@($"https://tarkov.dev/images/{@iconScan.TraderName.ToLower()}-icon.jpg")" Size="Size.Small" Style="float: right;" Class="ml-1" />
                                 </div>
                             }
 
@@ -77,7 +77,7 @@
                     {
                         <div class="d-flex align-center">
                             @RatScannerUI.IntToShortPrice(itemScan.BestTraderPrice)
-                            <MudAvatar Image="@($"https://tarkovtracker.io/img/{@itemScan.TraderName}Headshot.jpg")" Size="Size.Small" Style="float: right;" Class="ml-1" />
+                            <MudAvatar Image="@($"https://tarkov.dev/images/{@itemScan.TraderName.ToLower()}-icon.jpg")" Size="Size.Small" Style="float: right;" Class="ml-1" />
                         </div>
                     }
 
