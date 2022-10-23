@@ -286,9 +286,9 @@ internal static class RatConfig
 
 	private static (int widht, int height, double scale) GetTarkovScreenConfig()
 	{
-		var configPath = Environment.ExpandEnvironmentVariables(@"%AppData%\Battlestate Games\Escape From Tarkov\Settings\Graphics.ini");
 		try
 		{
+			var configPath = Environment.ExpandEnvironmentVariables(@"%AppData%\Battlestate Games\Escape From Tarkov\Settings\Graphics.ini");
 			using var file = new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 			using var reader = new StreamReader(file, Encoding.UTF8);
 
@@ -304,9 +304,9 @@ internal static class RatConfig
 
 			return (width, height, scale);
 		}
-		catch (FileNotFoundException e)
+		catch (Exception e)
 		{
-			Logger.LogWarning("Unable to find Escape From Tarkov graphic settings.", e);
+			Logger.LogWarning("Unable to query Escape From Tarkov graphic settings.", e);
 
 			var width = Screen.PrimaryScreen.Bounds.Width;
 			var height = Screen.PrimaryScreen.Bounds.Height;
