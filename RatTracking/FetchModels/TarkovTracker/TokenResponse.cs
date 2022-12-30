@@ -3,7 +3,7 @@
 namespace RatTracking.FetchModels.TarkovTracker;
 
 // Model representing a TarkovTracker Token's metadata
-public class Token
+public class TokenResponse
 {
 	// This token
 	[JsonProperty("token")]

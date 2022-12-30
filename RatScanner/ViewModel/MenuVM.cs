@@ -60,7 +60,7 @@ internal class MenuVM : INotifyPropertyChanged, IRatScannerUI
 
 		var neededItem = new NeededItem(item.Id);
 
-		Progress progress = null;
+		UserProgress progress = null;
 		if (RatConfig.Tracking.TarkovTracker.Enable && RatScannerMain.Instance.TarkovTrackerDB.Progress.Count >= 1)
 		{
 			var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
@@ -217,7 +217,7 @@ internal class MenuVM : INotifyPropertyChanged, IRatScannerUI
 		return "₽ " + result;
 	}
 
-	private static (int need, int have, bool FIR) GetQuestRequired(IEnumerable<QuestItem> requiredQuestItems, Progress progress)
+	private static (int need, int have, bool FIR) GetQuestRequired(IEnumerable<QuestItem> requiredQuestItems, UserProgress progress)
 	{
 		var need = 0;
 		var have = 0;
@@ -256,7 +256,7 @@ internal class MenuVM : INotifyPropertyChanged, IRatScannerUI
 		return (need, have, fir);
 	}
 
-	private static (int need, int have) GetHideoutRequired(IEnumerable<HideoutItem> requiredHideoutItems, Progress progress)
+	private static (int need, int have) GetHideoutRequired(IEnumerable<HideoutItem> requiredHideoutItems, UserProgress progress)
 	{
 		var need = 0;
 		var have = 0;

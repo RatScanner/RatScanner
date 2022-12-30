@@ -7,13 +7,13 @@ namespace RatTracking;
 // Storing information about progression from TarkovTracker API
 public class TarkovTrackerDB
 {
-	private Token? _token;
+	private TokenResponse? _token;
 	private bool _badToken;
 
-	public List<Progress> Progress = new();
+	public List<UserProgress> Progress = new();
 	public string? Token;
 
-	private const string TarkovTrackerUrl = "https://tarkovtracker.io/api/v1";
+	private const string TarkovTrackerUrl = "https://tarkovtracker.io/api/v2";
 
 	// Set up the TarkovTracker DB
 	public bool Init()
@@ -65,7 +65,7 @@ public class TarkovTrackerDB
 		{
 			// We have an unauthorized token, retrying won't help until we change it
 			_badToken = true;
-			_token = new Token { Id = Token };
+			_token = new TokenResponse { Id = Token };
 		}
 	}
 
@@ -82,7 +82,7 @@ public class TarkovTrackerDB
 		{
 			try
 			{
-				var rawProgress = JsonConvert.DeserializeObject<List<Progress>>(getTarkovTrackerTeam());
+				var rawProgress = JsonConvert.DeserializeObject<List<UserProgress>>(getTarkovTrackerTeam());
 				Progress = rawProgress?.Where(x => (x.Hide ?? false) == false).ToList();
 			}
 			catch (RateLimitExceededException)
@@ -104,8 +104,8 @@ public class TarkovTrackerDB
 
 			try
 			{
-				var soloProgress = JsonConvert.DeserializeObject<Progress>(getTarkovTrackerSolo());
-				Progress = new List<Progress> { soloProgress };
+				var soloProgress = JsonConvert.DeserializeObject<UserProgress>(getTarkovTrackerSolo());
+				Progress = new List<UserProgress> { soloProgress };
 			}
 			catch (RateLimitExceededException)
 			{
@@ -179,7 +179,7 @@ public class TarkovTrackerDB
 	}
 
 	// Checks the token metadata endpoint for TarkovTracker
-	private Token? getTarkovTrackerToken(string custom_token = null)
+	private TokenResponse? getTarkovTrackerToken(string custom_token = null)
 	{
 		var working_token = Token;
 		if (custom_token != null) working_token = custom_token;
@@ -190,7 +190,7 @@ public class TarkovTrackerDB
 			if (response == null) return null;
 			try
 			{
-				return JsonConvert.DeserializeObject<Token>(response);
+				return JsonConvert.DeserializeObject<TokenResponse>(response);
 			}
 			catch (Exception)
 			{
