@@ -46,8 +46,8 @@ public static class ItemExtensions
 		UserProgress progress = null;
 		if (RatConfig.Tracking.TarkovTracker.Enable && RatScannerMain.Instance.TarkovTrackerDB.Progress.Count >= 1)
 		{
-			var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
-			progress = teamProgress.First(x => x.Self ?? false);
+			var db = RatScannerMain.Instance.TarkovTrackerDB;
+			progress = db.Progress.First(x => x.UserId == db.Self);
 		}
 
 		// Set this item as for ourselves if this was our token
