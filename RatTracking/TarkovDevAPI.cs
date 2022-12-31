@@ -8,7 +8,92 @@ namespace RatTracking;
 /// </todo>
 public class TarkovDevAPI
 {
-	const string ApiEndpoit = "https://api.tarkov.dev/graphql";
+	const string ApiEndpoint = "https://api.tarkov.dev/graphql";
+
+	const string NeededQuery = @"
+	query ScannerNeeds {
+		tasks {
+		  id
+		  name
+		  trader {
+			id
+			name
+		  }
+		  map {
+			id
+			name
+		  }
+		  minPlayerLevel
+		  taskRequirements {
+			task {
+			  id
+			  name
+			}
+			status
+		  }
+		  traderLevelRequirements {
+			trader {
+			  id
+			  name
+			}
+			level
+		  }
+		  objectives {
+			id
+			type
+			maps {
+			  id
+			  name
+			}
+			optional
+			__typename
+			... on TaskObjectiveBuildItem {
+			  item {
+				id
+			  }
+			  containsAll {
+				id
+			  }
+			  containsOne {
+				id
+			  }
+			  attributes {
+				name
+				requirement {
+				  compareMethod
+				  value
+				}
+			  }
+			}
+			... on TaskObjectiveItem {
+			  item {
+				id
+			  }
+			  count
+			  foundInRaid
+			  dogTagLevel
+			  maxDurability
+			  minDurability
+			}
+			... on TaskObjectiveMark {
+			  markerItem {
+				id
+			  }
+			}
+		  }
+		  factionName
+		  neededKeys {
+			keys {
+			  id
+			}
+			map {
+			  id
+			  name
+			}
+		  }
+		}
+	  }
+	";
 
 	private static readonly HttpClient httpClient = new(new HttpClientHandler
 	{
@@ -26,7 +111,7 @@ public class TarkovDevAPI
 	private static string Get(string query)
 	{
 		var body = new Dictionary<string, string>() { { "query", query } };
-		var responseTask = httpClient.PostAsJsonAsync(ApiEndpoit, body);
+		var responseTask = httpClient.PostAsJsonAsync(ApiEndpoint, body);
 		responseTask.Wait();
 		if (responseTask.Result.StatusCode != HttpStatusCode.OK) throw new Exception("Tarkov.dev API request failed.");
 		var contentTask = responseTask.Result.Content.ReadAsStringAsync();
