@@ -19,10 +19,6 @@ public class TarkovDevAPI
 			id
 			name
 		  }
-		  map {
-			id
-			name
-		  }
 		  minPlayerLevel
 		  taskRequirements {
 			task {
@@ -30,13 +26,6 @@ public class TarkovDevAPI
 			  name
 			}
 			status
-		  }
-		  traderLevelRequirements {
-			trader {
-			  id
-			  name
-			}
-			level
 		  }
 		  objectives {
 			id
@@ -80,6 +69,25 @@ public class TarkovDevAPI
 				id
 			  }
 			}
+			... on TaskObjectiveShoot {
+			  shotType
+			  target
+			  count
+			  zoneNames
+			  bodyParts
+			  usingWeapon {
+				id
+			  }
+			  usingWeaponMods {
+				id
+			  }
+			  wearing {
+				id
+			  }
+			  notWearing {
+				id
+			  }
+			}
 		  }
 		  factionName
 		  neededKeys {
@@ -89,6 +97,29 @@ public class TarkovDevAPI
 			map {
 			  id
 			  name
+			}
+		  }
+		}
+  		hideoutStations {
+		  id
+		  name
+		  levels {
+			id
+			level
+			itemRequirements {
+			  id
+			  item {
+				id
+			  }
+			  count
+			}
+			stationLevelRequirements {
+			  id
+			  station {
+				id
+				name
+			  }
+			  level
 			}
 		  }
 		}
