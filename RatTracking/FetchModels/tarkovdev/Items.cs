@@ -22,9 +22,21 @@ namespace RatTracking.FetchModels.tarkovdev
 		[JsonProperty("foundInRaid")]
 		public bool FoundInRaid { get; set; }
 
+		// Task ID
+		[JsonProperty("taskId")]
+		public string? TaskId { get; set; } = null;
+
+		// Module ID
+		[JsonProperty("moduleId")]
+		public string? ModuleId { get; set; } = null;
+
+		// Station ID
+		[JsonProperty("stationId")]
+		public string? StationId { get; set; } = null;
+
 		// Objective ID
 		[JsonProperty("progressId")]
-		public string ProgressId { get; set; }
+		public string? ProgressId { get; set; } = null;
 
 		// Progress Type
 		public ProgressType ProgressType { get; set; }
@@ -41,7 +53,7 @@ namespace RatTracking.FetchModels.tarkovdev
 		[JsonProperty("maxDurability")]
 		public int? MaxDurability { get; set; } = 100;
 
-		public bool? HasAlternatives { get; set; } = false;
+		public bool HasAlternatives { get; set; } = false;
 	}
 	
 	// Item
@@ -49,7 +61,7 @@ namespace RatTracking.FetchModels.tarkovdev
 	{
 		// Item id
 		[JsonProperty("id")]
-		public string Id { get; set; }
+		public string Id { get; set; } = "";
 	}
 
 	public enum ProgressType

@@ -20,39 +20,34 @@ public class ProgressDB
 	// Set up the Item DB
 	public void Init()
 	{
-		var questBlob = getProgressDataQuest();
-		var hideoutBlob = getProgressDataHideout();
-
-		// Deserialize the quests.json schema into RatScanner.FetchModels.tarkovdata model
-		var quests = JsonConvert.DeserializeObject<List<Quest>>(questBlob);
-
-		// Deserialize the hideout.json schema into RatScanner.FetchModels.tarkovdata model
-		var hideout = JsonConvert.DeserializeObject<HideoutData>(hideoutBlob);
-
-		// Loop through each quest in our quest list
-		foreach (var quest in quests)
-			// Loop through all of our objectives within each quest
-		foreach (var objective in quest.Objectives)
-			// Check if the objective is a type that requires an item
-			if (_questObjectiveItemTypes.Contains(objective.Type))
-				// Some objectives can have array of targets (one-of-keys are currently only example), so add each
-				foreach (var item in objective.Target)
-					_questItems.Add(new QuestItem
-					{
-						Id = item, QuestId = quest.Id, Needed = objective.Number, QuestObjectiveId = objective.Id, FIR = objective.Type == "find",
-					});
-
-		// Loop through each hideout module in our hideout data
-		foreach (var module in hideout.Modules)
-			// Loop through each requirement within the module
-		foreach (var requirement in module.Requirements)
-			// If its an item requirement, add it to the list
-			if (requirement.Type == "item")
+		var neededItems = TarkovDevAPI.GetNeededItems();
+		// Loop through each neededItem
+		neededItems.ForEach((neededItem) =>
+		{
+			if (neededItem.ProgressType == FetchModels.tarkovdev.ProgressType.TaskTurnin)
+			{
+				_questItems.Add(new QuestItem
+				{
+					Id = neededItem.Id,
+					Needed = neededItem.Count,
+					TaskId = neededItem.TaskId ?? "",
+					FIR = neededItem.FoundInRaid,
+					HasAlternatives = neededItem.HasAlternatives,
+					TaskObjectiveId = neededItem.ProgressId ?? ""
+				});
+			}
+			else if (neededItem.ProgressType == FetchModels.tarkovdev.ProgressType.HideoutTurnin)
+			{
 				_hideoutItems.Add(new HideoutItem
 				{
-					Id = requirement.Name, StationId = module.StationId, ModuleLevel = module.Level, HideoutObjectiveId = requirement.Id,
-					Needed = requirement.Quantity,
+					Id = neededItem.Id,
+					Needed = neededItem.Count,
+					ModuleId = neededItem.ModuleId ?? "",
+					StationId = neededItem.StationId ?? "",
+					HideoutPartId = neededItem.ProgressId ?? "",
 				});
+			}
+		});
 	}
 
 	// Check if item is needed for any part of progression, quest or hideout
@@ -102,31 +97,5 @@ public class ProgressDB
 	{
 		if (uid?.Length > 0) return _hideoutItems.Where(i => i.Id == uid).ToList();
 		throw new ArgumentException();
-	}
-
-	// Pulls the whole quest data file from tarkovdata for processing
-	private static string getProgressDataQuest()
-	{
-		try
-		{
-			return APIClient.Get($"{TarkovDataUrl}/quests.json");
-		}
-		catch (Exception)
-		{
-			return null;
-		}
-	}
-
-	// Pulls the whole hideout file form tarkovdata for processing
-	private static string getProgressDataHideout()
-	{
-		try
-		{
-			return APIClient.Get($"{TarkovDataUrl}/hideout.json");
-		}
-		catch (Exception)
-		{
-			return null;
-		}
 	}
 }

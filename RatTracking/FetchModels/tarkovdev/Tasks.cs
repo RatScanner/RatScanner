@@ -50,11 +50,11 @@ namespace RatTracking.FetchModels.tarkovdev
 			var neededItems = new List<NeededItem>();
 			foreach (var objective in Objectives)
 			{
-				neededItems.AddRange(objective.GetNeededItems());
+				neededItems.AddRange(objective.GetNeededItems(Id));
 			}
 			foreach (var neededKey in NeededKeys)
 			{
-				neededItems.AddRange(neededKey.GetNeededItems());
+				neededItems.AddRange(neededKey.GetNeededItems(Id));
 			}
 			return neededItems;
 		}
@@ -152,7 +152,7 @@ namespace RatTracking.FetchModels.tarkovdev
 		public bool Optional { get; set; }
 
 		// Get needed items
-		public List<NeededItem> GetNeededItems();
+		public List<NeededItem> GetNeededItems(string taskId);
 	}
 
 	// Objective BuildItem
@@ -183,12 +183,12 @@ namespace RatTracking.FetchModels.tarkovdev
 		public List<Item> ContainsOne { get; set; }
 
 		// Get needed items
-		public List<NeededItem> GetNeededItems()
+		public List<NeededItem> GetNeededItems(string taskId)
 		{
 			// Return the item and all items in containsAll
-			return new List<NeededItem>() { new NeededItem() { Id = Item.Id, Count = 1, FoundInRaid = false, ProgressType = ProgressType.TaskTurnin } }
-				.Concat(ContainsAll.Select(x => new NeededItem() { Id = x.Id, Count = 1, FoundInRaid = false, ProgressType = ProgressType.TaskTurnin }))
-				.Concat(ContainsOne.Select(x => new NeededItem() { Id = x.Id, Count = 1, FoundInRaid = false, HasAlternatives = true, ProgressType = ProgressType.TaskTurnin }))
+			return new List<NeededItem>() { new NeededItem() { Id = Item.Id, Count = 1, FoundInRaid = false, ProgressType = ProgressType.TaskTurnin, ProgressId = Id, TaskId = taskId } }
+				.Concat(ContainsAll.Select(x => new NeededItem() { Id = x.Id, Count = 1, FoundInRaid = false, ProgressType = ProgressType.TaskTurnin, ProgressId = Id, TaskId = taskId }))
+				.Concat(ContainsOne.Select(x => new NeededItem() { Id = x.Id, Count = 1, FoundInRaid = false, HasAlternatives = true, ProgressType = ProgressType.TaskTurnin, ProgressId = Id, TaskId = taskId }))
 				.ToList();
 		}
 	}
@@ -233,7 +233,7 @@ namespace RatTracking.FetchModels.tarkovdev
 		public int Count { get; set; }
 
 		// Get needed items
-		public List<NeededItem> GetNeededItems()
+		public List<NeededItem> GetNeededItems(string taskId)
 		{
 			return new List<NeededItem>()
 			{
@@ -245,7 +245,9 @@ namespace RatTracking.FetchModels.tarkovdev
 					DogTagLevel = DogTagLevel,
 					MinDurability = MinDurability,
 					MaxDurability = MaxDurability,
-					ProgressType = ProgressType.TaskTurnin
+					ProgressType = ProgressType.TaskTurnin,
+					ProgressId = Id,
+					TaskId = taskId
 				}
 			};
 		}
@@ -272,7 +274,7 @@ namespace RatTracking.FetchModels.tarkovdev
 
 
 		// Get needed items
-		public List<NeededItem> GetNeededItems()
+		public List<NeededItem> GetNeededItems(string taskId)
 		{
 			return new List<NeededItem>()
 			{
@@ -281,7 +283,9 @@ namespace RatTracking.FetchModels.tarkovdev
 					Id = Item.Id,
 					Count = 1,
 					FoundInRaid = false,
-					ProgressType = ProgressType.TaskTurnin
+					ProgressType = ProgressType.TaskTurnin,
+					ProgressId = Id,
+					TaskId = taskId
 				}
 			};
 		}
@@ -316,33 +320,37 @@ namespace RatTracking.FetchModels.tarkovdev
 
 
 		// Get needed items
-		public List<NeededItem> GetNeededItems()
+		public List<NeededItem> GetNeededItems(string taskId)
 		{
 			// Create a list of needed items from the array of weapons
-			var neededItems = UsingWeapon.Select(x => new NeededItem() { Id = x.Id, Count = 1, FoundInRaid = false, ProgressType = ProgressType.TaskTurnin }).ToList();
-
 			return UsingWeapon.Select(x => new NeededItem() {
 				Id = x.Id,
 				Count = 1,
 				FoundInRaid = false,
-				ProgressType = ProgressType.TaskTurnin,
-				HasAlternatives = UsingWeapon.Count > 1
+				ProgressType = ProgressType.TaskUse,
+				HasAlternatives = UsingWeapon.Count > 1,
+				ProgressId = Id,
+				TaskId = taskId
 			})
 			.Concat(UsingWeaponMods.SelectMany(x => x.Select(y => new NeededItem()
 			{
 				Id = y.Id,
 				Count = 1,
 				FoundInRaid = false,
-				ProgressType = ProgressType.TaskTurnin,
-				HasAlternatives = x.Count > 1
+				ProgressType = ProgressType.TaskUse,
+				HasAlternatives = x.Count > 1,
+				ProgressId = Id,
+				TaskId = taskId
 			})))
 			.Concat(Wearing.SelectMany(x => x.Select(y => new NeededItem()
 			{
 				Id = y.Id,
 				Count = 1,
 				FoundInRaid = false,
-				ProgressType = ProgressType.TaskTurnin,
-				HasAlternatives = x.Count > 1
+				ProgressType = ProgressType.TaskUse,
+				HasAlternatives = x.Count > 1,
+				ProgressId = Id,
+				TaskId = taskId
 			})))
 			.ToList();
 		}
@@ -356,9 +364,9 @@ namespace RatTracking.FetchModels.tarkovdev
 		public List<Item> Keys { get; set; }
 
 		// Get needed items - has alternatives if there are multiple items in keys
-		public List<NeededItem> GetNeededItems()
+		public List<NeededItem> GetNeededItems(string taskId)
 		{
-			return Keys.Select(x => new NeededItem() { Id = x.Id, Count = 1, FoundInRaid = false, HasAlternatives = Keys.Count > 1, ProgressType = ProgressType.TaskKey }).ToList();
+			return Keys.Select(x => new NeededItem() { Id = x.Id, Count = 1, FoundInRaid = false, HasAlternatives = Keys.Count > 1, ProgressType = ProgressType.TaskKey, TaskId = taskId }).ToList();
 		}
 	}
 }

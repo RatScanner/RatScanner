@@ -1,4 +1,8 @@
-﻿using System.Net;
+﻿using Newtonsoft.Json;
+using RatTracking.FetchModels.tarkovdata;
+using RatTracking.FetchModels.tarkovdev;
+using System.Dynamic;
+using System.Net;
 using System.Net.Http.Json;
 
 namespace RatTracking;
@@ -9,6 +13,53 @@ namespace RatTracking;
 public class TarkovDevAPI
 {
 	const string ApiEndpoint = "https://api.tarkov.dev/graphql";
+
+	private static readonly HttpClient httpClient = new(new HttpClientHandler
+	{
+		AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
+	});
+
+	private static HttpRequestMessage Request(HttpMethod method, string url)
+	{
+		var request = new HttpRequestMessage(method, url);
+		request.Headers.Add("User-Agent", "RatScanner-Client/3");
+
+		return request;
+	}
+
+	private static string Get(string query)
+	{
+		var body = new Dictionary<string, string>() { { "query", query } };
+		var responseTask = httpClient.PostAsJsonAsync(ApiEndpoint, body);
+		responseTask.Wait();
+		if (responseTask.Result.StatusCode != HttpStatusCode.OK) throw new Exception("Tarkov.dev API request failed.");
+		var contentTask = responseTask.Result.Content.ReadAsStringAsync();
+		contentTask.Wait();
+
+		return contentTask.Result;
+	}
+	
+	public static List<NeededItem> GetNeededItems()
+	{
+		var apiResponse = Get(NeededQuery);
+		var neededResponse = JsonConvert.DeserializeObject<NeededResponse>(apiResponse);
+		return neededResponse.GetNeededItems();
+	}
+
+	/// <summary>
+	/// Querys all tasks
+	/// </summary>
+	/// <returns></returns>
+	// TODO: create task reponse class similar to the response classes
+	// of tarkov-tracker api in the fetch models namespace. The json
+	// response from the api should be able to just be casted into
+	// that class using jsonconvert.deserialize
+	//	public static TaskResponse GetTasks()
+	//	{
+	//		// We REALLY want to cache this for probably the whole execution time of rat scanner
+	//		// adding caching at a higher level would proba
+	//		return JsonConvert.Deserialize<TaskResponse>(Get("{tasks(limit: 0)}"));
+	//	}
 
 	const string NeededQuery = @"
 	query ScannerNeeds {
@@ -125,44 +176,4 @@ public class TarkovDevAPI
 		}
 	  }
 	";
-
-	private static readonly HttpClient httpClient = new(new HttpClientHandler
-	{
-		AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
-	});
-
-	private static HttpRequestMessage Request(HttpMethod method, string url)
-	{
-		var request = new HttpRequestMessage(method, url);
-		request.Headers.Add("User-Agent", "RatScanner-Client/3");
-
-		return request;
-	}
-
-	private static string Get(string query)
-	{
-		var body = new Dictionary<string, string>() { { "query", query } };
-		var responseTask = httpClient.PostAsJsonAsync(ApiEndpoint, body);
-		responseTask.Wait();
-		if (responseTask.Result.StatusCode != HttpStatusCode.OK) throw new Exception("Tarkov.dev API request failed.");
-		var contentTask = responseTask.Result.Content.ReadAsStringAsync();
-		contentTask.Wait();
-
-		return contentTask.Result;
-	}
-
-	/// <summary>
-	/// Querys all tasks
-	/// </summary>
-	/// <returns></returns>
-	// TODO: create task reponse class similar to the response classes
-	// of tarkov-tracker api in the fetch models namespace. The json
-	// response from the api should be able to just be casted into
-	// that class using jsonconvert.deserialize
-	//	public static TaskResponse GetTasks()
-	//	{
-	//		// We REALLY want to cache this for probably the whole execution time of rat scanner
-	//		// adding caching at a higher level would proba
-	//		return JsonConvert.Deserialize<TaskResponse>(Get("{tasks(limit: 0)}"));
-	//	}
 }

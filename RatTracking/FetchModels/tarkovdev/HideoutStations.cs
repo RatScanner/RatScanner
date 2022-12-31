@@ -20,6 +20,17 @@ namespace RatTracking.FetchModels.tarkovdev
 		// Station levels
 		[JsonProperty("levels")]
 		public List<HideoutStationLevel> Levels { get; set; }
+
+		// Get needed items from station levels
+		public List<NeededItem> GetNeededItems()
+		{
+			var neededItems = new List<NeededItem>();
+			foreach (var level in Levels)
+			{
+				neededItems.AddRange(level.GetNeededItems(Id));
+			}
+			return neededItems;
+		}
 	}
 
 	public class HideoutStationLevel
@@ -42,12 +53,12 @@ namespace RatTracking.FetchModels.tarkovdev
 		public List<LevelStationRequirement> StationLevelRequirements { get; set; }
 
 		// Get needed items
-		public List<NeededItem> GetNeededItems()
+		public List<NeededItem> GetNeededItems(string stationId)
 		{
 			var neededItems = new List<NeededItem>();
 			foreach (var itemRequirement in ItemRequirements)
 			{
-				neededItems.AddRange(itemRequirement.GetNeededItems());
+				neededItems.AddRange(itemRequirement.GetNeededItems(stationId, Id));
 			}
 			return neededItems;
 		}
@@ -68,7 +79,7 @@ namespace RatTracking.FetchModels.tarkovdev
 		public int Count { get; set; }
 
 		// Get needed items
-		public List<NeededItem> GetNeededItems()
+		public List<NeededItem> GetNeededItems(string stationId, string moduleId)
 		{
 			return new List<NeededItem>
 			{
@@ -77,7 +88,10 @@ namespace RatTracking.FetchModels.tarkovdev
 					Id = Item.Id,
 					Count = Count,
 					FoundInRaid = false,
-					ProgressType = ProgressType.HideoutTurnin
+					ProgressType = ProgressType.HideoutTurnin,
+					ProgressId = stationId,
+					ModuleId = moduleId,
+					StationId = stationId
 				}
 			};
 		}

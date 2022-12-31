@@ -145,16 +145,16 @@ public static class ItemExtensions
 				}
 				
 				// If the progress data doesn't have this requirement, then it should be a needed item
-				if (!progress.QuestObjectives.ContainsKey(requirement.QuestObjectiveId.ToString()))
+				if (!progress.QuestObjectives.ContainsKey(requirement.TaskObjectiveId.ToString()))
 				{
 					need += requirement.Needed;
 				}
 				// Else if we have the requirement in our progress data but its not complete, it might have metadata
-				else if (progress.QuestObjectives[requirement.QuestObjectiveId.ToString()].Complete != true)
+				else if (progress.QuestObjectives[requirement.TaskObjectiveId.ToString()].Complete != true)
 				{
 					// Check if we have completed this quest need
 					need += requirement.Needed;
-					have += progress.QuestObjectives[requirement.QuestObjectiveId.ToString()].Have ?? 0;
+					have += progress.QuestObjectives[requirement.TaskObjectiveId.ToString()].Have ?? 0;
 				}
 			}
 
@@ -176,16 +176,16 @@ public static class ItemExtensions
 			}
 
 			// If the progress data doesn't have this requirement, then it should be a needed item
-			if (!progress.HideoutObjectives.ContainsKey(requirement.HideoutObjectiveId.ToString()))
+			if (!progress.HideoutObjectives.ContainsKey(requirement.HideoutPartId.ToString()))
 			{
 				need += requirement.Needed;
 			}
 			// Else if we have the requirement in our progress data but its not complete, it might have metadata
-			else if (progress.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Complete != true)
+			else if (progress.HideoutObjectives[requirement.HideoutPartId.ToString()].Complete != true)
 			{
 				// Check if we have completed this hideout need
 				need += requirement.Needed;
-				have += progress.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Have ?? 0;
+				have += progress.HideoutObjectives[requirement.HideoutPartId.ToString()].Have ?? 0;
 			}
 		}
 
