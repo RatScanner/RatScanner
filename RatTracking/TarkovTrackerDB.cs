@@ -11,6 +11,7 @@ public class TarkovTrackerDB
 	private bool _badToken;
 
 	public List<UserProgress> Progress = new();
+	public string Self = "";
 	public string? Token;
 
 	private const string TarkovTrackerUrl = "https://tarkovtracker.io/api/v2";
@@ -51,7 +52,7 @@ public class TarkovTrackerDB
 		// Attempt to verify the token
 		try
 		{
-			var newToken = getTarkovTrackerToken();
+			var newToken = GetToken();
 			_badToken = newToken == null;
 			if (!_badToken)
 				// We have a valid token
@@ -69,7 +70,7 @@ public class TarkovTrackerDB
 		}
 	}
 
-	public int TeammateCount => Progress.Count(x => (x.Self ?? false) == false);
+	public int TeammateCount => Progress.Count(x => x.UserId != Self);
 
 	public bool? TeamProgressAvailable => _token?.Permissions.Contains("TP");
 
@@ -77,61 +78,47 @@ public class TarkovTrackerDB
 
 	private void UpdateProgression()
 	{
-		// We have access to team progression
-		if (TeamProgressAvailable == true)
+		try
 		{
-			try
+			if (TeamProgressAvailable == true)
 			{
-				var rawProgress = JsonConvert.DeserializeObject<List<UserProgress>>(getTarkovTrackerTeam());
-				Progress = rawProgress?.Where(x => (x.Hide ?? false) == false).ToList();
-			}
-			catch (RateLimitExceededException)
-			{
-				// We hit a rate limit issue, this doesn't mean our token is bad, but we have to wait until we try again
-			}
-			catch (UnauthorizedTokenException)
-			{
-				// We have an unauthorized token exception, it could be that we don't have permissions for this call
-			}
-			catch (JsonReaderException)
-			{
-				// We do not want to crash an entire application just because of invalid 3rd party api response
-			}
-		}
-		else if (SoloProgressAvailable == true)
-		{
-			// We have permission to get individual progress
 
-			try
-			{
-				var soloProgress = JsonConvert.DeserializeObject<UserProgress>(getTarkovTrackerSolo());
-				Progress = new List<UserProgress> { soloProgress };
+				var tpr = GetTeamProgress();
+				Self = tpr.Meta.Self;
+				Progress = tpr.TeamProgress.Where(x => !tpr.Meta.HiddenTeammates.Contains(x.UserId)).ToList();
 			}
-			catch (RateLimitExceededException)
+			else if (SoloProgressAvailable == true)
 			{
-				// We hit a rate limit issue, this doesn't mean our token is bad, but we have to wait until we try again
+				var spr = GetProgress();
+				Self = spr.Meta.Self;
+				Progress = new List<UserProgress> { spr.UserProgress };
 			}
-			catch (UnauthorizedTokenException)
+			else
 			{
-				// We have an unauthorized token exception, it could be that we don't have permissions for this call
-			}
-			catch (JsonReaderException)
-			{
-				// We do not want to crash an entire application just because of invalid 3rd party api response
+				// We dont have permissions
 			}
 		}
-		else
+		catch (RateLimitExceededException)
 		{
-			// We dont have permissions
+			// We hit a rate limit issue, this doesn't mean our token is bad, but we have to wait until we try again
+		}
+		catch (UnauthorizedTokenException)
+		{
+			// We have an unauthorized token exception, it could be that we don't have permissions for this call
+		}
+		catch (JsonReaderException)
+		{
+			// We do not want to crash an entire application just because of invalid 3rd party api response
 		}
 	}
 
 	// Checks the token metadata endpoint for TarkovTracker
-	private string? getTarkovTrackerTeam()
+	private TeamProgressResponse GetTeamProgress()
 	{
 		try
 		{
-			return APIClient.Get($"{TarkovTrackerUrl}/team/progress", _token.Id);
+			var responseStr = APIClient.Get($"{TarkovTrackerUrl}/team/progress", _token.Id);
+			return JsonConvert.DeserializeObject<TeamProgressResponse>(responseStr) ?? new();
 		}
 		catch (WebException e)
 		{
@@ -141,18 +128,15 @@ public class TarkovTrackerDB
 			// Unknown error, continue throwing
 			throw;
 		}
-		catch (Exception)
-		{
-			return null;
-		}
 	}
 
 	// Checks the token metadata endpoint for TarkovTracker
-	private string getTarkovTrackerSolo()
+	private ProgressResponse GetProgress()
 	{
 		try
 		{
-			return APIClient.Get($"{TarkovTrackerUrl}/progress", _token.Id);
+			var responseStr = APIClient.Get($"{TarkovTrackerUrl}/progress", _token.Id);
+			return JsonConvert.DeserializeObject<ProgressResponse>(responseStr) ?? new();
 		}
 		catch (WebException e)
 		{
@@ -168,7 +152,7 @@ public class TarkovTrackerDB
 	{
 		try
 		{
-			getTarkovTrackerToken(test_token);
+			GetToken(test_token);
 		}
 		catch (Exception)
 		{
@@ -179,23 +163,15 @@ public class TarkovTrackerDB
 	}
 
 	// Checks the token metadata endpoint for TarkovTracker
-	private TokenResponse? getTarkovTrackerToken(string custom_token = null)
+	private TokenResponse? GetToken(string? custom_token = null)
 	{
 		var working_token = Token;
 		if (custom_token != null) working_token = custom_token;
 
 		try
 		{
-			var response = APIClient.Get($"{TarkovTrackerUrl}/token", working_token);
-			if (response == null) return null;
-			try
-			{
-				return JsonConvert.DeserializeObject<TokenResponse>(response);
-			}
-			catch (Exception)
-			{
-				return null;
-			}
+			var responseStr = APIClient.Get($"{TarkovTrackerUrl}/token", working_token);
+			return JsonConvert.DeserializeObject<TokenResponse>(responseStr);
 		}
 		catch (WebException)
 		{

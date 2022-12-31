@@ -10,7 +10,7 @@ internal static class APIClient
 		AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
 	});
 
-	private static HttpRequestMessage formRequest(HttpMethod method, string url, string bearerToken = null)
+	private static HttpRequestMessage formRequest(HttpMethod method, string url, string? bearerToken = null)
 	{
 		var request = new HttpRequestMessage(method, url);
 		request.Headers.Add("User-Agent", "RatScanner-Client/3");
@@ -19,7 +19,7 @@ internal static class APIClient
 		return request;
 	}
 
-	public static string Get(string url, string bearerToken = null)
+	public static string Get(string url, string? bearerToken = null)
 	{
 		var request = formRequest(HttpMethod.Get, url, bearerToken);
 		var responseTask = httpClient.SendAsync(request);
