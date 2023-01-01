@@ -10,11 +10,11 @@ namespace RatTracking.FetchModels.tarkovdev
 	public class NeededResponseData
 	{
 		[JsonProperty("tasks")]
-		public List<Task> Tasks { get; set; }
+		public List<Task> Tasks { get; set; } = new();
 
 		// Hideout stations
 		[JsonProperty("hideoutStations")]
-		public List<HideoutStation> HideoutStations { get; set; }
+		public List<HideoutStation> HideoutStations { get; set; } = new();
 
 		// Get needed items from tasks and hideout station
 		public List<NeededItem> GetNeededItems()

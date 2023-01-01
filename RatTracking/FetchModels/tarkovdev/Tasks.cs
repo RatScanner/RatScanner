@@ -21,7 +21,7 @@ namespace RatTracking.FetchModels.tarkovdev
 
 		// The trader who gives the task
 		[JsonProperty("trader")]
-		public string Trader { get; set; }
+		public Trader Trader { get; set; }
 
 		// Minimum player level
 		[JsonProperty("minPlayerLevel")]
@@ -29,12 +29,11 @@ namespace RatTracking.FetchModels.tarkovdev
 		
 		// Task requirements
 		[JsonProperty("taskRequirements")]
-		public List<TaskStatusRequirement> TaskRequirements { get; set; }
+		public List<TaskStatusRequirement> TaskRequirements { get; set; } = new();
 
 		// Objectives
 		[JsonProperty("objectives")]
-		[JsonConverter(typeof(ObjectiveConverter))]
-		public List<IObjective> Objectives { get; set; }
+		public List<IObjective> Objectives { get; set; } = new();
 
 		// Faction name
 		[JsonProperty("factionName")]
@@ -42,7 +41,7 @@ namespace RatTracking.FetchModels.tarkovdev
 
 		// Needed keys
 		[JsonProperty("neededKeys")]
-		public List<NeededKey> NeededKeys { get; set; }
+		public List<NeededKey> NeededKeys { get; set; } = new();
 
 		// Get needed items from objectives and needed keys
 		public List<NeededItem> GetNeededItems()
@@ -94,6 +93,9 @@ namespace RatTracking.FetchModels.tarkovdev
 				case "TaskObjectiveShoot":
 					objective = new ObjectiveShoot();
 					break;
+				default:
+					objective = new ObjectiveOther();
+					break;
 			}
 			serializer.Populate(jsonObject.CreateReader(), objective);
 			return objective;
@@ -137,6 +139,7 @@ namespace RatTracking.FetchModels.tarkovdev
 	}
 
 	// Objective interface
+	[JsonConverter(typeof(ObjectiveConverter))]
 	public interface IObjective
 	{
 		// Objective id
@@ -176,11 +179,11 @@ namespace RatTracking.FetchModels.tarkovdev
 
 		// Contains all
 		[JsonProperty("containsAll")]
-		public List<Item> ContainsAll { get; set; }
+		public List<Item> ContainsAll { get; set; } = new();
 
 		// Contains one
 		[JsonProperty("containsOne")]
-		public List<Item> ContainsOne { get; set; }
+		public List<Item> ContainsOne { get; set; } = new();
 
 		// Get needed items
 		public List<NeededItem> GetNeededItems(string taskId)
@@ -308,15 +311,15 @@ namespace RatTracking.FetchModels.tarkovdev
 
 		// Using Weapons
 		[JsonProperty("usingWeapon")]
-		public List<Item> UsingWeapon { get; set; }
+		public List<Item> UsingWeapon { get; set; } = new();
 
 		// Using Weapon Mods
 		[JsonProperty("usingWeaponMods")]
-		public List<List<Item>> UsingWeaponMods { get; set; }
+		public List<List<Item>> UsingWeaponMods { get; set; } = new();
 
 		// Wearing
 		[JsonProperty("wearing")]
-		public List<List<Item>> Wearing { get; set; }
+		public List<List<Item>> Wearing { get; set; } = new();
 
 
 		// Get needed items
@@ -353,6 +356,28 @@ namespace RatTracking.FetchModels.tarkovdev
 				TaskId = taskId
 			})))
 			.ToList();
+		}
+	}
+
+	// Objective Other
+	public class ObjectiveOther : IObjective
+	{
+		// Objective id
+		[JsonProperty("id")]
+		public string Id { get; set; }
+
+		// Objective type
+		[JsonProperty("type")]
+		public string Type { get; set; }
+
+		// Objective optional
+		[JsonProperty("optional")]
+		public bool Optional { get; set; }
+
+		// Get needed items
+		public List<NeededItem> GetNeededItems(string taskId)
+		{
+			return new List<NeededItem>();
 		}
 	}
 

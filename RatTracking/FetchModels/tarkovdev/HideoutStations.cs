@@ -19,7 +19,7 @@ namespace RatTracking.FetchModels.tarkovdev
 
 		// Station levels
 		[JsonProperty("levels")]
-		public List<HideoutStationLevel> Levels { get; set; }
+		public List<HideoutStationLevel> Levels { get; set; } = new();
 
 		// Get needed items from station levels
 		public List<NeededItem> GetNeededItems()
@@ -45,12 +45,12 @@ namespace RatTracking.FetchModels.tarkovdev
 
 		// Item Requirements
 		[JsonProperty("itemRequirements")]
-		public List<LevelItemRequirement> ItemRequirements { get; set; }
+		public List<LevelItemRequirement> ItemRequirements { get; set; } = new();
 
 
 		// Station level requirements
 		[JsonProperty("stationLevelRequirements")]
-		public List<LevelStationRequirement> StationLevelRequirements { get; set; }
+		public List<LevelStationRequirement> StationLevelRequirements { get; set; } = new();
 
 		// Get needed items
 		public List<NeededItem> GetNeededItems(string stationId)

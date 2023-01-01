@@ -42,7 +42,10 @@ public class TarkovDevAPI
 	public static List<NeededItem> GetNeededItems()
 	{
 		var apiResponse = Get(NeededQuery);
-		var neededResponse = JsonConvert.DeserializeObject<NeededResponse>(apiResponse);
+		var jsonSerializerSettings = new JsonSerializerSettings();
+		jsonSerializerSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
+		jsonSerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+		var neededResponse = JsonConvert.DeserializeObject<NeededResponse>(apiResponse, jsonSerializerSettings);
 		return neededResponse.GetNeededItems();
 	}
 
@@ -62,14 +65,20 @@ public class TarkovDevAPI
 	//	}
 
 	const string NeededQuery = @"
-	query ScannerNeeds {
+	 query TarkovData {
 		tasks {
 		  id
+		  tarkovDataId
 		  name
 		  trader {
 			id
 			name
 		  }
+		  map {
+			id
+			name
+		  }
+		  wikiLink
 		  minPlayerLevel
 		  taskRequirements {
 			task {
@@ -77,6 +86,13 @@ public class TarkovDevAPI
 			  name
 			}
 			status
+		  }
+		  traderLevelRequirements {
+			trader {
+			  id
+			  name
+			}
+			level
 		  }
 		  objectives {
 			id
@@ -97,13 +113,6 @@ public class TarkovDevAPI
 			  containsOne {
 				id
 			  }
-			  attributes {
-				name
-				requirement {
-				  compareMethod
-				  value
-				}
-			  }
 			}
 			... on TaskObjectiveItem {
 			  item {
@@ -121,11 +130,6 @@ public class TarkovDevAPI
 			  }
 			}
 			... on TaskObjectiveShoot {
-			  shotType
-			  target
-			  count
-			  zoneNames
-			  bodyParts
 			  usingWeapon {
 				id
 			  }
@@ -154,6 +158,7 @@ public class TarkovDevAPI
   		hideoutStations {
 		  id
 		  name
+		  normalizedName
 		  levels {
 			id
 			level
@@ -171,6 +176,22 @@ public class TarkovDevAPI
 				name
 			  }
 			  level
+			}
+			crafts {
+			  id
+			  duration
+			  requiredItems {
+				item {
+				  id
+				}
+				count
+			  }
+			  rewardItems {
+				item {
+				  id
+				}
+				count
+			  }
 			}
 		  }
 		}
