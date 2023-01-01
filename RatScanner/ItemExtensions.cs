@@ -152,7 +152,14 @@ public static class ItemExtensions
 				}else
 				{
 					need += requirement.Needed;
-					have += taskObjective.Count;
+					if (taskObjective.Complete)
+					{
+						have += requirement.Needed;
+					}
+					else
+					{
+						have += taskObjective.Count;
+					}
 				}
 			}
 
@@ -182,7 +189,14 @@ public static class ItemExtensions
 			else
 			{
 				need += requirement.Needed;
-				have += hideoutPart.Count;
+				if (hideoutPart.Complete)
+				{
+					have += requirement.Needed;
+				}
+				else
+				{
+					have += hideoutPart.Count;
+				}
 			}
 		}
 

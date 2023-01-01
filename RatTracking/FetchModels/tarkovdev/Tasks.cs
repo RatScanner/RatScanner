@@ -238,21 +238,29 @@ namespace RatTracking.FetchModels.tarkovdev
 		// Get needed items
 		public List<NeededItem> GetNeededItems(string taskId)
 		{
-			return new List<NeededItem>()
+			// If type is 'giveItem' return the needed item, else return an empty list
+			if (Type == "giveItem")
 			{
-				new NeededItem()
+				return new List<NeededItem>()
 				{
-					Id = Item.Id,
-					Count = Count,
-					FoundInRaid = FoundInRaid,
-					DogTagLevel = DogTagLevel,
-					MinDurability = MinDurability,
-					MaxDurability = MaxDurability,
-					ProgressType = ProgressType.TaskTurnin,
-					ProgressId = Id,
-					TaskId = taskId
-				}
-			};
+					new NeededItem()
+					{
+						Id = Item.Id,
+						Count = Count,
+						FoundInRaid = FoundInRaid,
+						DogTagLevel = DogTagLevel,
+						MinDurability = MinDurability,
+						MaxDurability = MaxDurability,
+						ProgressType = ProgressType.TaskTurnin,
+						ProgressId = Id,
+						TaskId = taskId
+					}
+				};
+			}
+			else
+			{
+				return new List<NeededItem>();
+			}
 		}
 	}
 

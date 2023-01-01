@@ -246,8 +246,16 @@ internal class MenuVM : INotifyPropertyChanged, IRatScannerUI
 				}
 				else
 				{
+					if (taskObjective.Complete)
+					{
+						have += requirement.Needed;
+					}
+					else
+					{
+						have += taskObjective.Count;
+					}
 					need += requirement.Needed;
-					have += taskObjective.Count;
+					
 				}
 			}
 		}
@@ -278,7 +286,14 @@ internal class MenuVM : INotifyPropertyChanged, IRatScannerUI
 			else
 			{
 				need += requirement.Needed;
-				have += hideoutPart.Count;
+				if (hideoutPart.Complete)
+				{
+					have += requirement.Needed;
+				}
+				else
+				{
+					have += hideoutPart.Count;
+				}
 			}
 		}
 
