@@ -64,7 +64,7 @@ internal class MenuVM : INotifyPropertyChanged, IRatScannerUI
 		if (RatConfig.Tracking.TarkovTracker.Enable && RatScannerMain.Instance.TarkovTrackerDB.Progress.Count >= 1)
 		{
 			var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
-			progress = teamProgress.First(x => x.Self ?? false);
+			progress = teamProgress.FirstOrDefault(x => x.UserId == RatScannerMain.Instance.TarkovTrackerDB.Self);
 		}
 
 		// Set this item as for ourselves if this was our token
@@ -232,23 +232,30 @@ internal class MenuVM : INotifyPropertyChanged, IRatScannerUI
 				// Update FIR flag to true if any quest is FIR
 				if (requirement.FIR) fir = true;
 
-				if (progress == null || progress.QuestObjectives == null)
+				if (progress == null || progress.TaskObjectives == null)
 				{
 					need += requirement.Needed;
 					continue;
 				}
 
-				// If the progress data doesn't have this requirement, then it should be a needed item
-				if (!progress.QuestObjectives.ContainsKey(requirement.QuestObjectiveId.ToString()))
+				// Check if the requirement task objective id exists in progress.TaskObjectives
+				var taskObjective = progress.TaskObjectives.Find(x => x.Id == requirement.TaskObjectiveId);
+				if (taskObjective == null)
 				{
 					need += requirement.Needed;
 				}
-				// Else if we have the requirement in our progress data but its not complete, it might have metadata
-				else if (progress.QuestObjectives[requirement.QuestObjectiveId.ToString()].Complete != true)
+				else
 				{
-					// Check if we have completed this quest need
+					if (taskObjective.Complete)
+					{
+						have += requirement.Needed;
+					}
+					else
+					{
+						have += taskObjective.Count;
+					}
 					need += requirement.Needed;
-					have += progress.QuestObjectives[requirement.QuestObjectiveId.ToString()].Have ?? 0;
+					
 				}
 			}
 		}
@@ -264,23 +271,29 @@ internal class MenuVM : INotifyPropertyChanged, IRatScannerUI
 		// Add up all the hideout requirements
 		foreach (var requirement in requiredHideoutItems)
 		{
-			if (progress == null || progress.HideoutObjectives == null)
+			if (progress == null || progress.HideoutParts == null)
 			{
 				need += requirement.Needed;
 				continue;
 			}
 
-			// If the progress data doesn't have this requirement, then it should be a needed item
-			if (!progress.HideoutObjectives.ContainsKey(requirement.HideoutObjectiveId.ToString()))
+			// Check if the requirement hideout part id exists in progress.HideoutParts
+			var hideoutPart = progress.HideoutParts.Find(x => x.Id == requirement.HideoutPartId);
+			if (hideoutPart == null)
 			{
 				need += requirement.Needed;
 			}
-			// Else if we have the requirement in our progress data but its not complete, it might have metadata
-			else if (progress.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Complete != true)
+			else
 			{
-				// Check if we have completed this hideout need
 				need += requirement.Needed;
-				have += progress.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Have ?? 0;
+				if (hideoutPart.Complete)
+				{
+					have += requirement.Needed;
+				}
+				else
+				{
+					have += hideoutPart.Count;
+				}
 			}
 		}
 
