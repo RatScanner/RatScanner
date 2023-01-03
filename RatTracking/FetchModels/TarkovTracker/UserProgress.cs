@@ -5,7 +5,7 @@ namespace RatTracking.FetchModels.TarkovTracker;
 // Model representing the progress data of a TarkovTracker user
 public class UserProgress
 {
-	[JsonProperty("usedId")]
+	[JsonProperty("userId")]
 	public string UserId { get; set; } = "";
 
 	[JsonProperty("displayName")]

@@ -49,21 +49,6 @@ public class TarkovDevAPI
 		return neededResponse.GetNeededItems();
 	}
 
-	/// <summary>
-	/// Querys all tasks
-	/// </summary>
-	/// <returns></returns>
-	// TODO: create task reponse class similar to the response classes
-	// of tarkov-tracker api in the fetch models namespace. The json
-	// response from the api should be able to just be casted into
-	// that class using jsonconvert.deserialize
-	//	public static TaskResponse GetTasks()
-	//	{
-	//		// We REALLY want to cache this for probably the whole execution time of rat scanner
-	//		// adding caching at a higher level would proba
-	//		return JsonConvert.Deserialize<TaskResponse>(Get("{tasks(limit: 0)}"));
-	//	}
-
 	const string NeededQuery = @"
 	 query TarkovData {
 		tasks {

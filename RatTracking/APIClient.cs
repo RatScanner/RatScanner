@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using RatTracking.FetchModels.TarkovTracker;
 
 namespace RatTracking;
