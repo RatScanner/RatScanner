@@ -73,6 +73,8 @@ public class RatScannerMain : INotifyPropertyChanged
 		Logger.LogInfo("Loading config...");
 		RatConfig.LoadConfig();
 
+		Logger.LogInfo($"Screen Info: {RatConfig.ScreenWidth}x{RatConfig.ScreenHeight} at {RatConfig.ScreenScale*100}%");
+
 		Logger.LogInfo("Setting temporary default item...");
 		ItemScans.Enqueue(new DefaultItemScan(true));
 
