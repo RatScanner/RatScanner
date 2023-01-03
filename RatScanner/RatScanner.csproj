@@ -36,7 +36,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.0" />
     <PackageReference Include="RatEye" Version="2.4.1" />
-    <PackageReference Include="RatStash" Version="1.8.0" />
+    <PackageReference Include="RatStash" Version="3.0.0" />
     <PackageReference Include="SingleInstanceCore" Version="2.2.2" />
     <PackageReference Include="Tesseract" Version="4.1.1" />
   </ItemGroup>

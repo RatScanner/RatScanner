@@ -54,6 +54,7 @@ public class RatScannerMain : INotifyPropertyChanged
 	internal ProgressDB ProgressDB = new();
 	public TarkovTrackerDB TarkovTrackerDB;
 
+	public Database RatStashDB;
 	internal RatEyeEngine RatEyeEngine;
 
 	public event PropertyChangedEventHandler PropertyChanged;
@@ -95,6 +96,9 @@ public class RatScannerMain : INotifyPropertyChanged
 			Thread.Sleep(1000);
 			Logger.LogInfo("Checking for updates...");
 			CheckForUpdates();
+
+			Logger.LogInfo("Loading item data...");
+			RatStashDB = GetRatStashDatabase();
 
 			// Grab quest and hideout requirements from tarkovdata
 			Logger.LogInfo("Loading progress data...");
@@ -207,7 +211,7 @@ public class RatScannerMain : INotifyPropertyChanged
 		Config.LogDebug = RatConfig.LogDebug;
 		Config.Path.LogFile = "RatEyeLog.txt";
 		Config.Path.TesseractLibSearchPath = AppDomain.CurrentDomain.BaseDirectory;
-		RatEyeEngine = new RatEyeEngine(GetRatEyeConfig(), GetRatStashDatabase());
+		RatEyeEngine = new RatEyeEngine(GetRatEyeConfig(), RatStashDB);
 	}
 
 	private RatEye.Config GetRatEyeConfig(bool highlighted = true)

@@ -31,6 +31,8 @@ internal class MenuVM : INotifyPropertyChanged, IRatScannerUI
 		}
 	}
 
+	public RatStash.Database RatStashDB => DataSource?.RatStashDB;
+
 	public TarkovTrackerDB TarkovTrackerDB => DataSource?.TarkovTrackerDB;
 
 	public ProgressDB ProgressDB => DataSource?.ProgressDB;
@@ -255,7 +257,7 @@ internal class MenuVM : INotifyPropertyChanged, IRatScannerUI
 						have += taskObjective.Count;
 					}
 					need += requirement.Needed;
-					
+
 				}
 			}
 		}

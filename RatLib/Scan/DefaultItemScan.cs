@@ -23,7 +23,6 @@ public class DefaultItemScan : ItemScan
 
 		Confidence = 1;
 		IconPath = path;
-		DissapearAt = 0;
 
 		// Item Metadata
 		ImageLink = path;
@@ -32,10 +31,15 @@ public class DefaultItemScan : ItemScan
 		TarkovDevLink = fake ? "" : "https://tarkov.dev/item/physical-bitcoin";
 
 		// Item Information
-		Avg24hPrice = 0;
-		PricePerSlot = 0;
 		TraderName = fake ? "Fence" : "Therapist";
-		BestTraderPrice = 0;
+	}
+
+	public DefaultItemScan(Item item)
+	{
+		MatchedItem = item;
+		var path = $"https://assets.tarkov.dev/{item.Id}-item-grid-image.jpg";
+		Confidence = 1;
+		IconPath = path;
 	}
 
 	public override Vector2 GetToolTipPosition()

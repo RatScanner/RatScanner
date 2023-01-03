@@ -19,6 +19,7 @@ public interface IRatScannerUI : INotifyPropertyChanged
 	public ItemQueue ItemScans { get; }
 	public ItemScan LastItemScan { get; }
 
+	public RatStash.Database RatStashDB { get; }
 	public TarkovTrackerDB TarkovTrackerDB { get; }
 	public ProgressDB ProgressDB { get; }
 
