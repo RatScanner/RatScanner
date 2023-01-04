@@ -1,20 +1,17 @@
-﻿using RatRazor.Interfaces;
+﻿using RatStash;
 using RatScanner.FetchModels;
-using RatStash;
-using RatTracking.FetchModels;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using RatScanner.Scan;
+using RatScanner.FetchModels.TarkovTracker;
 using System.Web;
-using RatTracking;
-using RatLib.Scan;
-using RatTracking.FetchModels.TarkovTracker;
 
 namespace RatScanner.ViewModel;
 
-internal class MenuVM : INotifyPropertyChanged, IRatScannerUI
+internal class MenuVM : INotifyPropertyChanged
 {
 	private const string UpSymbol = "▲";
 	private const string DownSymbol = "▼";

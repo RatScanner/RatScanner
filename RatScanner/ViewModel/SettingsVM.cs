@@ -1,12 +1,11 @@
-﻿using RatRazor.Interfaces;
-using RatScanner.Controls;
+﻿using RatScanner.Controls;
 using System.ComponentModel;
 using System.Linq;
 using RatStash;
 
 namespace RatScanner.ViewModel;
 
-internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
+internal class SettingsVM : INotifyPropertyChanged
 {
 	public bool EnableNameScan { get; set; }
 	public bool EnableAutoNameScan { get; set; }
@@ -15,7 +14,7 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 	public bool EnableIconScan { get; set; }
 	public bool ScanRotatedIcons { get; set; }
 	public bool UseCachedIcons { get; set; }
-	public IHotkey IconScanHotkey { get; set; }
+	public Hotkey IconScanHotkey { get; set; }
 
 	public string ToolTipDuration { get; set; }
 	public int ToolTipMilli { get; set; }

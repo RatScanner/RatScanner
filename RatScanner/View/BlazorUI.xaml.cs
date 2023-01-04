@@ -1,16 +1,14 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using MudBlazor.Services;
-using RatRazor.Interfaces;
 using RatScanner.Controls;
 using RatScanner.ViewModel;
-using RatTracking;
+using RatScanner;
 using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
-using RatLib;
 
 using System.Linq;
 
@@ -31,16 +29,16 @@ public partial class BlazorUI : UserControl, ISwitchable
 		serviceCollection.AddMudServices();
 		RatConfig.LoadConfig();
 
-		serviceCollection.AddSingleton<IRatScannerUI>(s => new MenuVM(RatScannerMain.Instance));
+		serviceCollection.AddSingleton<MenuVM>(s => new MenuVM(RatScannerMain.Instance));
 
 		var settingsVM = new SettingsVM();
-		serviceCollection.AddSingleton<ISettingsUI>(s => settingsVM);
+		serviceCollection.AddSingleton<SettingsVM>(s => settingsVM);
 
 		IconScanHotkeySelector = new HotkeySelector();
 		IconScanHotkeySelector.Hotkey = (Hotkey)settingsVM.IconScanHotkey;
 		IconScanHotkeySelector.Width = 0;
 		IconScanHotkeySelector.Height = 0;
-		serviceCollection.AddSingleton<IHotkeySelector>(s => IconScanHotkeySelector);
+		serviceCollection.AddSingleton<HotkeySelector>(s => IconScanHotkeySelector);
 
 		var bounds = System.Windows.Forms.Screen.AllScreens.Select(screen => screen.Bounds);
 		var left = 0;

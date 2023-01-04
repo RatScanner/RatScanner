@@ -1,7 +1,7 @@
 ﻿using RatScanner.FetchModels;
 using RatStash;
-using RatTracking.FetchModels;
-using RatTracking.FetchModels.TarkovTracker;
+using RatScanner.FetchModels;
+using RatScanner.FetchModels.TarkovTracker;
 using System.Collections.Generic;
 using System.Linq;
 

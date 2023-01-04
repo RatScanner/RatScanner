@@ -1,6 +1,6 @@
 ﻿using RatEye;
 using RatScanner.View;
-using RatTracking;
+using RatScanner;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -10,7 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
-using RatLib.Scan;
+using RatScanner.Scan;
 using Color = System.Drawing.Color;
 using MessageBox = System.Windows.MessageBox;
 using Size = System.Drawing.Size;

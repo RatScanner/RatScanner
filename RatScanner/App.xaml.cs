@@ -13,7 +13,7 @@ namespace RatScanner;
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>
-public partial class App : Application, ISingleInstance
+public partial class App : Application//, ISingleInstance
 {
 	private readonly string[] _webview2RegKeys = new[]
 	{
@@ -39,25 +39,25 @@ public partial class App : Application, ISingleInstance
 
 		// Setup single instance mode
 		var guid = "{a057bb64-c126-4ef4-a4ed-3037c2e7bc89}";
-		var isFirstInstance = this.InitializeAsFirstInstance(guid);
-		if (!isFirstInstance)
-		{
-			SingleInstance.Cleanup();
-			Current.Shutdown(2);
-		}
+		//var isFirstInstance = this.InitializeAsFirstInstance(guid);
+		//if (!isFirstInstance)
+		//{
+		//	SingleInstance.Cleanup();
+		//	Application.Current.Shutdown(2);
+		//}
 	}
 
 	public void OnInstanceInvoked(string[] args)
 	{
-		Current.Dispatcher.Invoke(() =>
+		Application.Current.Dispatcher.Invoke(() =>
 		{
-			MainWindow.Activate();
-			MainWindow.WindowState = WindowState.Normal;
+			Application.Current.MainWindow.Activate();
+			Application.Current.MainWindow.WindowState = WindowState.Normal;
 
 			// Invert the topmost state twice to bring
-			// the window on top if it wasn't already
-			MainWindow.Topmost = !MainWindow.Topmost;
-			MainWindow.Topmost = !MainWindow.Topmost;
+			// the window on top but kepe the top most state
+			Application.Current.MainWindow.Topmost = !Application.Current.MainWindow.Topmost;
+			Application.Current.MainWindow.Topmost = !Application.Current.MainWindow.Topmost;
 		});
 	}
 
@@ -99,7 +99,7 @@ public partial class App : Application, ISingleInstance
 			LogUnhandledException((Exception)e.ExceptionObject, "AppDomain.CurrentDomain.UnhandledException");
 		};
 
-		DispatcherUnhandledException += (s, e) =>
+		Application.Current.DispatcherUnhandledException += (s, e) =>
 		{
 			LogUnhandledException(e.Exception, "Application.Current.DispatcherUnhandledException");
 			e.Handled = true;

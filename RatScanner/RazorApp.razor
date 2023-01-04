@@ -1,0 +1,19 @@
+﻿@inject NavigationManager NavigationManager
+<Error>
+	<Router AppAssembly="@typeof(RazorApp).Assembly">
+		<Found Context="routeData">
+			<RouteView RouteData="@routeData" DefaultLayout="@typeof(AppLayout)"/>
+			<FocusOnNavigate RouteData="@routeData" Selector="h1"/>
+		</Found>
+		<NotFound>
+			<PageTitle>Not found</PageTitle>
+			<LayoutView Layout="@typeof(AppLayout)">
+				<p role="alert">Sorry, there's nothing at this address.</p>
+			</LayoutView>
+		</NotFound>
+	</Router>
+</Error>
+
+@code {
+
+}

@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:controls="clr-namespace:RatScanner.Controls"
              xmlns:view="clr-namespace:RatScanner.View"
+						 xmlns:local="clr-namespace:RatScanner"
              StartupUri="PageSwitcher.xaml">
 	<Application.Resources>
 		<view:IntToLongPriceConverter x:Key="IntToLongPriceConverter" />
@@ -49,209 +50,11 @@
 			        Value="#EEEEEE" />
 		</Style>
 
-		<Style TargetType="{x:Type Button}">
-			<Setter Property="FocusVisualStyle"
-			        Value="{StaticResource FocusVisual}" />
-			<Setter Property="Background"
-			        Value="{StaticResource Button.Static.Background}" />
-			<Setter Property="BorderBrush"
-			        Value="{StaticResource Button.Static.Border}" />
-			<Setter Property="Foreground"
-			        Value="#444444" />
-			<Setter Property="FontFamily"
-			        Value="Roboto Medium" />
-			<Setter Property="FontSize"
-			        Value="14" />
-			<Setter Property="BorderThickness"
-			        Value="0" />
-			<Setter Property="HorizontalContentAlignment"
-			        Value="Center" />
-			<Setter Property="VerticalContentAlignment"
-			        Value="Center" />
-			<Setter Property="Padding"
-			        Value="3,1" />
-			<Setter Property="Cursor"
-			        Value="Hand" />
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate TargetType="{x:Type Button}">
-						<Border x:Name="border"
-						        Background="{TemplateBinding Background}"
-						        BorderBrush="{TemplateBinding BorderBrush}"
-						        BorderThickness="{TemplateBinding BorderThickness}"
-						        CornerRadius="3"
-						        SnapsToDevicePixels="true">
-							<ContentPresenter x:Name="contentPresenter"
-							                  Margin="{TemplateBinding Padding}"
-							                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-							                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-							                  Focusable="False"
-							                  RecognizesAccessKey="True"
-							                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-						</Border>
-						<ControlTemplate.Triggers>
-							<Trigger Property="IsDefaulted"
-							         Value="true">
-								<Setter TargetName="border"
-								        Property="BorderBrush"
-								        Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
-							</Trigger>
-							<Trigger Property="IsMouseOver"
-							         Value="true">
-								<Setter TargetName="border"
-								        Property="Opacity"
-								        Value="0.85" />
-								<Setter TargetName="border"
-								        Property="BorderBrush"
-								        Value="{StaticResource Button.MouseOver.Border}" />
-							</Trigger>
-							<Trigger Property="IsPressed"
-							         Value="true">
-								<Setter TargetName="border"
-								        Property="Opacity"
-								        Value="0.7" />
-								<Setter TargetName="border"
-								        Property="BorderBrush"
-								        Value="{StaticResource Button.Pressed.Border}" />
-							</Trigger>
-							<Trigger Property="IsEnabled"
-							         Value="false">
-								<Setter TargetName="border"
-								        Property="Background"
-								        Value="{StaticResource Button.Disabled.Background}" />
-								<Setter TargetName="border"
-								        Property="BorderBrush"
-								        Value="{StaticResource Button.Disabled.Border}" />
-								<Setter TargetName="contentPresenter"
-								        Property="TextElement.Foreground"
-								        Value="{StaticResource Button.Disabled.Foreground}" />
-							</Trigger>
-						</ControlTemplate.Triggers>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
-
-		<Style TargetType="{x:Type TextBox}">
-			<Setter Property="Margin"
-			        Value="5" />
-			<Setter Property="FontSize"
-			        Value="14" />
-			<Setter Property="FontFamily"
-			        Value="Roboto Medium" />
-			<Setter Property="Foreground"
-			        Value="#EEEEEE" />
-			<Setter Property="Background"
-			        Value="#555555" />
-			<Setter Property="VerticalContentAlignment"
-			        Value="Center" />
-			<Setter Property="HorizontalContentAlignment"
-			        Value="Right" />
-		</Style>
-
 		<Style TargetType="{x:Type Separator}">
 			<Setter Property="Margin"
 			        Value="0, 5" />
 			<Setter Property="Background"
 			        Value="#AAAAAA" />
-		</Style>
-
-		<Style TargetType="{x:Type Hyperlink}">
-			<Setter Property="TextBlock.FontSize"
-			        Value="14" />
-			<Setter Property="Foreground"
-			        Value="#EEEEEE" />
-			<Setter Property="FontFamily"
-			        Value="Roboto Medium" />
-			<Style.Triggers>
-				<Trigger Property="IsMouseOver"
-				         Value="True">
-					<Setter Property="Foreground"
-					        Value="#569CD6" />
-				</Trigger>
-			</Style.Triggers>
-		</Style>
-
-		<Style TargetType="{x:Type TabControl}">
-			<Setter Property="SnapsToDevicePixels"
-			        Value="True" />
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate TargetType="{x:Type TabControl}">
-						<Grid KeyboardNavigation.TabNavigation="Local">
-							<Grid.RowDefinitions>
-								<RowDefinition Height="Auto" />
-								<RowDefinition Height="*" />
-							</Grid.RowDefinitions>
-							<TabPanel Name="HeaderPanel"
-							          Grid.Row="0"
-							          Margin="3,-4,3,-1"
-							          Panel.ZIndex="1"
-							          Background="Transparent"
-							          IsItemsHost="True"
-							          KeyboardNavigation.TabIndex="1" />
-							<Border Name="Border"
-							        Grid.Row="1"
-							        Background="#444444"
-							        BorderBrush="#EEEEEE"
-							        BorderThickness="0,1,0,0"
-							        CornerRadius="0"
-							        KeyboardNavigation.DirectionalNavigation="Contained"
-							        KeyboardNavigation.TabIndex="2"
-							        KeyboardNavigation.TabNavigation="Local">
-								<ContentPresenter Name="PART_SelectedContentHost"
-								                  Margin="10,0"
-								                  ContentSource="SelectedContent" />
-							</Border>
-						</Grid>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
-		</Style>
-
-		<Style TargetType="{x:Type TabItem}">
-			<Setter Property="SnapsToDevicePixels"
-			        Value="True" />
-			<Setter Property="Foreground"
-			        Value="#EEEEEE" />
-			<Setter Property="FontFamily"
-			        Value="Roboto Medium" />
-			<Setter Property="Template">
-				<Setter.Value>
-					<ControlTemplate TargetType="{x:Type TabItem}">
-						<Border Name="Border"
-						        Margin="2,4,2,0"
-						        BorderBrush="#EEEEEE"
-						        BorderThickness="1,1,1,0">
-							<ContentPresenter x:Name="ContentSite"
-							                  Margin="10,2"
-							                  HorizontalAlignment="Center"
-							                  VerticalAlignment="Center"
-							                  ContentSource="Header" />
-						</Border>
-						<ControlTemplate.Triggers>
-							<Trigger Property="IsSelected"
-							         Value="True">
-								<Setter TargetName="Border"
-								        Property="Background"
-								        Value="#444444" />
-								<Setter TargetName="Border"
-								        Property="BorderThickness"
-								        Value="1,1,1,0" />
-							</Trigger>
-							<Trigger Property="IsSelected"
-							         Value="False">
-								<Setter TargetName="Border"
-								        Property="Background"
-								        Value="#555555" />
-								<Setter TargetName="Border"
-								        Property="BorderThickness"
-								        Value="1,1,1,1" />
-							</Trigger>
-						</ControlTemplate.Triggers>
-					</ControlTemplate>
-				</Setter.Value>
-			</Setter>
 		</Style>
 
 		<Style x:Key="TitleBarButtonStyle"
@@ -356,8 +159,7 @@
 			</Setter>
 		</Style>
 
-		<Style TargetType="{x:Type controls:HotkeySelector}"
-		       BasedOn="{StaticResource {x:Type Button}}" />
+		<!--<Style TargetType="{x:Type controls:HotkeySelector}" BasedOn="{StaticResource {x:Type Button}}" />-->
 
 		<!-- icons -->
 		<DrawingImage x:Key="hideoutIcon">

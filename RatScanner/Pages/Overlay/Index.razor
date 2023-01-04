@@ -1,0 +1,131 @@
+﻿@page "/overlay"
+@using RatScanner.Scan
+@using System.Globalization
+@using RatScanner.ViewModel;
+@inject MenuVM MenuVM
+@inject RatScanner.VirtualScreenOffset VirtualScreenOffset
+@inject SettingsVM SettingsVM;
+@inject IJSRuntime JSRuntime;
+@implements IDisposable
+
+<div style="transform-origin: top left; transform: scale(@((1f / SettingsVM.ScreenScale).ToString(CultureInfo.InvariantCulture)));">
+    @foreach (var itemScan in MenuVM.ItemScans)
+    {
+        @if (itemScan != null
+       && itemScan.GetToolTipPosition() != null
+       && itemScan.DissapearAt > DateTimeOffset.Now.ToUnixTimeMilliseconds())
+        {
+            @if (itemScan is ItemIconScan iconScan)
+            {
+                var leftPos = iconScan.GetToolTipPosition().X - VirtualScreenOffset.XOffset;
+                var topPos = iconScan.GetToolTipPosition().Y - VirtualScreenOffset.YOffset;
+                var width = iconScan.Icon.ItemSize.X;
+                var height = iconScan.Icon.ItemSize.Y;
+
+                <div style="font-size: smaller; position: absolute; left: @(leftPos)px; top: @(topPos)px; width: @(width)px; height: @(height)px; ">
+                    <div style="position: relative; width: 100%; height: 100%; text-shadow: 0px 0px 5px black; outline-offset: -1px; outline: 1px solid #555555;" class="pa-1">
+                        @{
+	                        var iconStyle = iconScan.Rotated ? "transform: rotate(90deg) translate(0%, -100%);" : "";
+                            var mWidth = iconScan.Rotated ? height : width;
+	                        var mHeight = iconScan.Rotated ? width : height;
+                        }
+                        <div style="position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; z-index: -1;">
+	                        <img src="@GetIconURL(iconScan)" style="width: @(mWidth)px; height: @(mHeight)px; background-color: #121212; transform-origin: top left; @iconStyle">
+                        </div>
+
+                        <div style="overflow: hidden;">
+                            @if (iconScan.Avg24hPrice >= iconScan.BestTraderPrice)
+                            {
+                                <div class="stroke">
+                                    @MenuVM.IntToShortPrice(iconScan.Avg24hPrice)
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="d-flex align-center stroke">
+                                    @MenuVM.IntToShortPrice(iconScan.BestTraderPrice)
+                                    <MudAvatar Image="@($"https://tarkov.dev/images/{@iconScan.TraderName.ToLower()}-icon.jpg")" Size="Size.Small" Style="float: right;" Class="ml-1" />
+                                </div>
+                            }
+
+                            @if (MenuVM.GetItemNeeds(iconScan).QuestRemaining > 0)
+                            {
+                                <div class="d-flex align-center stroke">
+                                    @MenuVM.GetItemNeeds(iconScan).QuestRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" />
+                                </div>
+                            }
+                            @if (MenuVM.GetItemNeeds(iconScan).HideoutRemaining > 0)
+                            {
+                                <div class="d-flex align-center stroke">
+                                    @MenuVM.GetItemNeeds(iconScan).HideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="d-flex align-enter" style="position: absolute; left: @(itemScan.GetToolTipPosition().X - VirtualScreenOffset.XOffset)px; top: @(itemScan.GetToolTipPosition().Y - VirtualScreenOffset.YOffset)px; background: #121212; padding: 4px;">
+
+                    @if (itemScan.Avg24hPrice >= itemScan.BestTraderPrice)
+                    {
+                        <div class="stroke">
+                            @MenuVM.IntToShortPrice(itemScan.Avg24hPrice)
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="d-flex align-center">
+                            @MenuVM.IntToShortPrice(itemScan.BestTraderPrice)
+                            <MudAvatar Image="@($"https://tarkov.dev/images/{@itemScan.TraderName.ToLower()}-icon.jpg")" Size="Size.Small" Style="float: right;" Class="ml-1" />
+                        </div>
+                    }
+
+                    @if (MenuVM.GetItemNeeds(itemScan).QuestRemaining > 0)
+                    {
+                        <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" />
+                    }
+                    @if (MenuVM.GetItemNeeds(itemScan).HideoutRemaining > 0)
+                    {
+                        <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" />
+                    }
+                </div>
+            }
+        }
+    }
+</div>
+
+@code {
+
+    private string GetIconURL(ItemIconScan itemScan)
+    {
+        var path = itemScan.IconPath;
+
+        if (string.IsNullOrEmpty(path))
+        {
+            return $"https://assets.tarkov.dev/{itemScan.MatchedItem.Id}-base-image.png";
+        }
+
+        path = path.Replace("\\", "/");
+        var pathEnd = path[path.IndexOf("Data/icons/")..path.Length];
+        pathEnd = pathEnd[5..pathEnd.Length];
+        var url = "https://local.data/" + pathEnd;
+        return url;
+    }
+
+    protected override void OnInitialized()
+    {
+        MenuVM.PropertyChanged += PropertyChangeHandler;
+    }
+
+    private async void PropertyChangeHandler(object sender, EventArgs e)
+    {
+        await InvokeAsync(() => StateHasChanged());
+    }
+
+    public void Dispose()
+    {
+        MenuVM.PropertyChanged -= PropertyChangeHandler;
+    }
+}
