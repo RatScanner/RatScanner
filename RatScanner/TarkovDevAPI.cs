@@ -1,9 +1,7 @@
 ﻿using Newtonsoft.Json;
-using RatScanner.FetchModels.tarkovdata;
-using RatScanner.FetchModels.tarkovdev;
+using RatScanner.FetchModels.TarkovDev;
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -41,7 +39,7 @@ public class TarkovDevAPI
 
 		return contentTask.Result;
 	}
-	
+
 	public static List<NeededItem> GetNeededItems()
 	{
 		var apiResponse = Get(NeededQuery);

@@ -1,7 +1,7 @@
-﻿using RatStash;
-using RatEye;
-using Icon = RatEye.Processing.Icon;
+﻿using RatEye;
+using RatStash;
 using System;
+using Icon = RatEye.Processing.Icon;
 
 namespace RatScanner.Scan;
 

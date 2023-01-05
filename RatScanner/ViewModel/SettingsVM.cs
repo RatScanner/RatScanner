@@ -1,7 +1,7 @@
 ﻿using RatScanner.Controls;
+using RatStash;
 using System.ComponentModel;
 using System.Linq;
-using RatStash;
 
 namespace RatScanner.ViewModel;
 

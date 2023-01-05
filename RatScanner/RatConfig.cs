@@ -1,4 +1,6 @@
-﻿using RatScanner.Controls;
+﻿using Newtonsoft.Json.Linq;
+using RatScanner.Controls;
+using RatStash;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -9,8 +11,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Input;
-using Newtonsoft.Json.Linq;
-using RatStash;
 using Key = System.Windows.Input.Key;
 
 namespace RatScanner;

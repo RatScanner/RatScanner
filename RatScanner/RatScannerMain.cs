@@ -1,6 +1,8 @@
 ﻿using RatEye;
+using RatScanner.FetchModels;
+using RatScanner.Scan;
 using RatScanner.View;
-using RatScanner;
+using RatStash;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -10,14 +12,11 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
-using RatScanner.Scan;
 using Color = System.Drawing.Color;
 using MessageBox = System.Windows.MessageBox;
+using PixelFormat = System.Drawing.Imaging.PixelFormat;
 using Size = System.Drawing.Size;
 using Timer = System.Threading.Timer;
-using RatScanner.FetchModels;
-using RatStash;
-using PixelFormat = System.Drawing.Imaging.PixelFormat;
 
 namespace RatScanner;
 
@@ -74,7 +73,7 @@ public class RatScannerMain : INotifyPropertyChanged
 		Logger.LogInfo("Loading config...");
 		RatConfig.LoadConfig();
 
-		Logger.LogInfo($"Screen Info: {RatConfig.ScreenWidth}x{RatConfig.ScreenHeight} at {RatConfig.ScreenScale*100}%");
+		Logger.LogInfo($"Screen Info: {RatConfig.ScreenWidth}x{RatConfig.ScreenHeight} at {RatConfig.ScreenScale * 100}%");
 
 		Logger.LogInfo("Setting temporary default item...");
 		ItemScans.Enqueue(new DefaultItemScan(true));

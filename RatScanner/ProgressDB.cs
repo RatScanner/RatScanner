@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using RatScanner.FetchModels;
-using RatScanner.FetchModels.tarkovdata;
+﻿using RatScanner.FetchModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +25,7 @@ public class ProgressDB
 		// Loop through each neededItem
 		neededItems.ForEach((neededItem) =>
 		{
-			if (neededItem.ProgressType == FetchModels.tarkovdev.ProgressType.TaskTurnin)
+			if (neededItem.ProgressType == FetchModels.TarkovDev.ProgressType.TaskTurnin)
 			{
 				_questItems.Add(new QuestItem
 				{
@@ -39,7 +37,7 @@ public class ProgressDB
 					TaskObjectiveId = neededItem.ProgressId ?? ""
 				});
 			}
-			else if (neededItem.ProgressType == FetchModels.tarkovdev.ProgressType.HideoutTurnin)
+			else if (neededItem.ProgressType == FetchModels.TarkovDev.ProgressType.HideoutTurnin)
 			{
 				_hideoutItems.Add(new HideoutItem
 				{

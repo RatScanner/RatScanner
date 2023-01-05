@@ -1,7 +1,6 @@
 ﻿using RatScanner.FetchModels;
-using RatStash;
-using RatScanner.FetchModels;
 using RatScanner.FetchModels.TarkovTracker;
+using RatStash;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -149,7 +148,8 @@ public static class ItemExtensions
 				if (taskObjective == null)
 				{
 					need += requirement.Needed;
-				}else
+				}
+				else
 				{
 					need += requirement.Needed;
 					if (taskObjective.Complete)

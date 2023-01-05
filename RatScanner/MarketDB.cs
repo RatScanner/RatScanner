@@ -19,7 +19,7 @@ public class MarketDB
 		if (_items == null) return null;
 		if (uid?.Length > 0)
 		{
-		var item = _items.FirstOrDefault(i => i.Id == uid);
+			var item = _items.FirstOrDefault(i => i.Id == uid);
 			if (item != null) return item.DeepClone();
 
 			Logger.LogWarning("Could not find item with uid: " + uid);

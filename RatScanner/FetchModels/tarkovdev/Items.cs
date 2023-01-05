@@ -1,11 +1,6 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace RatScanner.FetchModels.tarkovdev;
+namespace RatScanner.FetchModels.TarkovDev;
 
 // Needed Item
 public class NeededItem
@@ -40,7 +35,7 @@ public class NeededItem
 
 	// Progress Type
 	public ProgressType ProgressType { get; set; }
-	
+
 	// Dog tag level
 	[JsonProperty("dogTagLevel")]
 	public int? DogTagLevel { get; set; } = null;

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RatScanner.FetchModels.tarkovdev;
+namespace RatScanner.FetchModels.TarkovDev;
 
 public class Task
 {
@@ -23,7 +23,7 @@ public class Task
 	// Minimum player level
 	[JsonProperty("minPlayerLevel")]
 	public int MinPlayerLevel { get; set; }
-	
+
 	// Task requirements
 	[JsonProperty("taskRequirements")]
 	public List<TaskStatusRequirement> TaskRequirements { get; set; } = new();
@@ -331,7 +331,8 @@ public class ObjectiveShoot : IObjective
 	public List<NeededItem> GetNeededItems(string taskId)
 	{
 		// Create a list of needed items from the array of weapons
-		return UsingWeapon.Where(x => x != null).Select(x => new NeededItem() {
+		return UsingWeapon.Where(x => x != null).Select(x => new NeededItem()
+		{
 			Id = x.Id,
 			Count = 1,
 			FoundInRaid = false,

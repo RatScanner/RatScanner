@@ -1,6 +1,5 @@
-﻿using RatStash;
-using RatEye;
-using RatScanner;
+﻿using RatEye;
+using RatStash;
 
 namespace RatScanner.Scan;
 

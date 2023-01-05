@@ -2,15 +2,13 @@
 using MudBlazor.Services;
 using RatScanner.Controls;
 using RatScanner.ViewModel;
-using RatScanner;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
-
-using System.Linq;
 
 namespace RatScanner.View;
 

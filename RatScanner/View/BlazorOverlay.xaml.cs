@@ -1,13 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System.Diagnostics;
-using System.Windows;
 using Microsoft.Web.WebView2.Core;
-using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Interop;
-using MudBlazor.Extensions;
 
 namespace RatScanner.View;
 
@@ -46,7 +44,7 @@ public partial class BlazorOverlay : Window
 			if (bound.Right > right) right = bound.Right;
 			if (bound.Bottom > bottom) bottom = bound.Bottom;
 		}
-		
+
 		var handle = new WindowInteropHelper(this).Handle;
 		NativeMethods.SetWindowPos(handle, 0, left, top, right - left, bottom - top, 0);
 	}

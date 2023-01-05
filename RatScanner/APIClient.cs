@@ -1,7 +1,6 @@
-﻿using System.Diagnostics;
+﻿using RatScanner.FetchModels.TarkovTracker;
 using System.Net;
 using System.Net.Http;
-using RatScanner.FetchModels.TarkovTracker;
 
 namespace RatScanner;
 
