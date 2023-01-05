@@ -13,7 +13,7 @@ namespace RatScanner;
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>
-public partial class App : Application//, ISingleInstance
+public partial class App : Application, ISingleInstance
 {
 	private readonly string[] _webview2RegKeys = new[]
 	{
@@ -39,12 +39,12 @@ public partial class App : Application//, ISingleInstance
 
 		// Setup single instance mode
 		var guid = "{a057bb64-c126-4ef4-a4ed-3037c2e7bc89}";
-		//var isFirstInstance = this.InitializeAsFirstInstance(guid);
-		//if (!isFirstInstance)
-		//{
-		//	SingleInstance.Cleanup();
-		//	Application.Current.Shutdown(2);
-		//}
+		var isFirstInstance = this.InitializeAsFirstInstance(guid);
+		if (!isFirstInstance)
+		{
+			SingleInstance.Cleanup();
+			Application.Current.Shutdown(2);
+		}
 	}
 
 	public void OnInstanceInvoked(string[] args)
