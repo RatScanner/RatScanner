@@ -1,8 +1,11 @@
 ﻿using RatScanner.Controls;
+using RatScanner.View;
 using System;
 using System.Threading;
+using System.Windows;
 using System.Windows.Input;
 using static RatScanner.RatConfig;
+using OverlayC = RatScanner.RatConfig.Overlay;
 
 namespace RatScanner;
 
@@ -12,6 +15,7 @@ internal class HotkeyManager
 
 	internal ActiveHotkey NameScanHotkey;
 	internal ActiveHotkey IconScanHotkey;
+	internal ActiveHotkey OpenInteractableOverlayHotkey;
 
 	internal HotkeyManager()
 	{
@@ -39,6 +43,7 @@ internal class HotkeyManager
 		var nameScanHotkey = new Hotkey(null, new[] { MouseButton.Left });
 		NameScanHotkey = new ActiveHotkey(nameScanHotkey, OnNameScanHotkey, ref NameScan.Enable);
 		IconScanHotkey = new ActiveHotkey(IconScan.Hotkey, OnIconScanHotkey, ref IconScan.Enable);
+		OpenInteractableOverlayHotkey = new ActiveHotkey(OverlayC.Search.Hotkey, OnOpenInteractableOverlayHotkey, ref OverlayC.Search.Enable);
 	}
 
 	/// <summary>
@@ -47,6 +52,7 @@ internal class HotkeyManager
 	internal void UnregisterHotkeys()
 	{
 		NameScanHotkey?.Dispose();
+		IconScanHotkey?.Dispose();
 		IconScanHotkey?.Dispose();
 	}
 
@@ -91,5 +97,10 @@ internal class HotkeyManager
 	private void OnIconScanHotkey(object sender, KeyUpEventArgs e)
 	{
 		Wrap(() => RatScannerMain.Instance.IconScan(UserActivityHelper.GetMousePosition()));
+	}
+
+	private void OnOpenInteractableOverlayHotkey(object sender, KeyUpEventArgs e)
+	{
+		Wrap(() => Application.Current.Dispatcher.Invoke(() => Wrap(() => BlazorUI.BlazorInteractableOverlay.ShowOverlay())));
 	}
 }

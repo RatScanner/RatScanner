@@ -1,7 +1,7 @@
 ﻿@inject NavigationManager NavigationManager
 
 <Error>
-    <Router AppAssembly="@typeof(InteractableOverlay).Assembly">
+	<Router AppAssembly="@typeof(Overlay).Assembly">
 		<Found Context="routeData">
 			<RouteView RouteData="@routeData" DefaultLayout="@typeof(OverlayLayout)"/>
 			<FocusOnNavigate RouteData="@routeData" Selector="h1"/>
@@ -19,7 +19,7 @@
 
 	protected override void OnInitialized()
 	{
-		NavigationManager.NavigateTo("/overlay");
+		NavigationManager.NavigateTo("/interactableOverlay");
 	}
 
 }

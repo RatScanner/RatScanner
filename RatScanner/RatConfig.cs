@@ -4,7 +4,6 @@ using RatStash;
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -106,6 +105,16 @@ internal static class RatConfig
 		}
 	}
 
+	// Overlay options
+	internal static class Overlay
+	{
+		internal static class Search
+		{
+			internal static bool Enable = true;
+			internal static Hotkey Hotkey = new(new[] { Key.N, Key.M }.ToList());
+		}
+	}
+
 	// Other
 #if DEBUG
 	internal static bool LogDebug
@@ -162,51 +171,59 @@ internal static class RatConfig
 		var config = new SimpleConfig(Paths.ConfigFile);
 
 		config.Section = nameof(NameScan);
-		NameScan.Enable = config.ReadBool(nameof(NameScan.Enable), true);
-		NameScan.EnableAuto = config.ReadBool(nameof(NameScan.EnableAuto), false);
-		NameScan.Language = (Language)config.ReadInt(nameof(NameScan.Language), (int)Language.English);
+		NameScan.Enable = config.ReadBool(nameof(NameScan.Enable), NameScan.Enable);
+		NameScan.EnableAuto = config.ReadBool(nameof(NameScan.EnableAuto), NameScan.EnableAuto);
+		NameScan.Language = (Language)config.ReadInt(nameof(NameScan.Language));
 
 		config.Section = nameof(IconScan);
-		IconScan.Enable = config.ReadBool(nameof(IconScan.Enable), true);
-		IconScan.ScanRotatedIcons = config.ReadBool(nameof(IconScan.ScanRotatedIcons), true);
-		var keyboardKeys = config.ReadEnumerableEnum(nameof(IconScan.Hotkey) + "Keyboard", new[] { Key.LeftShift });
-		var mouseButtons = config.ReadEnumerableEnum(nameof(IconScan.Hotkey) + "Mouse", new[] { MouseButton.Left });
+		IconScan.Enable = config.ReadBool(nameof(IconScan.Enable), IconScan.Enable);
+		IconScan.ScanRotatedIcons = config.ReadBool(nameof(IconScan.ScanRotatedIcons), IconScan.ScanRotatedIcons);
+		var keyboardKeys = config.ReadEnumerableEnum(nameof(IconScan.Hotkey) + "Keyboard", IconScan.Hotkey.KeyboardKeys);
+		var mouseButtons = config.ReadEnumerableEnum(nameof(IconScan.Hotkey) + "Mouse", IconScan.Hotkey.MouseButtons);
 		IconScan.Hotkey = new Hotkey(keyboardKeys.ToList(), mouseButtons.ToList());
-		IconScan.UseCachedIcons = config.ReadBool(nameof(IconScan.UseCachedIcons), true);
+		IconScan.UseCachedIcons = config.ReadBool(nameof(IconScan.UseCachedIcons), IconScan.UseCachedIcons);
 
 		config.Section = nameof(ToolTip);
-		ToolTip.Duration = config.ReadInt(nameof(ToolTip.Duration), 1500);
-		ToolTip.DigitGroupingSymbol = config.ReadString(nameof(ToolTip.DigitGroupingSymbol), NumberFormatInfo.CurrentInfo.NumberGroupSeparator);
+		ToolTip.Duration = config.ReadInt(nameof(ToolTip.Duration), ToolTip.Duration);
+		ToolTip.DigitGroupingSymbol = config.ReadString(nameof(ToolTip.DigitGroupingSymbol), ToolTip.DigitGroupingSymbol);
 
 		config.Section = nameof(MinimalUi);
-		MinimalUi.ShowName = config.ReadBool(nameof(MinimalUi.ShowName), true);
-		MinimalUi.ShowAvgDayPrice = config.ReadBool(nameof(MinimalUi.ShowAvgDayPrice), true);
-		MinimalUi.ShowPricePerSlot = config.ReadBool(nameof(MinimalUi.ShowPricePerSlot), true);
-		MinimalUi.ShowTraderPrice = config.ReadBool(nameof(MinimalUi.ShowTraderPrice), true);
-		MinimalUi.ShowUpdated = config.ReadBool(nameof(MinimalUi.ShowUpdated), true);
-		MinimalUi.ShowQuestHideoutTracker = config.ReadBool(nameof(MinimalUi.ShowQuestHideoutTracker), true);
-		MinimalUi.ShowQuestHideoutTeamTracker = config.ReadBool(nameof(MinimalUi.ShowQuestHideoutTeamTracker), true);
-		MinimalUi.Opacity = config.ReadInt(nameof(MinimalUi.Opacity), 0);
+		MinimalUi.ShowName = config.ReadBool(nameof(MinimalUi.ShowName), MinimalUi.ShowName);
+		MinimalUi.ShowAvgDayPrice = config.ReadBool(nameof(MinimalUi.ShowAvgDayPrice), MinimalUi.ShowAvgDayPrice);
+		MinimalUi.ShowPricePerSlot = config.ReadBool(nameof(MinimalUi.ShowPricePerSlot), MinimalUi.ShowPricePerSlot);
+		MinimalUi.ShowTraderPrice = config.ReadBool(nameof(MinimalUi.ShowTraderPrice), MinimalUi.ShowTraderPrice);
+		MinimalUi.ShowUpdated = config.ReadBool(nameof(MinimalUi.ShowUpdated), MinimalUi.ShowUpdated);
+		MinimalUi.ShowQuestHideoutTracker = config.ReadBool(nameof(MinimalUi.ShowQuestHideoutTracker), MinimalUi.ShowQuestHideoutTracker);
+		MinimalUi.ShowQuestHideoutTeamTracker = config.ReadBool(nameof(MinimalUi.ShowQuestHideoutTeamTracker), MinimalUi.ShowQuestHideoutTeamTracker);
+		MinimalUi.Opacity = config.ReadInt(nameof(MinimalUi.Opacity), MinimalUi.Opacity);
 
 		config.Section = nameof(Tracking);
-		Tracking.ShowNonFIRNeeds = config.ReadBool(nameof(Tracking.ShowNonFIRNeeds), true);
+		Tracking.ShowNonFIRNeeds = config.ReadBool(nameof(Tracking.ShowNonFIRNeeds), Tracking.ShowNonFIRNeeds);
 
 		config.Section = nameof(Tracking.TarkovTracker);
-		Tracking.TarkovTracker.Token = config.ReadString(nameof(Tracking.TarkovTracker.Token), "");
-		Tracking.TarkovTracker.ShowTeam = config.ReadBool(nameof(Tracking.TarkovTracker.ShowTeam), true);
+		Tracking.TarkovTracker.Token = config.ReadString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);
+		Tracking.TarkovTracker.ShowTeam = config.ReadBool(nameof(Tracking.TarkovTracker.ShowTeam), Tracking.TarkovTracker.ShowTeam);
+
+		config.Section = nameof(Overlay);
+
+		config.Section = nameof(Overlay.Search);
+		Overlay.Search.Enable = config.ReadBool(nameof(Overlay.Search.Enable), Overlay.Search.Enable);
+		keyboardKeys = config.ReadEnumerableEnum(nameof(Overlay.Search.Hotkey) + "Keyboard", Overlay.Search.Hotkey.KeyboardKeys);
+		mouseButtons = config.ReadEnumerableEnum(nameof(Overlay.Search.Hotkey) + "Mouse", Overlay.Search.Hotkey.MouseButtons);
+		Overlay.Search.Hotkey = new Hotkey(keyboardKeys.ToList(), mouseButtons.ToList());
 
 		config.Section = "Other";
 		if (!SetScreen)
 		{
-			ScreenWidth = config.ReadInt(nameof(ScreenWidth), 1920);
-			ScreenHeight = config.ReadInt(nameof(ScreenHeight), 1080);
-			ScreenScale = config.ReadFloat(nameof(ScreenScale), 1f);
+			ScreenWidth = config.ReadInt(nameof(ScreenWidth), ScreenWidth);
+			ScreenHeight = config.ReadInt(nameof(ScreenHeight), ScreenHeight);
+			ScreenScale = config.ReadFloat(nameof(ScreenScale), ScreenScale);
 		}
 
-		MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), false);
-		AlwaysOnTop = config.ReadBool(nameof(AlwaysOnTop), false);
-		ItemDataBundleVersion = config.ReadString(nameof(ItemDataBundleVersion), "20220822");
-		LogDebug = config.ReadBool(nameof(LogDebug), false);
+		MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), MinimizeToTray);
+		AlwaysOnTop = config.ReadBool(nameof(AlwaysOnTop), AlwaysOnTop);
+		ItemDataBundleVersion = config.ReadString(nameof(ItemDataBundleVersion), ItemDataBundleVersion);
+		LogDebug = config.ReadBool(nameof(LogDebug), LogDebug);
 	}
 
 	internal static void SaveConfig()
@@ -245,6 +262,11 @@ internal static class RatConfig
 		config.Section = nameof(Tracking.TarkovTracker);
 		config.WriteString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);
 		config.WriteBool(nameof(Tracking.TarkovTracker.ShowTeam), Tracking.TarkovTracker.ShowTeam);
+
+		config.Section = nameof(Overlay);
+
+		config.Section = nameof(Overlay.Search);
+		config.WriteBool(nameof(Overlay.Search.Enable), Overlay.Search.Enable);
 
 		config.Section = "Other";
 		config.WriteInt(nameof(ScreenWidth), ScreenWidth);

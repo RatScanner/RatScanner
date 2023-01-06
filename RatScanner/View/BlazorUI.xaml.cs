@@ -19,6 +19,7 @@ public partial class BlazorUI : UserControl, ISwitchable
 {
 	public HotkeySelector IconScanHotkeySelector { get; set; }
 	public static BlazorOverlay BlazorOverlay { get; set; }
+	public static BlazorInteractableOverlay BlazorInteractableOverlay { get; set; }
 
 	public BlazorUI()
 	{
@@ -56,6 +57,9 @@ public partial class BlazorUI : UserControl, ISwitchable
 
 		BlazorOverlay ??= new BlazorOverlay(serviceProvider);
 		BlazorOverlay.Show();
+
+		BlazorInteractableOverlay ??= new BlazorInteractableOverlay(serviceProvider);
+		BlazorInteractableOverlay.Show();
 
 		InitializeComponent();
 	}

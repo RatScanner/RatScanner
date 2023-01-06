@@ -11,11 +11,7 @@
         <MudItem xs="12">
             <div class="d-flex align-center justify-start mx-2 mt-2 mb-1">
                 <img src="@item.IconLink" class="mr-2 mud-elevation-1" style="border-style: solid; border-width: 1px; border-color: #585D60; display: block; max-width: 64px; max-height: 64px; width: auto; height: auto;" />
-                <div style="text-shadow: 2px 2px 5px black;">
-                    <MudText Typo="Typo.subtitle1" Color="Color.Inherit">
-                        @(item.MatchedItem.Name.Length < 40 ? item.MatchedItem.Name : item.MatchedItem.ShortName)
-                    </MudText>
-                </div>
+                <MudText Class="ellipsis" Style="display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;" Color="Color.Inherit">@item.MatchedItem.Name</MudText>
             </div>
         </MudItem>
         <MudItem xs="6">
@@ -94,9 +90,11 @@
                         <MudPaper Class="ma-n1" Elevation="4">
                             <MudStack Row="true" Style="height: 48px">
                                 <MudImage Class="m-0 p-0" Src="@item.GetMarketItem().IconLink" Style="max-width:100%; max-height:100%;" />
-                                <MudText Class="overflow-hidden" Style="height: 48px;">
-                                    @(item == null ? null : $"{item.Name}")
-                                </MudText>
+                                <MudStack Class="overflow-hidden">
+                                    <MudText Class="ellipsis">
+                                        @(item == null ? null : $"{item.Name}")
+                                    </MudText>
+                                </MudStack>
                             </MudStack>
                         </MudPaper>
                     </ItemTemplate>
@@ -105,6 +103,13 @@
         </MudItem>
     </MudGrid>
 </MudGrid>
+
+<style>
+    .ellipsis {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
 
 @code {
     private ItemScan item => MenuVM.LastItemScan;

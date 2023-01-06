@@ -141,7 +141,6 @@ public partial class PageSwitcher : Window
 
 	internal void SetBackgroundOpacity(float opacity)
 	{
-		//return;
 		Background.Opacity = Math.Clamp(opacity, 1f / 510f, 1f);
 	}
 }

@@ -1,0 +1,85 @@
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Web.WebView2.Core;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Windows;
+using System.Windows.Forms;
+using System.Windows.Interop;
+
+namespace RatScanner.View;
+
+/// <summary>
+/// Interaction logic for BlazorInteractableOverlay.xaml
+/// </summary>
+public partial class BlazorInteractableOverlay : Window
+{
+	public BlazorInteractableOverlay(ServiceProvider serviceProvider)
+	{
+		Resources.Add("services", serviceProvider);
+
+		InitializeComponent();
+	}
+
+	private void BlazorInteractableOverlay_Loaded(object sender, RoutedEventArgs e)
+	{
+		blazorInteractableOverlayWebView.WebView.DefaultBackgroundColor = System.Drawing.Color.Transparent;
+		SetPosition();
+		SetWindowStyle();
+		blazorInteractableOverlayWebView.WebView.NavigationCompleted += WebView_Loaded;
+		blazorInteractableOverlayWebView.WebView.CoreWebView2InitializationCompleted += CoreWebView_Loaded;
+		WindowBlurEffect.EnableBlur(this, WindowBlurEffect.AccentState.ACCENT_ENABLE_BLURBEHIND);
+	}
+
+	private void SetPosition()
+	{
+		var hoveredScreen = Screen.AllScreens.Where(screen => screen.Bounds.Contains(UserActivityHelper.GetMousePosition()));
+		var screen = hoveredScreen.FirstOrDefault() ?? Screen.PrimaryScreen;
+		var b = screen.Bounds;
+		var handle = new WindowInteropHelper(this).Handle;
+		NativeMethods.SetWindowPos(handle, 0, b.Left, b.Top, b.Right - b.Left, b.Bottom - b.Top, 0);
+	}
+
+	internal void ShowOverlay()
+	{
+		SetPosition();
+		this.Show();
+	}
+
+	internal void HideOverlay()
+	{
+		this.Hide();
+	}
+
+	private void SetWindowStyle()
+	{
+		const int gwlExStyle = -20; // GWL_EXSTYLE
+		const uint wsExToolWindow = 0x00000080; // WS_EX_TOOLWINDOW
+
+		var handle = new WindowInteropHelper(this).Handle;
+		NativeMethods.SetWindowLongPtr(handle, gwlExStyle, NativeMethods.GetWindowLongPtr(handle, gwlExStyle) | (nint)wsExToolWindow);
+	}
+
+	private void WebView_Loaded(object sender, CoreWebView2NavigationCompletedEventArgs e)
+	{
+		// if we are running in a debug mode, open dev tools to help out
+		if (Debugger.IsAttached) blazorInteractableOverlayWebView.WebView.CoreWebView2.OpenDevToolsWindow();
+	}
+
+	private void CoreWebView_Loaded(object sender, CoreWebView2InitializationCompletedEventArgs e)
+	{
+		blazorInteractableOverlayWebView.WebView.CoreWebView2.SetVirtualHostNameToFolderMapping("local.data", "Data", CoreWebView2HostResourceAccessKind.Allow);
+	}
+
+	private static class NativeMethods
+	{
+		[DllImport("user32.dll", EntryPoint = "GetWindowLongPtr")]
+		public static extern nint GetWindowLongPtr(nint hWnd, int nIndex);
+
+		[DllImport("user32.dll", EntryPoint = "SetWindowLongPtr")]
+		public static extern nint SetWindowLongPtr(nint hWnd, int nIndex, nint dwNewLong);
+
+		[DllImport("user32.dll", SetLastError = true)]
+		public static extern bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+	}
+}

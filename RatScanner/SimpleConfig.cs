@@ -104,8 +104,9 @@ internal class SimpleConfig
 	{
 		try
 		{
-			var readStrings = ReadString(key).Split(EnumerableSeparator);
-			if (readStrings.Length == 1 && readStrings[0] == "") return new TEnum[0];
+			var readStrings = ReadString(key)?.Split(EnumerableSeparator);
+			if (readStrings == null) return defaultValue;
+			if (readStrings.Length == 1 && readStrings[0] == "") return defaultValue;
 			return readStrings.Select(Enum.Parse<TEnum>);
 		}
 		catch (Exception)

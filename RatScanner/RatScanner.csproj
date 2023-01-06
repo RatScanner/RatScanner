@@ -54,6 +54,10 @@
 	<ItemGroup>
 		<None Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
+	
+	<ItemGroup>
+	  <Content Remove="wwwroot\interactableOverlay.html" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
