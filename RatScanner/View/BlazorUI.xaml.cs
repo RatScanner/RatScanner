@@ -58,8 +58,8 @@ public partial class BlazorUI : UserControl, ISwitchable
 		BlazorOverlay ??= new BlazorOverlay(serviceProvider);
 		BlazorOverlay.Show();
 
-		BlazorInteractableOverlay ??= new BlazorInteractableOverlay(serviceProvider);
-		BlazorInteractableOverlay.Show();
+		//BlazorInteractableOverlay ??= new BlazorInteractableOverlay(serviceProvider);
+		//BlazorInteractableOverlay.Show();
 
 		InitializeComponent();
 	}
