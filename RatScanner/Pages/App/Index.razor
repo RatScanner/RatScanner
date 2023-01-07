@@ -130,21 +130,46 @@
 
         if (string.IsNullOrEmpty(value)) return new RatStash.Item[0];
 
-        value = value.ToLower();
-        var matches = _items.Where(item =>
+        value = SanitizeSearch(value);
+
+        Func<RatStash.Item, (RatStash.Item? item, int score)> filter = (item) =>
+            {
+                if (SanitizeSearch(item.Name).StartsWith(value)) return (item, 20);
+                if (SanitizeSearch(item.ShortName).StartsWith(value)) return (item, 20);
+
+                // Match every individual word (expensive)
+                string[] filters = value.Split(new[] { ' ' });
+                if (filters.All(filter => SanitizeSearch(item.Name).Contains(filter))) return (item, 40);
+                if (filters.All(filter => SanitizeSearch(item.ShortName).Contains(filter))) return (item, 40);
+
+                if (SanitizeSearch(item.Name).Contains(value)) return (item, 60);
+                if (SanitizeSearch(item.ShortName).Contains(value)) return (item, 60);
+
+                if (value.Length > 3 && SanitizeSearch(item.Id).StartsWith(value)) return (item, 80);
+                if (value.Length > 3 && SanitizeSearch(item.Id).Contains(value)) return (item, 100);
+                return (null, -1);
+            };
+
+        var matches = new List<(RatStash.Item? item, int score)>();
+        foreach (var item in _items)
         {
-            if (item.Name.ToLower().Contains(value)) return true;
-            if (item.ShortName.ToLower().Contains(value)) return true;
-            if (value.Length > 3 && item.Id.ToLower().Contains(value)) return true;
+            var match = filter(item);
+            if (match.item == null) continue;
+            matches.Add(match);
+        }
 
-            // Match every individual word (expensive)
-            string[] filters = value.Split(new[] { ' ' });
-            if (filters.All(filter => item.Name.ToLower().Contains(filter))) return true;
-            if (filters.All(filter => item.ShortName.ToLower().Contains(filter))) return true;
-            return false;
-        });
+        // Penalize weapon mods so the weapon it self will rank higher
+        for (var i = 0; i < matches.Count; i++) if (matches[i].item is RatStash.WeaponMod) matches[i] = (matches[i].item, matches[i].score + 5);
 
-        return matches;
+        var sortedMatches = matches.OrderBy(match => match.score).ThenBy(match => match.item.Name.Length);
+        return sortedMatches.Select(match => match.item);
+    }
+
+    private string SanitizeSearch(string value)
+    {
+        value = value.ToLower();
+        value = new string(value.Where(c => char.IsLetterOrDigit(c) || c == ' ').ToArray());
+        return value;
     }
 
     private async void SetSearchItem(RatStash.Item item)
