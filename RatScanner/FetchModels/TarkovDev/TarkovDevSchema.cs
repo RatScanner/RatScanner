@@ -736,8 +736,10 @@ public class TarkovDevSchema
 	}
 	#endregion
 
+    public class ItemProperties{}
+
 	#region ItemPropertiesAmmo
-	public class ItemPropertiesAmmo
+	public class ItemPropertiesAmmo : ItemProperties
 	{
 		#region members
 		[JsonProperty("caliber")]
@@ -809,7 +811,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesArmor
-	public class ItemPropertiesArmor
+	public class ItemPropertiesArmor : ItemProperties
 	{
 		#region members
 		[JsonProperty("class")]
@@ -840,7 +842,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesArmorAttachment
-	public class ItemPropertiesArmorAttachment
+	public class ItemPropertiesArmorAttachment : ItemProperties
 	{
 		#region members
 		[JsonProperty("class")]
@@ -874,7 +876,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesBackpack
-	public class ItemPropertiesBackpack
+	public class ItemPropertiesBackpack : ItemProperties
 	{
 		#region members
 		[JsonProperty("capacity")]
@@ -891,7 +893,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesBarrel
-	public class ItemPropertiesBarrel
+	public class ItemPropertiesBarrel : ItemProperties
 	{
 		#region members
 		[JsonProperty("ergonomics")]
@@ -924,7 +926,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesChestRig
-	public class ItemPropertiesChestRig
+	public class ItemPropertiesChestRig : ItemProperties
 	{
 		#region members
 		[JsonProperty("class")]
@@ -965,7 +967,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesContainer
-	public class ItemPropertiesContainer
+	public class ItemPropertiesContainer : ItemProperties
 	{
 		#region members
 		[JsonProperty("capacity")]
@@ -978,7 +980,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesFoodDrink
-	public class ItemPropertiesFoodDrink
+	public class ItemPropertiesFoodDrink : ItemProperties
 	{
 		#region members
 		[JsonProperty("energy")]
@@ -997,7 +999,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesGlasses
-	public class ItemPropertiesGlasses
+	public class ItemPropertiesGlasses : ItemProperties
 	{
 		#region members
 		[JsonProperty("class")]
@@ -1019,7 +1021,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesGrenade
-	public class ItemPropertiesGrenade
+	public class ItemPropertiesGrenade : ItemProperties
 	{
 		#region members
 		[JsonProperty("type")]
@@ -1044,7 +1046,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesHelmet
-	public class ItemPropertiesHelmet
+	public class ItemPropertiesHelmet : ItemProperties
 	{
 		#region members
 		[JsonProperty("class")]
@@ -1096,7 +1098,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesKey
-	public class ItemPropertiesKey
+	public class ItemPropertiesKey : ItemProperties
 	{
 		#region members
 		[JsonProperty("uses")]
@@ -1106,7 +1108,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesMagazine
-	public class ItemPropertiesMagazine
+	public class ItemPropertiesMagazine : ItemProperties
 	{
 		#region members
 		[JsonProperty("ergonomics")]
@@ -1141,7 +1143,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesMedicalItem
-	public class ItemPropertiesMedicalItem
+	public class ItemPropertiesMedicalItem : ItemProperties
 	{
 		#region members
 		[JsonProperty("uses")]
@@ -1157,7 +1159,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesMedKit
-	public class ItemPropertiesMedKit
+	public class ItemPropertiesMedKit : ItemProperties
 	{
 		#region members
 		[JsonProperty("hitpoints")]
@@ -1182,7 +1184,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesMelee
-	public class ItemPropertiesMelee
+	public class ItemPropertiesMelee : ItemProperties
 	{
 		#region members
 		[JsonProperty("slashDamage")]
@@ -1198,7 +1200,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesNightVision
-	public class ItemPropertiesNightVision
+	public class ItemPropertiesNightVision : ItemProperties
 	{
 		#region members
 		[JsonProperty("intensity")]
@@ -1217,7 +1219,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesPainkiller
-	public class ItemPropertiesPainkiller
+	public class ItemPropertiesPainkiller : ItemProperties
 	{
 		#region members
 		[JsonProperty("uses")]
@@ -1242,7 +1244,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesPreset
-	public class ItemPropertiesPreset
+	public class ItemPropertiesPreset : ItemProperties
 	{
 		#region members
 		[JsonProperty("baseItem")]
@@ -1264,7 +1266,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesScope
-	public class ItemPropertiesScope
+	public class ItemPropertiesScope : ItemProperties
 	{
 		#region members
 		[JsonProperty("ergonomics")]
@@ -1293,7 +1295,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesStim
-	public class ItemPropertiesStim
+	public class ItemPropertiesStim : ItemProperties
 	{
 		#region members
 		[JsonProperty("useTime")]
@@ -1309,7 +1311,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesSurgicalKit
-	public class ItemPropertiesSurgicalKit
+	public class ItemPropertiesSurgicalKit : ItemProperties
 	{
 		#region members
 		[JsonProperty("uses")]
@@ -1331,7 +1333,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesWeapon
-	public class ItemPropertiesWeapon
+	public class ItemPropertiesWeapon : ItemProperties
 	{
 		#region members
 		[JsonProperty("caliber")]
@@ -1410,7 +1412,7 @@ public class TarkovDevSchema
 	#endregion
 
 	#region ItemPropertiesWeaponMod
-	public class ItemPropertiesWeaponMod
+	public class ItemPropertiesWeaponMod : ItemProperties
 	{
 		#region members
 		[JsonProperty("ergonomics")]
