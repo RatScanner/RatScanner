@@ -85,7 +85,7 @@ public class LevelItemRequirement
 				Count = Count,
 				FoundInRaid = false,
 				ProgressType = ProgressType.HideoutTurnin,
-				ProgressId = stationId,
+				ProgressId = Id,
 				ModuleId = moduleId,
 				StationId = stationId
 			}
