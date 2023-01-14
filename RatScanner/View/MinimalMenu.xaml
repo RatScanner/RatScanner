@@ -95,7 +95,7 @@
 					<StackPanel Grid.Column="1"
 					            Orientation="Horizontal"
 					            HorizontalAlignment="Right">
-						<Label Content="{Binding TrackingNeeds.QuestRemaining, FallbackValue=0}" />
+						<Label Content="{Binding TaskRemaining, FallbackValue=0}" />
 						<Image Source="{StaticResource questIcon}"
 						       VerticalAlignment="Center"
 						       Height="20" />
@@ -103,7 +103,7 @@
 					<StackPanel Grid.Column="2"
 					            Orientation="Horizontal"
 					            HorizontalAlignment="Right">
-						<Label Content="{Binding TrackingNeeds.HideoutRemaining, FallbackValue=0}" />
+						<Label Content="{Binding HideoutRemaining, FallbackValue=0}" />
 						<Image Source="{StaticResource hideoutIcon}"
 						       VerticalAlignment="Center"
 						       Height="20" />
@@ -119,8 +119,8 @@
 						<Setter Property="Visibility"
 						        Value="Visible" />
 						<Style.Triggers>
-							<DataTrigger Binding="{Binding TrackingNeeds.Remaining}"
-							             Value="0">
+							<DataTrigger Binding="{Binding ItemNeeded}"
+							             Value="False">
 								<Setter Property="Visibility"
 								        Value="Collapsed" />
 							</DataTrigger>
@@ -133,7 +133,7 @@
 		<StackPanel x:Name="TeamTrackingDisplay">
 			<StackPanel>
 				<Separator />
-				<ListView ItemsSource="{Binding TrackingTeamNeedsFiltered}"
+				<ListView ItemsSource="{Binding ItemTeamNeeds}"
 				          Background="Transparent"
 				          BorderThickness="0">
 					<ListView.ItemContainerStyle>
@@ -170,7 +170,7 @@
 								<StackPanel Grid.Column="1"
 								            Orientation="Horizontal"
 								            HorizontalAlignment="Right">
-									<Label Content="{Binding Value.QuestRemaining, FallbackValue=0}" />
+									<Label Content="{Binding Value.Key, FallbackValue=0}" />
 									<Image Source="{StaticResource questIcon}"
 									       VerticalAlignment="Center"
 									       Height="20" />
@@ -178,7 +178,7 @@
 								<StackPanel Grid.Column="2"
 								            Orientation="Horizontal"
 								            HorizontalAlignment="Right">
-									<Label Content="{Binding Value.HideoutRemaining, FallbackValue=0}" />
+									<Label Content="{Binding Value.Value, FallbackValue=0}" />
 									<Image Source="{StaticResource hideoutIcon}"
 									       VerticalAlignment="Center"
 									       Height="20" />
@@ -198,8 +198,8 @@
 						<Setter Property="Visibility"
 						        Value="Visible" />
 						<Style.Triggers>
-							<DataTrigger Binding="{Binding TrackingTeamNeedsSummed.Remaining}"
-							             Value="0">
+							<DataTrigger Binding="{Binding ItemTeamNeeded}"
+							             Value="False">
 								<Setter Property="Visibility"
 								        Value="Collapsed" />
 							</DataTrigger>

@@ -70,7 +70,7 @@
 
     private async Task<IEnumerable<RatStash.Item>> SearchItem(string value)
     {
-        if (_items == null) _items = MenuVM.RatStashDB?.GetItems()?.ToList() ?? null;
+        if (_items == null) _items = RatScannerMain.Instance.RatStashDB?.GetItems()?.ToList() ?? null;
         if (_items == null) return new RatStash.Item[0];
 
         if (string.IsNullOrEmpty(value)) return new RatStash.Item[0];

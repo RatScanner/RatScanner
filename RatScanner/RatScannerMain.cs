@@ -50,7 +50,6 @@ public class RatScannerMain : INotifyPropertyChanged
 	internal static object IconScanLock = new();
 
 	internal MarketDB MarketDB = new();
-	internal ProgressDB ProgressDB = new();
 	public TarkovTrackerDB TarkovTrackerDB;
 
 	public Database RatStashDB;
@@ -98,10 +97,6 @@ public class RatScannerMain : INotifyPropertyChanged
 
 			Logger.LogInfo("Loading item data...");
 			RatStashDB = GetRatStashDatabase();
-
-			// Grab quest and hideout requirements from tarkovdata
-			Logger.LogInfo("Loading progress data...");
-			ProgressDB.Init();
 
 			Logger.LogInfo("Loading price data...");
 			MarketDB.Init();

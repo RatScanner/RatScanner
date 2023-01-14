@@ -48,16 +48,16 @@
                                 </div>
                             }
 
-                            @if (MenuVM.GetItemNeeds(iconScan).QuestRemaining > 0)
+                            @if (MenuVM.TaskRemaining > 0)
                             {
                                 <div class="d-flex align-center stroke">
-                                    @MenuVM.GetItemNeeds(iconScan).QuestRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" />
+                                    @MenuVM.TaskRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" />
                                 </div>
                             }
-                            @if (MenuVM.GetItemNeeds(iconScan).HideoutRemaining > 0)
+                            @if (MenuVM.HideoutRemaining > 0)
                             {
                                 <div class="d-flex align-center stroke">
-                                    @MenuVM.GetItemNeeds(iconScan).HideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" />
+                                    @MenuVM.HideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" />
                                 </div>
                             }
                         </div>
@@ -82,11 +82,11 @@
                         </div>
                     }
 
-                    @if (MenuVM.GetItemNeeds(itemScan).QuestRemaining > 0)
+                    @if (MenuVM.TaskRemaining > 0)
                     {
                         <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" />
                     }
-                    @if (MenuVM.GetItemNeeds(itemScan).HideoutRemaining > 0)
+                    @if (MenuVM.HideoutRemaining > 0)
                     {
                         <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" />
                     }

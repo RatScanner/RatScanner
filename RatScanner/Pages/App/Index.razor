@@ -55,17 +55,17 @@
                 <div class="d-flex align-center">
                 @MenuVM.TrackingNeedsHideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
                 </div>*@
-                @if (MenuVM.GetItemTeamNeeds(item) != null && (MenuVM.GetItemTeamNeedsSummed(item).QuestRemaining > 0 || MenuVM.GetItemTeamNeedsSummed(item).HideoutRemaining > 0))
+                @if (MenuVM.ItemTeamNeeds.Any())
                 {
                     <MudGrid Spacing="0" Class="pa-0 ma-0">
-                        @foreach (var teammate in MenuVM.GetItemTeamNeeds(item).Where(t => t.Value.QuestRemaining > 0 || t.Value.HideoutRemaining > 0).ToList())
+                        @foreach (var need in MenuVM.ItemTeamNeeds)
                         {
                             <MudItem xs="12" Class="pa-0 ma-0">
                                 <div class="d-flex justify-space-between">
-                                    <div class="mx-1">@teammate.Key</div>
+                                    <div class="mx-1">@need.Key</div>
                                     <div class="d-flex align-center">
-                                        <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="mr-1" /> @teammate.Value.QuestRemaining
-                                        <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-3 mr-1" /> @teammate.Value.HideoutRemaining
+                                        <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="mr-1" /> @need.Value.Key
+                                        <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-3 mr-1" /> @need.Value.Value
                                     </div>
                                 </div>
                             </MudItem>
@@ -75,10 +75,10 @@
                 else
                 {
                     <div class="d-flex align-center">
-                        @MenuVM.GetItemNeeds(item).QuestRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" /> Quest
+                    @MenuVM.TaskRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" /> Quest
                     </div>
                     <div class="d-flex align-center">
-                        @MenuVM.GetItemNeeds(item).HideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
+                    @MenuVM.HideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
                     </div>
                 }
             </MudPaper>
@@ -125,7 +125,7 @@
 
     private async Task<IEnumerable<RatStash.Item>> SearchItem(string value)
     {
-        if (_items == null) _items = MenuVM.RatStashDB?.GetItems()?.ToList() ?? null;
+        if (_items == null) _items = RatScannerMain.Instance.RatStashDB?.GetItems()?.ToList() ?? null;
         if (_items == null) return new RatStash.Item[0];
 
         if (string.IsNullOrEmpty(value)) return new RatStash.Item[0];

@@ -13,16 +13,16 @@ public class NeededResponseData
 	public List<HideoutStation> HideoutStations { get; set; } = new();
 
 	// Get needed items from tasks and hideout station
-	public List<NeededItem> GetNeededItems()
+	public (List<NeededItem> tasks, List<NeededItem> hideout) GetNeededItems()
 	{
-		var neededItems = new List<NeededItem>();
+		var neededItems = (new List<NeededItem>(), new List<NeededItem>());
 		foreach (var task in Tasks)
 		{
-			neededItems.AddRange(task.GetNeededItems());
+			neededItems.Item1.AddRange(task.GetNeededItems());
 		}
 		foreach (var station in HideoutStations)
 		{
-			neededItems.AddRange(station.GetNeededItems());
+			neededItems.Item2.AddRange(station.GetNeededItems());
 		}
 		return neededItems;
 	}
@@ -32,10 +32,4 @@ public class NeededResponse
 {
 	[JsonProperty("data")]
 	public NeededResponseData Data { get; set; }
-
-	// Get needed items from data
-	public List<NeededItem> GetNeededItems()
-	{
-		return Data.GetNeededItems();
-	}
 }
