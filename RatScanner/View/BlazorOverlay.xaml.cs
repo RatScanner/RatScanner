@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.WebView.Wpf;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Web.WebView2.Core;
 using System.Diagnostics;
 using System.Linq;

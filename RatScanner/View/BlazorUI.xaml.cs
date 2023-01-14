@@ -55,9 +55,6 @@ public partial class BlazorUI : UserControl, ISwitchable
 
 		Resources.Add("services", serviceProvider);
 
-		blazorWebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
-		blazorUIGrid..CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;
-
 		BlazorOverlay ??= new BlazorOverlay(serviceProvider);
 		BlazorOverlay.Show();
 
@@ -74,6 +71,8 @@ public partial class BlazorUI : UserControl, ISwitchable
 		blazorWebView.WebView.DefaultBackgroundColor = System.Drawing.Color.Transparent;
 		blazorWebView.WebView.NavigationCompleted += WebView_Loaded;
 		blazorWebView.WebView.CoreWebView2InitializationCompleted += CoreWebView_Loaded;
+		blazorWebView.WebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
+		blazorWebView.WebView.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;
 	}
 
 	private void WebView_Loaded(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs e)

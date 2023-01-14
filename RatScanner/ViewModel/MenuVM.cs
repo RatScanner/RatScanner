@@ -1,11 +1,8 @@
-﻿using RatScanner.FetchModels.TarkovDev;
-using RatScanner.FetchModels.TarkovTracker;
+﻿using RatScanner.FetchModels.TarkovTracker;
 using RatScanner.Scan;
-using RatStash;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Web;
