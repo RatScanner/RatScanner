@@ -75,10 +75,10 @@
                 else
                 {
                     <div class="d-flex align-center">
-                    @MenuVM.TaskRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" /> Quest
+                        @MenuVM.TaskRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" /> Quest
                     </div>
                     <div class="d-flex align-center">
-                    @MenuVM.HideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
+                        @MenuVM.HideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
                     </div>
                 }
             </MudPaper>
@@ -181,22 +181,17 @@
 
     private async void OpenWiki()
     {
-        if (item.WikiLink != null)
-        {
-            OpenURL(item.WikiLink);
-        }
+        OpenURL(item.WikiLink);
     }
 
     private async void OpenTarkovDev()
     {
-        if (item.TarkovDevLink != null)
-        {
-            OpenURL(item.TarkovDevLink);
-        }
+        OpenURL(item.TarkovDevLink);
     }
 
     private void OpenURL(string url)
     {
+        if (string.IsNullOrEmpty(url)) return;
         var psi = new ProcessStartInfo
             {
                 FileName = url,
