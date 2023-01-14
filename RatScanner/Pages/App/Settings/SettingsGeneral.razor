@@ -23,13 +23,13 @@
                 <MudText Style="margin-bottom: 4px">Screen Resolution</MudText>
                 <MudGrid Spacing="1">
                     <MudItem xs="4">
-                        <MudNumericField @bind-Value="SettingsVM.ScreenWidth" HideSpinButtons="true" Label="Width" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0"></MudNumericField>
+                        <MudNumericField @bind-Value="SettingsVM.ScreenWidth" HideSpinButtons="true" Label="Width" Variant="Variant.Outlined" Margin="Margin.Dense" Min="100" Max="99999"></MudNumericField>
                     </MudItem>
                     <MudItem xs="4">
-                        <MudNumericField @bind-Value="SettingsVM.ScreenHeight" HideSpinButtons="true" Label="Height" Variant="Variant.Outlined" Margin="Margin.Dense" Min="0"></MudNumericField>
+                        <MudNumericField @bind-Value="SettingsVM.ScreenHeight" HideSpinButtons="true" Label="Height" Variant="Variant.Outlined" Margin="Margin.Dense" Min="100" Max="99999"></MudNumericField>
                     </MudItem>
                     <MudItem xs="4">
-                        <MudNumericField @bind-Value="SettingsVM.ScreenScale" Label="Scale" Variant="Variant.Outlined" HideSpinButtons="true" Converter="@percentageConverter" Margin="Margin.Dense" Min="0" Max="8"></MudNumericField>
+                        <MudNumericField @bind-Value="SettingsVM.ScreenScale" Label="Scale" Variant="Variant.Outlined" HideSpinButtons="true" Converter="@percentageConverter" Margin="Margin.Dense" Min="0.1f" Max="8"></MudNumericField>
                     </MudItem>
                 </MudGrid>
             </MudPaper>
