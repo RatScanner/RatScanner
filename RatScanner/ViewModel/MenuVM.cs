@@ -28,7 +28,7 @@ internal class MenuVM : INotifyPropertyChanged
 
 	public ItemQueue ItemScans => DataSource?.ItemScans;
 
-	public ItemScan LastItemScan => ItemScans.Last();
+	public ItemScan LastItemScan => ItemScans.LastOrDefault(new DefaultItemScan(true));
 
 	public RatStash.Item LastItem => LastItemScan.MatchedItem;
 
