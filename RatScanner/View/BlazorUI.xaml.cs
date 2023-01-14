@@ -55,6 +55,9 @@ public partial class BlazorUI : UserControl, ISwitchable
 
 		Resources.Add("services", serviceProvider);
 
+		blazorWebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
+		blazorUIGrid..CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;
+
 		BlazorOverlay ??= new BlazorOverlay(serviceProvider);
 		BlazorOverlay.Show();
 

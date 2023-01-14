@@ -28,6 +28,8 @@ public partial class BlazorInteractableOverlay : Window
 		SetWindowStyle();
 		blazorInteractableOverlayWebView.WebView.NavigationCompleted += WebView_Loaded;
 		blazorInteractableOverlayWebView.WebView.CoreWebView2InitializationCompleted += CoreWebView_Loaded;
+		blazorInteractableOverlayWebView.WebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
+		blazorInteractableOverlayWebView.WebView.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;
 		WindowBlurEffect.EnableBlur(this, WindowBlurEffect.AccentState.ACCENT_ENABLE_BLURBEHIND);
 	}
 
