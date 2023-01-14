@@ -53,6 +53,7 @@ static class WindowBlurEffect
 
 		// to enable blur the image behind the window
 		accent.AccentState = accentState;
+		accent.AccentFlags = 0b10;
 		accent.GradientColor = (_blurOpacity << 24) | (_blurBackgroundColor & 0xFFFFFF); /*(White mask 0xFFFFFF)*/
 
 
