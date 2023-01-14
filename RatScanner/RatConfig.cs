@@ -128,7 +128,7 @@ internal static class RatConfig
 	internal static bool MinimizeToTray = false;
 	internal static bool AlwaysOnTop = true;
 	internal static int MarketDBRefreshTime = 30 * 60 * 1000; // 30 minutes
-	internal static string ItemDataBundleVersion = "20220822";
+	internal static string ItemDataBundleVersion = "20230114";
 	private static int ConfigVersion => 2;
 
 	internal static int ScreenWidth = 1920;
