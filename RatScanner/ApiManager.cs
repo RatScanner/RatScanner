@@ -19,8 +19,6 @@ public static class ApiManager
 		GithubLink,
 		DiscordLink,
 		FAQLink,
-		ItemDataBundleLink,
-		ItemDataBundleVersion,
 		UpdaterLink,
 	}
 
@@ -118,8 +116,6 @@ public static class ApiManager
 			ResourceType.GithubLink => "RSGithubLink",
 			ResourceType.DiscordLink => "RSDiscordLink",
 			ResourceType.FAQLink => "RSFAQLink",
-			ResourceType.ItemDataBundleLink => "RSItemDataBundleLink",
-			ResourceType.ItemDataBundleVersion => "RSItemDataBundleVersion",
 			ResourceType.UpdaterLink => "RSUpdaterLink",
 			_ => throw new NotImplementedException(),
 		};

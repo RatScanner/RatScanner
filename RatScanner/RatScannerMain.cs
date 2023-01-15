@@ -77,9 +77,6 @@ public class RatScannerMain : INotifyPropertyChanged
 		Logger.LogInfo("Setting temporary default item...");
 		ItemScans.Enqueue(new DefaultItemScan(true));
 
-		Logger.LogInfo("Checking for item data updates...");
-		CheckForItemDataUpdates();
-
 		Logger.LogInfo("Initializing tarkov tracker database");
 		TarkovTrackerDB = new TarkovTrackerDB();
 
@@ -177,27 +174,6 @@ public class RatScannerMain : INotifyPropertyChanged
 		startInfo.ArgumentList.Add("--update");
 		Process.Start(startInfo);
 		Environment.Exit(0);
-	}
-
-	private void CheckForItemDataUpdates()
-	{
-		var mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ItemDataBundleVersion);
-		if (!File.Exists(RatConfig.Paths.ItemData) || mostRecentVersion != RatConfig.ItemDataBundleVersion)
-		{
-			Logger.LogInfo("A new item data bundle is available: " + mostRecentVersion);
-
-			// Download and extract new item data
-			var itemDataLink = ApiManager.GetResource(ApiManager.ResourceType.ItemDataBundleLink);
-			ApiManager.DownloadFile(itemDataLink, "itemData.zip");
-			System.IO.Compression.ZipFile.ExtractToDirectory("itemData.zip", RatConfig.Paths.Data, true);
-			File.Delete("itemData.zip");
-
-			// Save the current version number to the config
-			RatConfig.ItemDataBundleVersion = mostRecentVersion;
-			RatConfig.SaveConfig();
-
-			Logger.LogInfo("Successfully updated to the latest item data bundle");
-		}
 	}
 
 	internal void SetupRatEye()
