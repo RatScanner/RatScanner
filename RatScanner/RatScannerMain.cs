@@ -206,7 +206,6 @@ public class RatScannerMain : INotifyPropertyChanged
 				InventoryConfig = new Config.Processing.Inventory()
 				{
 					OptimizeHighlighted = highlighted,
-					MaxGridColor = Color.FromArgb(89, 100, 100),
 				},
 				InspectionConfig = new Config.Processing.Inspection()
 				{
