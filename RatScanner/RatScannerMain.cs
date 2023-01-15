@@ -228,12 +228,20 @@ public class RatScannerMain : INotifyPropertyChanged
 			typeof(LootContainer),
 			typeof(StationaryContainer),
 			typeof(Pockets),
+			typeof(Stash),
 		};
 
-		itemDB = itemDB.Filter(item =>
+		var excludeItems = new[]
 		{
-			return !item.QuestItem && !excludeTypes.Contains(item.GetType());
-		});
+			"5c0a5a5986f77476aa30ae64",	// Developer container
+			"5c0a5f6c86f774753654890e",	// Developer case
+			"56e294cdd2720b603a8b4575", // Developer Pack
+			"590de4a286f77423d9312a32",	// Autokey
+			"5d52cc5ba4b9367408500062",	// AGS-30 30x29mm automatic grenade launcher
+			"5d52d479a4b936793d58c76b",	// AGS-30 30x29 30-round box
+		};
+
+		itemDB = itemDB.Filter(item => !item.QuestItem && !excludeTypes.Contains(item.GetType()) && !excludeItems.Contains(item.Id));
 
 		return itemDB;
 	}
