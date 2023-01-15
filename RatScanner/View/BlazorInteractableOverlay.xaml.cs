@@ -28,8 +28,6 @@ public partial class BlazorInteractableOverlay : Window
 		SetWindowStyle();
 		blazorInteractableOverlayWebView.WebView.NavigationCompleted += WebView_Loaded;
 		blazorInteractableOverlayWebView.WebView.CoreWebView2InitializationCompleted += CoreWebView_Loaded;
-		blazorInteractableOverlayWebView.WebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
-		blazorInteractableOverlayWebView.WebView.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;
 		WindowBlurEffect.EnableBlur(this, WindowBlurEffect.AccentState.ACCENT_ENABLE_BLURBEHIND);
 	}
 
@@ -71,6 +69,9 @@ public partial class BlazorInteractableOverlay : Window
 	private void CoreWebView_Loaded(object sender, CoreWebView2InitializationCompletedEventArgs e)
 	{
 		blazorInteractableOverlayWebView.WebView.CoreWebView2.SetVirtualHostNameToFolderMapping("local.data", "Data", CoreWebView2HostResourceAccessKind.Allow);
+		blazorInteractableOverlayWebView.WebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
+		blazorInteractableOverlayWebView.WebView.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;
+		blazorInteractableOverlayWebView.WebView.CoreWebView2.Navigate("https://0.0.0.0/interactableOverlay");
 	}
 
 	private static class NativeMethods

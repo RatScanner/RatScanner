@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Web.WebView2.Core;
 using MudBlazor.Services;
 using RatScanner.Controls;
 using RatScanner.ViewModel;
@@ -71,18 +72,18 @@ public partial class BlazorUI : UserControl, ISwitchable
 		blazorWebView.WebView.DefaultBackgroundColor = System.Drawing.Color.Transparent;
 		blazorWebView.WebView.NavigationCompleted += WebView_Loaded;
 		blazorWebView.WebView.CoreWebView2InitializationCompleted += CoreWebView_Loaded;
-		blazorWebView.WebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
-		blazorWebView.WebView.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;
 	}
 
-	private void WebView_Loaded(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs e)
+	private void WebView_Loaded(object sender, CoreWebView2NavigationCompletedEventArgs e)
 	{
 		// If we are running in a development/debugger mode, open dev tools to help out
 		if (Debugger.IsAttached) blazorWebView.WebView.CoreWebView2.OpenDevToolsWindow();
 	}
 
-	private void CoreWebView_Loaded(object sender, Microsoft.Web.WebView2.Core.CoreWebView2InitializationCompletedEventArgs e)
+	private void CoreWebView_Loaded(object sender, CoreWebView2InitializationCompletedEventArgs e)
 	{
+		blazorWebView.WebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
+		blazorWebView.WebView.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;
 		blazorWebView.WebView.CoreWebView2.Navigate("https://0.0.0.0/app");
 	}
 
