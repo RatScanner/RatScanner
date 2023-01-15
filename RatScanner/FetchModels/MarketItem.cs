@@ -6,10 +6,10 @@ namespace RatScanner.FetchModels;
 public class MarketItem
 {
 	// Item data
-	public string Id { get; set; }
+	public string Id { get; set; } = "";
 	public string WikiLink { get; set; } = "Unknown";
-	public string ImageLink { get; set; }
-	public string IconLink { get; set; }
+	public string ImageLink { get; set; } = "https://assets.tarkov.dev/unknown-item-grid-image.jpg";
+	public string IconLink { get; set; } = "https://assets.tarkov.dev/unknown-item-grid-image.jpg";
 	public int Timestamp { get; set; }
 
 	// Price data

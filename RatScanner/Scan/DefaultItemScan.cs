@@ -44,7 +44,9 @@ public class DefaultItemScan : ItemScan
 
 		var marketItem = item.GetMarketItem();
 		ImageLink = marketItem.ImageLink;
+		if (string.IsNullOrWhiteSpace(ImageLink)) ImageLink = "https://assets.tarkov.dev/unknown-item-grid-image.jpg";
 		IconLink = marketItem.IconLink;
+		if (string.IsNullOrWhiteSpace(IconLink)) IconLink = "https://assets.tarkov.dev/unknown-item-grid-image.jpg";
 		WikiLink = marketItem.WikiLink;
 		TarkovDevLink = $"https://tarkov.dev/item/{item.Id}";
 
