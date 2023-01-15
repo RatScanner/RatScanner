@@ -48,12 +48,6 @@
         </MudItem>
         <MudItem xs="12">
             <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">
-                @*<div class="d-flex align-center">
-                @MenuVM.TrackingNeedsQuestRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" /> Quest
-                </div>
-                <div class="d-flex align-center">
-                @MenuVM.TrackingNeedsHideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
-                </div>*@
                 @if (MenuVM.ItemTeamNeeds != null && MenuVM.ItemTeamNeeds.Any())
                 {
                     <MudGrid Spacing="0" Class="pa-0 ma-0">
