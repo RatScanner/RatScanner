@@ -71,7 +71,6 @@ public partial class BlazorInteractableOverlay : Window
 		blazorInteractableOverlayWebView.WebView.CoreWebView2.SetVirtualHostNameToFolderMapping("local.data", "Data", CoreWebView2HostResourceAccessKind.Allow);
 		blazorInteractableOverlayWebView.WebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
 		blazorInteractableOverlayWebView.WebView.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;
-		blazorInteractableOverlayWebView.WebView.CoreWebView2.Navigate("https://0.0.0.0/interactableOverlay");
 	}
 
 	private static class NativeMethods

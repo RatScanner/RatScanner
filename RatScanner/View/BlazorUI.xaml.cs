@@ -82,9 +82,9 @@ public partial class BlazorUI : UserControl, ISwitchable
 
 	private void CoreWebView_Loaded(object sender, CoreWebView2InitializationCompletedEventArgs e)
 	{
+		blazorWebView.WebView.CoreWebView2.SetVirtualHostNameToFolderMapping("local.data", "Data", CoreWebView2HostResourceAccessKind.Allow);
 		blazorWebView.WebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
 		blazorWebView.WebView.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;
-		blazorWebView.WebView.CoreWebView2.Navigate("https://0.0.0.0/app");
 	}
 
 	private void UpdateElements() { }

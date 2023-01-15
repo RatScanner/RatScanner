@@ -69,7 +69,6 @@ public partial class BlazorOverlay : Window
 		blazorOverlayWebView.WebView.CoreWebView2.SetVirtualHostNameToFolderMapping("local.data", "Data", CoreWebView2HostResourceAccessKind.Allow);
 		blazorOverlayWebView.WebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
 		blazorOverlayWebView.WebView.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;
-		blazorOverlayWebView.WebView.CoreWebView2.Navigate("https://0.0.0.0/overlay");
 	}
 
 	private static class NativeMethods
