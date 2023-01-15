@@ -54,7 +54,7 @@
                 <div class="d-flex align-center">
                 @MenuVM.TrackingNeedsHideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
                 </div>*@
-                @if (MenuVM.ItemTeamNeeds.Any())
+                @if (MenuVM.ItemTeamNeeds != null && MenuVM.ItemTeamNeeds.Any())
                 {
                     <MudGrid Spacing="0" Class="pa-0 ma-0">
                         @foreach (var need in MenuVM.ItemTeamNeeds)
