@@ -84,7 +84,7 @@
         </MudItem>
         <MudItem xs="12">
             <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">
-                <MudAutocomplete @ref="_searchBox" T="RatStash.Item" AutoFocus="true" OffsetY="true" Placeholder="Item Search" PopoverClass="searchBoxPopover" SelectValueOnTab="true" ValueChanged="SetSearchItem" MaxItems="5" AnchorOrigin="Origin.TopCenter" TransformOrigin="Origin.BottomCenter" CoerceValue="true" AdornmentIcon="@Icons.Material.Filled.Search" SearchFunc="@SearchItem" Margin="Margin.Dense" Dense="true" Variant="Variant.Outlined">
+                <MudAutocomplete @ref="_searchBox" T="RatStash.Item" OffsetY="true" Placeholder="Item Search" PopoverClass="searchBoxPopover" SelectValueOnTab="true" ValueChanged="SetSearchItem" MaxItems="5" AnchorOrigin="Origin.TopCenter" TransformOrigin="Origin.BottomCenter" CoerceValue="true" AdornmentIcon="@Icons.Material.Filled.Search" SearchFunc="@SearchItem" Margin="Margin.Dense" Dense="true" Variant="Variant.Outlined">
                     <ItemTemplate Context="item">
                         <MudPaper Class="ma-n1" Elevation="4">
                             <MudStack Row="true" Style="height: 48px">
