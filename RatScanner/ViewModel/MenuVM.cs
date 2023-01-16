@@ -77,8 +77,8 @@ internal class MenuVM : INotifyPropertyChanged
 		get
 		{
 			if (!RatConfig.Tracking.TarkovTracker.Enable) return null;
-			var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
-			//var teamProgress = progress.Where(x => x.UserId != RatScannerMain.Instance.TarkovTrackerDB.Self);
+			var progress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
+			var teamProgress = progress.Where(x => x.UserId != RatScannerMain.Instance.TarkovTrackerDB.Self);
 
 			var needs = new List<KeyValuePair<string, KeyValuePair<int, int>>>();
 			foreach (var memberProgress in teamProgress)

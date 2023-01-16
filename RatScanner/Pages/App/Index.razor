@@ -48,8 +48,18 @@
         </MudItem>
         <MudItem xs="12">
             <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">
-                @if (MenuVM.ItemTeamNeeds != null && MenuVM.ItemTeamNeeds.Any())
-                {
+                <div class="d-flex align-center">
+                    @MenuVM.TaskRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" /> Quest
+                </div>
+                <div class="d-flex align-center">
+                    @MenuVM.HideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
+                </div>
+            </MudPaper>
+        </MudItem>
+        @if (MenuVM.ItemTeamNeeds != null && MenuVM.ItemTeamNeeds.Any())
+        {
+            <MudItem xs="12">
+                <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">
                     <MudGrid Spacing="0" Class="pa-0 ma-0">
                         @foreach (var need in MenuVM.ItemTeamNeeds)
                         {
@@ -64,18 +74,9 @@
                             </MudItem>
                         }
                     </MudGrid>
-                }
-                else
-                {
-                    <div class="d-flex align-center">
-                        @MenuVM.TaskRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" /> Quest
-                    </div>
-                    <div class="d-flex align-center">
-                        @MenuVM.HideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
-                    </div>
-                }
-            </MudPaper>
-        </MudItem>
+                </MudPaper>
+            </MudItem>
+        }
         <MudItem xs="12">
             <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">
                 <MudAutocomplete @ref="_searchBox" T="RatStash.Item" OffsetY="true" Placeholder="Item Search" PopoverClass="searchBoxPopover" SelectValueOnTab="true" ValueChanged="SetSearchItem" MaxItems="5" AnchorOrigin="Origin.TopCenter" TransformOrigin="Origin.BottomCenter" CoerceValue="true" AdornmentIcon="@Icons.Material.Filled.Search" SearchFunc="@SearchItem" Margin="Margin.Dense" Dense="true" Variant="Variant.Outlined">
