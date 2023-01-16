@@ -1,8 +1,10 @@
 ﻿using RatScanner.ViewModel;
 using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Input;
 using RCMinUi = RatScanner.RatConfig.MinimalUi;
+using RatEye;
+using UserControl = System.Windows.Controls.UserControl;
 
 namespace RatScanner.View;
 
@@ -53,4 +55,17 @@ public partial class MinimalMenu : UserControl, ISwitchable
 	public void OnOpen() { }
 
 	public void OnClose() { }
+
+	private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+	{
+		var win = PageSwitcher.Instance;
+		var center = new Vector2((int)(win.Left + win.Width / 2), (int)(win.Top + win.Height / 2));
+		var screen = Screen.FromPoint(center);
+		var isOnLeftSide = center.X < screen.Bounds.X + screen.Bounds.Width / 2;
+		if (isOnLeftSide) return;
+
+		// Else make it grow to the left
+		var delta = e.PreviousSize.Width - e.NewSize.Width;
+		PageSwitcher.Instance.Left += delta;
+	}
 }
