@@ -22,14 +22,18 @@
                 var height = iconScan.Icon.ItemSize.Y;
 
                 <div style="font-size: smaller; position: absolute; left: @(leftPos)px; top: @(topPos)px; width: @(width)px; height: @(height)px; ">
-                    <div style="position: relative; width: 100%; height: 100%; text-shadow: 0px 0px 5px black; outline-offset: -1px; outline: 1px solid #555555;" class="pa-1">
+                    <div style="position: relative; width: 100%; height: 100%;
+	                            text-shadow: 0px 0px 5px black;
+	                            outline-offset: -1px;
+	                            outline: 1px solid #495154;" class="pa-1">
                         @{
                             var iconStyle = iconScan.Rotated ? "transform: rotate(90deg) translate(0%, -100%);" : "";
                             var mWidth = iconScan.Rotated ? height : width;
                             var mHeight = iconScan.Rotated ? width : height;
                         }
                         <div style="position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; z-index: -1;">
-                            <img src="@GetIconURL(iconScan)" style="width: @(mWidth)px; height: @(mHeight)px; background-color: #121212; transform-origin: top left; @iconStyle">
+                            <img src="@GetIconURL(iconScan)" style="width: @(mWidth)px; height: @(mHeight)px;
+	                                                                background-color: #121212; transform-origin: top left; @iconStyle">
                         </div>
 
                         <div style="overflow: hidden;">
@@ -43,7 +47,8 @@
                             {
                                 <div class="d-flex align-center stroke">
                                     @MenuVM.IntToShortPrice(iconScan.BestTraderPrice)
-                                    <MudAvatar Image="@($"https://tarkov.dev/images/{@iconScan.TraderName.ToLower()}-icon.jpg")" Size="Size.Small" Style="float: right;" Class="ml-1" />
+                                    <MudAvatar Image="@($"https://tarkov.dev/images/{@iconScan.TraderName.ToLower()}-icon.jpg")"
+                                               Size="Size.Small" Style="float: right;" Class="ml-1" />
                                 </div>
                             }
 
@@ -65,7 +70,10 @@
             }
             else
             {
-                <div class="d-flex align-enter" style="position: absolute; left: @(itemScan.GetToolTipPosition().X - VirtualScreenOffset.XOffset)px; top: @(itemScan.GetToolTipPosition().Y - VirtualScreenOffset.YOffset)px; background: #121212; padding: 4px;">
+                <div class="d-flex align-enter" style="position: absolute;
+	                                                   left: @(itemScan.GetToolTipPosition().X - VirtualScreenOffset.XOffset)px;
+	                                                   top: @(itemScan.GetToolTipPosition().Y - VirtualScreenOffset.YOffset)px;
+	                                                   background: #121212; padding: 4px;">
 
                     @if (itemScan.Avg24hPrice >= itemScan.BestTraderPrice)
                     {
