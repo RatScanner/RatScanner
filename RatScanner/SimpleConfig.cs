@@ -47,6 +47,11 @@ internal class SimpleConfig
 
 	internal void WriteEnumerableEnum<T>(string key, IEnumerable<T> value) where T : struct, IConvertible
 	{
+		if (value == null || !value.Any())
+		{
+			WriteString(key, "null");
+			return;
+		}
 		WriteString(key, string.Join(EnumerableSeparator, value));
 	}
 
@@ -105,6 +110,7 @@ internal class SimpleConfig
 		try
 		{
 			var readStrings = ReadString(key)?.Split(EnumerableSeparator);
+			if (readStrings[0] == "null") return Enumerable.Empty<TEnum>();
 			if (readStrings == null) return defaultValue;
 			if (readStrings.Length == 1 && readStrings[0] == "") return defaultValue;
 			return readStrings.Select(Enum.Parse<TEnum>);
