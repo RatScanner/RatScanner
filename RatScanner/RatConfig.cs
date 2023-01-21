@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using RatScanner.Controls;
 using RatStash;
 using System;
 using System.Diagnostics;

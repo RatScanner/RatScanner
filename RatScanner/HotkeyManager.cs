@@ -1,5 +1,4 @@
-﻿using RatScanner.Controls;
-using RatScanner.View;
+﻿using RatScanner.View;
 using System;
 using System.Threading;
 using System.Windows;

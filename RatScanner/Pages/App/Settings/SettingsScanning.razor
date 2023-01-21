@@ -1,7 +1,6 @@
 ﻿@page "/app/settings/scanning"
-@using RatScanner.Controls;
+@using RatScanner.Components;
 @inject SettingsVM SettingsVM
-@inject HotkeySelector HotkeySelector
 @inject IJSRuntime JSRuntime
 @implements IDisposable
 @using System.Linq
@@ -16,15 +15,15 @@
         <MudItem xs="12">
             <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
                 <MudGrid Spacing="0" Class="pa-0 ma-0">
-                        <MudSelect @bind-Value="@SettingsVM.NameScanLanguage" T="int" Label="Name Scan Language" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Text" Margin="Margin.Dense" Dense="true" Class="mx-1">
-                            @foreach (var language in GetLanguages())
-                            {
-                                <MudSelectItem T="int" Value="@language.ordinal">
-                                    @language.name
-                                </MudSelectItem>
-                            }
-                        </MudSelect>
-                        <MudCheckBox @bind-Checked="@SettingsVM.EnableNameScan" Label="Enable Name Scan" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+                    <MudSelect @bind-Value="@SettingsVM.NameScanLanguage" T="int" Label="Name Scan Language" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Text" Margin="Margin.Dense" Dense="true" Class="mx-1">
+                        @foreach (var language in GetLanguages())
+                        {
+                            <MudSelectItem T="int" Value="@language.ordinal">
+                                @language.name
+                            </MudSelectItem>
+                        }
+                    </MudSelect>
+                    <MudCheckBox @bind-Checked="@SettingsVM.EnableNameScan" Label="Enable Name Scan" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
                     <MudCheckBox @bind-Checked="@SettingsVM.EnableAutoNameScan" Label="Automatic Scanning" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
                 </MudGrid>
             </MudPaper>
@@ -40,28 +39,16 @@
         </MudItem>
         <MudItem xs="12">
             <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudGrid Spacing="0" Class="pa-0 ma-0">
-                    <MudItem xs="12" Class="pa-0 ma-0 ">
-                        <div class="d-flex justify-center">
-                            <MudText>
-                                Icon Scan Hotkey
-                            </MudText>
-                        </div>
-                        <div class="d-flex justify-center">
-                            <MudButton Size="Size.Small" Variant="Variant.Filled" Dense="true" DisableElevation="true" Color="@(HotkeySelector.Listening == true ? Color.Info : Color.Primary)" @onclick="HotkeyClickEventHandler">
-                                @if (HotkeySelector.Listening)
-                                {
-                                    <MudProgressCircular Class="ms-n1 mr-1" Size="Size.Small" Indeterminate="true" />
-                                    @HotkeySelector.HotkeyString
-                                }
-                                else
-                                {
-                                    @HotkeySelector.HotkeyString
-                                }
-                            </MudButton>
-                        </div>
+                <MudStack Spacing="0" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Row="true">
+                    <MudItem>
+                        <MudText>
+                            Icon Scan Hotkey
+                        </MudText>
                     </MudItem>
-                </MudGrid>
+                    <MudItem>
+                        <HotkeySelector Hotkey="@SettingsVM.IconScanHotkey"></HotkeySelector>
+                    </MudItem>
+                </MudStack>
             </MudPaper>
         </MudItem>
     </MudGrid>
@@ -80,7 +67,6 @@
     protected override void OnInitialized()
     {
         SettingsVM.PropertyChanged += PropertyChangeHandler;
-        HotkeySelector.PropertyChanged += PropertyChangeHandler;
     }
 
     private async void PropertyChangeHandler(object sender, EventArgs e)
@@ -91,30 +77,10 @@
     public void Dispose()
     {
         SettingsVM.PropertyChanged -= PropertyChangeHandler;
-        HotkeySelector.PropertyChanged -= PropertyChangeHandler;
     }
 
     public async Task LogAsync(string message)
     {
         await JSRuntime.InvokeVoidAsync("console.log", message);
     }
-
-    bool RegisterHotkey = false;
-
-    private void HotkeyClickEventHandler(MouseEventArgs args)
-    {
-        if (!HotkeySelector.Listening)
-        {
-            //KeyboardKeys.Clear();
-            //MouseButtons.Clear();
-            HotkeySelector.StartListening();
-        }
-        else
-        {
-            HotkeySelector.StopListening();
-            SettingsVM.IconScanHotkey = HotkeySelector.Hotkey;
-            //MouseButtons.Add(args.Button.ToString());
-        }
-    }
-
 }

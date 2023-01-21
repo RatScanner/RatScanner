@@ -1,5 +1,4 @@
-﻿using RatScanner.Controls;
-using RatStash;
+﻿using RatStash;
 using System.ComponentModel;
 using System.Linq;
 
