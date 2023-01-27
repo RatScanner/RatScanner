@@ -137,14 +137,6 @@
         return value;
     }
 
-    private async void SetSearchItem(RatStash.Item item)
-    {
-        if (item == null) return;
-        BlazorUI.BlazorInteractableOverlay.HideOverlay();
-        MenuVM.ItemScans.Enqueue(new DefaultItemScan(item));
-        await _searchTextField.Clear();
-    }
-
     [JSInvokable]
     public static void JSHideOverlay()
     {
