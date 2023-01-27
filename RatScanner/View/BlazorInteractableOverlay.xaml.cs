@@ -44,6 +44,7 @@ public partial class BlazorInteractableOverlay : Window
 	{
 		SetPosition();
 		this.Show();
+		blazorInteractableOverlayWebView.WebView.ExecuteScriptAsync("ShowOverlay()");
 	}
 
 	internal void HideOverlay()
