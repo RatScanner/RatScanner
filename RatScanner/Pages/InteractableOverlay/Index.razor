@@ -2,6 +2,8 @@
 @using RatScanner.Scan
 @using RatScanner.View;
 @using RatStash
+@using RatScanner.FetchModels
+@using Color = MudBlazor.Color
 @inject MenuVM MenuVM
 @inject RatScanner.VirtualScreenOffset VirtualScreenOffset
 @inject SettingsVM SettingsVM;
@@ -9,171 +11,219 @@
 @implements IDisposable
 
 <div id="click-away-background" style="position: absolute; width: 100%; height: 100%;"
-     onmousedown="if (event.target == this) DotNet.invokeMethodAsync('RatScanner', 'JSHideOverlay')"></div>
+	 onmousedown="if (event.target == this) DotNet.invokeMethodAsync('RatScanner', 'JSHideOverlay')"></div>
 <div style="width: 100%; height: 100%;">
-    <!--Disable pointer events to make clicks on layout divs passthorugh to the "click-away-background"-->
-    <div style="position: relative; top: 20%; pointer-events: none;">
-        <div class="d-flex align-content-center justify-center">
+	<!--Disable pointer events to make clicks on layout divs passthorugh to the "click-away-background"-->
+	<div style="position: relative; top: 20%; pointer-events: none;">
+		<div class="d-flex align-content-center justify-center">
 
-            <!--Enable pointer events again to make elements clickable-->
-            <div style="width: 40%; pointer-events: auto;">
-                <MudPaper>
-                    <MudTextField @ref="_searchTextField" T="string" Variant="Variant.Outlined"
-                                  Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search"
-                                  DebounceInterval="100" OnDebounceIntervalElapsed="ExecuteSearch" @bind-Value="@_searchText">
-                    </MudTextField>
-                </MudPaper>
+			<!--Enable pointer events again to make elements clickable-->
+			<div style="width: 40vw; pointer-events: auto;">
+				<MudPaper>
+					<MudTextField @ref="_searchTextField" T="string" Variant="Variant.Outlined"
+								  Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search"
+								  DebounceInterval="100" OnDebounceIntervalElapsed="ExecuteSearch" @bind-Value="@_searchText">
+					</MudTextField>
+				</MudPaper>
 
-                <MudStack Spacing="2" Class="py-2">
-                    @foreach (var searchResult in _searchResults)
-                    {
-                        if (searchResult.Data is RatStash.Item item)
-                        {
-                            <MudPaper Class="" Elevation="1" Style="height:10vh;">
-                                <MudStack Row="true">
-                                    <MudImage Class="ma-0 pa-2" Src="@($"https://assets.tarkov.dev/{item.Id}-base-image.png")"
-                                      Style="height:10vh; width:10vh; object-fit: contain;" />
-                                    <MudStack Justify="Justify.SpaceEvenly">
-                                        <MudText Class="ellipsis" Typo="Typo.caption" Style="font-size: 1.5rem;">
-                                            @item.Name
-                                        </MudText>
-                                        <MudText Class="ellipsis" Typo="Typo.caption" Style="font-size: 1.5rem;">
-                                            @item.ShortName
-                                        </MudText>
-                                    </MudStack>
-                                </MudStack>
-                            </MudPaper>
-                        }
-                    }
-                </MudStack>
-            </div>
-        </div>
-    </div>
+				<MudStack Spacing="2" Class="py-2">
+					@foreach (var searchResult in _searchResults)
+					{
+						if (searchResult.Data is RatStash.Item item)
+						{
+							<MudPaper Class="pa-2" Elevation="3" Style="height:8vh;">
+								<MudStack Row="true" Justify="Justify.SpaceBetween" Style="height: 100%;">
+									<!--Left side of the search result item-->
+									<MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" Style="">
+										<MudStack Justify="Justify.Center">
+											<MudPaper Style="height: 6vh; width: 6vh;" Outlined="true">
+												<MudImage Src="@($"https://assets.tarkov.dev/{item.Id}-base-image.png")"
+														  Style="height: 6vh; width: 6vh; object-fit: contain;" />
+											</MudPaper>
+										</MudStack>
+
+										<MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Style="width: 4vw;">
+											<MudChip OnClose="() => { }" CloseIcon="@Icons.Filled.Checklist" Size="Size.Small"
+											 Variant="Variant.Outlined" Color="@(item.GetTaskRemaining() > 0 ? Color.Default : Color.Dark)">
+												@item.GetTaskRemaining().ToShortString()
+											</MudChip>
+											<MudChip OnClose="() => { }" CloseIcon="@Icons.Filled.House" Size="Size.Small"
+											 Variant="Variant.Outlined" Color="@(item.GetHideoutRemaining() > 0 ? Color.Default : Color.Dark)">
+												@item.GetHideoutRemaining().ToShortString()
+											</MudChip>
+										</MudStack>
+
+										<MudDivider Vertical="true" FlexItem="true" />
+
+										<MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Start">
+											<MudText Class="ellipsis" Typo="Typo.h5" Style="max-width: 18vw">
+												@item.Name
+											</MudText>
+											<MudText>
+												@item.ShortName
+											</MudText>
+										</MudStack>
+									</MudStack>
+
+									<!--Right side of the search result item-->
+									<MudStack Row="true" Justify="Justify.FlexEnd">
+										<MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Style="width: 8vw" Spacing="0">
+											<MudText Typo="Typo.h5">
+												@item.GetAvg24hMarketPrice()
+											</MudText>
+											<MudText>
+												@item.GetAvg24hMarketPricePerSlot()
+											</MudText>
+										</MudStack>
+
+										<MudDivider Vertical="true" FlexItem="true" />
+
+										<MudStack>
+											@{
+												var bestTrader = item.GetBestTrader();
+												var traderName = TraderPrice.GetTraderName(bestTrader.traderId);
+											}
+											<MudAvatar Image="@($"https://tarkov.dev/images/{@traderName.ToLower()}-icon.jpg")"
+											   Size="Size.Medium" Style="float: left;" Class="mr-1" Elevation="1"
+											   Square="true" Variant="Variant.Outlined" />
+											<MudText Typo="Typo.subtitle2" Style="float: right;">@bestTrader.price.ToShortString()</MudText>
+										</MudStack>
+									</MudStack>
+								</MudStack>
+							</MudPaper>
+						}
+					}
+				</MudStack>
+			</div>
+		</div>
+	</div>
 </div>
 
 <style>
-    .ellipsis {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
+	.ellipsis {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		min-width: 0;
+	}
 
-    .mud-select-input {
-        font-size: 2.00rem;
-    }
+	.mud-select-input {
+		font-size: 2.00rem;
+	}
 </style>
 
 @code {
-    private List<RatStash.Item>? _items;
+	private List<RatStash.Item>? _items;
 
-    private static MudTextField<string> _searchTextField { get; set; }
+	private static MudTextField<string> _searchTextField { get; set; }
 
-    private string _searchText { get; set; }
+	private string _searchText { get; set; }
 
-    private IEnumerable<SearchResult> _searchResults { get; set; } = new List<SearchResult>();
+	private IEnumerable<SearchResult> _searchResults { get; set; } = new List<SearchResult>();
 
-    private async void ExecuteSearch(string value)
-    {
-        var items = await SearchItem(value);
-        var tmp = items ?? new SearchResult[0];
-        tmp = tmp.Where(result => result != null && result.Data != null);
-        tmp = tmp.OrderBy(result => result.Score).Take(4);
-        _searchResults = tmp;
-    }
+	private async void ExecuteSearch(string value)
+	{
+		var items = await SearchItem(value);
+		var tmp = items ?? new SearchResult[0];
+		tmp = tmp.Where(result => result != null && result.Data != null);
+		tmp = tmp.OrderBy(result => result.Score).Take(4);
+		_searchResults = tmp;
+	}
 
-    private async Task<IEnumerable<SearchResult>> SearchItem(string value)
-    {
-        if (_items == null) _items = RatScannerMain.Instance.RatStashDB?.GetItems()?.ToList() ?? null;
-        if (_items == null) return null;
+	private async Task<IEnumerable<SearchResult>> SearchItem(string value)
+	{
+		if (_items == null) _items = RatScannerMain.Instance.RatStashDB?.GetItems()?.ToList() ?? null;
+		if (_items == null) return null;
 
-        if (string.IsNullOrEmpty(value)) return null;
+		if (string.IsNullOrEmpty(value)) return null;
 
-        value = SanitizeSearch(value);
+		value = SanitizeSearch(value);
 
-        Func<RatStash.Item, SearchResult> filter = (item) =>
-            {
-	            if (SanitizeSearch(item.Name) == value) return new(item, 5);
-	            if (SanitizeSearch(item.ShortName) == value) return new(item, 10);
+		Func<RatStash.Item, SearchResult> filter = (item) =>
+			{
+				if (SanitizeSearch(item.Name) == value) return new(item, 5);
+				if (SanitizeSearch(item.ShortName) == value) return new(item, 10);
 
-                if (SanitizeSearch(item.Name).StartsWith(value)) return new(item, 20);
-                if (SanitizeSearch(item.ShortName).StartsWith(value)) return new(item, 20);
+				if (SanitizeSearch(item.Name).StartsWith(value)) return new(item, 20);
+				if (SanitizeSearch(item.ShortName).StartsWith(value)) return new(item, 20);
 
-                // Match every individual word (expensive)
-                string[] filters = value.Split(new[] { ' ' });
-                if (filters.All(filter => SanitizeSearch(item.Name).Contains(filter))) return new(item, 40);
-                if (filters.All(filter => SanitizeSearch(item.ShortName).Contains(filter))) return new(item, 40);
+				// Match every individual word (expensive)
+				string[] filters = value.Split(new[] { ' ' });
+				if (filters.All(filter => SanitizeSearch(item.Name).Contains(filter))) return new(item, 40);
+				if (filters.All(filter => SanitizeSearch(item.ShortName).Contains(filter))) return new(item, 40);
 
-                if (SanitizeSearch(item.Name).Contains(value)) return new(item, 60);
-                if (SanitizeSearch(item.ShortName).Contains(value)) return new(item, 60);
+				if (SanitizeSearch(item.Name).Contains(value)) return new(item, 60);
+				if (SanitizeSearch(item.ShortName).Contains(value)) return new(item, 60);
 
-                if (value.Length > 3 && SanitizeSearch(item.Id).StartsWith(value)) return new(item, 80);
-                if (value.Length > 3 && SanitizeSearch(item.Id).Contains(value)) return new(item, 100);
-                return new(null, -1);
-            };
+				if (value.Length > 3 && SanitizeSearch(item.Id).StartsWith(value)) return new(item, 80);
+				if (value.Length > 3 && SanitizeSearch(item.Id).Contains(value)) return new(item, 100);
+				return new(null, -1);
+			};
 
-        var matches = new List<SearchResult>();
-        foreach (var item in _items)
-        {
-            var match = filter(item);
-            if (match.Data == null) continue;
-            matches.Add(match);
-        }
+		var matches = new List<SearchResult>();
+		foreach (var item in _items)
+		{
+			var match = filter(item);
+			if (match.Data == null) continue;
+			matches.Add(match);
+		}
 
-        for (var i = 0; i < matches.Count; i++)
-        {
-            // Slightly penalize items with long names
-            matches[i].Score += (matches[i].Data as Item).Name.Length * 0.002;
+		for (var i = 0; i < matches.Count; i++)
+		{
+			// Slightly penalize items with long names
+			matches[i].Score += (matches[i].Data as Item).Name.Length * 0.002;
 
-            // Penalize weapon mods so the weapon it self will rank higher
-            if (matches[i].Data is RatStash.WeaponMod) matches[i].Score += 5;
-        }
+			// Penalize weapon mods so the weapon it self will rank higher
+			if (matches[i].Data is RatStash.WeaponMod) matches[i].Score += 5;
+		}
 
-        return matches;
-    }
+		return matches;
+	}
 
-    private string SanitizeSearch(string value)
-    {
-        value = value.ToLower();
-        value = new string(value.Where(c => char.IsLetterOrDigit(c) || c == ' ').ToArray());
-        return value;
-    }
+	private string SanitizeSearch(string value)
+	{
+		value = value.ToLower();
+		value = new string(value.Where(c => char.IsLetterOrDigit(c) || c == ' ').ToArray());
+		return value;
+	}
 
-    [JSInvokable]
-    public static void JSHideOverlay()
-    {
-        BlazorUI.BlazorInteractableOverlay.HideOverlay();
-    }
+	[JSInvokable]
+	public static void JSHideOverlay()
+	{
+		BlazorUI.BlazorInteractableOverlay.HideOverlay();
+	}
 
-    [JSInvokable]
-    public static void JSShowOverlay()
-    {
-        _searchTextField.FocusAsync();
-        _searchTextField.SelectAsync();
-    }
+	[JSInvokable]
+	public static void JSShowOverlay()
+	{
+		_searchTextField.FocusAsync();
+		_searchTextField.SelectAsync();
+	}
 
-    protected override void OnInitialized()
-    {
-        MenuVM.PropertyChanged += PropertyChangeHandler;
-    }
+	protected override void OnInitialized()
+	{
+		MenuVM.PropertyChanged += PropertyChangeHandler;
+	}
 
-    private async void PropertyChangeHandler(object sender, EventArgs e)
-    {
-        await InvokeAsync(() => StateHasChanged());
-    }
+	private async void PropertyChangeHandler(object sender, EventArgs e)
+	{
+		await InvokeAsync(() => StateHasChanged());
+	}
 
-    public void Dispose()
-    {
-        MenuVM.PropertyChanged -= PropertyChangeHandler;
-    }
+	public void Dispose()
+	{
+		MenuVM.PropertyChanged -= PropertyChangeHandler;
+	}
 
-    public class SearchResult
-    {
-        public SearchResult(object data, float score)
-        {
-            Score = score;
-            Data = data;
-        }
+	public class SearchResult
+	{
+		public SearchResult(object data, float score)
+		{
+			Score = score;
+			Data = data;
+		}
 
-        public object Data;
-        public double Score;
-    }
+		public object Data;
+		public double Score;
+	}
 }

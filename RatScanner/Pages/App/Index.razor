@@ -27,11 +27,11 @@
             <MudPaper Class="align-center justify-center pa-2 mx-2 my-1" Elevation="2">
                 <div class="d-flex justify-space-between align-center mt-2">
                     <MudText Typo="Typo.subtitle2">Recent Avg. Price</MudText>
-                    <MudText Typo="Typo.subtitle2">@MenuVM.IntToLongPrice(item.Avg24hPrice)</MudText>
+                    <MudText Typo="Typo.subtitle2">@item.MatchedItem.GetAvg24hMarketPrice()</MudText>
                 </div>
                 <div class="d-flex justify-space-between align-center my-1">
                     <MudText Typo="Typo.subtitle2">Value per Slot</MudText>
-                    <MudText Typo="Typo.subtitle2">@MenuVM.IntToLongPrice(item.PricePerSlot)</MudText>
+                    <MudText Typo="Typo.subtitle2">@item.MatchedItem.GetAvg24hMarketPricePerSlot()</MudText>
                 </div>
                 <MudDivider DividerType="DividerType.FullWidth" />
                 <div class="d-flex justify-space-between align-center mt-2">
@@ -42,17 +42,17 @@
                 </div>
                 <div class="d-flex justify-space-between align-center my-1">
                     <MudText Typo="Typo.subtitle2">Trader Price</MudText>
-                    <MudText Typo="Typo.subtitle2">@MenuVM.IntToLongPrice(item.BestTraderPrice)</MudText>
+                    <MudText Typo="Typo.subtitle2">@item.MatchedItem.GetBestTrader().price</MudText>
                 </div>
             </MudPaper>
         </MudItem>
         <MudItem xs="12">
             <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">
                 <div class="d-flex align-center">
-                    @MenuVM.TaskRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" /> Quest
+                    @item.MatchedItem.GetTaskRemaining() <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" /> Quest
                 </div>
                 <div class="d-flex align-center">
-                    @MenuVM.HideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
+                    @item.MatchedItem.GetHideoutRemaining() <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
                 </div>
             </MudPaper>
         </MudItem>

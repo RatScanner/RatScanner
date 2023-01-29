@@ -53,8 +53,9 @@ public class DefaultItemScan : ItemScan
 		Avg24hPrice = marketItem.Avg24hPrice;
 		(int w, int h) = item.GetSlotSize();
 		PricePerSlot = Avg24hPrice / (w * h);
-		(var traderId, BestTraderPrice) = item.GetBestTrader();
+		(var traderId, var bestTraderPrice) = item.GetBestTrader();
 		TraderName = TraderPrice.GetTraderName(traderId);
+		BestTraderPrice = bestTraderPrice.Value;
 	}
 
 	public override Vector2 GetToolTipPosition()

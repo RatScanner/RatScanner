@@ -126,6 +126,7 @@ internal class MenuVM : INotifyPropertyChanged
 		OnPropertyChanged();
 	}
 
+	// Still used in minimal menu
 	public string IntToLongPrice(int? value)
 	{
 		if (value == null) return "0 ₽";
@@ -133,24 +134,5 @@ internal class MenuVM : INotifyPropertyChanged
 		var text = $"{value:n0}";
 		var numberGroupSeparator = NumberFormatInfo.CurrentInfo.NumberGroupSeparator;
 		return text.Replace(numberGroupSeparator, RatConfig.ToolTip.DigitGroupingSymbol) + " ₽";
-	}
-
-	public string IntToShortPrice(int? value)
-	{
-		if (value == null) return "₽ 0";
-
-		var priceStr = value.ToString();
-		if (priceStr.Length < 4) return "₽ " + priceStr;
-
-		var suffixes = new string[] { "", "K", "M", "B", "T" };
-
-		var result = priceStr[..3];
-
-		var dotPos = priceStr.Length % 3;
-		//if (dotPos != 0) result = result.Insert(dotPos, ".");
-		if (dotPos != 0) result = result[..dotPos];
-
-		result += " " + suffixes[(int)Math.Floor((priceStr.Length - 1) / 3f)];
-		return "₽ " + result;
 	}
 }
