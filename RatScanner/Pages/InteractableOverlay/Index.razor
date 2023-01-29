@@ -56,7 +56,7 @@
 										<MudDivider Vertical="true" FlexItem="true" />
 
 										<MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Start">
-											<MudText Class="ellipsis" Typo="Typo.h5" Style="max-width: 18vw">
+											<MudText Class="ellipsis" Typo="Typo.h6" Style="max-width: 16vw">
 												@item.Name
 											</MudText>
 											<MudText>
@@ -68,7 +68,7 @@
 									<!--Right side of the search result item-->
 									<MudStack Row="true" Justify="Justify.FlexEnd">
 										<MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Style="width: 8vw" Spacing="0">
-											<MudText Typo="Typo.h5">
+											<MudText Typo="Typo.h6">
 												@item.GetAvg24hMarketPrice()
 											</MudText>
 											<MudText>
@@ -78,14 +78,13 @@
 
 										<MudDivider Vertical="true" FlexItem="true" />
 
-										<MudStack>
+										<MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Center" Style="width: 3vw" Spacing="0">
 											@{
 												var bestTrader = item.GetBestTrader();
 												var traderName = TraderPrice.GetTraderName(bestTrader.traderId);
 											}
 											<MudAvatar Image="@($"https://tarkov.dev/images/{@traderName.ToLower()}-icon.jpg")"
-											   Size="Size.Medium" Style="float: left;" Class="mr-1" Elevation="1"
-											   Square="true" Variant="Variant.Outlined" />
+											   Size="Size.Medium" Style="float: left;" Square="true" Variant="Variant.Outlined" />
 											<MudText Typo="Typo.subtitle2" Style="float: right;">@bestTrader.price.ToShortString()</MudText>
 										</MudStack>
 									</MudStack>
