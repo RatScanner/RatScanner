@@ -40,7 +40,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="RatEye" Version="2.6.3" />
+    <PackageReference Include="RatEye" Version="2.6.4" />
     <PackageReference Include="RatStash" Version="4.1.0" />
     <PackageReference Include="SingleInstanceCore" Version="2.2.2" />
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
