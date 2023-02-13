@@ -26,7 +26,7 @@
 - [Could not find icon cache folder at: ...](#could-not-find-icon-cache-folder-at-)
 - [Could not find dynamic correlation data at: ...](#could-not-find-dynamic-correlation-data-at-)
 - [The type initializer for 'OpenCvSharp.NativeMethods' threw an exception.](#the-type-initializer-for-opencvsharpnativemethods-threw-an-exception)
-- [The system cannot find the file specified.](#the-system-cannot-find-the-file-specified.)
+- [The system cannot find the file specified.](#the-system-cannot-find-the-file-specified)
 
 ### Scanning issues
 - [Icon scanning gets a lot of wrong matches](#icon-scanning-gets-a-lot-of-wrong-matches)
