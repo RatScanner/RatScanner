@@ -26,6 +26,7 @@
 - [Could not find icon cache folder at: ...](#could-not-find-icon-cache-folder-at-)
 - [Could not find dynamic correlation data at: ...](#could-not-find-dynamic-correlation-data-at-)
 - [The type initializer for 'OpenCvSharp.NativeMethods' threw an exception.](#the-type-initializer-for-opencvsharpnativemethods-threw-an-exception)
+- [The system cannot find the file specified.](#the-system-cannot-find-the-file-specified.)
 
 ### Scanning issues
 - [Icon scanning gets a lot of wrong matches](#icon-scanning-gets-a-lot-of-wrong-matches)
@@ -61,7 +62,7 @@ In that case, create a exception for it or disable your antivirus.
 
 If you still can't run the application, you are probably missing the WebView2 Runtime (which should usually come with Edge). 
 
-[Download WebView2 Runtime](https://go.microsoft.com/fwlink/p/?LinkId=2124703)
+[Download WebView2 Runtime][webview2-download]
 
 ## Nothing happens when scanning
 - Check that you set your resolution correctly inside the settings
@@ -91,6 +92,15 @@ There are two ways to install the Media Feature Pack:
 
 After the installation has finished, restart your computer to make sure the changes are applied.
 
+## The system cannot find the file specified.
+Uninstall WebView2 through windows `Add or remove programs` interface.
+
+If you can't uninstall it, search in windows for regedit and delete these two entries (or make sure they dont exist):
+- `HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}`
+- `HKEY_CURRENT_USER\Software\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}`
+
+After you've uninstalled it (or removed the entries), restart your pc and install WebView2 from [here][webview2-download].
+
 <br/>
 
 ---
@@ -104,6 +114,7 @@ Icon scanning still has some known issues, some which are not possible to fix.
 This currently leads to items like keys and small attachments matching wrong due to their simularity to other items.
 Also, when in the stash, the light bright in the top center of the screen interferes with the top left section of the stash which results in extremly bad results.
 
+[webview2-download]: https://go.microsoft.com/fwlink/p/?LinkId=2124703
 [net-download]: https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-6.0.100-windows-x64-installer
 [download-section]: https://github.com/Blightbuster/RatScanner#download
 [windows-media-pack]: https://www.microsoft.com/en-us/software-download/mediafeaturepack
