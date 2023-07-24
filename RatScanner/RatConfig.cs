@@ -77,6 +77,12 @@ internal static class RatConfig
 		internal static int Duration = 1500;
 	}
 
+	// Value Per Slot options
+	internal static class ValuePerSlot
+	{
+		internal static int Value = 1000;
+	}
+
 	// Minimal UI
 	internal static class MinimalUi
 	{

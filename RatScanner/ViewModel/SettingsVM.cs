@@ -19,6 +19,8 @@ internal class SettingsVM : INotifyPropertyChanged
 	public string ToolTipDuration { get; set; }
 	public int ToolTipMilli { get; set; }
 
+	public int ValuePerSlot { get; set; }
+
 	public bool ShowName { get; set; }
 	public bool ShowAvgDayPrice { get; set; }
 	public bool ShowPricePerSlot { get; set; }
@@ -62,6 +64,8 @@ internal class SettingsVM : INotifyPropertyChanged
 		ToolTipDuration = RatConfig.ToolTip.Duration.ToString();
 		ToolTipMilli = RatConfig.ToolTip.Duration;
 
+		ValuePerSlot = RatConfig.ValuePerSlot.Value;
+
 		ShowName = RatConfig.MinimalUi.ShowName;
 		ShowAvgDayPrice = RatConfig.MinimalUi.ShowAvgDayPrice;
 		ShowPricePerSlot = RatConfig.MinimalUi.ShowPricePerSlot;
@@ -104,6 +108,8 @@ internal class SettingsVM : INotifyPropertyChanged
 
 		RatConfig.ToolTip.Duration = int.TryParse(ToolTipDuration, out var i) ? i : 0;
 		RatConfig.ToolTip.Duration = ToolTipMilli;
+
+		RatConfig.ValuePerSlot.Value = ValuePerSlot;
 
 		RatConfig.MinimalUi.ShowName = ShowName;
 		RatConfig.MinimalUi.ShowAvgDayPrice = ShowAvgDayPrice;
