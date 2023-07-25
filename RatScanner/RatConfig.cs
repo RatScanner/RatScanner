@@ -256,6 +256,12 @@ internal static class RatConfig
 		config.WriteInt(nameof(ToolTip.Duration), ToolTip.Duration);
 		config.WriteString(nameof(ToolTip.DigitGroupingSymbol), ToolTip.DigitGroupingSymbol);
 
+		config.Section = nameof(ValuePerSlot);
+		config.WriteInt(nameof(ValuePerSlot), ValuePerSlot.Value);
+
+		config.Section = nameof(PercentProfitRespectTrader);
+		config.WriteInt(nameof(PercentProfitRespectTrader), PercentProfitRespectTrader.Value);
+
 		config.Section = nameof(MinimalUi);
 		config.WriteBool(nameof(MinimalUi.ShowName), MinimalUi.ShowName);
 		config.WriteBool(nameof(MinimalUi.ShowAvgDayPrice), MinimalUi.ShowAvgDayPrice);
