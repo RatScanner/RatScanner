@@ -18,6 +18,9 @@
 				<MudSlider @bind-Value="SettingsVM.ValuePerSlot" Min="0" Max="50000" Step="100" Color="Color.Info">
 					<MudText Typo="Typo.subtitle2">Value Per Slot: @SettingsVM.ValuePerSlot.ToString()</MudText>
 				</MudSlider>
+				<MudSlider @bind-Value="SettingsVM.PercentProfitRespectTrader" Min="0" Max="1000" Step="1" Color="Color.Info">
+					<MudText Typo="Typo.subtitle2">Profit respect Trader: @SettingsVM.PercentProfitRespectTrader.ToString()%</MudText>
+				</MudSlider>
             </MudPaper>
         </MudItem>
         <MudItem xs="12">

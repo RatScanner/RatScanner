@@ -2,6 +2,7 @@
 using RatStash;
 using System.ComponentModel;
 using System.Linq;
+using static RatScanner.RatConfig;
 
 namespace RatScanner.ViewModel;
 
@@ -20,6 +21,8 @@ internal class SettingsVM : INotifyPropertyChanged
 	public int ToolTipMilli { get; set; }
 
 	public int ValuePerSlot { get; set; }
+
+	public int PercentProfitRespectTrader { get; set; }
 
 	public bool ShowName { get; set; }
 	public bool ShowAvgDayPrice { get; set; }
@@ -66,6 +69,8 @@ internal class SettingsVM : INotifyPropertyChanged
 
 		ValuePerSlot = RatConfig.ValuePerSlot.Value;
 
+		PercentProfitRespectTrader = RatConfig.PercentProfitRespectTrader.Value;
+
 		ShowName = RatConfig.MinimalUi.ShowName;
 		ShowAvgDayPrice = RatConfig.MinimalUi.ShowAvgDayPrice;
 		ShowPricePerSlot = RatConfig.MinimalUi.ShowPricePerSlot;
@@ -110,6 +115,8 @@ internal class SettingsVM : INotifyPropertyChanged
 		RatConfig.ToolTip.Duration = ToolTipMilli;
 
 		RatConfig.ValuePerSlot.Value = ValuePerSlot;
+
+		RatConfig.PercentProfitRespectTrader.Value = PercentProfitRespectTrader;
 
 		RatConfig.MinimalUi.ShowName = ShowName;
 		RatConfig.MinimalUi.ShowAvgDayPrice = ShowAvgDayPrice;

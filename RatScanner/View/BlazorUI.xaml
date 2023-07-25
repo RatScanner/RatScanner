@@ -6,7 +6,7 @@
              xmlns:blazor="clr-namespace:Microsoft.AspNetCore.Components.WebView.Wpf;assembly=Microsoft.AspNetCore.Components.WebView.Wpf"
              xmlns:local="clr-namespace:RatScanner"
              mc:Ignorable="d"
-             d:DesignHeight="600" d:DesignWidth="800">
+             d:DesignHeight="800" d:DesignWidth="800">
 	<Grid x:Name="blazorUIGrid">
 		<blazor:BlazorWebView HostPage="wwwroot/index.html" Services="{StaticResource services}" Panel.ZIndex="99"
 		                      x:Name="blazorWebView" Loaded="BlazorUI_Loaded">

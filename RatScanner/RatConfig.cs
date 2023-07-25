@@ -83,6 +83,12 @@ internal static class RatConfig
 		internal static int Value = 1000;
 	}
 
+	// Percent Profit Respect Trader options
+	internal static class PercentProfitRespectTrader
+	{
+		internal static int Value = 60;
+	}
+
 	// Minimal UI
 	internal static class MinimalUi
 	{
