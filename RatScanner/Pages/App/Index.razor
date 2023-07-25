@@ -90,8 +90,11 @@
 					}
 				}
 				<div class="d-flex justify-space-between align-center my-1">
-					<MudText Typo="Typo.subtitle2">Percentage from Trader</MudText>
-					<MudText Typo="Typo.subtitle2">+@(SellToDiff().ToString("0")) % | @((SellToDiff() / 100).ToString("0.0"))</MudText>
+					<MudText Typo="Typo.subtitle2">% from Trader</MudText>
+					<div class="d-flex align-center" style="gap: .5rem;">
+						<MudText Typo="Typo.subtitle2">x@(((SellToDiff() / 100) + 1).ToString("0.0"))</MudText>
+						<MudText Typo="Typo.subtitle2">+@(SellToDiff().ToString("0")) %</MudText>
+					</div>
 				</div>
             </MudPaper>
         </MudItem>
