@@ -87,15 +87,15 @@
 								<MudText style="@($"color:{ValuePerSlotReached24Avg()}")" Typo="Typo.subtitle2">@(MenuVM.IntToLongPrice(item.PricePerSlot))</MudText>
 							</div>
 						</div>
+						<div class="d-flex justify-space-between align-center my-1">
+							<MudText Typo="Typo.subtitle2">% from Trader</MudText>
+							<div class="d-flex align-center" style="gap: .5rem;">
+								<MudText style="@($"color:{PercentageReachedTrader()}")" Typo="Typo.subtitle2">x@(((SellToDiff() / 100) + 1).ToString("0.0"))</MudText>
+									<MudText style="@($"color:{PercentageReachedTrader()}")" Typo="Typo.subtitle2">+@(SellToDiff().ToString("0")) %</MudText>
+							</div>
+						</div>
 					}
 				}
-				<div class="d-flex justify-space-between align-center my-1">
-					<MudText Typo="Typo.subtitle2">% from Trader</MudText>
-					<div class="d-flex align-center" style="gap: .5rem;">
-						<MudText Typo="Typo.subtitle2">x@(((SellToDiff() / 100) + 1).ToString("0.0"))</MudText>
-						<MudText Typo="Typo.subtitle2">+@(SellToDiff().ToString("0")) %</MudText>
-					</div>
-				</div>
             </MudPaper>
         </MudItem>
         <MudItem xs="12">
@@ -265,6 +265,11 @@
 	{
 		int PricePerSlotTrader = item.BestTraderPrice / (item.MatchedItem.Width * item.MatchedItem.Height);
 		return PricePerSlotTrader == 0 ? "#fff" : PricePerSlotTrader >= RatConfig.ValuePerSlot.Value ? "#008000" : "#FF0000";
+	}
+
+	public string PercentageReachedTrader()
+	{
+		return SellToDiff() == 0 ? "#fff" : SellToDiff() >= RatConfig.PercentProfitRespectTrader.Value ? "#008000" : "#FF0000";
 	}
 
 	public float SellToDiff()
