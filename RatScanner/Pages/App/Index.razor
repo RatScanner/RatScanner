@@ -274,14 +274,15 @@
 
 	public float SellToDiff()
 	{
+		//item.MatchedItem.GetMarketItem().Price
 		if (item.Avg24hPrice == 0) return 0;
-		float pricePerSlotFlea = item.PricePerSlot;
+		float pricePerSlotFlea = item.Avg24hPrice / (item.MatchedItem.Width * item.MatchedItem.Height);
 		float pricePerSlotTrader = item.BestTraderPrice / (item.MatchedItem.Width * item.MatchedItem.Height);
 		return (pricePerSlotFlea - pricePerSlotTrader) / pricePerSlotTrader * 100;
 	}
 
 	public string SellTo()
 	{
-		return SellToDiff() >= 60 ? "Flea" : "Trader";
+		return SellToDiff() >= RatConfig.PercentProfitRespectTrader.Value ? "Flea" : "Trader";
 	}
 }
