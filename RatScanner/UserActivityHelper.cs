@@ -1,9 +1,9 @@
-﻿using System;
+﻿using RatEye;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
-using RatEye;
 
 namespace RatScanner;
 
@@ -56,7 +56,7 @@ internal static class UserActivityHelper
 	internal delegate void KeyUpEventHandler(object sender, KeyUpEventArgs e);
 
 	/// <summary>
-	/// Occurs when the user releases a keyboard key
+	/// Occurs when the user releases any keyboard key
 	/// </summary>
 	internal static event KeyUpEventHandler OnKeyboardKeyUp;
 

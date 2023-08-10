@@ -1,0 +1,147 @@
+﻿@page "/interactableOverlay"
+@using RatScanner.Scan
+@using RatScanner.View;
+@inject MenuVM MenuVM
+@inject RatScanner.VirtualScreenOffset VirtualScreenOffset
+@inject SettingsVM SettingsVM;
+@inject IJSRuntime JSRuntime;
+@implements IDisposable
+
+<div style="position: absolute; width: 100%; height: 100%;"
+     onmousedown="if (event.target == this) DotNet.invokeMethodAsync('RatScanner', 'JSHideOverlay')"></div>
+<div style="width: 100%; height: 100%;">
+    <div style="position: relative; top: 20%;">
+        <div class="d-flex align-content-center justify-center">
+            <MudPaper Class="" Style="width: 40%">
+                <MudAutocomplete @ref="_searchBox" PopoverClass="searchBoxPopover"
+                                 T="RatStash.Item" ValueChanged="SetSearchItem" SearchFunc="@SearchItem"
+                                 SelectValueOnTab="true" MaxItems="6" CoerceValue="true"
+                                 AdornmentIcon="@Icons.Material.Filled.Search"
+                                 Margin="Margin.None" Dense="false" Variant="Variant.Outlined"
+                                 TransformOrigin="Origin.TopCenter" AnchorOrigin="Origin.BottomCenter"
+                                 DisableUnderLine="true" AutoFocus="true" MaxHeight="0x0FFFFFFF"
+                                 Class="overflow-hidden ma-0 pa-0"
+                                 Style="font-size: var(--mud-typography-caption-size);">
+                    <ItemTemplate Context="item">
+                        <MudPaper Class="ma-n1" Elevation="4" Style="height: 8vmin;">
+                            <MudStack Row="true" Style="height: 100%" AlignItems="AlignItems.Stretch">
+                                <MudImage Class="ma-1 pa-0" Src="@($"https://assets.tarkov.dev/{item.Id}-base-image.png")"
+                                          Style="height: auto; aspect-ratio: 1; object-fit: scale-down" />
+                                <MudStack Style="width: 100%" Justify="Justify.SpaceEvenly">
+                                    <MudText Class="ellipsis" Typo="Typo.caption" Style="font-size: 1.5rem;">
+                                        @(item == null ? null : $"{item.Name}")
+                                    </MudText>
+                                    <MudText Class="ellipsis" Typo="Typo.caption" Style="font-size: 1.5rem;">
+                                        @(item == null ? null : $"{item.ShortName}")
+                                    </MudText>
+                                    <!--<MudText>@item.GetAvg24hMarketPrice()</MudText>-->
+                                </MudStack>
+                            </MudStack>
+                        </MudPaper>
+                    </ItemTemplate>
+                </MudAutocomplete>
+            </MudPaper>
+        </div>
+    </div>
+</div>
+
+<style>
+    .ellipsis {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .searchBoxPopover {
+        margin-top: 1vh;
+        background-color: var(--mud-palette-dark);
+    }
+
+    .mud-select-input {
+        font-size: 2.00rem;
+    }
+</style>
+
+@code {
+    private List<RatStash.Item>? _items;
+
+    private MudAutocomplete<RatStash.Item> _searchBox { get; set; }
+
+    private async Task<IEnumerable<RatStash.Item>> SearchItem(string value)
+    {
+        if (_items == null) _items = RatScannerMain.Instance.RatStashDB?.GetItems()?.ToList() ?? null;
+        if (_items == null) return new RatStash.Item[0];
+
+        if (string.IsNullOrEmpty(value)) return new RatStash.Item[0];
+
+        value = SanitizeSearch(value);
+
+        Func<RatStash.Item, (RatStash.Item? item, int score)> filter = (item) =>
+            {
+                if (SanitizeSearch(item.Name).StartsWith(value)) return (item, 20);
+                if (SanitizeSearch(item.ShortName).StartsWith(value)) return (item, 20);
+
+                // Match every individual word (expensive)
+                string[] filters = value.Split(new[] { ' ' });
+                if (filters.All(filter => SanitizeSearch(item.Name).Contains(filter))) return (item, 40);
+                if (filters.All(filter => SanitizeSearch(item.ShortName).Contains(filter))) return (item, 40);
+
+                if (SanitizeSearch(item.Name).Contains(value)) return (item, 60);
+                if (SanitizeSearch(item.ShortName).Contains(value)) return (item, 60);
+
+                if (value.Length > 3 && SanitizeSearch(item.Id).StartsWith(value)) return (item, 80);
+                if (value.Length > 3 && SanitizeSearch(item.Id).Contains(value)) return (item, 100);
+                return (null, -1);
+            };
+
+        var matches = new List<(RatStash.Item? item, int score)>();
+        foreach (var item in _items)
+        {
+            var match = filter(item);
+            if (match.item == null) continue;
+            matches.Add(match);
+        }
+
+        // Penalize weapon mods so the weapon it self will rank higher
+        for (var i = 0; i < matches.Count; i++) if (matches[i].item is RatStash.WeaponMod) matches[i] = (matches[i].item, matches[i].score + 5);
+
+        var sortedMatches = matches.OrderBy(match => match.score).ThenBy(match => match.item.Name.Length);
+        return sortedMatches.Select(match => match.item);
+    }
+
+    private string SanitizeSearch(string value)
+    {
+        value = value.ToLower();
+        value = new string(value.Where(c => char.IsLetterOrDigit(c) || c == ' ').ToArray());
+        return value;
+    }
+
+    private async void SetSearchItem(RatStash.Item item)
+    {
+        if (item == null) return;
+        BlazorUI.BlazorInteractableOverlay.HideOverlay();
+        MenuVM.ItemScans.Enqueue(new DefaultItemScan(item));
+        await _searchBox.Clear();
+    }
+
+    [JSInvokable]
+    public static Task<int> JSHideOverlay()
+    {
+        BlazorUI.BlazorInteractableOverlay.HideOverlay();
+        return Task.FromResult(0);
+    }
+
+    protected override void OnInitialized()
+    {
+        MenuVM.PropertyChanged += PropertyChangeHandler;
+    }
+
+    private async void PropertyChangeHandler(object sender, EventArgs e)
+    {
+        await InvokeAsync(() => StateHasChanged());
+    }
+
+    public void Dispose()
+    {
+        MenuVM.PropertyChanged -= PropertyChangeHandler;
+    }
+}

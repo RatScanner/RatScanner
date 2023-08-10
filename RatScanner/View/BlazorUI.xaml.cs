@@ -1,16 +1,15 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Web.WebView2.Core;
 using MudBlazor.Services;
-using RatRazor.Interfaces;
 using RatScanner.Controls;
 using RatScanner.ViewModel;
-using RatTracking;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
-using RatLib;
 using RatTracking.TarkovTools;
 
 namespace RatScanner.View;
@@ -22,27 +21,35 @@ public partial class BlazorUI : UserControl, ISwitchable
 {
 	public HotkeySelector IconScanHotkeySelector { get; set; }
 	public static BlazorOverlay BlazorOverlay { get; set; }
+	public static BlazorInteractableOverlay BlazorInteractableOverlay { get; set; }
 
 	public BlazorUI()
 	{
 		var serviceCollection = new ServiceCollection();
-		serviceCollection.AddBlazorWebView();
+		serviceCollection.AddWpfBlazorWebView();
 		serviceCollection.AddMudServices();
 		RatConfig.LoadConfig();
 
-		serviceCollection.AddSingleton<IRatScannerUI>(s => new MainWindowVM(RatScannerMain.Instance));
+		serviceCollection.AddSingleton<MenuVM>(s => new MenuVM(RatScannerMain.Instance));
 
 		var settingsVM = new SettingsVM();
-		serviceCollection.AddSingleton<ISettingsUI>(s => settingsVM);
+		serviceCollection.AddSingleton<SettingsVM>(s => settingsVM);
 
 		IconScanHotkeySelector = new HotkeySelector();
 		IconScanHotkeySelector.Hotkey = (Hotkey)settingsVM.IconScanHotkey;
 		IconScanHotkeySelector.Width = 0;
 		IconScanHotkeySelector.Height = 0;
-		serviceCollection.AddSingleton<IHotkeySelector>(s => IconScanHotkeySelector);
+		serviceCollection.AddSingleton<HotkeySelector>(s => IconScanHotkeySelector);
 
-		serviceCollection.AddSingleton<VirtualScreenOffset>(s =>
-			new VirtualScreenOffset((int)SystemParameters.VirtualScreenLeft, (int)SystemParameters.VirtualScreenTop));
+		var bounds = System.Windows.Forms.Screen.AllScreens.Select(screen => screen.Bounds);
+		var left = 0;
+		var top = 0;
+		foreach (var bound in bounds)
+		{
+			if (bound.Left < left) left = bound.Left;
+			if (bound.Top < top) top = bound.Top;
+		}
+		serviceCollection.AddSingleton<VirtualScreenOffset>(s => new VirtualScreenOffset(left, top));
 
 		serviceCollection.AddSingleton<TarkovTrackerDB>(s => RatScannerMain.Instance.TarkovTrackerDB);
 
@@ -54,6 +61,9 @@ public partial class BlazorUI : UserControl, ISwitchable
 
 		BlazorOverlay ??= new BlazorOverlay(serviceProvider);
 		BlazorOverlay.Show();
+
+		//BlazorInteractableOverlay ??= new BlazorInteractableOverlay(serviceProvider);
+		//BlazorInteractableOverlay.Show();
 
 		InitializeComponent();
 	}
@@ -67,15 +77,17 @@ public partial class BlazorUI : UserControl, ISwitchable
 		blazorWebView.WebView.CoreWebView2InitializationCompleted += CoreWebView_Loaded;
 	}
 
-	private void WebView_Loaded(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationCompletedEventArgs e)
+	private void WebView_Loaded(object sender, CoreWebView2NavigationCompletedEventArgs e)
 	{
 		// If we are running in a development/debugger mode, open dev tools to help out
 		if (Debugger.IsAttached) blazorWebView.WebView.CoreWebView2.OpenDevToolsWindow();
 	}
 
-	private void CoreWebView_Loaded(object sender, Microsoft.Web.WebView2.Core.CoreWebView2InitializationCompletedEventArgs e)
+	private void CoreWebView_Loaded(object sender, CoreWebView2InitializationCompletedEventArgs e)
 	{
-		blazorWebView.WebView.CoreWebView2.Navigate("https://0.0.0.0/app");
+		blazorWebView.WebView.CoreWebView2.SetVirtualHostNameToFolderMapping("local.data", "Data", CoreWebView2HostResourceAccessKind.Allow);
+		blazorWebView.WebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
+		blazorWebView.WebView.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;
 	}
 
 	private void UpdateElements() { }

@@ -32,7 +32,7 @@ internal class SimpleConfig
 
 	internal void WriteInt(string key, int value)
 	{
-		WriteString(key, value.ToString());
+		WriteString(key, value.ToString(CultureInfo.InvariantCulture));
 	}
 
 	internal void WriteFloat(string key, float value)
@@ -42,11 +42,16 @@ internal class SimpleConfig
 
 	internal void WriteBool(string key, bool value)
 	{
-		WriteString(key, value.ToString());
+		WriteString(key, value.ToString(CultureInfo.InvariantCulture));
 	}
 
 	internal void WriteEnumerableEnum<T>(string key, IEnumerable<T> value) where T : struct, IConvertible
 	{
+		if (value == null || !value.Any())
+		{
+			WriteString(key, "null");
+			return;
+		}
 		WriteString(key, string.Join(EnumerableSeparator, value));
 	}
 
@@ -68,7 +73,7 @@ internal class SimpleConfig
 	{
 		try
 		{
-			return int.Parse(ReadString(key));
+			return int.Parse(ReadString(key), CultureInfo.InvariantCulture);
 		}
 		catch (Exception)
 		{
@@ -80,7 +85,7 @@ internal class SimpleConfig
 	{
 		try
 		{
-			return float.Parse(ReadString(key));
+			return float.Parse(ReadString(key), CultureInfo.InvariantCulture);
 		}
 		catch (Exception)
 		{
@@ -104,8 +109,10 @@ internal class SimpleConfig
 	{
 		try
 		{
-			var readStrings = ReadString(key).Split(EnumerableSeparator);
-			if (readStrings.Length == 1 && readStrings[0] == "") return new TEnum[0];
+			var readStrings = ReadString(key)?.Split(EnumerableSeparator);
+			if (readStrings[0] == "null") return Enumerable.Empty<TEnum>();
+			if (readStrings == null) return defaultValue;
+			if (readStrings.Length == 1 && readStrings[0] == "") return defaultValue;
 			return readStrings.Select(Enum.Parse<TEnum>);
 		}
 		catch (Exception)

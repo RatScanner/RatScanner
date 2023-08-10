@@ -17,6 +17,8 @@ internal static class Logger
 
 	private static readonly Queue<string> Backlog = new();
 
+	private static bool Crashed = false;
+
 	internal static void LogInfo(string message)
 	{
 		AppendToLog("[Info]  " + message);
@@ -28,8 +30,17 @@ internal static class Logger
 		if (e != null) AppendToLog(e.ToString());
 	}
 
+	internal static void LogError(Exception e)
+	{
+		var message = e.GetBaseException().GetBaseException();
+		LogError(message.Message, e);
+	}
+
 	internal static void LogError(string message, Exception e = null)
 	{
+		if (Crashed) return;
+		Crashed = true;
+
 		// Log the error
 		var logMessage = "[Error] " + message;
 		var divider = new string('-', 20);

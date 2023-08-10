@@ -1,18 +1,27 @@
-﻿using RatScanner.Controls;
+﻿using Newtonsoft.Json.Linq;
+using RatScanner.Controls;
+using RatStash;
 using System;
 using System.Diagnostics;
-using System.Globalization;
+using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 using System.Windows.Input;
-using RatStash;
 using Key = System.Windows.Input.Key;
 
 namespace RatScanner;
 
 internal static class RatConfig
 {
+	[DllImport("user32.dll")]
+	private static extern IntPtr MonitorFromPoint([In] Point pt, [In] uint dwFlags);
+
+	[DllImport("Shcore.dll")]
+	private static extern IntPtr GetDpiForMonitor([In] IntPtr hmonitor, [In] DpiType dpiType, [Out] out uint dpiX, [Out] out uint dpiY);
+
 	// Version
 	public static string Version => Process.GetCurrentProcess().MainModule.FileVersionInfo.ProductVersion;
 
@@ -42,10 +51,11 @@ internal static class RatConfig
 	internal static class NameScan
 	{
 		internal static bool Enable = true;
+		internal static bool EnableAuto = false;
 		internal static Language Language = Language.English;
 		internal static float ConfWarnThreshold = 0.85f;
-		internal static int MarkerScanSize => (int)(50 * ScreenScale);
-		internal static int TextWidth => (int)(600 * ScreenScale);
+		internal static int MarkerScanSize => (int)(50 * GameScale);
+		internal static int TextWidth => (int)(600 * GameScale);
 	}
 
 	// Icon Scan options
@@ -54,8 +64,8 @@ internal static class RatConfig
 		internal static bool Enable = true;
 		internal static float ConfWarnThreshold = 0.8f;
 		internal static bool ScanRotatedIcons = true;
-		internal static int ScanWidth => (int)(ScreenScale * 896);
-		internal static int ScanHeight => (int)(ScreenScale * 896);
+		internal static int ScanWidth => (int)(GameScale * 896);
+		internal static int ScanHeight => (int)(GameScale * 896);
 		internal static Hotkey Hotkey = new(new[] { Key.LeftShift }.ToList(), new[] { MouseButton.Left });
 		internal static bool UseCachedIcons = true;
 	}
@@ -74,11 +84,10 @@ internal static class RatConfig
 		internal static bool ShowAvgDayPrice = true;
 		internal static bool ShowPricePerSlot = true;
 		internal static bool ShowTraderPrice = true;
-		internal static bool ShowTraderMaxPrice = false;
 		internal static bool ShowUpdated = false;
 		internal static bool ShowQuestHideoutTracker = true;
 		internal static bool ShowQuestHideoutTeamTracker = false;
-		internal static int Opacity = 10;
+		internal static int Opacity = 0;
 	}
 
 	// Progress Tracking options
@@ -93,6 +102,16 @@ internal static class RatConfig
 			internal static string Token = "";
 			internal static bool ShowTeam = true;
 			internal static int RefreshTime = 5 * 60 * 1000; // 5 minutes
+		}
+	}
+
+	// Overlay options
+	internal static class Overlay
+	{
+		internal static class Search
+		{
+			internal static bool Enable = true;
+			internal static Hotkey Hotkey = new(new[] { Key.N, Key.M }.ToList());
 		}
 	}
 
@@ -121,14 +140,14 @@ internal static class RatConfig
 	internal static bool MinimizeToTray = false;
 	internal static bool AlwaysOnTop = true;
 	internal static int MarketDBRefreshTime = 30 * 60 * 1000; // 30 minutes
-	internal static string ItemDataBundleVersion = "20220118";
 	private static int ConfigVersion => 2;
 
 	internal static int ScreenWidth = 1920;
 	internal static int ScreenHeight = 1080;
+	internal static float ScreenScale = 1f;
 	internal static bool SetScreen = false;
 
-	internal static float ScreenScale => RatScannerMain.Instance.RatEyeConfig.ProcessingConfig.Scale;
+	internal static float GameScale => RatScannerMain.Instance.RatEyeEngine.Config.ProcessingConfig.Scale;
 
 	private static bool IsSupportedConfigVersion()
 	{
@@ -151,50 +170,58 @@ internal static class RatConfig
 			Logger.ShowMessage(message);
 
 			File.Delete(Paths.ConfigFile);
-			TrySetScreenResolution();
+			TrySetScreenConfig();
 			SaveConfig();
 		}
 		else if (!configFileExists)
 		{
-			TrySetScreenResolution();
+			TrySetScreenConfig();
 			SaveConfig();
 		}
 
 		var config = new SimpleConfig(Paths.ConfigFile);
 
 		config.Section = nameof(NameScan);
-		NameScan.Enable = config.ReadBool(nameof(NameScan.Enable), true);
-		NameScan.Language = (Language)config.ReadInt(nameof(NameScan.Language), (int)Language.English);
+		NameScan.Enable = config.ReadBool(nameof(NameScan.Enable), NameScan.Enable);
+		NameScan.EnableAuto = config.ReadBool(nameof(NameScan.EnableAuto), NameScan.EnableAuto);
+		NameScan.Language = (Language)config.ReadInt(nameof(NameScan.Language));
 
 		config.Section = nameof(IconScan);
-		IconScan.Enable = config.ReadBool(nameof(IconScan.Enable), true);
-		IconScan.ScanRotatedIcons = config.ReadBool(nameof(IconScan.ScanRotatedIcons), true);
-		var keyboardKeys = config.ReadEnumerableEnum(nameof(IconScan.Hotkey) + "Keyboard", new[] { Key.LeftShift });
-		var mouseButtons = config.ReadEnumerableEnum(nameof(IconScan.Hotkey) + "Mouse", new[] { MouseButton.Left });
+		IconScan.Enable = config.ReadBool(nameof(IconScan.Enable), IconScan.Enable);
+		IconScan.ScanRotatedIcons = config.ReadBool(nameof(IconScan.ScanRotatedIcons), IconScan.ScanRotatedIcons);
+		var keyboardKeys = config.ReadEnumerableEnum(nameof(IconScan.Hotkey) + "Keyboard", IconScan.Hotkey.KeyboardKeys);
+		var mouseButtons = config.ReadEnumerableEnum(nameof(IconScan.Hotkey) + "Mouse", IconScan.Hotkey.MouseButtons);
 		IconScan.Hotkey = new Hotkey(keyboardKeys.ToList(), mouseButtons.ToList());
-		IconScan.UseCachedIcons = config.ReadBool(nameof(IconScan.UseCachedIcons), true);
+		IconScan.UseCachedIcons = config.ReadBool(nameof(IconScan.UseCachedIcons), IconScan.UseCachedIcons);
 
 		config.Section = nameof(ToolTip);
-		ToolTip.Duration = config.ReadInt(nameof(ToolTip.Duration), 1500);
-		ToolTip.DigitGroupingSymbol = config.ReadString(nameof(ToolTip.DigitGroupingSymbol), NumberFormatInfo.CurrentInfo.NumberGroupSeparator);
+		ToolTip.Duration = config.ReadInt(nameof(ToolTip.Duration), ToolTip.Duration);
+		ToolTip.DigitGroupingSymbol = config.ReadString(nameof(ToolTip.DigitGroupingSymbol), ToolTip.DigitGroupingSymbol);
 
 		config.Section = nameof(MinimalUi);
-		MinimalUi.ShowName = config.ReadBool(nameof(MinimalUi.ShowName), true);
-		MinimalUi.ShowAvgDayPrice = config.ReadBool(nameof(MinimalUi.ShowAvgDayPrice), true);
-		MinimalUi.ShowPricePerSlot = config.ReadBool(nameof(MinimalUi.ShowPricePerSlot), true);
-		MinimalUi.ShowTraderPrice = config.ReadBool(nameof(MinimalUi.ShowTraderPrice), true);
-		MinimalUi.ShowTraderMaxPrice = config.ReadBool(nameof(MinimalUi.ShowTraderMaxPrice), true);
-		MinimalUi.ShowUpdated = config.ReadBool(nameof(MinimalUi.ShowUpdated), true);
-		MinimalUi.ShowQuestHideoutTracker = config.ReadBool(nameof(MinimalUi.ShowQuestHideoutTracker), true);
-		MinimalUi.ShowQuestHideoutTeamTracker = config.ReadBool(nameof(MinimalUi.ShowQuestHideoutTeamTracker), true);
-		MinimalUi.Opacity = config.ReadInt(nameof(MinimalUi.Opacity), 50);
+		MinimalUi.ShowName = config.ReadBool(nameof(MinimalUi.ShowName), MinimalUi.ShowName);
+		MinimalUi.ShowAvgDayPrice = config.ReadBool(nameof(MinimalUi.ShowAvgDayPrice), MinimalUi.ShowAvgDayPrice);
+		MinimalUi.ShowPricePerSlot = config.ReadBool(nameof(MinimalUi.ShowPricePerSlot), MinimalUi.ShowPricePerSlot);
+		MinimalUi.ShowTraderPrice = config.ReadBool(nameof(MinimalUi.ShowTraderPrice), MinimalUi.ShowTraderPrice);
+		MinimalUi.ShowUpdated = config.ReadBool(nameof(MinimalUi.ShowUpdated), MinimalUi.ShowUpdated);
+		MinimalUi.ShowQuestHideoutTracker = config.ReadBool(nameof(MinimalUi.ShowQuestHideoutTracker), MinimalUi.ShowQuestHideoutTracker);
+		MinimalUi.ShowQuestHideoutTeamTracker = config.ReadBool(nameof(MinimalUi.ShowQuestHideoutTeamTracker), MinimalUi.ShowQuestHideoutTeamTracker);
+		MinimalUi.Opacity = config.ReadInt(nameof(MinimalUi.Opacity), MinimalUi.Opacity);
 
 		config.Section = nameof(Tracking);
-		Tracking.ShowNonFIRNeeds = config.ReadBool(nameof(Tracking.ShowNonFIRNeeds), true);
+		Tracking.ShowNonFIRNeeds = config.ReadBool(nameof(Tracking.ShowNonFIRNeeds), Tracking.ShowNonFIRNeeds);
 
 		config.Section = nameof(Tracking.TarkovTracker);
-		Tracking.TarkovTracker.Token = config.ReadString(nameof(Tracking.TarkovTracker.Token), "");
-		Tracking.TarkovTracker.ShowTeam = config.ReadBool(nameof(Tracking.TarkovTracker.ShowTeam), true);
+		Tracking.TarkovTracker.Token = config.ReadString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);
+		Tracking.TarkovTracker.ShowTeam = config.ReadBool(nameof(Tracking.TarkovTracker.ShowTeam), Tracking.TarkovTracker.ShowTeam);
+
+		config.Section = nameof(Overlay);
+
+		config.Section = nameof(Overlay.Search);
+		Overlay.Search.Enable = config.ReadBool(nameof(Overlay.Search.Enable), Overlay.Search.Enable);
+		keyboardKeys = config.ReadEnumerableEnum(nameof(Overlay.Search.Hotkey) + "Keyboard", Overlay.Search.Hotkey.KeyboardKeys);
+		mouseButtons = config.ReadEnumerableEnum(nameof(Overlay.Search.Hotkey) + "Mouse", Overlay.Search.Hotkey.MouseButtons);
+		Overlay.Search.Hotkey = new Hotkey(keyboardKeys.ToList(), mouseButtons.ToList());
 
 		config.Section = nameof(TarkovTools.RemoteControl);
 		TarkovTools.RemoteControl.SessionId = config.ReadString(nameof(TarkovTools.RemoteControl.SessionId));
@@ -204,14 +231,14 @@ internal static class RatConfig
 		config.Section = "Other";
 		if (!SetScreen)
 		{
-			ScreenWidth = config.ReadInt(nameof(ScreenWidth), 1920);
-			ScreenHeight = config.ReadInt(nameof(ScreenHeight), 1080);
+			ScreenWidth = config.ReadInt(nameof(ScreenWidth), ScreenWidth);
+			ScreenHeight = config.ReadInt(nameof(ScreenHeight), ScreenHeight);
+			ScreenScale = config.ReadFloat(nameof(ScreenScale), ScreenScale);
 		}
 
-		MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), false);
-		AlwaysOnTop = config.ReadBool(nameof(AlwaysOnTop), false);
-		ItemDataBundleVersion = config.ReadString(nameof(ItemDataBundleVersion), "20220118");
-		LogDebug = config.ReadBool(nameof(LogDebug), false);
+		MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), MinimizeToTray);
+		AlwaysOnTop = config.ReadBool(nameof(AlwaysOnTop), AlwaysOnTop);
+		LogDebug = config.ReadBool(nameof(LogDebug), LogDebug);
 	}
 
 	internal static void SaveConfig()
@@ -220,6 +247,7 @@ internal static class RatConfig
 
 		config.Section = nameof(NameScan);
 		config.WriteBool(nameof(NameScan.Enable), NameScan.Enable);
+		config.WriteBool(nameof(NameScan.EnableAuto), NameScan.EnableAuto);
 		config.WriteInt(nameof(NameScan.Language), (int)NameScan.Language);
 
 		config.Section = nameof(IconScan);
@@ -238,7 +266,6 @@ internal static class RatConfig
 		config.WriteBool(nameof(MinimalUi.ShowAvgDayPrice), MinimalUi.ShowAvgDayPrice);
 		config.WriteBool(nameof(MinimalUi.ShowPricePerSlot), MinimalUi.ShowPricePerSlot);
 		config.WriteBool(nameof(MinimalUi.ShowTraderPrice), MinimalUi.ShowTraderPrice);
-		config.WriteBool(nameof(MinimalUi.ShowTraderMaxPrice), MinimalUi.ShowTraderMaxPrice);
 		config.WriteBool(nameof(MinimalUi.ShowUpdated), MinimalUi.ShowUpdated);
 		config.WriteBool(nameof(MinimalUi.ShowQuestHideoutTracker), MinimalUi.ShowQuestHideoutTracker);
 		config.WriteBool(nameof(MinimalUi.ShowQuestHideoutTeamTracker), MinimalUi.ShowQuestHideoutTeamTracker);
@@ -256,26 +283,81 @@ internal static class RatConfig
 		config.WriteBool(nameof(TarkovTools.RemoteControl.AutoSync), TarkovTools.RemoteControl.AutoSync);
 		config.WriteBool(nameof(TarkovTools.RemoteControl.OpenAmmoChart), TarkovTools.RemoteControl.OpenAmmoChart);
 
+		config.Section = nameof(Overlay);
+
+		config.Section = nameof(Overlay.Search);
+		config.WriteBool(nameof(Overlay.Search.Enable), Overlay.Search.Enable);
+
 		config.Section = "Other";
 		config.WriteInt(nameof(ScreenWidth), ScreenWidth);
 		config.WriteInt(nameof(ScreenHeight), ScreenHeight);
+		config.WriteFloat(nameof(ScreenScale), ScreenScale);
 		config.WriteBool(nameof(MinimizeToTray), MinimizeToTray);
 		config.WriteBool(nameof(AlwaysOnTop), AlwaysOnTop);
-		config.WriteString(nameof(ItemDataBundleVersion), ItemDataBundleVersion);
 		config.WriteBool(nameof(LogDebug), LogDebug);
 		config.WriteInt(nameof(ConfigVersion), ConfigVersion);
 	}
 
 	/// <summary>
-	/// Converts PrimaryScreen resolution to Resolution enum, sets screenResolution if a match is found
+	/// Get the current screen config from tarkov's config files or default to the primary screen
 	/// </summary>
-	internal static void TrySetScreenResolution()
+	internal static void TrySetScreenConfig()
 	{
-		ScreenWidth = Screen.PrimaryScreen.Bounds.Width;
-		ScreenHeight = Screen.PrimaryScreen.Bounds.Height;
+		var (width, height, scale) = GetTarkovScreenConfig();
+		ScreenWidth = width;
+		ScreenHeight = height;
+		ScreenScale = (float)scale;
 		SetScreen = true;
-		var message = $"Detected {ScreenWidth}x{ScreenHeight} Resolution.\n\n";
-		message += "You can adjust this inside the settings.";
-		Logger.ShowMessage(message);
+	}
+
+	public enum DpiType
+	{
+		Effective = 0,
+		Angular = 1,
+		Raw = 2,
+	}
+
+	public static double GetScalingForScreen(Screen screen)
+	{
+		var pointOnScreen = new Point(screen.Bounds.X + 1, screen.Bounds.Y + 1);
+		var mon = MonitorFromPoint(pointOnScreen, 2 /*MONITOR_DEFAULTTONEAREST*/);
+		GetDpiForMonitor(mon, DpiType.Effective, out var dpiX, out _);
+		return dpiX / 96.0;
+	}
+
+	private static (int widht, int height, double scale) GetTarkovScreenConfig()
+	{
+		try
+		{
+			var configPath = Environment.ExpandEnvironmentVariables(@"%AppData%\Battlestate Games\Escape From Tarkov\Settings\Graphics.ini");
+			using var file = new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+			using var reader = new StreamReader(file, Encoding.UTF8);
+
+			var json = JObject.Parse(reader.ReadToEnd());
+
+			var activeDisplay = json["DisplaySettings"]["Display"].ToObject<int>();
+			var windowRes = json["Stored"][activeDisplay.ToString()]["WindowResolution"];
+			var width = windowRes["Width"].ToObject<int>();
+			var height = windowRes["Height"].ToObject<int>();
+
+			var usedScreen = Screen.AllScreens[activeDisplay];
+			var scale = GetScalingForScreen(usedScreen);
+
+			return (width, height, scale);
+		}
+		catch (Exception e)
+		{
+			Logger.LogWarning("Unable to query Escape From Tarkov graphic settings.", e);
+
+			var width = Screen.PrimaryScreen.Bounds.Width;
+			var height = Screen.PrimaryScreen.Bounds.Height;
+			var scale = GetScalingForScreen(Screen.PrimaryScreen);
+
+			var message = $"Detected {width}x{height} Resolution at {scale} Scale.\n\n";
+			message += "You can adjust this inside the settings.";
+			Logger.ShowMessage(message);
+
+			return (width, height, scale);
+		}
 	}
 }

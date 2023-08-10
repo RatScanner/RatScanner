@@ -1,0 +1,57 @@
+﻿@inherits LayoutComponentBase
+@inject IJSRuntime JSRuntime;
+<MudThemeProvider Theme="currentTheme" />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+@Body
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        currentTheme = darkTheme;
+    }
+
+    MudTheme currentTheme = new();
+
+    MudTheme darkTheme = new()
+        {
+            Typography = new Typography()
+            {
+                Caption = new Caption()
+                {
+                    FontFamily = new[] { "Roboto", "Helvetica", "Arial", "sans-serif" },
+                    FontSize = "1.25rem",
+                    FontWeight = 200,
+                    LineHeight = 1.6,
+                    LetterSpacing = ".0075em"
+                }
+            },
+            Palette = new Palette()
+            {
+                Black = "#27272f",
+                Background = "rgba(255,255,255,0.00)",
+                BackgroundGrey = "#27272f",
+                Surface = "#1e1e1e",
+                DrawerBackground = "#27272f",
+                DrawerText = "rgba(255,255,255, 0.50)",
+                DrawerIcon = "rgba(255,255,255, 0.50)",
+                AppbarBackground = "#242f35",
+                AppbarText = "rgba(255,255,255, 0.70)",
+                TextPrimary = "rgba(255,255,255, 0.90)",
+                TextSecondary = "rgba(255,255,255, 0.50)",
+                ActionDefault = "#adadb1",
+                ActionDisabled = "rgba(255,255,255, 0.26)",
+                ActionDisabledBackground = "rgba(255,255,255, 0.12)",
+                Divider = "rgba(255,255,255, 0.12)",
+                DividerLight = "rgba(255,255,255, 0.06)",
+                TableLines = "rgba(255,255,255, 0.12)",
+                LinesDefault = "rgba(255,255,255, 0.12)",
+                LinesInputs = "rgba(255,255,255, 0.3)",
+                TextDisabled = "rgba(255,255,255, 0.2)",
+                HoverOpacity = 0.1,
+            },
+        };
+
+}

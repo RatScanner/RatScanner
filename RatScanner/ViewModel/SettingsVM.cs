@@ -1,22 +1,22 @@
-﻿using RatRazor.Interfaces;
-using RatScanner.Controls;
+﻿using RatScanner.Controls;
+using RatStash;
 using System.ComponentModel;
 using System.Linq;
-using RatStash;
 using System.Threading.Tasks;
 using RatTracking.TarkovTools;
 
 namespace RatScanner.ViewModel;
 
-internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
+internal class SettingsVM : INotifyPropertyChanged
 {
 	public bool EnableNameScan { get; set; }
+	public bool EnableAutoNameScan { get; set; }
 	public int NameScanLanguage { get; set; }
 
 	public bool EnableIconScan { get; set; }
 	public bool ScanRotatedIcons { get; set; }
 	public bool UseCachedIcons { get; set; }
-	public IHotkey IconScanHotkey { get; set; }
+	public Hotkey IconScanHotkey { get; set; }
 
 	public string ToolTipDuration { get; set; }
 	public int ToolTipMilli { get; set; }
@@ -25,7 +25,6 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 	public bool ShowAvgDayPrice { get; set; }
 	public bool ShowPricePerSlot { get; set; }
 	public bool ShowTraderPrice { get; set; }
-	public bool ShowTraderMaxPrice { get; set; }
 	public bool ShowUpdated { get; set; }
 	public bool ShowQuestHideoutTracker { get; set; }
 	public bool ShowQuestHideoutTeamTracker { get; set; }
@@ -33,6 +32,7 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 
 	public int ScreenWidth { get; set; }
 	public int ScreenHeight { get; set; }
+	public float ScreenScale { get; set; }
 	public bool MinimizeToTray { get; set; }
 	public bool AlwaysOnTop { get; set; }
 	public bool LogDebug { get; set; }
@@ -49,7 +49,6 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 	public string TarkovToolsRemoteControlSessionId { get; set; }
 	public bool TarkovToolsRemoteControlAutoSync { get; set; }
 	public bool TarkovToolsRemoteControlOpenAmmoChart { get; set; }
-
 	internal SettingsVM()
 	{
 		LoadSettings();
@@ -58,6 +57,7 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 	public void LoadSettings()
 	{
 		EnableNameScan = RatConfig.NameScan.Enable;
+		EnableAutoNameScan = RatConfig.NameScan.EnableAuto;
 		NameScanLanguage = (int)RatConfig.NameScan.Language;
 
 		EnableIconScan = RatConfig.IconScan.Enable;
@@ -72,7 +72,6 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 		ShowAvgDayPrice = RatConfig.MinimalUi.ShowAvgDayPrice;
 		ShowPricePerSlot = RatConfig.MinimalUi.ShowPricePerSlot;
 		ShowTraderPrice = RatConfig.MinimalUi.ShowTraderPrice;
-		ShowTraderMaxPrice = RatConfig.MinimalUi.ShowTraderMaxPrice;
 		ShowQuestHideoutTracker = RatConfig.MinimalUi.ShowQuestHideoutTracker;
 		ShowQuestHideoutTeamTracker = RatConfig.MinimalUi.ShowQuestHideoutTeamTracker;
 		ShowUpdated = RatConfig.MinimalUi.ShowUpdated;
@@ -80,6 +79,7 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 
 		ScreenWidth = RatConfig.ScreenWidth;
 		ScreenHeight = RatConfig.ScreenHeight;
+		ScreenScale = RatConfig.ScreenScale;
 		MinimizeToTray = RatConfig.MinimizeToTray;
 		AlwaysOnTop = RatConfig.AlwaysOnTop;
 		LogDebug = RatConfig.LogDebug;
@@ -106,6 +106,7 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 
 		// Save config
 		RatConfig.NameScan.Enable = EnableNameScan;
+		RatConfig.NameScan.EnableAuto = EnableAutoNameScan;
 		RatConfig.NameScan.Language = (Language)NameScanLanguage;
 
 		RatConfig.IconScan.Enable = EnableIconScan;
@@ -120,7 +121,6 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 		RatConfig.MinimalUi.ShowAvgDayPrice = ShowAvgDayPrice;
 		RatConfig.MinimalUi.ShowPricePerSlot = ShowPricePerSlot;
 		RatConfig.MinimalUi.ShowTraderPrice = ShowTraderPrice;
-		RatConfig.MinimalUi.ShowTraderMaxPrice = ShowTraderMaxPrice;
 		RatConfig.MinimalUi.ShowQuestHideoutTracker = ShowQuestHideoutTracker;
 		RatConfig.MinimalUi.ShowQuestHideoutTeamTracker = ShowQuestHideoutTeamTracker;
 		RatConfig.MinimalUi.ShowUpdated = ShowUpdated;
@@ -137,6 +137,7 @@ internal class SettingsVM : INotifyPropertyChanged, ISettingsUI
 
 		RatConfig.ScreenWidth = ScreenWidth;
 		RatConfig.ScreenHeight = ScreenHeight;
+		RatConfig.ScreenScale = ScreenScale;
 		RatConfig.MinimizeToTray = MinimizeToTray;
 		RatConfig.AlwaysOnTop = AlwaysOnTop;
 		RatConfig.LogDebug = LogDebug;

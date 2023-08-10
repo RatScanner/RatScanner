@@ -1,6 +1,4 @@
-﻿using RatRazor.Interfaces;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
@@ -10,7 +8,7 @@ using System.Windows.Media;
 
 namespace RatScanner.Controls;
 
-public class Hotkey : INotifyPropertyChanged, IHotkey
+public class Hotkey : INotifyPropertyChanged
 {
 	/// <summary>
 	/// Keyboard key of the selected hotkey
@@ -62,7 +60,7 @@ public class Hotkey : INotifyPropertyChanged, IHotkey
 	}
 }
 
-public class HotkeySelector : Button, IHotkeySelector, INotifyPropertyChanged
+public class HotkeySelector : Button, INotifyPropertyChanged
 {
 	/// <summary>
 	/// Identifies the <see cref="DoCaptureMouse"/> dependency property.
@@ -121,12 +119,9 @@ public class HotkeySelector : Button, IHotkeySelector, INotifyPropertyChanged
 		}
 	}
 
-	public IHotkey HotkeyInterface => Hotkey;
-
-	private bool _listening = false;
 	private Brush _previousBackground;
 
-	public bool Listening => _listening;
+	public bool Listening { get; private set; } = false;
 
 	static HotkeySelector()
 	{
@@ -141,7 +136,7 @@ public class HotkeySelector : Button, IHotkeySelector, INotifyPropertyChanged
 
 	protected override void OnClick()
 	{
-		if (_listening) return;
+		if (Listening) return;
 		StartListening();
 		base.OnClick();
 	}
@@ -151,13 +146,13 @@ public class HotkeySelector : Button, IHotkeySelector, INotifyPropertyChanged
 	/// </summary>
 	protected override void OnPreviewKeyDown(KeyEventArgs e)
 	{
-		if (!_listening) return;
+		if (!Listening) return;
 		if (Hotkey.KeyboardKeys.Contains(e.Key)) return;
 
 		Hotkey.KeyboardKeys.Add(e.Key);
 		OnPropertyChanged();
 		UpdateControl();
-		Console.WriteLine($"Adding Key: {e.Key}");
+		Logger.LogDebug($"Adding Key: {e.Key}");
 
 		e.Handled = true;
 	}
@@ -167,7 +162,7 @@ public class HotkeySelector : Button, IHotkeySelector, INotifyPropertyChanged
 	/// </summary>
 	protected override void OnPreviewKeyUp(KeyEventArgs e)
 	{
-		if (_listening)
+		if (Listening)
 		{
 			StopListening();
 			e.Handled = true;
@@ -189,7 +184,7 @@ public class HotkeySelector : Button, IHotkeySelector, INotifyPropertyChanged
 			return;
 		}
 
-		if (!_listening) return;
+		if (!Listening) return;
 		if (Hotkey.MouseButtons.Contains(e.ChangedButton)) return;
 
 		Hotkey.MouseButtons.Add(e.ChangedButton);
@@ -225,7 +220,7 @@ public class HotkeySelector : Button, IHotkeySelector, INotifyPropertyChanged
 	public void StartListening()
 	{
 		Focus();
-		if (_listening) return;
+		if (Listening) return;
 
 		Hotkey.KeyboardKeys.Clear();
 		Hotkey.MouseButtons.Clear();
@@ -237,15 +232,15 @@ public class HotkeySelector : Button, IHotkeySelector, INotifyPropertyChanged
 		_previousBackground = Background;
 		SetValue(BackgroundProperty, ListeningBackground);
 
-		_listening = true;
+		Listening = true;
 		Logger.LogDebug($"Started listening for input");
 	}
 
 	public void StopListening()
 	{
-		if (!_listening) return;
+		if (!Listening) return;
 
-		_listening = false;
+		Listening = false;
 		OnPropertyChanged();
 
 		// Release mouse capture

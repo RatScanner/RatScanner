@@ -1,0 +1,51 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - v*
+  pull_request:
+    branches:
+      - master
+      - main
+      - dev
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🔎 The name of the branch is ${{ github.ref }} and the repository is ${{ github.repository }}."
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 7.0.x
+      - name: Restore Dependencies
+        run: dotnet restore
+      - name: Publish
+        run: dotnet publish RatScanner/RatScanner.csproj -c Release -o publish -p:PublishSingleFile=true --runtime win-x64 --self-contained
+      - name: Include Data
+        run: |
+          curl -L "https://github.com/RatScanner/RatScannerData/releases/latest/download/Data.zip" --output "publish/Data.zip"
+          7z x publish/Data.zip -opublish/Data
+          Remove-Item publish/Data.zip
+      - name: Include Updater
+        run: curl -L "https://github.com/RatScanner/RatUpdater/releases/latest/download/RatUpdater.exe" --output "publish/RatUpdater.exe"
+      - name: Zip Content
+        run: 7z a -r RatScanner.zip ./publish/*
+      - uses: actions/upload-artifact@v3
+        with:
+          name: RatScanner
+          path: ./publish/
+      - name: Draft Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: RatScanner.zip
+          draft: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: startsWith(github.ref, 'refs/tags/v') && github.event_name != 'pull_request'
+      

@@ -1,13 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net7.0-windows10.0.22621.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>True</UseWindowsForms>
     <ApplicationIcon>Resources\RatLogoSmall.ico</ApplicationIcon>
     <StartupObject>RatScanner.App</StartupObject>
-    <Version>3.2.3</Version>
+    <Version>3.5.4</Version>
+    <ImplicitUsings>disable</ImplicitUsings>
+		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+		<RootNamespace>RatScanner</RootNamespace>
+		<SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
   </PropertyGroup>
+	
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
@@ -18,64 +23,49 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
-  <ItemGroup>
-    <None Remove="Resources\iconMods.png" />
-    <None Remove="Resources\RatLogoMedium.png" />
-    <None Remove="Resources\settings.png" />
-  </ItemGroup>
+	
   <ItemGroup>
     <Resource Include="Resources\iconMods.png" />
     <Resource Include="Resources\settings.png" />
   </ItemGroup>
+	
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="6.0.200-preview.12.2441" />
-    <PackageReference Include="MudBlazor" Version="6.0.5" />
-    <PackageReference Include="RatEye" Version="2.2.0" />
-    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.261602">
+    <PackageReference Include="DeepCloner" Version="0.10.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="7.0.52" />
+    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
+    <PackageReference Include="MudBlazor" Version="6.1.7" />
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.355802">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="6.0.0" />
-    <PackageReference Include="RatStash" Version="1.6.0" />
-    <PackageReference Include="SingleInstanceCore" Version="2.2.1" />
-    <PackageReference Include="Tesseract" Version="4.1.1" />
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="RatEye" Version="2.6.2" />
+    <PackageReference Include="RatStash" Version="4.0.0" />
+    <PackageReference Include="SingleInstanceCore" Version="2.2.2" />
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+    <PackageReference Include="Tesseract" Version="5.2.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="App.xaml" />
-  </ItemGroup>
+	
   <ItemGroup>
     <SplashScreen Include="Resources\RatLogoMedium.png" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\RatLib\RatLib.csproj" />
-    <ProjectReference Include="..\RatRazor\RatRazor.csproj" />
-    <ProjectReference Include="..\RatTracking\RatTracking.csproj" />
-  </ItemGroup>
+	
 	<ItemGroup>
 		<None Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
+	
 	<ItemGroup>
-	  <Compile Remove="Data\**" />
-	  <Compile Remove="publish\**" />
-	  <Content Remove="Data\**" />
-	  <Content Remove="publish\**" />
-	  <EmbeddedResource Remove="Data\**" />
-	  <EmbeddedResource Remove="publish\**" />
-	  <None Remove="Data\**" />
-	  <None Remove="publish\**" />
-	  <Page Remove="Data\**" />
-	  <Page Remove="publish\**" />
+	  <Content Remove="wwwroot\interactableOverlay.html" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Update="_Imports.razor">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+		</Content>
 	</ItemGroup>
 </Project>

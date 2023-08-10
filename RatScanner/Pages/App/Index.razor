@@ -1,0 +1,207 @@
+﻿@page "/"
+@page "/app"
+@using RatScanner.Scan
+@using System.Diagnostics
+@inject MenuVM MenuVM
+@implements IDisposable
+
+<MudGrid Class="pa-0" Spacing="0">
+    <MudGrid Class="pa-0" Spacing="0">
+        <MudItem xs="12">
+            <div class="d-flex align-center justify-start mx-2 mt-2 mb-1">
+                <img src="@item.IconLink" class="mr-2 mud-elevation-1" style="border-style: solid; border-width: 1px; border-color: #585D60; display: block; max-width: 64px; max-height: 64px; width: auto; height: auto;" />
+                <MudText Class="ellipsis" Style="display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;" Color="Color.Inherit">@item.MatchedItem.Name</MudText>
+            </div>
+        </MudItem>
+        <MudItem xs="6">
+            <MudPaper Class="d-flex align-center justify-center pa-1 ml-2 mr-1 my-1 mud-grey-darken4" Elevation="2" @onclick="OpenWiki" Style="cursor: pointer;" MinHeight="32px">
+                <img src="https://static.wikia.nocookie.net/escapefromtarkov_gamepedia/images/e/e6/Site-logo.png" height="24px" />
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="6">
+            <MudPaper Class="d-flex align-center justify-center pa-1 ml-1 mr-2 my-1" Elevation="2" @onclick="OpenTarkovDev" Style="cursor: pointer;" MinHeight="32px">
+                <img src="https://api.ratscanner.com/v3/file/tarkov-dev-logo.png" height="18px" />
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12">
+            <MudPaper Class="align-center justify-center pa-2 mx-2 my-1" Elevation="2">
+                <div class="d-flex justify-space-between align-center mt-2">
+                    <MudText Typo="Typo.subtitle2">Recent Avg. Price</MudText>
+                    <MudText Typo="Typo.subtitle2">@MenuVM.IntToLongPrice(item.Avg24hPrice)</MudText>
+                </div>
+                <div class="d-flex justify-space-between align-center my-1">
+                    <MudText Typo="Typo.subtitle2">Value per Slot</MudText>
+                    <MudText Typo="Typo.subtitle2">@MenuVM.IntToLongPrice(item.PricePerSlot)</MudText>
+                </div>
+                <MudDivider DividerType="DividerType.FullWidth" />
+                <div class="d-flex justify-space-between align-center mt-2">
+                    <MudText Typo="Typo.subtitle2">Best Trader</MudText>
+                    <div class="d-flex align-center">
+                        <MudAvatar Image="@($"https://tarkov.dev/images/{@item.TraderName.ToLower()}-icon.jpg")" Size="Size.Small" Style="float: left;" Class="mr-1" Elevation="1" /><MudText Typo="Typo.subtitle2" Style="float: right;">@item.TraderName</MudText>
+                    </div>
+                </div>
+                <div class="d-flex justify-space-between align-center my-1">
+                    <MudText Typo="Typo.subtitle2">Trader Price</MudText>
+                    <MudText Typo="Typo.subtitle2">@MenuVM.IntToLongPrice(item.BestTraderPrice)</MudText>
+                </div>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12">
+            <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">
+                <div class="d-flex align-center">
+                    @MenuVM.TaskRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" /> Quest
+                </div>
+                <div class="d-flex align-center">
+                    @MenuVM.HideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
+                </div>
+            </MudPaper>
+        </MudItem>
+        @if (MenuVM.ItemTeamNeeds != null && MenuVM.ItemTeamNeeds.Any())
+        {
+            <MudItem xs="12">
+                <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">
+                    <MudGrid Spacing="0" Class="pa-0 ma-0">
+                        @foreach (var need in MenuVM.ItemTeamNeeds)
+                        {
+                            <MudItem xs="12" Class="pa-0 ma-0">
+                                <div class="d-flex justify-space-between">
+                                    <div class="mx-1">@need.Key</div>
+                                    <div class="d-flex align-center">
+                                        <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="mr-1" /> @need.Value.Key
+                                        <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-3 mr-1" /> @need.Value.Value
+                                    </div>
+                                </div>
+                            </MudItem>
+                        }
+                    </MudGrid>
+                </MudPaper>
+            </MudItem>
+        }
+        <MudItem xs="12">
+            <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">
+                <MudAutocomplete @ref="_searchBox" T="RatStash.Item" OffsetY="true" Placeholder="Item Search" PopoverClass="searchBoxPopover" SelectValueOnTab="true" ValueChanged="SetSearchItem" MaxItems="5" AnchorOrigin="Origin.TopCenter" TransformOrigin="Origin.BottomCenter" CoerceValue="true" AdornmentIcon="@Icons.Material.Filled.Search" SearchFunc="@SearchItem" Margin="Margin.Dense" Dense="true" Variant="Variant.Outlined">
+                    <ItemTemplate Context="item">
+                        <MudPaper Class="ma-n1" Elevation="4">
+                            <MudStack Row="true" Style="height: 48px">
+                                <MudImage Class="m-0 p-0" Src="@item.GetMarketItem().IconLink" Style="max-width:100%; max-height:100%;" />
+                                <MudStack Class="overflow-hidden">
+                                    <MudText Class="ellipsis">
+                                        @(item == null ? null : $"{item.Name}")
+                                    </MudText>
+                                </MudStack>
+                            </MudStack>
+                        </MudPaper>
+                    </ItemTemplate>
+                </MudAutocomplete>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudGrid>
+
+<style>
+    .ellipsis {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
+@code {
+    private ItemScan item => MenuVM.LastItemScan;
+
+    private List<RatStash.Item>? _items;
+
+    private MudAutocomplete<RatStash.Item> _searchBox { get; set; }
+
+    protected override void OnInitialized()
+    {
+        MenuVM.PropertyChanged += PropertyChangeHandler;
+    }
+
+    private async Task<IEnumerable<RatStash.Item>> SearchItem(string value)
+    {
+        if (_items == null) _items = RatScannerMain.Instance.RatStashDB?.GetItems()?.ToList() ?? null;
+        if (_items == null) return new RatStash.Item[0];
+
+        if (string.IsNullOrEmpty(value)) return new RatStash.Item[0];
+
+        value = SanitizeSearch(value);
+
+        Func<RatStash.Item, (RatStash.Item? item, int score)> filter = (item) =>
+            {
+                if (SanitizeSearch(item.Name).StartsWith(value)) return (item, 20);
+                if (SanitizeSearch(item.ShortName).StartsWith(value)) return (item, 20);
+
+                // Match every individual word (expensive)
+                string[] filters = value.Split(new[] { ' ' });
+                if (filters.All(filter => SanitizeSearch(item.Name).Contains(filter))) return (item, 40);
+                if (filters.All(filter => SanitizeSearch(item.ShortName).Contains(filter))) return (item, 40);
+
+                if (SanitizeSearch(item.Name).Contains(value)) return (item, 60);
+                if (SanitizeSearch(item.ShortName).Contains(value)) return (item, 60);
+
+                if (value.Length > 3 && SanitizeSearch(item.Id).StartsWith(value)) return (item, 80);
+                if (value.Length > 3 && SanitizeSearch(item.Id).Contains(value)) return (item, 100);
+                return (null, -1);
+            };
+
+        var matches = new List<(RatStash.Item? item, int score)>();
+        foreach (var item in _items)
+        {
+            var match = filter(item);
+            if (match.item == null) continue;
+            matches.Add(match);
+        }
+
+        // Penalize weapon mods so the weapon it self will rank higher
+        for (var i = 0; i < matches.Count; i++) if (matches[i].item is RatStash.WeaponMod) matches[i] = (matches[i].item, matches[i].score + 5);
+
+        var sortedMatches = matches.OrderBy(match => match.score).ThenBy(match => match.item.Name.Length);
+        return sortedMatches.Select(match => match.item);
+    }
+
+    private string SanitizeSearch(string value)
+    {
+        value = value.ToLower();
+        value = new string(value.Where(c => char.IsLetterOrDigit(c) || c == ' ').ToArray());
+        return value;
+    }
+
+    private async void SetSearchItem(RatStash.Item item)
+    {
+        if (item == null) return;
+        MenuVM.ItemScans.Enqueue(new DefaultItemScan(item));
+        await _searchBox.Clear();
+    }
+
+    private async void OpenWiki()
+    {
+        OpenURL(item.WikiLink);
+    }
+
+    private async void OpenTarkovDev()
+    {
+        OpenURL(item.TarkovDevLink);
+    }
+
+    private void OpenURL(string url)
+    {
+        if (string.IsNullOrEmpty(url)) return;
+        var psi = new ProcessStartInfo
+            {
+                FileName = url,
+                UseShellExecute = true,
+            };
+        Process.Start(psi);
+    }
+
+    private async void PropertyChangeHandler(object sender, EventArgs e)
+    {
+        await InvokeAsync(() => StateHasChanged());
+    }
+
+    public void Dispose()
+    {
+        MenuVM.PropertyChanged -= PropertyChangeHandler;
+    }
+
+}

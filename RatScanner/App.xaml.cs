@@ -3,6 +3,7 @@ using SingleInstanceCore;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,8 +15,12 @@ namespace RatScanner;
 /// </summary>
 public partial class App : Application, ISingleInstance
 {
-	private const string webview2regKey =
-		"HKEY_LOCAL_MACHINE\\SOFTWARE\\WOW6432Node\\Microsoft\\EdgeUpdate\\Clients\\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}";
+	private readonly string[] _webview2RegKeys = new[]
+	{
+		@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}",
+		@"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}",
+		@"HKEY_CURRENT_USER\Software\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}",
+	};
 
 	protected override void OnStartup(StartupEventArgs e)
 	{
@@ -24,11 +29,13 @@ public partial class App : Application, ISingleInstance
 		// Set current working directory to executable location
 		Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
+#if !DEBUG
 		SetupExceptionHandling();
+#endif
 
 		// Install webview2 runtime if it is not already
-		var winLogonKey = Registry.GetValue(webview2regKey, "pv", null);
-		if (winLogonKey == null) InstallWebview2Runtime();
+		var existing = _webview2RegKeys.Any(key => Registry.GetValue(key, "pv", null) != null);
+		if (!existing) InstallWebview2Runtime();
 
 		// Setup single instance mode
 		var guid = "{a057bb64-c126-4ef4-a4ed-3037c2e7bc89}";
@@ -36,21 +43,21 @@ public partial class App : Application, ISingleInstance
 		if (!isFirstInstance)
 		{
 			SingleInstance.Cleanup();
-			Current.Shutdown(2);
+			Application.Current.Shutdown(2);
 		}
 	}
 
 	public void OnInstanceInvoked(string[] args)
 	{
-		Current.Dispatcher.Invoke(() =>
+		Application.Current.Dispatcher.Invoke(() =>
 		{
-			MainWindow.Activate();
-			MainWindow.WindowState = WindowState.Normal;
+			Application.Current.MainWindow.Activate();
+			Application.Current.MainWindow.WindowState = WindowState.Normal;
 
-			// Invert the topmost state twice to bring the window on
-			// top if it wasnt previously or do nothing
-			MainWindow.Topmost = !MainWindow.Topmost;
-			MainWindow.Topmost = !MainWindow.Topmost;
+			// Invert the topmost state twice to bring
+			// the window on top but kepe the top most state
+			Application.Current.MainWindow.Topmost = !Application.Current.MainWindow.Topmost;
+			Application.Current.MainWindow.Topmost = !Application.Current.MainWindow.Topmost;
 		});
 	}
 
@@ -64,7 +71,7 @@ public partial class App : Application, ISingleInstance
 		startInfo.UseShellExecute = false;
 		startInfo.FileName = "MicrosoftEdgeWebview2Setup.exe";
 		startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-		startInfo.Arguments = "/silent /install";
+		startInfo.Arguments = "/install";
 
 		try
 		{
@@ -92,7 +99,7 @@ public partial class App : Application, ISingleInstance
 			LogUnhandledException((Exception)e.ExceptionObject, "AppDomain.CurrentDomain.UnhandledException");
 		};
 
-		DispatcherUnhandledException += (s, e) =>
+		Application.Current.DispatcherUnhandledException += (s, e) =>
 		{
 			LogUnhandledException(e.Exception, "Application.Current.DispatcherUnhandledException");
 			e.Handled = true;
@@ -107,7 +114,7 @@ public partial class App : Application, ISingleInstance
 
 	private void LogUnhandledException(Exception exception, string source)
 	{
-		var message = $"Unhandled exception ({source})";
-		Logger.LogError(message, exception);
+		exception.Data.Add("Source", source);
+		Logger.LogError(exception);
 	}
 }

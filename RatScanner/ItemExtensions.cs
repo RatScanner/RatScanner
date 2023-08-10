@@ -1,195 +1,69 @@
 ﻿using RatScanner.FetchModels;
+using RatScanner.FetchModels.TarkovTracker;
 using RatStash;
-using RatTracking.FetchModels;
-using RatTracking.FetchModels.TarkovTracker;
-using System.Collections.Generic;
 using System.Linq;
+using Item = RatStash.Item;
 
 namespace RatScanner;
 
 public static class ItemExtensions
 {
-	// This is probably redundant, or can be simplified down based upon what the
-	// output of this information ends up being
-	public static bool IsProgressionItem(this Item item)
+	public static int GetTaskRemaining(this Item item, bool firOnly = false, UserProgress? progress = null)
 	{
-		return RatScannerMain.Instance.ProgressDB.IsProgressionItem(item.Id);
-	}
+		var count = 0;
+		var needed = TarkovDevAPI.GetNeededItems().tasks;
+		var neededItems = needed.Where(i => i.Id == item.Id && (i.FoundInRaid || !firOnly));
 
-	public static bool IsQuestItem(this Item item)
-	{
-		return RatScannerMain.Instance.ProgressDB.IsQuestItem(item.Id);
-	}
-
-	public static bool IsHideoutItem(this Item item)
-	{
-		return RatScannerMain.Instance.ProgressDB.IsHideoutItem(item.Id);
-	}
-
-	public static List<QuestItem> GetQuestRequired(this Item item)
-	{
-		return RatScannerMain.Instance.ProgressDB.GetQuestRequiredById(item.Id);
-	}
-
-	public static List<HideoutItem> GetHideoutRequired(this Item item)
-	{
-		return RatScannerMain.Instance.ProgressDB.GetHideoutRequiredById(item.Id);
-	}
-
-	public static NeededItem GetTrackingNeeds(this Item item)
-	{
-		var requiredQuest = item.GetQuestRequired();
-		var requiredHideout = item.GetHideoutRequired();
-
-		var neededItem = new NeededItem(item.Id);
-
-		Progress progress = null;
-		if (RatConfig.Tracking.TarkovTracker.Enable && RatScannerMain.Instance.TarkovTrackerDB.Progress.Count >= 1)
+		if (progress != null)
 		{
-			var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
-			progress = teamProgress.First(x => x.Self ?? false);
+			neededItems = neededItems.Where(i => !progress.Tasks.Any(h => h.Id == i.TaskId && h.Complete));
 		}
 
-		// Set this item as for ourselves if this was our token
-		neededItem.Self = true;
+		if (!neededItems.Any()) return 0;
 
-		var (questNeeded, questHave, fir) = GetQuestRequired(requiredQuest, progress);
-		neededItem.QuestNeeded += questNeeded;
-		neededItem.QuestHave += questHave;
-		neededItem.FIR = fir;
-
-		var (hideoutNeeded, hideoutHave) = GetHideoutRequired(requiredHideout, progress);
-		neededItem.HideoutNeeded += hideoutNeeded;
-		neededItem.HideoutHave += hideoutHave;
-		return neededItem;
-	}
-
-	public static List<KeyValuePair<string, NeededItem>> GetTrackingTeamNeeds(this Item item)
-	{
-		if (!RatConfig.Tracking.TarkovTracker.Enable) return null;
-
-		var requiredQuest = item.GetQuestRequired();
-		var requiredHideout = item.GetHideoutRequired();
-
-		var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
-
-		var trackedNeeds = new Dictionary<string, NeededItem>();
-
-		foreach (var memberProgress in teamProgress)
+		foreach (var neededItem in neededItems)
 		{
-			var neededItem = new NeededItem(item.Id);
-			var (questNeeded, questHave, fir) = GetQuestRequired(requiredQuest, memberProgress);
-			neededItem.QuestNeeded += questNeeded;
-			neededItem.QuestHave += questHave;
-			neededItem.FIR = fir;
+			count += neededItem.Count;
+			if (progress == null) continue;
 
-			var (hideoutNeeded, hideoutHave) = GetHideoutRequired(requiredHideout, memberProgress);
-			neededItem.HideoutNeeded += hideoutNeeded;
-			neededItem.HideoutHave += hideoutHave;
-
-			var name = memberProgress.DisplayName ?? "Unknown";
-			for (var i = 2; i < 99; i++)
+			var taskProgress = progress.TaskObjectives.Where(part => part.Id == neededItem.ProgressId).ToList();
+			foreach (var p in taskProgress)
 			{
-				if (!trackedNeeds.ContainsKey(name)) break;
-				name = $"{memberProgress.DisplayName} #{i}";
-			}
-
-			trackedNeeds.Add(name, neededItem);
-		}
-
-		return trackedNeeds.OrderBy(x => -x.Value.Remaining).ToList();
-	}
-
-	public static NeededItem GetSummedTrackingTeamNeeds(this Item item)
-	{
-		var result = new NeededItem(item.Id);
-		var teamData = item.GetTrackingTeamNeeds();
-		if (teamData == null)
-		{
-			result.HideoutNeeded = 0;
-			result.QuestNeeded = 0;
-			result.HideoutHave = 0;
-			result.QuestHave = 0;
-			return result;
-		}
-
-		foreach (var (_, value) in teamData)
-		{
-			result.HideoutNeeded += value.HideoutNeeded;
-			result.QuestNeeded += value.QuestNeeded;
-			result.HideoutHave += value.HideoutHave;
-			result.QuestHave += value.QuestHave;
-		}
-
-		return result;
-	}
-
-	private static (int need, int have, bool FIR) GetQuestRequired(IEnumerable<QuestItem> requiredQuestItems, Progress progress)
-	{
-		var need = 0;
-		var have = 0;
-		var fir = false;
-
-		// Add up all the quest requirements
-		foreach (var requirement in requiredQuestItems)
-			// Add the item if its FIR or we want to show non FIR
-			if (requirement.FIR || RatConfig.Tracking.ShowNonFIRNeeds)
-			{
-				// Update FIR flag to true if any quest is FIR
-				if (requirement.FIR) fir = true;
-
-				if (progress == null)
-				{
-					need += requirement.Needed;
-					continue;
-				}
-
-				// If the progress data doesn't have this requirement, then it should be a needed item
-				if (!progress.QuestObjectives.ContainsKey(requirement.QuestObjectiveId.ToString()))
-				{
-					need += requirement.Needed;
-				}
-				// Else if we have the requirement in our progress data but its not complete, it might have metadata
-				else if (progress.QuestObjectives[requirement.QuestObjectiveId.ToString()].Complete != true)
-				{
-					// Check if we have completed this quest need
-					need += requirement.Needed;
-					have += progress.QuestObjectives[requirement.QuestObjectiveId.ToString()].Have ?? 0;
-				}
-			}
-
-		return (need, have, fir);
-	}
-
-	private static (int need, int have) GetHideoutRequired(IEnumerable<HideoutItem> requiredHideoutItems, Progress progress)
-	{
-		var need = 0;
-		var have = 0;
-
-		// Add up all the hideout requirements
-		foreach (var requirement in requiredHideoutItems)
-		{
-			if (progress == null)
-			{
-				need += requirement.Needed;
-				continue;
-			}
-
-			// If the progress data doesn't have this requirement, then it should be a needed item
-			if (!progress.HideoutObjectives.ContainsKey(requirement.HideoutObjectiveId.ToString()))
-			{
-				need += requirement.Needed;
-			}
-			// Else if we have the requirement in our progress data but its not complete, it might have metadata
-			else if (progress.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Complete != true)
-			{
-				// Check if we have completed this hideout need
-				need += requirement.Needed;
-				have += progress.HideoutObjectives[requirement.HideoutObjectiveId.ToString()].Have ?? 0;
+				if (p.Complete) continue;
+				count -= p.Count;
 			}
 		}
 
-		return (need, have);
+		return count;
+	}
+
+	public static int GetHideoutRemaining(this Item item, bool firOnly = false, UserProgress? progress = null)
+	{
+		var count = 0;
+		var needed = TarkovDevAPI.GetNeededItems().hideout;
+		var neededItems = needed.Where(i => i.Id == item.Id && (i.FoundInRaid || !firOnly));
+
+		if (progress != null)
+		{
+			neededItems = neededItems.Where(i => !progress.HideoutModules.Any(h => h.Id == i.ModuleId && h.Complete));
+		}
+
+		if (!neededItems.Any()) return 0;
+
+		foreach (var neededItem in neededItems)
+		{
+			count += neededItem.Count;
+			if (progress == null) continue;
+
+			var partProgress = progress.HideoutParts.Where(part => part.Id == neededItem.ProgressId).ToList();
+			foreach (var p in partProgress)
+			{
+				if (p.Complete) continue;
+				count -= p.Count;
+			}
+		}
+
+		return count;
 	}
 
 	public static MarketItem GetMarketItem(this Item item)
@@ -233,5 +107,23 @@ public static class ItemExtensions
 		}
 
 		return result;
+	}
+
+	public static string GetBestTradeIconLink(this Item item)
+	{
+		var name = GetBestTrader(item).traderId switch
+		{
+			"54cb57776803fa99248b456e" => "Therapist",
+			"58330581ace78e27b8b10cee" => "Skier",
+			"5935c25fb3acc3127c3d8cd9" => "Peacekeeper",
+			"54cb50c76803fa8b248b4571" => "Prapor",
+			"579dc571d53a0658a154fbec" => "Fence",
+			"5a7c2eca46aef81a7ca2145d" => "Mechanic",
+			"5ac3b934156ae10c4430e83c" => "Ragman",
+			"5c0647fdd443bc2504c2d371" => "Jaeger",
+			"" => "",
+			_ => "Unknown",
+		};
+		return $"https://tarkov.dev/images/{name.ToLower()}-icon.jpg";
 	}
 }

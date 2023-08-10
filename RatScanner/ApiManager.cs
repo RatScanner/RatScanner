@@ -13,13 +13,12 @@ public static class ApiManager
 	public enum ResourceType
 	{
 		ClientVersion,
+		ClientForceUpdateVersions,
 		DownloadLink,
 		PatreonLink,
 		GithubLink,
 		DiscordLink,
 		FAQLink,
-		ItemDataBundleLink,
-		ItemDataBundleVersion,
 		UpdaterLink,
 	}
 
@@ -111,13 +110,12 @@ public static class ApiManager
 		return resourceType switch
 		{
 			ResourceType.ClientVersion => "RSClientVersion",
+			ResourceType.ClientForceUpdateVersions => "RSClientForceUpdateVersions",
 			ResourceType.DownloadLink => "RSDownloadLink",
 			ResourceType.PatreonLink => "RSPatreonLink",
 			ResourceType.GithubLink => "RSGithubLink",
 			ResourceType.DiscordLink => "RSDiscordLink",
 			ResourceType.FAQLink => "RSFAQLink",
-			ResourceType.ItemDataBundleLink => "RSItemDataBundleLink",
-			ResourceType.ItemDataBundleVersion => "RSItemDataBundleVersion",
 			ResourceType.UpdaterLink => "RSUpdaterLink",
 			_ => throw new NotImplementedException(),
 		};

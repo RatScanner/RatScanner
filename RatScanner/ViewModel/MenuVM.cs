@@ -1,22 +1,16 @@
-﻿using RatRazor.Interfaces;
-using RatScanner.FetchModels;
-using RatStash;
-using RatTracking.FetchModels;
+﻿using RatScanner.FetchModels.TarkovTracker;
+using RatScanner.Scan;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Web;
-using RatLib.Scan;
 
 namespace RatScanner.ViewModel;
 
-internal class MainWindowVM : INotifyPropertyChanged, IRatScannerUI
+internal class MenuVM : INotifyPropertyChanged
 {
-	private const string UpSymbol = "▲";
-	private const string DownSymbol = "▼";
-
 	private RatScannerMain _dataSource;
 
 	public RatScannerMain DataSource
@@ -29,54 +23,11 @@ internal class MainWindowVM : INotifyPropertyChanged, IRatScannerUI
 		}
 	}
 
-	public ItemScan CurrentItemScan => DataSource?.CurrentItemScan;
+	public ItemQueue ItemScans => DataSource?.ItemScans;
 
-	private Item MatchedItem => CurrentItemScan?.MatchedItem;
+	public ItemScan LastItemScan => ItemScans.LastOrDefault(new DefaultItemScan(true));
 
-	public string ItemId => MatchedItem.Id;
-
-	public string IconPath
-	{
-		get
-		{
-			ItemExtraInfo itemExtraInfo;
-			if (CurrentItemScan is ItemIconScan scan) itemExtraInfo = scan.ItemExtraInfo;
-			else itemExtraInfo = new ItemExtraInfo();
-			var path = CurrentItemScan.IconPath;
-			return path ?? RatConfig.Paths.UnknownIcon;
-		}
-	}
-
-	public string Name => MatchedItem.Name;
-
-	public string ShortName => MatchedItem.ShortName;
-
-	public bool HasMods => MatchedItem is CompoundItem itemC && itemC.Slots.Count > 0;
-
-	// https://youtrack.jetbrains.com/issue/RSRP-468572
-	// ReSharper disable InconsistentNaming
-	public int Avg24hPrice => MatchedItem.GetAvg24hMarketPrice();
-	// ReSharper restore InconsistentNaming
-
-	public int PricePerSlot => MatchedItem.GetAvg24hMarketPrice() / (MatchedItem.Width * MatchedItem.Height);
-
-	public string TraderName => TraderPrice.GetTraderName(MatchedItem.GetBestTrader().traderId);
-
-	public int BestTraderPrice => MatchedItem.GetBestTrader().price;
-
-	public int MaxTraderPrice => MatchedItem.GetMaxTraderPrice();
-
-
-	public NeededItem TrackingNeeds => MatchedItem.GetTrackingNeeds();
-	public NeededItem TrackingTeamNeedsSummed => MatchedItem.GetSummedTrackingTeamNeeds();
-
-	public string TrackingNeedsQuestRemaining => TrackingNeeds.QuestRemaining.ToString();
-	public string TrackingNeedsHideoutRemaining => TrackingNeeds.QuestRemaining.ToString();
-
-	public List<KeyValuePair<string, NeededItem>> TrackingTeamNeeds => MatchedItem.GetTrackingTeamNeeds();
-
-	public List<KeyValuePair<string, NeededItem>> TrackingTeamNeedsFiltered =>
-		TrackingTeamNeeds?.Where(x => x.Value.Remaining > 0).ToList() ?? new List<KeyValuePair<string, NeededItem>>();
+	public RatStash.Item LastItem => LastItemScan.MatchedItem;
 
 	public string DiscordLink => ApiManager.GetResource(ApiManager.ResourceType.DiscordLink);
 
@@ -89,7 +40,7 @@ internal class MainWindowVM : INotifyPropertyChanged, IRatScannerUI
 		get
 		{
 			var dt = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-			var min = MatchedItem.GetMarketItem().Timestamp;
+			var min = LastItem.GetMarketItem().Timestamp;
 			return dt.AddSeconds(min).ToLocalTime().ToString(CultureInfo.CurrentCulture);
 		}
 	}
@@ -98,21 +49,68 @@ internal class MainWindowVM : INotifyPropertyChanged, IRatScannerUI
 	{
 		get
 		{
-			var link = MatchedItem.GetMarketItem().WikiLink;
+			var link = LastItem.GetMarketItem().WikiLink;
 			if (link.Length > 3) return link;
-			return $"https://escapefromtarkov.gamepedia.com/{HttpUtility.UrlEncode(Name.Replace(" ", "_"))}";
+			return $"https://escapefromtarkov.gamepedia.com/{HttpUtility.UrlEncode(LastItem.Name.Replace(" ", "_"))}";
 		}
 	}
 
-	public string TarkovDevLink => $"https://tarkov.dev/item/{ItemId}";
+	private UserProgress GetUserProgress()
+	{
+		UserProgress progress = null;
+		if (RatConfig.Tracking.TarkovTracker.Enable && RatScannerMain.Instance.TarkovTrackerDB.Progress.Count >= 1)
+		{
+			var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
+			progress = teamProgress.FirstOrDefault(x => x.UserId == RatScannerMain.Instance.TarkovTrackerDB.Self);
+		}
+		return progress;
+	}
 
-	public string IconLink => MatchedItem.GetMarketItem().IconLink;
+	public int TaskRemaining => LastItem.GetTaskRemaining(!RatConfig.Tracking.ShowNonFIRNeeds, GetUserProgress());
 
-	public string ImageLink => MatchedItem.GetMarketItem().ImageLink;
+	public int HideoutRemaining => LastItem.GetHideoutRemaining(false, GetUserProgress());
+
+	public bool ItemNeeded => TaskRemaining + HideoutRemaining > 0;
+
+	public List<KeyValuePair<string, KeyValuePair<int, int>>> ItemTeamNeeds
+	{
+		get
+		{
+			if (!RatConfig.Tracking.TarkovTracker.Enable) return null;
+			var progress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
+			var teamProgress = progress.Where(x => x.UserId != RatScannerMain.Instance.TarkovTrackerDB.Self);
+
+			var needs = new List<KeyValuePair<string, KeyValuePair<int, int>>>();
+			foreach (var memberProgress in teamProgress)
+			{
+				var task = LastItem.GetTaskRemaining(!RatConfig.Tracking.ShowNonFIRNeeds, memberProgress);
+				var hideout = LastItem.GetHideoutRemaining(false, memberProgress);
+
+				if (task == 0 && hideout == 0) continue;
+
+				var need = new KeyValuePair<int, int>(task, hideout);
+
+				var name = memberProgress.DisplayName ?? "Unknown";
+				for (var i = 2; i < 99; i++)
+				{
+					if (needs.All(n => n.Key != name)) break;
+					name = $"{memberProgress.DisplayName} #{i}";
+				}
+
+				needs.Add(new KeyValuePair<string, KeyValuePair<int, int>>(name, need));
+			}
+
+			return needs;
+		}
+	}
+
+	public (int task, int hideout) ItemTeamNeedsSummed => (ItemTeamNeeds.Sum(i => i.Value.Key), ItemTeamNeeds.Sum(i => i.Value.Value));
+
+	public bool ItemTeamNeeded => ItemTeamNeeds.Any();
 
 	public event PropertyChangedEventHandler PropertyChanged;
 
-	public MainWindowVM(RatScannerMain ratScanner)
+	public MenuVM(RatScannerMain ratScanner)
 	{
 		DataSource = ratScanner;
 		DataSource.PropertyChanged += ModelPropertyChanged;
@@ -146,7 +144,7 @@ internal class MainWindowVM : INotifyPropertyChanged, IRatScannerUI
 
 		var suffixes = new string[] { "", "K", "M", "B", "T" };
 
-		var result = priceStr.Substring(0, 3);
+		var result = priceStr[..3];
 
 		var dotPos = priceStr.Length % 3;
 		//if (dotPos != 0) result = result.Insert(dotPos, ".");
