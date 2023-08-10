@@ -1,5 +1,5 @@
 ﻿@page "/app/settings/tarkovTools"
-@inject RatRazor.Interfaces.ISettingsUI SettingsUI
+@inject SettingsVM SettingsVM
 @implements IDisposable
 <div>
 	<MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
@@ -19,7 +19,7 @@
 						</div>
 					</MudItem>
 					<MudItem xs="12">
-						<MudTextField @bind-Value="SettingsUI.TarkovToolsRemoteControlSessionId"
+						<MudTextField @bind-Value="SettingsVM.TarkovToolsRemoteControlSessionId"
 						              Label="Session ID"
 						              Variant="Variant.Outlined"
 						              Margin="Margin.Dense"
@@ -29,10 +29,10 @@
 						              OnAdornmentClick="ResetSessionId"></MudTextField>
 					</MudItem>
 					<MudItem xs="12">
-						<MudCheckBox @bind-Checked="SettingsUI.TarkovToolsRemoteControlAutoSync" Label="Synchronize Item Scan" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+						<MudCheckBox @bind-Checked="SettingsVM.TarkovToolsRemoteControlAutoSync" Label="Synchronize Item Scan" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
 					</MudItem>
 					<MudItem xs="12">
-						<MudCheckBox @bind-Checked="SettingsUI.TarkovToolsRemoteControlOpenAmmoChart" Label="Open Ammo Chart" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+						<MudCheckBox @bind-Checked="SettingsVM.TarkovToolsRemoteControlOpenAmmoChart" Label="Open Ammo Chart" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
 					</MudItem>
 				</MudGrid>
 			</MudPaper>
@@ -42,17 +42,17 @@
 @code {
 	protected override void OnInitialized()
 	{
-		SettingsUI.PropertyChanged += PropertyChangeHandler;
+		SettingsVM.PropertyChanged += PropertyChangeHandler;
 	}
 
-	public void Dispose() => SettingsUI.PropertyChanged -= PropertyChangeHandler;
+	public void Dispose() => SettingsVM.PropertyChanged -= PropertyChangeHandler;
 
 	private async void PropertyChangeHandler(object sender, EventArgs e)
 	{
 		await InvokeAsync(() => StateHasChanged());
 	}
 
-	private void ResetSessionId() => SettingsUI.TarkovToolsRemoteControlSessionId = RandomAlphaNumString(12);
+	private void ResetSessionId() => SettingsVM.TarkovToolsRemoteControlSessionId = RandomAlphaNumString(12);
 
 	private static string RandomAlphaNumString(int length)
 	{

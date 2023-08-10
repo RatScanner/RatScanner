@@ -1,6 +1,7 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 
-namespace RatTracking.TarkovTools;
+namespace RatScanner.TarkovTools;
 
 [Serializable]
 public class TarkovToolsRemoteControllerException : Exception

@@ -1,7 +1,8 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using RatStash;
-using System.Runtime.CompilerServices;
 
-namespace RatTracking.TarkovTools;
+namespace RatScanner.TarkovTools;
 
 public static class TarkovToolsRemoteControlUtils
 {

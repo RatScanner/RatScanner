@@ -1,4 +1,7 @@
-﻿using System.Net.WebSockets;
+﻿using System;
+using System.Collections.Generic;
+using System.Net.WebSockets;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -6,7 +9,7 @@ using Websocket.Client;
 using Websocket.Client.Exceptions;
 using Websocket.Client.Models;
 
-namespace RatTracking.TarkovTools;
+namespace RatScanner.TarkovTools;
 
 public interface ITarkovToolsRemoteController : IDisposable
 {
@@ -18,7 +21,7 @@ public interface ITarkovToolsRemoteController : IDisposable
 
 public class TarkovToolsRemoteController : ITarkovToolsRemoteController
 {
-	private const string wssUri = "wss://hideout-socket-server.herokuapp.com";
+	private const string wssUri = "wss://socket.tarkov.dev";
 
 	private static readonly JsonSerializerSettings jsonSettings = new()
 	{

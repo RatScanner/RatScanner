@@ -3,7 +3,7 @@ using RatStash;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
-using RatTracking.TarkovTools;
+using RatScanner.TarkovTools;
 
 namespace RatScanner.ViewModel;
 
@@ -96,7 +96,7 @@ internal class SettingsVM : INotifyPropertyChanged
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
 	}
 
-	public async Task SaveSettingsAsync()
+	public void SaveSettings()
 	{
 		var updateMarketDB = NameScanLanguage != (int)RatConfig.NameScan.Language;
 		var updateTarkovTrackerToken = TarkovTrackerToken != RatConfig.Tracking.TarkovTracker.Token;
