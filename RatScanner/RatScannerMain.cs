@@ -66,11 +66,6 @@ public class RatScannerMain : INotifyPropertyChanged
 		Logger.Clear();
 
 		Logger.LogInfo("----- RatScanner " + RatConfig.Version + " -----");
-		Logger.LogInfo("Starting RatScanner...");
-
-		Logger.LogInfo("Loading config...");
-		RatConfig.LoadConfig();
-
 		Logger.LogInfo($"Screen Info: {RatConfig.ScreenWidth}x{RatConfig.ScreenHeight} at {RatConfig.ScreenScale * 100}%");
 
 		Logger.LogInfo("Setting temporary default item...");

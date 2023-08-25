@@ -122,7 +122,7 @@ internal static class RatConfig
 		set { }
 	}
 #else
-		internal static bool LogDebug = false;
+	internal static bool LogDebug = false;
 #endif
 	internal static bool MinimizeToTray = false;
 	internal static bool AlwaysOnTop = true;
@@ -133,6 +133,9 @@ internal static class RatConfig
 	internal static int ScreenHeight = 1080;
 	internal static float ScreenScale = 1f;
 	internal static bool SetScreen = false;
+	internal static int LastWindowPositionX = int.MinValue;
+	internal static int LastWindowPositionY = int.MinValue;
+	internal static WindowMode LastWindowMode = WindowMode.Normal;
 
 	internal static float GameScale => RatScannerMain.Instance.RatEyeEngine.Config.ProcessingConfig.Scale;
 
@@ -221,6 +224,10 @@ internal static class RatConfig
 		MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), MinimizeToTray);
 		AlwaysOnTop = config.ReadBool(nameof(AlwaysOnTop), AlwaysOnTop);
 		LogDebug = config.ReadBool(nameof(LogDebug), LogDebug);
+
+		LastWindowPositionX = config.ReadInt(nameof(LastWindowPositionX), LastWindowPositionX);
+		LastWindowPositionY = config.ReadInt(nameof(LastWindowPositionY), LastWindowPositionY);
+		LastWindowMode = (WindowMode)config.ReadInt(nameof(LastWindowMode), (int)LastWindowMode);
 	}
 
 	internal static void SaveConfig()
@@ -273,6 +280,9 @@ internal static class RatConfig
 		config.WriteBool(nameof(AlwaysOnTop), AlwaysOnTop);
 		config.WriteBool(nameof(LogDebug), LogDebug);
 		config.WriteInt(nameof(ConfigVersion), ConfigVersion);
+		config.WriteInt(nameof(LastWindowPositionX), LastWindowPositionX);
+		config.WriteInt(nameof(LastWindowPositionY), LastWindowPositionY);
+		config.WriteInt(nameof(LastWindowMode), (int)LastWindowMode);
 	}
 
 	/// <summary>
@@ -292,6 +302,13 @@ internal static class RatConfig
 		Effective = 0,
 		Angular = 1,
 		Raw = 2,
+	}
+
+	public enum WindowMode
+	{
+		Normal = 0,
+		Minimal = 1,
+		Minimized = 2,
 	}
 
 	public static double GetScalingForScreen(Screen screen)
