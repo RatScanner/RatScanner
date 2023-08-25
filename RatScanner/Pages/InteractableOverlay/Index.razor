@@ -83,7 +83,7 @@
 												var bestTrader = item.GetBestTrader();
 												var traderName = TraderPrice.GetTraderName(bestTrader.traderId);
 											}
-											<MudAvatar Image="@($"https://tarkov.dev/images/{@traderName.ToLower()}-icon.jpg")"
+                                            <MudAvatar Image="@($"https://tarkov.dev/images/traders/{@traderName.ToLower()}-icon.jpg")"
 											   Size="Size.Medium" Style="float: left;" Square="true" Variant="Variant.Outlined" />
 											<MudText Typo="Typo.subtitle2" Style="float: right;">@bestTrader.price.ToShortString()</MudText>
 										</MudStack>
