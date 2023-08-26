@@ -47,7 +47,7 @@
                             {
                                 <div class="d-flex align-center stroke">
 	                                @iconScan.MatchedItem.GetBestTrader().price.ToShortString()
-                                    <MudAvatar Image="@($"https://tarkov.dev/images/{@iconScan.TraderName.ToLower()}-icon.jpg")"
+                                    <MudAvatar Image="@($"https://tarkov.dev/images/traders/{@iconScan.TraderName.ToLower()}-icon.jpg")"
                                                Size="Size.Small" Style="float: right;" Class="ml-1" />
                                 </div>
                             }
@@ -85,7 +85,7 @@
                     {
                         <div class="d-flex align-center">
                             @itemScan.MatchedItem.GetBestTrader().price.ToShortString()
-                            <MudAvatar Image="@($"https://tarkov.dev/images/{@itemScan.TraderName.ToLower()}-icon.jpg")" Size="Size.Small" Style="float: right;" Class="ml-1" />
+                            <MudAvatar Image="@($"https://tarkov.dev/images/traders/{@itemScan.TraderName.ToLower()}-icon.jpg")" Size="Size.Small" Style="float: right;" Class="ml-1" />
                         </div>
                     }
 
