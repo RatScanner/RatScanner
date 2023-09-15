@@ -57,16 +57,6 @@ public class TaskObjectiveBuildItem : ITaskObjective
 				ProgressId = Id,
 				TaskId = taskId,
 			}))
-			.Concat(ContainsOne.Select(x => new NeededItem
-			{
-				Id = x.Id,
-				Count = 1,
-				FoundInRaid = false,
-				HasAlternatives = true,
-				ProgressType = ProgressType.TaskTurnin,
-				ProgressId = Id,
-				TaskId = taskId,
-			}))
 			.ToList();
 	}
 }
