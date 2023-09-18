@@ -106,7 +106,7 @@ internal class MenuVM : INotifyPropertyChanged
 
 	public (int task, int hideout) ItemTeamNeedsSummed => (ItemTeamNeeds.Sum(i => i.Value.Key), ItemTeamNeeds.Sum(i => i.Value.Value));
 
-	public bool ItemTeamNeeded => ItemTeamNeeds.Any();
+	public bool ItemTeamNeeded => ItemTeamNeeds != null && ItemTeamNeeds.Any();
 
 	public event PropertyChangedEventHandler PropertyChanged;
 
