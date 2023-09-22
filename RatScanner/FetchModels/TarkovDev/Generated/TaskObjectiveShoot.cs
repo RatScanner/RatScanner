@@ -57,39 +57,5 @@ public class TaskObjectiveShoot : ITaskObjective
 	[JsonProperty("enemyHealthEffect")]
 	public HealthEffect EnemyHealthEffect { get; set; }
 
-	public List<NeededItem> GetNeededItems(string taskId)
-	{
-		// Create a list of needed items from the array of weapons
-		return UsingWeapon.Where(x => x != null).Select(x => new NeededItem()
-			{
-				Id = x.Id,
-				Count = 1,
-				FoundInRaid = false,
-				ProgressType = ProgressType.TaskUse,
-				HasAlternatives = UsingWeapon.Count > 1,
-				ProgressId = Id,
-				TaskId = taskId
-			})
-			.Concat(UsingWeaponMods.Where(x => x != null).SelectMany(x => x.Select(y => new NeededItem()
-			{
-				Id = y.Id,
-				Count = 1,
-				FoundInRaid = false,
-				ProgressType = ProgressType.TaskUse,
-				HasAlternatives = x.Count > 1,
-				ProgressId = Id,
-				TaskId = taskId
-			})))
-			.Concat(Wearing.Where(x => x != null).SelectMany(x => x.Select(y => new NeededItem()
-			{
-				Id = y.Id,
-				Count = 1,
-				FoundInRaid = false,
-				ProgressType = ProgressType.TaskUse,
-				HasAlternatives = x.Count > 1,
-				ProgressId = Id,
-				TaskId = taskId
-			})))
-			.ToList();
-	}
+	public List<NeededItem> GetNeededItems(string taskId) => new();
 }
