@@ -47,12 +47,13 @@ public partial class BlazorInteractableOverlay : Window
 		WindowBlurEffect.SetBlur(this, accent);
 	}
 
-	internal void ShowOverlay()
+	async internal void ShowOverlay()
 	{
 		ApplyBlurBehind();
 		SetPosition();
 		this.Show();
-		blazorInteractableOverlayWebView.WebView.ExecuteScriptAsync("ShowOverlay()");
+		await blazorInteractableOverlayWebView.WebView.EnsureCoreWebView2Async();
+		await blazorInteractableOverlayWebView.WebView.ExecuteScriptAsync("ShowOverlay()");
 	}
 
 	internal void HideOverlay()
