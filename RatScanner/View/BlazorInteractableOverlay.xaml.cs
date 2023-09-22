@@ -24,11 +24,11 @@ public partial class BlazorInteractableOverlay : Window
 	private void BlazorInteractableOverlay_Loaded(object sender, RoutedEventArgs e)
 	{
 		blazorInteractableOverlayWebView.WebView.DefaultBackgroundColor = System.Drawing.Color.Transparent;
-		SetPosition();
 		SetWindowStyle();
+		SetPosition();
+		ApplyBlurBehind();
 		blazorInteractableOverlayWebView.WebView.NavigationCompleted += WebView_Loaded;
 		blazorInteractableOverlayWebView.WebView.CoreWebView2InitializationCompleted += CoreWebView_Loaded;
-		WindowBlurEffect.EnableBlur(this, WindowBlurEffect.AccentState.ACCENT_ENABLE_BLURBEHIND);
 	}
 
 	private void SetPosition()
@@ -40,10 +40,19 @@ public partial class BlazorInteractableOverlay : Window
 		NativeMethods.SetWindowPos(handle, 0, b.Left, b.Top, b.Right - b.Left, b.Bottom - b.Top, 0);
 	}
 
+	private void ApplyBlurBehind()
+	{
+		var accent = WindowBlurEffect.AccentState.ACCENT_DISABLED;
+		if (RatConfig.Overlay.Search.BlurBehind) accent = WindowBlurEffect.AccentState.ACCENT_ENABLE_BLURBEHIND;
+		WindowBlurEffect.SetBlur(this, accent);
+	}
+
 	internal void ShowOverlay()
 	{
+		ApplyBlurBehind();
 		SetPosition();
 		this.Show();
+		blazorInteractableOverlayWebView.WebView.ExecuteScriptAsync("ShowOverlay()");
 	}
 
 	internal void HideOverlay()

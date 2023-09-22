@@ -1,5 +1,4 @@
-﻿using RatScanner.Controls;
-using RatStash;
+﻿using RatStash;
 using System.ComponentModel;
 using System.Linq;
 
@@ -43,6 +42,11 @@ internal class SettingsVM : INotifyPropertyChanged
 
 	public bool ShowTarkovTrackerTeam { get; set; }
 
+	// Interactable Overlay
+	public bool EnableIneractableOverlay { get; set; }
+	public bool BlurBehindSearch { get; set; }
+	public Hotkey InteractableOverlayHotkey { get; set; }
+
 	internal SettingsVM()
 	{
 		LoadSettings();
@@ -82,6 +86,11 @@ internal class SettingsVM : INotifyPropertyChanged
 
 		TarkovTrackerToken = RatConfig.Tracking.TarkovTracker.Token;
 		ShowTarkovTrackerTeam = RatConfig.Tracking.TarkovTracker.ShowTeam;
+
+		EnableIneractableOverlay = RatConfig.Overlay.Search.Enable;
+		BlurBehindSearch = RatConfig.Overlay.Search.BlurBehind;
+		InteractableOverlayHotkey = RatConfig.Overlay.Search.Hotkey;
+
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
 	}
 
@@ -100,7 +109,7 @@ internal class SettingsVM : INotifyPropertyChanged
 		RatConfig.IconScan.Enable = EnableIconScan;
 		RatConfig.IconScan.ScanRotatedIcons = ScanRotatedIcons;
 		RatConfig.IconScan.UseCachedIcons = UseCachedIcons;
-		RatConfig.IconScan.Hotkey = (Hotkey)IconScanHotkey;
+		RatConfig.IconScan.Hotkey = IconScanHotkey;
 
 		RatConfig.ToolTip.Duration = int.TryParse(ToolTipDuration, out var i) ? i : 0;
 		RatConfig.ToolTip.Duration = ToolTipMilli;
@@ -118,6 +127,10 @@ internal class SettingsVM : INotifyPropertyChanged
 
 		RatConfig.Tracking.TarkovTracker.Token = TarkovTrackerToken.Trim();
 		RatConfig.Tracking.TarkovTracker.ShowTeam = ShowTarkovTrackerTeam;
+
+		RatConfig.Overlay.Search.Enable = EnableIneractableOverlay;
+		RatConfig.Overlay.Search.BlurBehind = BlurBehindSearch;
+		RatConfig.Overlay.Search.Hotkey = InteractableOverlayHotkey;
 
 		RatConfig.ScreenWidth = ScreenWidth;
 		RatConfig.ScreenHeight = ScreenHeight;

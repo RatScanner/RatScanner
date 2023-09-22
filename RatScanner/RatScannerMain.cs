@@ -12,7 +12,6 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
-using Color = System.Drawing.Color;
 using MessageBox = System.Windows.MessageBox;
 using PixelFormat = System.Drawing.Imaging.PixelFormat;
 using Size = System.Drawing.Size;
@@ -67,11 +66,6 @@ public class RatScannerMain : INotifyPropertyChanged
 		Logger.Clear();
 
 		Logger.LogInfo("----- RatScanner " + RatConfig.Version + " -----");
-		Logger.LogInfo("Starting RatScanner...");
-
-		Logger.LogInfo("Loading config...");
-		RatConfig.LoadConfig();
-
 		Logger.LogInfo($"Screen Info: {RatConfig.ScreenWidth}x{RatConfig.ScreenHeight} at {RatConfig.ScreenScale * 100}%");
 
 		Logger.LogInfo("Setting temporary default item...");
@@ -121,7 +115,7 @@ public class RatScannerMain : INotifyPropertyChanged
 
 			Logger.LogInfo("Setting default item...");
 			var itemScan = new DefaultItemScan(false);
-			itemScan.BestTraderPrice = itemScan.MatchedItem.GetMaxTraderPrice();
+			itemScan.BestTraderPrice = itemScan.MatchedItem.GetBestTrader().price.Value;
 			ItemScans.Enqueue(itemScan);
 
 			Logger.LogInfo("Enabling hotkeys...");
@@ -288,7 +282,7 @@ public class RatScannerMain : INotifyPropertyChanged
 			tempNameScan.Avg24hPrice = tempNameScan.MatchedItem.GetMarketItem().Avg24hPrice;
 			tempNameScan.PricePerSlot = tempNameScan.MatchedItem.GetMarketItem().Avg24hPrice / (tempNameScan.MatchedItem.Width * tempNameScan.MatchedItem.Height);
 			tempNameScan.TraderName = TraderPrice.GetTraderName(tempNameScan.MatchedItem.GetBestTrader().traderId);
-			tempNameScan.BestTraderPrice = tempNameScan.MatchedItem.GetBestTrader().price;
+			tempNameScan.BestTraderPrice = tempNameScan.MatchedItem.GetBestTrader().price.Value;
 
 			ItemScans.Enqueue(tempNameScan);
 
@@ -335,7 +329,7 @@ public class RatScannerMain : INotifyPropertyChanged
 					Avg24hPrice = inspection.Item.GetMarketItem().Avg24hPrice,
 					PricePerSlot = inspection.Item.GetMarketItem().Avg24hPrice / (inspection.Item.Width * inspection.Item.Height),
 					TraderName = TraderPrice.GetTraderName(inspection.Item.GetBestTrader().traderId),
-					BestTraderPrice = inspection.Item.GetBestTrader().price,
+					BestTraderPrice = inspection.Item.GetBestTrader().price.Value,
 				};
 
 				ItemScans.Enqueue(tempNameScan);
@@ -380,7 +374,7 @@ public class RatScannerMain : INotifyPropertyChanged
 				Avg24hPrice = icon.Item.GetMarketItem().Avg24hPrice,
 				PricePerSlot = icon.Item.GetMarketItem().Avg24hPrice / (icon.Item.Width * icon.Item.Height),
 				TraderName = TraderPrice.GetTraderName(icon.Item.GetBestTrader().traderId),
-				BestTraderPrice = icon.Item.GetBestTrader().price,
+				BestTraderPrice = icon.Item.GetBestTrader().price.Value,
 			};
 
 			ItemScans.Enqueue(tempIconScan);

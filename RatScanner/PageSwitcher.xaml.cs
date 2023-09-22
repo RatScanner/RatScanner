@@ -27,13 +27,20 @@ public partial class PageSwitcher : Window
 		try
 		{
 			_instance = this;
+			RatConfig.LoadConfig();
 
 			InitializeComponent();
 			ResetWindowSize();
 			Navigate(new BlazorUI());
 			AddTrayIcon();
 
+			if (RatConfig.LastWindowPositionX != int.MinValue || RatConfig.LastWindowPositionY != int.MinValue)
+			{
+				Left = RatConfig.LastWindowPositionX;
+				Top = RatConfig.LastWindowPositionY;
+			}
 			Topmost = RatConfig.AlwaysOnTop;
+			if (RatConfig.LastWindowMode == RatConfig.WindowMode.Minimal) OnTitleBarMinimal(null, null);
 		}
 		catch (Exception e)
 		{
@@ -86,7 +93,9 @@ public partial class PageSwitcher : Window
 		}
 
 		base.OnClosed(e);
-
+		RatConfig.LastWindowPositionX = (int)this.Left;
+		RatConfig.LastWindowPositionY = (int)this.Top;
+		RatConfig.SaveConfig();
 		Application.Current.Shutdown();
 	}
 
@@ -113,11 +122,13 @@ public partial class PageSwitcher : Window
 
 	private void OnTitleBarMinimize(object sender, RoutedEventArgs e)
 	{
+		RatConfig.LastWindowMode = RatConfig.WindowMode.Minimized;
 		WindowState = WindowState.Minimized;
 	}
 
 	private void OnTitleBarMinimal(object sender, RoutedEventArgs e)
 	{
+		RatConfig.LastWindowMode = RatConfig.WindowMode.Minimal;
 		CollapseTitleBar();
 		SizeToContent = SizeToContent.WidthAndHeight;
 		SetBackgroundOpacity(RatConfig.MinimalUi.Opacity / 100f);
