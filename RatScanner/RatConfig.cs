@@ -110,6 +110,7 @@ internal static class RatConfig
 		internal static class Search
 		{
 			internal static bool Enable = true;
+			internal static bool BlurBehind = true;
 			internal static Hotkey Hotkey = new(new[] { Key.N, Key.M }.ToList());
 		}
 	}
@@ -179,9 +180,7 @@ internal static class RatConfig
 		config.Section = nameof(IconScan);
 		IconScan.Enable = config.ReadBool(nameof(IconScan.Enable), IconScan.Enable);
 		IconScan.ScanRotatedIcons = config.ReadBool(nameof(IconScan.ScanRotatedIcons), IconScan.ScanRotatedIcons);
-		var keyboardKeys = config.ReadEnumerableEnum(nameof(IconScan.Hotkey) + "Keyboard", IconScan.Hotkey.KeyboardKeys);
-		var mouseButtons = config.ReadEnumerableEnum(nameof(IconScan.Hotkey) + "Mouse", IconScan.Hotkey.MouseButtons);
-		IconScan.Hotkey = new Hotkey(keyboardKeys.ToList(), mouseButtons.ToList());
+		IconScan.Hotkey = config.ReadHotkey(nameof(IconScan.Hotkey), IconScan.Hotkey);
 		IconScan.UseCachedIcons = config.ReadBool(nameof(IconScan.UseCachedIcons), IconScan.UseCachedIcons);
 
 		config.Section = nameof(ToolTip);
@@ -209,9 +208,8 @@ internal static class RatConfig
 
 		config.Section = nameof(Overlay.Search);
 		Overlay.Search.Enable = config.ReadBool(nameof(Overlay.Search.Enable), Overlay.Search.Enable);
-		keyboardKeys = config.ReadEnumerableEnum(nameof(Overlay.Search.Hotkey) + "Keyboard", Overlay.Search.Hotkey.KeyboardKeys);
-		mouseButtons = config.ReadEnumerableEnum(nameof(Overlay.Search.Hotkey) + "Mouse", Overlay.Search.Hotkey.MouseButtons);
-		Overlay.Search.Hotkey = new Hotkey(keyboardKeys.ToList(), mouseButtons.ToList());
+		Overlay.Search.BlurBehind = config.ReadBool(nameof(Overlay.Search.BlurBehind), Overlay.Search.BlurBehind);
+		Overlay.Search.Hotkey = config.ReadHotkey(nameof(Overlay.Search.Hotkey), Overlay.Search.Hotkey);
 
 		config.Section = "Other";
 		if (!SetScreen)
@@ -242,8 +240,7 @@ internal static class RatConfig
 		config.Section = nameof(IconScan);
 		config.WriteBool(nameof(IconScan.Enable), IconScan.Enable);
 		config.WriteBool(nameof(IconScan.ScanRotatedIcons), IconScan.ScanRotatedIcons);
-		config.WriteEnumerableEnum(nameof(IconScan.Hotkey) + "Keyboard", IconScan.Hotkey.KeyboardKeys);
-		config.WriteEnumerableEnum(nameof(IconScan.Hotkey) + "Mouse", IconScan.Hotkey.MouseButtons);
+		config.WriteHotkey(nameof(IconScan.Hotkey), IconScan.Hotkey);
 		config.WriteBool(nameof(IconScan.UseCachedIcons), IconScan.UseCachedIcons);
 
 		config.Section = nameof(ToolTip);
@@ -271,6 +268,8 @@ internal static class RatConfig
 
 		config.Section = nameof(Overlay.Search);
 		config.WriteBool(nameof(Overlay.Search.Enable), Overlay.Search.Enable);
+		config.WriteBool(nameof(Overlay.Search.BlurBehind), Overlay.Search.BlurBehind);
+		config.WriteHotkey(nameof(Overlay.Search.Hotkey), Overlay.Search.Hotkey);
 
 		config.Section = "Other";
 		config.WriteInt(nameof(ScreenWidth), ScreenWidth);

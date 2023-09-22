@@ -1,9 +1,12 @@
-﻿using System;
+﻿using RatEye;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Windows.Forms;
+using static RatScanner.RatConfig;
 
 namespace RatScanner;
 
@@ -53,6 +56,12 @@ internal class SimpleConfig
 			return;
 		}
 		WriteString(key, string.Join(EnumerableSeparator, value));
+	}
+
+	internal void WriteHotkey(string key, Hotkey value)
+	{
+		WriteEnumerableEnum(key + "Keyboard", value.KeyboardKeys);
+		WriteEnumerableEnum(key + "Mouse", value.MouseButtons);
 	}
 
 	internal string ReadString(string key, string defaultValue = "")
@@ -119,5 +128,13 @@ internal class SimpleConfig
 		{
 			return defaultValue;
 		}
+	}
+
+	internal Hotkey? ReadHotkey(string key, Hotkey defaultValue = null)
+	{
+		var keyboardKeys = ReadEnumerableEnum(key + "Keyboard", defaultValue.KeyboardKeys);
+		var mouseButtons = ReadEnumerableEnum(key + "Mouse", defaultValue.MouseButtons);
+		return new Hotkey(keyboardKeys.ToList(), mouseButtons.ToList());
+
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using RatStash;
 using System;
 using System.Runtime.InteropServices;
 using System.Windows;
@@ -61,7 +62,7 @@ static class WindowBlurEffect
 		return registryValue == 1;
 	}
 
-	internal static void EnableBlur(Window window, AccentState accentState)
+	internal static void SetBlur(Window window, AccentState accentState)
 	{
 		if (!IsTransparencyAvailable())
 		{
