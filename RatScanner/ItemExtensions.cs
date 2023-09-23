@@ -8,11 +8,25 @@ namespace RatScanner;
 
 public static class ItemExtensions
 {
-	public static int GetTaskRemaining(this Item item, bool firOnly = false, UserProgress? progress = null)
+	private static UserProgress? GetUserProgress()
 	{
+		UserProgress progress = null;
+		if (RatConfig.Tracking.TarkovTracker.Enable && RatScannerMain.Instance.TarkovTrackerDB.Progress.Count >= 1)
+		{
+			var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
+			progress = teamProgress.FirstOrDefault(x => x.UserId == RatScannerMain.Instance.TarkovTrackerDB.Self);
+		}
+		return progress;
+	}
+
+	public static int GetTaskRemaining(this Item item, UserProgress? progress = null)
+	{
+		progress ??= GetUserProgress();
+
 		var count = 0;
+		var showNonFir = RatConfig.Tracking.ShowNonFIRNeeds;
 		var needed = TarkovDevAPI.GetNeededItems().tasks;
-		var neededItems = needed.Where(i => i.Id == item.Id && (i.FoundInRaid || !firOnly));
+		var neededItems = needed.Where(i => i.Id == item.Id && (i.FoundInRaid || showNonFir));
 
 		if (progress != null)
 		{
@@ -37,11 +51,13 @@ public static class ItemExtensions
 		return count;
 	}
 
-	public static int GetHideoutRemaining(this Item item, bool firOnly = false, UserProgress? progress = null)
+	public static int GetHideoutRemaining(this Item item, UserProgress? progress = null)
 	{
+		progress ??= GetUserProgress();
+
 		var count = 0;
 		var needed = TarkovDevAPI.GetNeededItems().hideout;
-		var neededItems = needed.Where(i => i.Id == item.Id && (i.FoundInRaid || !firOnly));
+		var neededItems = needed.Where(i => i.Id == item.Id);
 
 		if (progress != null)
 		{

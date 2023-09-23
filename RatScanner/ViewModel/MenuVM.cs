@@ -55,20 +55,9 @@ internal class MenuVM : INotifyPropertyChanged
 		}
 	}
 
-	private UserProgress GetUserProgress()
-	{
-		UserProgress progress = null;
-		if (RatConfig.Tracking.TarkovTracker.Enable && RatScannerMain.Instance.TarkovTrackerDB.Progress.Count >= 1)
-		{
-			var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
-			progress = teamProgress.FirstOrDefault(x => x.UserId == RatScannerMain.Instance.TarkovTrackerDB.Self);
-		}
-		return progress;
-	}
+	public int TaskRemaining => LastItem.GetTaskRemaining();
 
-	public int TaskRemaining => LastItem.GetTaskRemaining(!RatConfig.Tracking.ShowNonFIRNeeds, GetUserProgress());
-
-	public int HideoutRemaining => LastItem.GetHideoutRemaining(false, GetUserProgress());
+	public int HideoutRemaining => LastItem.GetHideoutRemaining();
 
 	public bool ItemNeeded => TaskRemaining + HideoutRemaining > 0;
 
@@ -83,8 +72,8 @@ internal class MenuVM : INotifyPropertyChanged
 			var needs = new List<KeyValuePair<string, KeyValuePair<int, int>>>();
 			foreach (var memberProgress in teamProgress)
 			{
-				var task = LastItem.GetTaskRemaining(!RatConfig.Tracking.ShowNonFIRNeeds, memberProgress);
-				var hideout = LastItem.GetHideoutRemaining(false, memberProgress);
+				var task = LastItem.GetTaskRemaining(memberProgress);
+				var hideout = LastItem.GetHideoutRemaining(memberProgress);
 
 				if (task == 0 && hideout == 0) continue;
 
