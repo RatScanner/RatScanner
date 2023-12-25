@@ -1,6 +1,7 @@
 ﻿using RatScanner.FetchModels;
 using RatScanner.FetchModels.TarkovTracker;
 using RatStash;
+using System;
 using System.Linq;
 using Item = RatStash.Item;
 
@@ -110,6 +111,36 @@ public static class ItemExtensions
 		if (item is CompoundItem itemC) total += itemC.Slots.Sum(slot => slot.ContainedItem?.GetTraderPrice(traderId).Value ?? 0);
 
 		return new Price(total);
+	}
+
+	public static Price GetFleaTaxPrice(this Item item, int quantity = 1)
+	{
+		int Vo = item.GetMarketItem().BasePrice;
+		int Vr = item.GetAvg24hMarketPrice().Value;
+
+		double Po;
+		double Pr;
+
+		try
+		{
+			Po = Math.Pow(Math.Log10(Vo / Vr), Vr < Vo ? 1.08 : 1);
+			Pr = Math.Pow(Math.Log10(Vr / Vo), Vr >= Vo ? 1.08 : 1);
+		} catch (DivideByZeroException)
+		{
+			return new Price(0);
+		}
+
+		float Ti = 0.05f; // Tax constant
+		float Tr = 0.05f; // Tax constant
+
+		int fee = Convert.ToInt32(Math.Round((Vo * Ti * Math.Pow(4, Po) * quantity) + (Vr * Tr * Math.Pow(4, Pr) * quantity)));
+
+		return new Price(fee);
+	}
+
+	public static Price GetFleaVsTraderProfit(this Item item)
+	{
+		return new Price((item.GetAvg24hMarketPrice().Value - item.GetFleaTaxPrice().Value) - item.GetTraderPrice(item.GetBestTrader().traderId).Value);
 	}
 
 	public static (string traderId, Price price) GetBestTrader(this Item item)
