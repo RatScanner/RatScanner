@@ -1,6 +1,7 @@
 ﻿using RatScanner.FetchModels;
 using RatScanner.FetchModels.TarkovTracker;
 using RatStash;
+using System;
 using System.Linq;
 using Item = RatStash.Item;
 
@@ -112,13 +113,55 @@ public static class ItemExtensions
 		return new Price(total);
 	}
 
-	public static (string traderId, Price price) GetBestTrader(this Item item)
+	public static Price GetFleaTaxPrice(this Item item, int quantity = 1)
 	{
-		(string traderId, Price price) result = ("", new Price(0));
+		int Vo = item.GetMarketItem().BasePrice;
+		int Vr = item.GetAvg24hMarketPrice().Value;
+
+		double Po;
+		double Pr;
+
+		try
+		{
+			Po = Math.Pow(Math.Log10(Vo / Vr), Vr < Vo ? 1.08 : 1);
+			Pr = Math.Pow(Math.Log10(Vr / Vo), Vr >= Vo ? 1.08 : 1);
+		}
+		catch (DivideByZeroException)
+		{
+			return new Price(0);
+		}
+
+		float Ti = 0.05f; // Tax constant
+		float Tr = 0.05f; // Tax constant
+
+		int fee = Convert.ToInt32(Math.Round((Vo * Ti * Math.Pow(4, Po) * quantity) + (Vr * Tr * Math.Pow(4, Pr) * quantity)));
+
+		return new Price(fee);
+	}
+
+	public static Price GetFleaVsTraderProfit(this Item item)
+	{
+		return new Price((item.GetAvg24hMarketPrice().Value - item.GetFleaTaxPrice().Value) - item.GetTraderPrice(item.GetBestTrader().traderId).Value);
+	}
+
+	public static Price GetFleaVsTraderProfitPerSlot(this Item item)
+	{
+		return new Price(item.GetFleaVsTraderProfit().Value / (item.Width * item.Height));
+	}
+
+	public static string GetBestProfitableMethod(this Item item, Scan.ItemScan itemScan)
+	{
+		return (item.GetAvg24hMarketPrice().Value - item.GetFleaTaxPrice().Value) > item.GetBestTrader().price.Value ? "Flea" : itemScan.TraderName;
+	}
+
+	public static (string traderId, Price price, Price pricePerSlot) GetBestTrader(this Item item)
+	{
+		(string traderId, Price price, Price pricePerSlot) result = ("", new Price(0), new Price(0));
 		foreach (var traderId in TraderPrice.TraderIds)
 		{
 			var traderPrice = item.GetTraderPrice(traderId);
-			if (traderPrice.Value > result.price.Value) result = (traderId, traderPrice);
+			var traderPricePerSlot = new Price(traderPrice.Value / (item.Width * item.Height));
+			if (traderPrice.Value > result.price.Value) result = (traderId, traderPrice, traderPricePerSlot);
 		}
 
 		return result;
