@@ -112,13 +112,14 @@ public static class ItemExtensions
 		return new Price(total);
 	}
 
-	public static (string traderId, Price price) GetBestTrader(this Item item)
+	public static (string traderId, Price price, Price pricePerSlot) GetBestTrader(this Item item)
 	{
-		(string traderId, Price price) result = ("", new Price(0));
+		(string traderId, Price price, Price pricePerSlot) result = ("", new Price(0), new Price(0));
 		foreach (var traderId in TraderPrice.TraderIds)
 		{
 			var traderPrice = item.GetTraderPrice(traderId);
-			if (traderPrice.Value > result.price.Value) result = (traderId, traderPrice);
+			var traderPricePerSlot = new Price(traderPrice.Value / (item.Width * item.Height));
+			if (traderPrice.Value > result.price.Value) result = (traderId, traderPrice, traderPricePerSlot);
 		}
 
 		return result;
