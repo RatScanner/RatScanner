@@ -144,6 +144,16 @@ public static class ItemExtensions
 		return new Price((item.GetAvg24hMarketPrice().Value - item.GetFleaTaxPrice().Value) - item.GetTraderPrice(item.GetBestTrader().traderId).Value);
 	}
 
+	public static Price GetFleaVsTraderProfitPerSlot(this Item item)
+	{
+		return new Price(item.GetFleaVsTraderProfit().Value / (item.Width * item.Height));
+	}
+
+	public static string GetBestProfitableMethod(this Item item, Scan.ItemScan itemScan)
+	{
+		return (item.GetAvg24hMarketPrice().Value - item.GetFleaTaxPrice().Value) > item.GetBestTrader().price.Value ? "Flea" : itemScan.TraderName;
+	}
+
 	public static (string traderId, Price price, Price pricePerSlot) GetBestTrader(this Item item)
 	{
 		(string traderId, Price price, Price pricePerSlot) result = ("", new Price(0), new Price(0));
