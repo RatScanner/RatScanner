@@ -29,16 +29,4 @@ public class Craft
 
 	[JsonProperty("rewardItems")]
 	public List<ContainedItem> RewardItems { get; set; }
-
-	[Obsolete("Use stationLevel instead.")]
-	[JsonProperty("source")]
-	public string Source { get; set; }
-
-	[Obsolete("Use stationLevel instead.")]
-	[JsonProperty("sourceName")]
-	public string SourceName { get; set; }
-
-	[Obsolete("Use stationLevel instead.")]
-	[JsonProperty("requirements")]
-	public List<PriceRequirement> Requirements { get; set; }
 }

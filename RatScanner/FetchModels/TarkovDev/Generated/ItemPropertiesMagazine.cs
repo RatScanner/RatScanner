@@ -9,10 +9,6 @@ public class ItemPropertiesMagazine : ItemProperties
 	[JsonProperty("ergonomics")]
 	public double? Ergonomics { get; set; }
 
-	[Obsolete("Use recoilModifier instead.")]
-	[JsonProperty("recoil")]
-	public double? Recoil { get; set; }
-
 	[JsonProperty("recoilModifier")]
 	public double? RecoilModifier { get; set; }
 

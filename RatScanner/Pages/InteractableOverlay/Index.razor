@@ -29,7 +29,7 @@
 				<MudStack Spacing="2" Class="py-2">
 					@foreach (var searchResult in _searchResults)
 					{
-						if (searchResult.Data is RatStash.Item item)
+						if (searchResult.Data is FetchModels.TarkovDev.Item item)
 						{
 							<MudPaper Class="pa-2" Elevation="3" Style="height:8vh;">
 								<MudStack Row="true" Justify="Justify.SpaceBetween" Style="height: 100%;">
@@ -69,7 +69,7 @@
 									<MudStack Row="true" Justify="Justify.FlexEnd">
 										<MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Style="width: 8vw" Spacing="0">
 											<MudText Typo="Typo.h6">
-												@item.GetAvg24hMarketPrice()
+												@item.Avg24HPrice
 											</MudText>
 											<MudText>
 												@item.GetAvg24hMarketPricePerSlot()
@@ -80,12 +80,12 @@
 
 										<MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Center" Style="width: 3vw" Spacing="0">
 											@{
-												var bestTrader = item.GetBestTrader();
-												var traderName = TraderPrice.GetTraderName(bestTrader.traderId);
+												var bestTrader = item.GetBestTraderOffer();
+												var traderImage = item.GetBestTraderOfferVendor().Trader.ImageLink;
 											}
-                                            <MudAvatar Image="@($"https://tarkov.dev/images/traders/{@traderName.ToLower()}-icon.jpg")"
+                                            <MudAvatar Image="@traderImage"
 											   Size="Size.Medium" Style="float: left;" Square="true" Variant="Variant.Outlined" />
-											<MudText Typo="Typo.subtitle2" Style="float: right;">@bestTrader.price.ToShortString()</MudText>
+                                            <MudText Typo="Typo.subtitle2" Style="float: right;">@bestTrader.PriceRub.AsRubs()</MudText>
 										</MudStack>
 									</MudStack>
 								</MudStack>
@@ -112,33 +112,33 @@
 </style>
 
 @code {
-	private List<RatStash.Item>? _items;
+    private List<FetchModels.TarkovDev.Item>? _items;
 
-	private static MudTextField<string> _searchTextField { get; set; }
+    private static MudTextField<string> _searchTextField { get; set; }
 
-	private string _searchText { get; set; }
+    private string _searchText { get; set; }
 
-	private IEnumerable<SearchResult> _searchResults { get; set; } = new List<SearchResult>();
+    private IEnumerable<SearchResult> _searchResults { get; set; } = new List<SearchResult>();
 
-	private async void ExecuteSearch(string value)
-	{
-		var items = await SearchItem(value);
-		var tmp = items ?? new SearchResult[0];
-		tmp = tmp.Where(result => result != null && result.Data != null);
-		tmp = tmp.OrderBy(result => result.Score).Take(4);
-		_searchResults = tmp;
-	}
+    private async void ExecuteSearch(string value)
+    {
+        var items = await SearchItem(value);
+        var tmp = items ?? new SearchResult[0];
+        tmp = tmp.Where(result => result != null && result.Data != null);
+        tmp = tmp.OrderBy(result => result.Score).Take(4);
+        _searchResults = tmp;
+    }
 
-	private async Task<IEnumerable<SearchResult>> SearchItem(string value)
-	{
-		if (_items == null) _items = RatScannerMain.Instance.RatStashDB?.GetItems()?.ToList() ?? null;
+    private async Task<IEnumerable<SearchResult>> SearchItem(string value)
+    {
+        if (_items == null) _items = RatScannerMain.Instance.ItemDB?.Values?.ToList() ?? null;
 		if (_items == null) return null;
 
 		if (string.IsNullOrEmpty(value)) return null;
 
 		value = SanitizeSearch(value);
 
-		Func<RatStash.Item, SearchResult> filter = (item) =>
+        Func<FetchModels.TarkovDev.Item, SearchResult> filter = (item) =>
 			{
 				if (SanitizeSearch(item.Name) == value) return new(item, 5);
 				if (SanitizeSearch(item.ShortName) == value) return new(item, 10);
@@ -160,7 +160,7 @@
 			};
 
 		var matches = new List<SearchResult>();
-		foreach (var item in _items)
+        foreach (var item in _items)
 		{
 			var match = filter(item);
 			if (match.Data == null) continue;

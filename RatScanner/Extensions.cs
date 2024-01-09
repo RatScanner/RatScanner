@@ -19,4 +19,10 @@ public static class Extensions
 		var suffix = suffixes[(int)Math.Floor((str.Length - 1) / 3f)];
 		return $"{digits}{suffix}";
 	}
+	public static string ToShortString(this int? value) => ToShortString(value ?? 0);
+
+	public static string AsRubs(this int value) => $"{value} ₽";
+	public static string AsRubs(this int? value) => AsRubs(value ?? 0);
+
+	public static string AsRubs(this string value) => $"{value} ₽";
 }

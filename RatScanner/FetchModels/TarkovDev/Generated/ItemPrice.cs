@@ -20,12 +20,4 @@ public class ItemPrice
 
 	[JsonProperty("priceRUB")]
 	public int? PriceRub { get; set; }
-
-	[Obsolete("Use vendor instead.")]
-	[JsonProperty("source")]
-	public ItemSourceName? Source { get; set; }
-
-	[Obsolete("Use vendor instead.")]
-	[JsonProperty("requirements")]
-	public List<PriceRequirement> Requirements { get; set; }
 }

@@ -141,7 +141,7 @@ internal class SettingsVM : INotifyPropertyChanged
 
 		// Apply config
 		PageSwitcher.Instance.Topmost = RatConfig.AlwaysOnTop;
-		if (updateMarketDB) RatScannerMain.Instance.MarketDB.Init();
+		//if (updateMarketDB) RatScannerMain.Instance.MarketDB.Init();//TODO
 		if (updateTarkovTrackerToken) UpdateTarkovTrackerToken();
 		if (updateResolution || updateLanguage) RatScannerMain.Instance.SetupRatEye();
 

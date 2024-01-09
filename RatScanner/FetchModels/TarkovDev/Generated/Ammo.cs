@@ -47,16 +47,8 @@ public class Ammo
 	[JsonProperty("penetrationPower")]
 	public int PenetrationPower { get; set; }
 
-	[Obsolete("Use accuracyModifier instead.")]
-	[JsonProperty("accuracy")]
-	public int? Accuracy { get; set; }
-
 	[JsonProperty("accuracyModifier")]
 	public double? AccuracyModifier { get; set; }
-
-	[Obsolete("Use recoilModifier instead.")]
-	[JsonProperty("recoil")]
-	public int? Recoil { get; set; }
 
 	[JsonProperty("recoilModifier")]
 	public double? RecoilModifier { get; set; }

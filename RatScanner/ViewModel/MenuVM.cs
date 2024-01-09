@@ -25,9 +25,9 @@ internal class MenuVM : INotifyPropertyChanged
 
 	public ItemQueue ItemScans => DataSource?.ItemScans;
 
-	public ItemScan LastItemScan => ItemScans.LastOrDefault(new DefaultItemScan(true));
+	public ItemScan LastItemScan => ItemScans.LastOrDefault();
 
-	public RatStash.Item LastItem => LastItemScan.MatchedItem;
+	public FetchModels.TarkovDev.Item LastItem => LastItemScan.Item;
 
 	public string DiscordLink => ApiManager.GetResource(ApiManager.ResourceType.DiscordLink);
 
@@ -35,21 +35,13 @@ internal class MenuVM : INotifyPropertyChanged
 
 	public string PatreonLink => ApiManager.GetResource(ApiManager.ResourceType.PatreonLink);
 
-	public string Updated
-	{
-		get
-		{
-			var dt = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-			var min = LastItem.GetMarketItem().Timestamp;
-			return dt.AddSeconds(min).ToLocalTime().ToString(CultureInfo.CurrentCulture);
-		}
-	}
+	public string Updated => LastItem.Updated.ToLocalTime().ToString(CultureInfo.CurrentCulture);
 
 	public string WikiLink
 	{
 		get
 		{
-			var link = LastItem.GetMarketItem().WikiLink;
+			var link = LastItem.WikiLink;
 			if (link.Length > 3) return link;
 			return $"https://escapefromtarkov.gamepedia.com/{HttpUtility.UrlEncode(LastItem.Name.Replace(" ", "_"))}";
 		}

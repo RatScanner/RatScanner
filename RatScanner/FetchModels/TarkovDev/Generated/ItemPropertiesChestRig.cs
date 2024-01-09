@@ -35,8 +35,4 @@ public class ItemPropertiesChestRig : ItemProperties
 
 	[JsonProperty("grids")]
 	public List<ItemStorageGrid> Grids { get; set; }
-
-	[Obsolete("Use grids instead.")]
-	[JsonProperty("pouches")]
-	public List<ItemStorageGrid> Pouches { get; set; }
 }

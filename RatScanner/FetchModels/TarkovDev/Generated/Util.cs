@@ -215,6 +215,7 @@ public enum ItemType
 	AmmoBox,
 	Any,
 	Armor,
+	ArmorPlate,
 	Backpack,
 	Barter,
 	Container,

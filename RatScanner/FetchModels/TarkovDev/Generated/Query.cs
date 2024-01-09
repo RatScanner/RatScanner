@@ -59,36 +59,4 @@ public class Query
 
 	[JsonProperty("playerLevels")]
 	public List<PlayerLevel> PlayerLevels { get; set; }
-
-	[Obsolete("Use hideoutStations instead.")]
-	[JsonProperty("hideoutModules")]
-	public List<HideoutModule> HideoutModules { get; set; }
-
-	[Obsolete("Use items instead.")]
-	[JsonProperty("itemsByIDs")]
-	public List<Item> ItemsByIDs { get; set; }
-
-	[Obsolete("Use items instead.")]
-	[JsonProperty("itemsByType")]
-	public List<Item> ItemsByType { get; set; }
-
-	[Obsolete("Use items instead.")]
-	[JsonProperty("itemsByName")]
-	public List<Item> ItemsByName { get; set; }
-
-	[Obsolete("Use item instead.")]
-	[JsonProperty("itemByNormalizedName")]
-	public Item ItemByNormalizedName { get; set; }
-
-	[Obsolete("Use items instead.")]
-	[JsonProperty("itemsByBsgCategoryId")]
-	public List<Item> ItemsByBsgCategoryId { get; set; }
-
-	[Obsolete("Use tasks instead.")]
-	[JsonProperty("quests")]
-	public List<Quest> Quests { get; set; }
-
-	[Obsolete("Use traders instead.")]
-	[JsonProperty("traderResetTimes")]
-	public List<TraderResetTime> TraderResetTimes { get; set; }
 }

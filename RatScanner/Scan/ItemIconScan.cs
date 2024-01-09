@@ -16,7 +16,7 @@ public class ItemIconScan : ItemScan
 	public ItemIconScan(Icon icon, Vector2 toolTipPosition, int duration)
 	{
 		Icon = icon;
-		MatchedItem = icon.Item;
+		Item = RatScannerMain.Instance.ItemDB[icon.Item.Id];
 		ItemExtraInfo = icon.ItemExtraInfo;
 		Confidence = icon.DetectionConfidence;
 		Rotated = icon.Rotated;

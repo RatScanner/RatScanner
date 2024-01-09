@@ -4,6 +4,7 @@ using RatScanner.Scan;
 using RatScanner.View;
 using RatStash;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -48,10 +49,10 @@ public class RatScannerMain : INotifyPropertyChanged
 	/// </remarks>
 	internal static object IconScanLock = new();
 
-	internal MarketDB MarketDB = new();
 	public TarkovTrackerDB TarkovTrackerDB;
 
 	public Database RatStashDB;
+	public Dictionary<string, FetchModels.TarkovDev.Item> ItemDB;
 	internal RatEyeEngine RatEyeEngine;
 
 	public event PropertyChangedEventHandler PropertyChanged;
@@ -68,8 +69,10 @@ public class RatScannerMain : INotifyPropertyChanged
 		Logger.LogInfo("----- RatScanner " + RatConfig.Version + " -----");
 		Logger.LogInfo($"Screen Info: {RatConfig.ScreenWidth}x{RatConfig.ScreenHeight} at {RatConfig.ScreenScale * 100}%");
 
-		Logger.LogInfo("Setting temporary default item...");
-		ItemScans.Enqueue(new DefaultItemScan(true));
+		Logger.LogInfo("Loading price data...");
+		ItemDB = TarkovDevAPI.GetItems().ToDictionary(x => x.Id, x => x);
+
+		ItemScans.Enqueue(new DefaultItemScan(ItemDB.First().Value));
 
 		Logger.LogInfo("Initializing tarkov tracker database");
 		TarkovTrackerDB = new TarkovTrackerDB();
@@ -88,9 +91,6 @@ public class RatScannerMain : INotifyPropertyChanged
 
 			Logger.LogInfo("Loading item data...");
 			RatStashDB = GetRatStashDatabase();
-
-			Logger.LogInfo("Loading price data...");
-			MarketDB.Init();
 
 			Logger.LogInfo("Loading TarkovTracker data...");
 			if (RatConfig.Tracking.TarkovTracker.Enable)
@@ -112,11 +112,6 @@ public class RatScannerMain : INotifyPropertyChanged
 			_marketDBRefreshTimer = new Timer(RefreshMarketDB, null, RatConfig.MarketDBRefreshTime, Timeout.Infinite);
 			_tarkovTrackerDBRefreshTimer = new Timer(RefreshTarkovTrackerDB, null, RatConfig.Tracking.TarkovTracker.RefreshTime, Timeout.Infinite);
 			_scanRefreshTimer = new Timer(RefreshOverlay, null, 1000, 100);
-
-			Logger.LogInfo("Setting default item...");
-			var itemScan = new DefaultItemScan(false);
-			itemScan.BestTraderPrice = itemScan.MatchedItem.GetBestTrader().price.Value;
-			ItemScans.Enqueue(itemScan);
 
 			Logger.LogInfo("Enabling hotkeys...");
 			HotkeyManager.RegisterHotkeys();
@@ -235,7 +230,7 @@ public class RatScannerMain : INotifyPropertyChanged
 		};
 
 		itemDB = itemDB.Filter(item => !item.QuestItem && !excludeTypes.Contains(item.GetType()) && !excludeItems.Contains(item.Id));
-
+		Logger.LogInfo($"Loaded {itemDB.GetItems().Count()} items!");
 		return itemDB;
 	}
 
@@ -275,14 +270,6 @@ public class RatScannerMain : INotifyPropertyChanged
 				inspection,
 				toolTipPosition,
 				RatConfig.ToolTip.Duration);
-			tempNameScan.ImageLink = tempNameScan.MatchedItem.GetMarketItem().ImageLink;
-			tempNameScan.IconLink = tempNameScan.MatchedItem.GetMarketItem().IconLink;
-			tempNameScan.WikiLink = tempNameScan.MatchedItem.GetMarketItem().WikiLink;
-			tempNameScan.TarkovDevLink = $"https://tarkov.dev/item/{tempNameScan.MatchedItem.Id}";
-			tempNameScan.Avg24hPrice = tempNameScan.MatchedItem.GetMarketItem().Avg24hPrice;
-			tempNameScan.PricePerSlot = tempNameScan.MatchedItem.GetMarketItem().Avg24hPrice / (tempNameScan.MatchedItem.Width * tempNameScan.MatchedItem.Height);
-			tempNameScan.TraderName = TraderPrice.GetTraderName(tempNameScan.MatchedItem.GetBestTrader().traderId);
-			tempNameScan.BestTraderPrice = tempNameScan.MatchedItem.GetBestTrader().price.Value;
 
 			ItemScans.Enqueue(tempNameScan);
 
@@ -320,17 +307,7 @@ public class RatScannerMain : INotifyPropertyChanged
 				var tempNameScan = new ItemNameScan(
 						inspection,
 						toolTipPosition,
-						RatConfig.ToolTip.Duration)
-				{
-					ImageLink = inspection.Item.GetMarketItem().ImageLink,
-					IconLink = inspection.Item.GetMarketItem().IconLink,
-					WikiLink = inspection.Item.GetMarketItem().WikiLink,
-					TarkovDevLink = $"https://tarkov.dev/item/{inspection.Item.Id}",
-					Avg24hPrice = inspection.Item.GetMarketItem().Avg24hPrice,
-					PricePerSlot = inspection.Item.GetMarketItem().Avg24hPrice / (inspection.Item.Width * inspection.Item.Height),
-					TraderName = TraderPrice.GetTraderName(inspection.Item.GetBestTrader().traderId),
-					BestTraderPrice = inspection.Item.GetBestTrader().price.Value,
-				};
+						RatConfig.ToolTip.Duration);
 
 				ItemScans.Enqueue(tempNameScan);
 			}
@@ -365,17 +342,7 @@ public class RatScannerMain : INotifyPropertyChanged
 			toolTipPosition += icon.Position + icon.ItemPosition;
 			toolTipPosition -= new Vector2(RatConfig.IconScan.ScanWidth, RatConfig.IconScan.ScanHeight) / 2;
 
-			var tempIconScan = new ItemIconScan(icon, toolTipPosition, RatConfig.ToolTip.Duration)
-			{
-				ImageLink = icon.Item.GetMarketItem().ImageLink,
-				IconLink = icon.Item.GetMarketItem().IconLink,
-				WikiLink = icon.Item.GetMarketItem().WikiLink,
-				TarkovDevLink = $"https://tarkov.dev/item/{icon.Item.Id}",
-				Avg24hPrice = icon.Item.GetMarketItem().Avg24hPrice,
-				PricePerSlot = icon.Item.GetMarketItem().Avg24hPrice / (icon.Item.Width * icon.Item.Height),
-				TraderName = TraderPrice.GetTraderName(icon.Item.GetBestTrader().traderId),
-				BestTraderPrice = icon.Item.GetBestTrader().price.Value,
-			};
+			var tempIconScan = new ItemIconScan(icon, toolTipPosition, RatConfig.ToolTip.Duration);
 
 			ItemScans.Enqueue(tempIconScan);
 			RefreshOverlay();
@@ -408,7 +375,7 @@ public class RatScannerMain : INotifyPropertyChanged
 	private void RefreshMarketDB(object? o = null)
 	{
 		Logger.LogInfo("Refreshing Market DB...");
-		MarketDB.Init();
+		// TODO
 		_marketDBRefreshTimer.Change(RatConfig.MarketDBRefreshTime, Timeout.Infinite);
 	}
 

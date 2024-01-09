@@ -1,8 +1,9 @@
 ﻿using RatScanner.FetchModels;
+using RatScanner.FetchModels.TarkovDev;
 using RatScanner.FetchModels.TarkovTracker;
 using RatStash;
 using System.Linq;
-using Item = RatStash.Item;
+using Item = RatScanner.FetchModels.TarkovDev.Item;
 
 namespace RatScanner;
 
@@ -82,45 +83,14 @@ public static class ItemExtensions
 		return count;
 	}
 
-	public static MarketItem GetMarketItem(this Item item)
+	public static int GetAvg24hMarketPricePerSlot(this Item item)
 	{
-		var marketItem = RatScannerMain.Instance.MarketDB.GetItemById(item.Id);
-		return marketItem ?? new MarketItem(item.Id);
+		var price = item.Avg24HPrice.Value;
+		var size = item.Width * item.Height;
+		return price / size;
 	}
 
-	public static Price GetAvg24hMarketPrice(this Item item)
-	{
-		var total = item.GetMarketItem().Avg24hPrice;
-		if (item is CompoundItem itemC) total += itemC.Slots.Sum(slot => slot.ContainedItem?.GetAvg24hMarketPrice().Value ?? 0);
-		return new Price(total);
-	}
+	public static ItemPrice GetBestTraderOffer(this Item item) => item.SellFor.Where(i => i.Vendor is TraderOffer).MaxBy(i => i.PriceRub);
 
-	public static Price GetAvg24hMarketPricePerSlot(this Item item)
-	{
-		var price = GetAvg24hMarketPrice(item).Value;
-		var size = item.GetSlotSize();
-		return new Price(price / (size.width * size.height));
-	}
-
-	private static Price GetTraderPrice(this Item item, string traderId)
-	{
-		var traderPrices = item.GetMarketItem().TraderPrices;
-		var total = traderPrices?.FirstOrDefault(price => price.TraderId == traderId)?.Price ?? 0;
-
-		if (item is CompoundItem itemC) total += itemC.Slots.Sum(slot => slot.ContainedItem?.GetTraderPrice(traderId).Value ?? 0);
-
-		return new Price(total);
-	}
-
-	public static (string traderId, Price price) GetBestTrader(this Item item)
-	{
-		(string traderId, Price price) result = ("", new Price(0));
-		foreach (var traderId in TraderPrice.TraderIds)
-		{
-			var traderPrice = item.GetTraderPrice(traderId);
-			if (traderPrice.Value > result.price.Value) result = (traderId, traderPrice);
-		}
-
-		return result;
-	}
+	public static TraderOffer GetBestTraderOfferVendor(this Item item) => GetBestTraderOffer(item).Vendor as TraderOffer;
 }

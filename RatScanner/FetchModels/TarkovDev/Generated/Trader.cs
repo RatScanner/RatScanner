@@ -35,6 +35,12 @@ public class Trader
 	[JsonProperty("cashOffers")]
 	public List<TraderCashOffer> CashOffers { get; set; }
 
+	[JsonProperty("imageLink")]
+	public string ImageLink { get; set; }
+
+	[JsonProperty("image4xLink")]
+	public string Image4xLink { get; set; }
+
 	[JsonProperty("tarkovDataId")]
 	public int? TarkovDataId { get; set; }
 }

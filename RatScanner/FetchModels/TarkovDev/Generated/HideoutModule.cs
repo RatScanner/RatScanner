@@ -6,14 +6,6 @@ namespace RatScanner.FetchModels.TarkovDev;
 
 public class HideoutModule
 {
-	[Obsolete("Use HideoutStation type instead.")]
-	[JsonProperty("id")]
-	public int? Id { get; set; }
-
-	[Obsolete("Use HideoutStation type instead.")]
-	[JsonProperty("name")]
-	public string Name { get; set; }
-
 	[JsonProperty("level")]
 	public int? Level { get; set; }
 

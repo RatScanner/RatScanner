@@ -10,14 +10,14 @@ public class ItemNameScan : ItemScan
 
 	public ItemNameScan(Inspection inspection)
 	{
-		MatchedItem = inspection.Item;
+		Item = RatScannerMain.Instance.ItemDB[inspection.Item.Id];
 		Confidence = inspection.MarkerConfidence;
 		IconPath = inspection.IconPath;
 	}
 
 	public ItemNameScan(Inspection inspection, Vector2 toolTipPosition, int duration)
 	{
-		MatchedItem = inspection.Item;
+		Item = RatScannerMain.Instance.ItemDB[inspection.Item.Id];
 		Confidence = inspection.MarkerConfidence;
 		IconPath = inspection.IconPath;
 		_toolTipPosition = toolTipPosition;

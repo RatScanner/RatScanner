@@ -25,7 +25,7 @@ public class Item
 	public int BasePrice { get; set; }
 
 	[JsonProperty("updated")]
-	public string Updated { get; set; }
+	public DateTime Updated { get; set; }
 
 	[JsonProperty("width")]
 	public int Width { get; set; }
@@ -161,36 +161,4 @@ public class Item
 
 	[JsonProperty("fleaMarketFee")]
 	public int? FleaMarketFee { get; set; }
-
-	[Obsolete("No longer meaningful with inclusion of Item category.")]
-	[JsonProperty("categoryTop")]
-	public ItemCategory CategoryTop { get; set; }
-
-	[Obsolete("Use the lang argument on queries instead.")]
-	[JsonProperty("translation")]
-	public ItemTranslation Translation { get; set; }
-
-	[Obsolete("Use sellFor instead.")]
-	[JsonProperty("traderPrices")]
-	public List<TraderPrice> TraderPrices { get; set; }
-
-	[Obsolete("Use category instead.")]
-	[JsonProperty("bsgCategory")]
-	public ItemCategory BsgCategory { get; set; }
-
-	[Obsolete("Use inspectImageLink instead.")]
-	[JsonProperty("imageLink")]
-	public string ImageLink { get; set; }
-
-	[Obsolete("Fallback handled automatically by inspectImageLink.")]
-	[JsonProperty("imageLinkFallback")]
-	public string ImageLinkFallback { get; set; }
-
-	[Obsolete("Fallback handled automatically by iconLink.")]
-	[JsonProperty("iconLinkFallback")]
-	public string IconLinkFallback { get; set; }
-
-	[Obsolete("Fallback handled automatically by gridImageLink.")]
-	[JsonProperty("gridImageLinkFallback")]
-	public string GridImageLinkFallback { get; set; }
 }

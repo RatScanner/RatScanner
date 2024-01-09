@@ -12,10 +12,6 @@ public class ItemPropertiesScope : ItemProperties
 	[JsonProperty("sightModes")]
 	public List<int?> SightModes { get; set; }
 
-	[Obsolete("Use recoilModifier instead.")]
-	[JsonProperty("recoil")]
-	public double? Recoil { get; set; }
-
 	[JsonProperty("sightingRange")]
 	public int? SightingRange { get; set; }
 

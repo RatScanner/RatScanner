@@ -27,20 +27,6 @@ public static class ApiManager
 	// Official RatScanner API URL
 	private const string BaseUrl = "https://api.ratscanner.com/v3";
 
-	public static MarketItem[] GetMarketDB()
-	{
-		try
-		{
-			var json = GetString($"{BaseUrl}/all");
-			return JsonConvert.DeserializeObject<MarketItem[]>(json);
-		}
-		catch (Exception e)
-		{
-			Logger.LogError($"Loading of market data failed.\n{e}");
-			return null;
-		}
-	}
-
 	public static string GetResource(ResourceType resource)
 	{
 		if (ResCache.ContainsKey(resource)) return ResCache[resource];

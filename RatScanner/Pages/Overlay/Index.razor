@@ -10,6 +10,7 @@
 <div style="transform-origin: top left; transform: scale(@((1f / SettingsVM.ScreenScale).ToString(CultureInfo.InvariantCulture)));">
     @foreach (var itemScan in MenuVM.ItemScans)
     {
+        var item = itemScan.Item;
         @if (itemScan != null
        && itemScan.GetToolTipPosition() != null
        && itemScan.DissapearAt > DateTimeOffset.Now.ToUnixTimeMilliseconds())
@@ -37,17 +38,17 @@
                         </div>
 
                         <div style="overflow: hidden;">
-                            @if (iconScan.Avg24hPrice >= iconScan.BestTraderPrice)
+                            @if (item.Avg24HPrice >= item.GetBestTraderOffer().PriceRub)
                             {
                                 <div class="stroke">
-                                    @iconScan.MatchedItem.GetAvg24hMarketPrice().ToShortString()
+                                    @item.Avg24HPrice.ToShortString().AsRubs()
                                 </div>
                             }
                             else
                             {
                                 <div class="d-flex align-center stroke">
-	                                @iconScan.MatchedItem.GetBestTrader().price.ToShortString()
-                                    <MudAvatar Image="@($"https://tarkov.dev/images/traders/{@iconScan.TraderName.ToLower()}-icon.jpg")"
+                                    @item.GetBestTraderOffer().PriceRub.ToShortString().AsRubs()
+                                    <MudAvatar Image="@(item.GetBestTraderOfferVendor().Trader.ImageLink)"
                                                Size="Size.Small" Style="float: right;" Class="ml-1" />
                                 </div>
                             }
@@ -75,17 +76,18 @@
 	                                                   top: @(itemScan.GetToolTipPosition().Y - VirtualScreenOffset.YOffset)px;
 	                                                   background: #121212; padding: 4px;">
 
-                    @if (itemScan.Avg24hPrice >= itemScan.BestTraderPrice)
+                    @if (item.Avg24HPrice >= item.GetBestTraderOffer().PriceRub)
                     {
                         <div class="stroke">
-                            @itemScan.MatchedItem.GetAvg24hMarketPrice().ToShortString()
+                            @item.Avg24HPrice.ToShortString().AsRubs()
                         </div>
                     }
                     else
                     {
-                        <div class="d-flex align-center">
-                            @itemScan.MatchedItem.GetBestTrader().price.ToShortString()
-                            <MudAvatar Image="@($"https://tarkov.dev/images/traders/{@itemScan.TraderName.ToLower()}-icon.jpg")" Size="Size.Small" Style="float: right;" Class="ml-1" />
+                        <div class="d-flex align-center stroke">
+                            @item.GetBestTraderOffer().PriceRub.ToShortString().AsRubs()
+                            <MudAvatar Image="@(item.GetBestTraderOfferVendor().Trader.ImageLink)"
+                                       Size="Size.Small" Style="float: right;" Class="ml-1" />
                         </div>
                     }
 
@@ -110,7 +112,7 @@
 
         if (string.IsNullOrEmpty(path))
         {
-            return $"https://assets.tarkov.dev/{itemScan.MatchedItem.Id}-base-image.png";
+            return $"https://assets.tarkov.dev/{itemScan.Item.Id}-base-image.png";
         }
 
         path = path.Replace("\\", "/");

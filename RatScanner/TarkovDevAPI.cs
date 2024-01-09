@@ -1,7 +1,10 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RatScanner.FetchModels.TarkovDev;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -14,6 +17,18 @@ namespace RatScanner;
 /// </todo>
 public static class TarkovDevAPI
 {
+	private class ResponseData<T>
+	{
+		[JsonProperty("data")]
+		public ResponseDataInner<T> Data { get; set; }
+	}
+
+	private class ResponseDataInner<T>
+	{
+		[JsonProperty("data")]
+		public T Data { get; set; }
+	}
+
 	const string ApiEndpoint = "https://api.tarkov.dev/graphql";
 
 	private static readonly Dictionary<string, (long expire, object response)> Cache = new();
@@ -67,6 +82,195 @@ public static class TarkovDevAPI
 
 		return response;
 	}
+
+	public static Item[] GetItems(long ttl = 0xFFFFFF)
+	{
+		var time = DateTimeOffset.Now.ToUnixTimeSeconds();
+		var key = nameof(ItemQuery);
+		if (Cache.ContainsKey(key) && time < Cache[key].expire)
+		{
+			return (Item[])Cache[key].response;
+		}
+
+		var apiResponse = Get(ItemQuery);
+		var jsonSerializerSettings = new JsonSerializerSettings()
+		{
+			MissingMemberHandling = MissingMemberHandling.Ignore,
+			NullValueHandling = NullValueHandling.Ignore,
+			TypeNameHandling = TypeNameHandling.Auto,
+			TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
+		};
+		System.IO.File.WriteAllText("test.json", apiResponse);
+
+		var res = JsonConvert.DeserializeObject<ResponseData<Item[]>>(apiResponse, jsonSerializerSettings);
+		var response = res.Data.Data;
+
+		if (ttl > 0) Cache[key] = (time + ttl, response);
+
+		return response;
+	}
+
+	const string ItemQuery = @"
+{
+  data: items {
+    id
+    name
+    normalizedName
+    shortName
+    description
+    basePrice
+    updated
+    width
+    height
+    backgroundColor
+    iconLink
+    gridImageLink
+    baseImageLink
+    inspectImageLink
+    image512pxLink
+    image8xLink
+    wikiLink
+    types
+    avg24hPrice
+    properties {
+      __typename
+      ... on ItemPropertiesAmmo {
+        caliber
+        stackMaxSize
+        tracer
+        tracerColor
+        ammoType
+        projectileCount
+        damage
+        armorDamage
+        fragmentationChance
+        ricochetChance
+        penetrationChance
+        penetrationPower
+        accuracyModifier
+        recoilModifier
+        initialSpeed
+        lightBleedModifier
+        heavyBleedModifier
+        durabilityBurnFactor
+        heatFactor
+        staminaBurnPerDamage
+        ballisticCoeficient
+        bulletDiameterMilimeters
+        bulletMassGrams
+      }
+      ... on ItemPropertiesFoodDrink {
+        energy
+        hydration
+        units
+        stimEffects {
+          type
+          chance
+          delay
+          duration
+          value
+          percent
+          skillName
+          __typename
+        }
+      }
+      ... on ItemPropertiesStim {
+        useTime
+        cures
+        stimEffects {
+          type
+          chance
+          delay
+          duration
+          value
+          percent
+          skillName
+          __typename
+        }
+      }
+      ... on ItemPropertiesMedicalItem {
+        uses
+        useTime
+        cures
+      }
+      ... on ItemPropertiesMedKit {
+        hitpoints
+        useTime
+        maxHealPerUse
+        cures
+        hpCostLightBleeding
+        hpCostHeavyBleeding
+      }
+    }
+    conflictingSlotIds
+    accuracyModifier
+    recoilModifier
+    ergonomicsModifier
+    hasGrid
+    blocksHeadphones
+    link
+    lastLowPrice
+    changeLast48h
+    changeLast48hPercent
+    low24hPrice
+    high24hPrice
+    lastOfferCount
+    sellFor {
+      vendor {
+        __typename
+        normalizedName
+        ... on TraderOffer {
+          trader {
+            id
+            imageLink
+            normalizedName
+          }
+        }
+      }
+      priceRUB
+    }
+    buyFor {
+      vendor {
+        __typename
+        normalizedName
+        ... on TraderOffer {
+          trader {
+            id
+            imageLink
+            normalizedName
+          }
+        }
+      }
+      priceRUB
+    }
+    category {
+      id
+    }
+    categories {
+      id
+    }
+    bsgCategoryId
+    weight
+    velocity
+    loudness
+    bartersFor {
+      id
+      trader {
+        id
+      }
+    }
+    bartersUsing {
+      id
+    }
+    craftsFor {
+      id
+    }
+    craftsUsing {
+      id
+    }
+  }
+}
+";
 
 	const string NeededQuery = @"
 query {
