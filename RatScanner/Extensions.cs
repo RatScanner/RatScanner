@@ -1,5 +1,6 @@
 ﻿using RatStash;
 using System;
+using System.Globalization;
 
 namespace RatScanner;
 public static class Extensions
@@ -21,7 +22,14 @@ public static class Extensions
 	}
 	public static string ToShortString(this int? value) => ToShortString(value ?? 0);
 
-	public static string AsRubs(this int value) => $"{value} ₽";
+	public static string AsRubs(this int value)
+	{
+		var text = $"{value:n0}";
+		var numberGroupSeparator = NumberFormatInfo.CurrentInfo.NumberGroupSeparator;
+		text = text.Replace(numberGroupSeparator, RatConfig.ToolTip.DigitGroupingSymbol);
+		return $"{text} ₽";
+	}
+
 	public static string AsRubs(this int? value) => AsRubs(value ?? 0);
 
 	public static string AsRubs(this string value) => $"{value} ₽";

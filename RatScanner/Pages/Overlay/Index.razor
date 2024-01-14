@@ -110,10 +110,7 @@
     {
         var path = itemScan.IconPath;
 
-        if (string.IsNullOrEmpty(path))
-        {
-            return $"https://assets.tarkov.dev/{itemScan.Item.Id}-base-image.png";
-        }
+        if (string.IsNullOrEmpty(path)) return itemScan.Item.BaseImageLink;
 
         path = path.Replace("\\", "/");
         var pathEnd = path[path.IndexOf("Data/icons/")..path.Length];

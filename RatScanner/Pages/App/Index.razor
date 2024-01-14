@@ -27,22 +27,22 @@
             <MudPaper Class="align-center justify-center pa-2 mx-2 my-1" Elevation="2">
                 <div class="d-flex justify-space-between align-center mt-2">
                     <MudText Typo="Typo.subtitle2">Recent Avg. Price</MudText>
-                    <MudText Typo="Typo.subtitle2">@_lastScannedItem.Avg24HPrice</MudText>
+                    <MudText Typo="Typo.subtitle2">@_lastScannedItem.Avg24HPrice.AsRubs()</MudText>
                 </div>
                 <div class="d-flex justify-space-between align-center my-1">
                     <MudText Typo="Typo.subtitle2">Value per Slot</MudText>
-                    <MudText Typo="Typo.subtitle2">@_lastScannedItem.GetAvg24hMarketPricePerSlot()</MudText>
+                    <MudText Typo="Typo.subtitle2">@_lastScannedItem.GetAvg24hMarketPricePerSlot().AsRubs()</MudText>
                 </div>
                 <MudDivider DividerType="DividerType.FullWidth" />
                 <div class="d-flex justify-space-between align-center mt-2">
                     <MudText Typo="Typo.subtitle2">Best Trader</MudText>
                     <div class="d-flex align-center">
-                        <MudAvatar Image="@(_lastScannedItem.GetBestTraderOfferVendor().Trader.ImageLink)" Size="Size.Small" Style="float: left;" Class="mr-1" Elevation="1" /><MudText Typo="Typo.subtitle2" Style="float: right;">@_lastScannedItem.GetBestTraderOfferVendor().NormalizedName</MudText>
+                        <MudAvatar Image="@(_lastScannedItem.GetBestTraderOfferVendor().Trader.ImageLink)" Size="Size.Small" Style="float: left;" Class="mr-1" Elevation="1" /><MudText Typo="Typo.subtitle2" Style="float: right;">@_lastScannedItem.GetBestTraderOfferVendor().Name</MudText>
                     </div>
                 </div>
                 <div class="d-flex justify-space-between align-center my-1">
                     <MudText Typo="Typo.subtitle2">Trader Price</MudText>
-                    <MudText Typo="Typo.subtitle2">@_lastScannedItem.GetBestTraderOffer().PriceRub</MudText>
+                    <MudText Typo="Typo.subtitle2">@_lastScannedItem.GetBestTraderOffer().PriceRub.AsRubs()</MudText>
                 </div>
             </MudPaper>
         </MudItem>
@@ -83,7 +83,7 @@
                     <ItemTemplate Context="item">
                         <MudPaper Class="ma-n1" Elevation="4">
                             <MudStack Row="true" Style="height: 48px">
-                                <MudImage Class="m-0 p-0" Src="@_lastScannedItem.BaseImageLink" Style="max-width:100%; max-height:100%;" />
+                                <MudImage Class="m-0 p-0" Src="@item.IconLink" Style="max-width:100%; max-height:100%;" />
                                 <MudStack Class="overflow-hidden">
                                     <MudText Class="ellipsis">
                                         @(item == null ? null : $"{item.Name}")
@@ -106,7 +106,6 @@
 </style>
 
 @code {
-    private ItemScan _lastItemScan => MenuVM.LastItemScan;
     private FetchModels.TarkovDev.Item _lastScannedItem => MenuVM?.LastItemScan?.Item;
 
     private List<FetchModels.TarkovDev.Item>? _items;
@@ -162,11 +161,11 @@
             matches[i] = (matches[i].item, (int)(matches[i].score + matches[i].item.Name.Length * 0.002f));
 
             // Penalize weapon mods so the weapon it self will rank higher
-            if (matches[i].item is RatStash.WeaponMod) matches[i] = (matches[i].item, matches[i].score + 5);
+            if (matches[i].item.Types.Contains(ItemType.Mods)) matches[i] = (matches[i].item, matches[i].score + 5);
         }
 
 
-        for (var i = 0; i < matches.Count; i++) if (matches[i].item is RatStash.WeaponMod) matches[i] = (matches[i].item, matches[i].score + 5);
+        for (var i = 0; i < matches.Count; i++) if (matches[i].item.Types.Contains(ItemType.Mods)) matches[i] = (matches[i].item, matches[i].score + 5);
 
         var sortedMatches = matches.OrderBy(match => match.score).ThenBy(match => match.item.Name.Length);
         return sortedMatches.Select(match => match.item);
@@ -182,17 +181,18 @@
     private async void SetSearchItem(FetchModels.TarkovDev.Item item)
     {
         if (item == null) return;
+        MenuVM.ItemScans.Enqueue(new DefaultItemScan(item));
         await _searchBox.Clear();
     }
 
     private async void OpenWiki()
     {
-        OpenURL(_lastItemScan.Item.WikiLink);
+        OpenURL(_lastScannedItem.WikiLink);
     }
 
     private async void OpenTarkovDev()
     {
-        OpenURL(_lastItemScan.Item.Link);
+        OpenURL(_lastScannedItem.Link);
     }
 
     private void OpenURL(string url)

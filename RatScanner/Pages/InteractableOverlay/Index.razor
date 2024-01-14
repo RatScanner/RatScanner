@@ -1,7 +1,6 @@
 ﻿@page "/interactableOverlay"
 @using RatScanner.Scan
 @using RatScanner.View;
-@using RatStash
 @using RatScanner.FetchModels
 @using Color = MudBlazor.Color
 @inject MenuVM MenuVM
@@ -37,7 +36,7 @@
 									<MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" Style="">
 										<MudStack Justify="Justify.Center">
 											<MudPaper Style="height: 6vh; width: 6vh;" Outlined="true">
-												<MudImage Src="@($"https://assets.tarkov.dev/{item.Id}-base-image.png")"
+												<MudImage Src="@item.BaseImageLink"
 														  Style="height: 6vh; width: 6vh; object-fit: contain;" />
 											</MudPaper>
 										</MudStack>
@@ -69,10 +68,10 @@
 									<MudStack Row="true" Justify="Justify.FlexEnd">
 										<MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Style="width: 8vw" Spacing="0">
 											<MudText Typo="Typo.h6">
-												@item.Avg24HPrice
+												@item.Avg24HPrice.AsRubs()
 											</MudText>
 											<MudText>
-												@item.GetAvg24hMarketPricePerSlot()
+												@item.GetAvg24hMarketPricePerSlot().AsRubs()
 											</MudText>
 										</MudStack>
 
@@ -81,11 +80,11 @@
 										<MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Center" Style="width: 3vw" Spacing="0">
 											@{
 												var bestTrader = item.GetBestTraderOffer();
-												var traderImage = item.GetBestTraderOfferVendor().Trader.ImageLink;
+												var traderImage = item.GetBestTraderOfferVendor()?.Trader.ImageLink;
 											}
                                             <MudAvatar Image="@traderImage"
 											   Size="Size.Medium" Style="float: left;" Square="true" Variant="Variant.Outlined" />
-                                            <MudText Typo="Typo.subtitle2" Style="float: right;">@bestTrader.PriceRub.AsRubs()</MudText>
+                                            <MudText Typo="Typo.subtitle2" Style="float: right;">@bestTrader?.PriceRub.AsRubs()</MudText>
 										</MudStack>
 									</MudStack>
 								</MudStack>
@@ -170,10 +169,10 @@
 		for (var i = 0; i < matches.Count; i++)
 		{
 			// Slightly penalize items with long names
-			matches[i].Score += (matches[i].Data as Item).Name.Length * 0.002;
+			matches[i].Score += (matches[i].Data as FetchModels.TarkovDev.Item).Name.Length * 0.002;
 
 			// Penalize weapon mods so the weapon it self will rank higher
-			if (matches[i].Data is RatStash.WeaponMod) matches[i].Score += 5;
+            if ((matches[i].Data as FetchModels.TarkovDev.Item).Types.Contains(ItemType.Mods)) matches[i].Score += 5;
 		}
 
 		return matches;

@@ -90,7 +90,7 @@ public static class ItemExtensions
 		return price / size;
 	}
 
-	public static ItemPrice GetBestTraderOffer(this Item item) => item.SellFor.Where(i => i.Vendor is TraderOffer).MaxBy(i => i.PriceRub);
+	public static ItemPrice? GetBestTraderOffer(this Item item) => item.SellFor.Where(i => i.Vendor is TraderOffer).MaxBy(i => i.PriceRub);
 
-	public static TraderOffer GetBestTraderOfferVendor(this Item item) => GetBestTraderOffer(item).Vendor as TraderOffer;
+	public static TraderOffer? GetBestTraderOfferVendor(this Item item) => GetBestTraderOffer(item)?.Vendor as TraderOffer;
 }

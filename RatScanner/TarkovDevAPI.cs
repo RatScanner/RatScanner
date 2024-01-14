@@ -110,8 +110,7 @@ public static class TarkovDevAPI
 		return response;
 	}
 
-	const string ItemQuery = @"
-{
+	const string ItemQuery = @"{
   data: items {
     id
     name
@@ -218,11 +217,13 @@ public static class TarkovDevAPI
     sellFor {
       vendor {
         __typename
+        name
         normalizedName
         ... on TraderOffer {
           trader {
             id
             imageLink
+            name
             normalizedName
           }
         }
@@ -232,11 +233,13 @@ public static class TarkovDevAPI
     buyFor {
       vendor {
         __typename
+        name
         normalizedName
         ... on TraderOffer {
           trader {
             id
             imageLink
+            name
             normalizedName
           }
         }
@@ -269,8 +272,7 @@ public static class TarkovDevAPI
       id
     }
   }
-}
-";
+}";
 
 	const string NeededQuery = @"
 query {
