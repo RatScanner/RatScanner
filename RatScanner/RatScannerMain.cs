@@ -235,6 +235,7 @@ public class RatScannerMain : INotifyPropertyChanged
 		};
 
 		itemDB = itemDB.Filter(item => !item.QuestItem && !excludeTypes.Contains(item.GetType()) && !excludeItems.Contains(item.Id));
+		itemDB = itemDB.Filter(item => item.Name.Trim() != "" && item.ShortName.Trim() != "");
 
 		return itemDB;
 	}
