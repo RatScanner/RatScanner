@@ -39,7 +39,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="RatEye" Version="3.0.0" />
+    <PackageReference Include="RatEye" Version="3.0.1" />
     <PackageReference Include="RatStash" Version="5.0.0" />
     <PackageReference Include="SingleInstanceCore" Version="2.2.2" />
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
