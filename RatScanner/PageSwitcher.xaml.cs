@@ -95,10 +95,7 @@ public partial class PageSwitcher : Window
 		}
 
 		base.OnClosed(e);
-		RatConfig.LastWindowPositionX = (int)this.Left;
-		RatConfig.LastWindowPositionY = (int)this.Top;
-		RatConfig.SaveConfig();
-		Application.Current.Shutdown();
+		ExitApplication(null, null);
 	}
 
 	private void AddTrayIcon()
