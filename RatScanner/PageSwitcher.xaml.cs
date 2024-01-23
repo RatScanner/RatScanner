@@ -33,7 +33,7 @@ public partial class PageSwitcher : Window
 
 			InitializeComponent();
 			ResetWindowSize();
-			Navigate(new BlazorUI());
+			Navigate(BlazorUI.Instance);
 			AddTrayIcon();
 
 			if (RatConfig.LastWindowPositionX != int.MinValue || RatConfig.LastWindowPositionY != int.MinValue)
@@ -141,7 +141,7 @@ public partial class PageSwitcher : Window
 		ResetWindowSize();
 		SetBackgroundOpacity(1);
 		ShowTitleBar();
-		Navigate(new BlazorUI());
+		Navigate(BlazorUI.Instance);
 	}
 
 	internal void ShowMinimalUI()
@@ -150,7 +150,7 @@ public partial class PageSwitcher : Window
 		CollapseTitleBar();
 		SizeToContent = SizeToContent.WidthAndHeight;
 		SetBackgroundOpacity(RatConfig.MinimalUi.Opacity / 100f);
-		Navigate(new MinimalMenu());
+		Navigate(MinimalMenu.Instance);
 	}
 
 	internal void ExitApplication()

@@ -13,7 +13,10 @@ namespace RatScanner.View;
 /// </summary>
 public partial class MinimalMenu : UserControl, ISwitchable
 {
-	internal MinimalMenu()
+	private static MinimalMenu _instance = null;
+	public static MinimalMenu Instance => _instance ??= new MinimalMenu();
+
+	private MinimalMenu()
 	{
 		InitializeComponent();
 		DataContext = new MenuVM(RatScannerMain.Instance);
