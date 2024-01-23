@@ -110,7 +110,7 @@ public partial class PageSwitcher : Window
 			Icon = Properties.Resources.RatLogoSmall,
 		};
 
-		_contextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
+		_contextMenuStrip = new ContextMenuStrip();
 
 		_contextMenuStrip.Items.Add("Show UI", null, ShowUI);
 		_contextMenuStrip.Items.Add("Show Minimal UI", null, ShowMinimalUI);
