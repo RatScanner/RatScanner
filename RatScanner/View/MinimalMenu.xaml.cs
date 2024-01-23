@@ -41,11 +41,7 @@ public partial class MinimalMenu : UserControl, ISwitchable
 
 	private void OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
 	{
-		RatConfig.LastWindowMode = RatConfig.WindowMode.Normal;
-		PageSwitcher.Instance.ResetWindowSize();
-		PageSwitcher.Instance.SetBackgroundOpacity(1);
-		PageSwitcher.Instance.ShowTitleBar();
-		PageSwitcher.Instance.Navigate(new BlazorUI());
+		PageSwitcher.Instance.ShowUI();
 	}
 
 	public void UtilizeState(object state)

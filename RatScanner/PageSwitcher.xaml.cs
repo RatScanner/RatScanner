@@ -95,7 +95,7 @@ public partial class PageSwitcher : Window
 		}
 
 		base.OnClosed(e);
-		ExitApplication(null, null);
+		ExitApplication();
 	}
 
 	private void AddTrayIcon()
@@ -109,10 +109,10 @@ public partial class PageSwitcher : Window
 
 		_contextMenuStrip = new ContextMenuStrip();
 
-		_contextMenuStrip.Items.Add("Show UI", null, ShowUI);
-		_contextMenuStrip.Items.Add("Show Minimal UI", null, ShowMinimalUI);
-		_contextMenuStrip.Items.Add("Show Overlay", null, ShowOverlay);
-		_contextMenuStrip.Items.Add("Exit", null, ExitApplication);
+		_contextMenuStrip.Items.Add("Show UI", null, OnContextMenuShowUI);
+		_contextMenuStrip.Items.Add("Show Minimal UI", null, OnContextMenuShowMinimalUI);
+		_contextMenuStrip.Items.Add("Show Overlay", null, OnContextMenuShowOverlay);
+		_contextMenuStrip.Items.Add("Exit", null, OnContextMenuExitApplication);
 
 		_notifyIcon.ContextMenuStrip = _contextMenuStrip;
 
@@ -125,13 +125,17 @@ public partial class PageSwitcher : Window
 			}
 		};
 	}
+	private void OnContextMenuShowOverlay(object sender, EventArgs e) => ShowOverlay();
+	private void OnContextMenuShowUI(object sender, EventArgs e) => ShowUI();
+	private void OnContextMenuShowMinimalUI(object sender, EventArgs e) => ShowMinimalUI();
+	private void OnContextMenuExitApplication(object sender, EventArgs e) => ExitApplication();
 
-	private void ShowOverlay(object sender, EventArgs e)
+	internal void ShowOverlay()
 	{
 		BlazorUI.BlazorInteractableOverlay.ShowOverlay();
 	}
 
-	private void ShowUI(object sender, EventArgs e)
+	internal void ShowUI()
 	{
 		RatConfig.LastWindowMode = RatConfig.WindowMode.Normal;
 		ResetWindowSize();
@@ -140,7 +144,7 @@ public partial class PageSwitcher : Window
 		Navigate(new BlazorUI());
 	}
 
-	private void ShowMinimalUI(object sender, EventArgs e)
+	internal void ShowMinimalUI()
 	{
 		RatConfig.LastWindowMode = RatConfig.WindowMode.Minimal;
 		CollapseTitleBar();
@@ -149,7 +153,7 @@ public partial class PageSwitcher : Window
 		Navigate(new MinimalMenu());
 	}
 
-	private void ExitApplication(object sender, EventArgs e)
+	internal void ExitApplication()
 	{
 		RatConfig.LastWindowPositionX = (int)this.Left;
 		RatConfig.LastWindowPositionY = (int)this.Top;
@@ -168,14 +172,7 @@ public partial class PageSwitcher : Window
 		WindowState = WindowState.Minimized;
 	}
 
-	private void OnTitleBarMinimal(object sender, RoutedEventArgs e)
-	{
-		RatConfig.LastWindowMode = RatConfig.WindowMode.Minimal;
-		CollapseTitleBar();
-		SizeToContent = SizeToContent.WidthAndHeight;
-		SetBackgroundOpacity(RatConfig.MinimalUi.Opacity / 100f);
-		Navigate(new MinimalMenu());
-	}
+	private void OnTitleBarMinimal(object sender, RoutedEventArgs e) => ShowMinimalUI();
 
 	private void OnTitleBarClose(object sender, RoutedEventArgs e)
 	{
