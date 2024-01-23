@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using NotifyIcon = System.Windows.Forms.NotifyIcon;
+using ContextMenuStrip = System.Windows.Forms.ContextMenuStrip;
 
 namespace RatScanner;
 
@@ -16,6 +17,7 @@ public partial class PageSwitcher : Window
 	public const int DefaultHeight = 450;
 
 	private NotifyIcon _notifyIcon;
+	private ContextMenuStrip _contextMenuStrip;
 
 	private static PageSwitcher _instance;
 	public static PageSwitcher Instance => _instance ??= new PageSwitcher();
@@ -108,11 +110,54 @@ public partial class PageSwitcher : Window
 			Icon = Properties.Resources.RatLogoSmall,
 		};
 
-		_notifyIcon.Click += delegate
+		_contextMenuStrip = new System.Windows.Forms.ContextMenuStrip();
+
+		_contextMenuStrip.Items.Add("Show UI", null, ShowUI);
+		_contextMenuStrip.Items.Add("Show Minimal UI", null, ShowMinimalUI);
+		_contextMenuStrip.Items.Add("Show Overlay", null, ShowOverlay);
+		_contextMenuStrip.Items.Add("Exit", null, ExitApplication);
+
+		_notifyIcon.ContextMenuStrip = _contextMenuStrip;
+
+		_notifyIcon.MouseClick += (sender, e) =>
 		{
-			Show();
-			WindowState = WindowState.Normal;
+			if (e.Button == System.Windows.Forms.MouseButtons.Left)
+			{
+				Show();
+				WindowState = WindowState.Normal;
+			}
 		};
+	}
+
+	private void ShowOverlay(object sender, EventArgs e)
+	{
+		BlazorUI.BlazorInteractableOverlay.ShowOverlay();
+	}
+
+	private void ShowUI(object sender, EventArgs e)
+	{
+		RatConfig.LastWindowMode = RatConfig.WindowMode.Normal;
+		ResetWindowSize();
+		SetBackgroundOpacity(1);
+		ShowTitleBar();
+		Navigate(new BlazorUI());
+	}
+
+	private void ShowMinimalUI(object sender, EventArgs e)
+	{
+		RatConfig.LastWindowMode = RatConfig.WindowMode.Minimal;
+		CollapseTitleBar();
+		SizeToContent = SizeToContent.WidthAndHeight;
+		SetBackgroundOpacity(RatConfig.MinimalUi.Opacity / 100f);
+		Navigate(new MinimalMenu());
+	}
+
+	private void ExitApplication(object sender, EventArgs e)
+	{
+		RatConfig.LastWindowPositionX = (int)this.Left;
+		RatConfig.LastWindowPositionY = (int)this.Top;
+		RatConfig.SaveConfig();
+		Application.Current.Shutdown();
 	}
 
 	private void OnTitleBarMouseDown(object sender, MouseButtonEventArgs e)
