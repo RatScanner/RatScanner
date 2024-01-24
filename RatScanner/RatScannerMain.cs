@@ -90,7 +90,7 @@ public class RatScannerMain : INotifyPropertyChanged
 			CheckForUpdates();
 
 			Logger.LogInfo("Loading item data...");
-			RatStashDB = GetRatStashDatabase();
+			RatStashDB = RatStashDatabaseFromTarkovDev();
 
 			Logger.LogInfo("Loading TarkovTracker data...");
 			if (RatConfig.Tracking.TarkovTracker.Enable)
@@ -181,7 +181,6 @@ public class RatScannerMain : INotifyPropertyChanged
 			{
 				TrainedData = RatConfig.Paths.TrainedData,
 				StaticIcons = RatConfig.Paths.StaticIcon,
-				StaticCorrelationData = RatConfig.Paths.StaticCorrelation,
 			},
 			ProcessingConfig = new Config.Processing()
 			{
@@ -189,7 +188,8 @@ public class RatScannerMain : INotifyPropertyChanged
 				Language = RatConfig.NameScan.Language,
 				IconConfig = new Config.Processing.Icon()
 				{
-					ScanMode = Config.Processing.Icon.ScanModes.OCR,
+					UseStaticIcons = true,
+					ScanMode = Config.Processing.Icon.ScanModes.TemplateMatching,
 				},
 				InventoryConfig = new Config.Processing.Inventory()
 				{
@@ -216,36 +216,6 @@ public class RatScannerMain : INotifyPropertyChanged
 			});
 		}
 		return RatStash.Database.FromItems(rsItems);
-	}
-
-	private Database GetRatStashDatabase()
-	{
-		var langFile = RatConfig.NameScan.Language.ToBSGCode() + ".json";
-		var itemLocale = Path.Combine(RatConfig.Paths.Locales, langFile);
-		var itemDB = Database.FromFile(RatConfig.Paths.ItemData, true, itemLocale);
-
-		// Filter unwanted items from the database
-		var excludeTypes = new[]
-		{
-			typeof(LootContainer),
-			typeof(StationaryContainer),
-			typeof(Pockets),
-			typeof(Stash),
-		};
-
-		var excludeItems = new[]
-		{
-			"5c0a5a5986f77476aa30ae64",	// Developer container
-			"5c0a5f6c86f774753654890e",	// Developer case
-			"56e294cdd2720b603a8b4575", // Developer Pack
-			"590de4a286f77423d9312a32",	// Autokey
-			"5d52cc5ba4b9367408500062",	// AGS-30 30x29mm automatic grenade launcher
-			"5d52d479a4b936793d58c76b",	// AGS-30 30x29 30-round box
-		};
-
-		itemDB = itemDB.Filter(item => !item.QuestItem && !excludeTypes.Contains(item.GetType()) && !excludeItems.Contains(item.Id));
-		Logger.LogInfo($"Loaded {itemDB.GetItems().Count()} items!");
-		return itemDB;
 	}
 
 	/// <summary>
