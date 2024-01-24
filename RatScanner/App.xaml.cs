@@ -53,6 +53,12 @@ public partial class App : Application, ISingleInstance
 	{
 		Application.Current.Dispatcher.Invoke(() =>
 		{
+			if (args.Length > 1)
+			{
+				OnInstanceInvokedWithArgs(args);
+				return;
+			}
+
 			Application.Current.MainWindow.Activate();
 			Application.Current.MainWindow.WindowState = WindowState.Normal;
 
@@ -61,6 +67,18 @@ public partial class App : Application, ISingleInstance
 			Application.Current.MainWindow.Topmost = !Application.Current.MainWindow.Topmost;
 			Application.Current.MainWindow.Topmost = !Application.Current.MainWindow.Topmost;
 		});
+	}
+
+	public void OnInstanceInvokedWithArgs(string[] args)
+	{
+		Action action = args[1] switch
+		{
+			"/showUI" => PageSwitcher.Instance.ShowUI,
+			"/showMinimalUI" => PageSwitcher.Instance.ShowMinimalUI,
+			"/showOverlay" => PageSwitcher.Instance.ShowOverlay,
+			_ => () => OnInstanceInvoked(Array.Empty<string>()),
+		};
+		action.Invoke();
 	}
 
 	private void InstallWebview2Runtime()

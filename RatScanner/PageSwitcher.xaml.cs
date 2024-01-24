@@ -34,6 +34,7 @@ public partial class PageSwitcher : Window
 			InitializeComponent();
 			ResetWindowSize();
 			Navigate(BlazorUI.Instance);
+			AddJumpList();
 			AddTrayIcon();
 
 			if (RatConfig.LastWindowPositionX != int.MinValue || RatConfig.LastWindowPositionY != int.MinValue)
@@ -98,6 +99,46 @@ public partial class PageSwitcher : Window
 		ExitApplication();
 	}
 
+	private void AddJumpList()
+	{
+		JumpTask showUITask = new()
+		{
+			Title = "Show UI",
+			Arguments = "/showUI",
+			Description = "Opens the main interface of RatScanner",
+			IconResourcePath = Environment.ProcessPath,
+			ApplicationPath = Environment.ProcessPath,
+			
+		};
+
+		JumpTask showMinimalUITask = new()
+		{
+			Title = "Show Minimal UI",
+			Arguments = "/showMinimalUI",
+			Description = "Opens the minimal interface of RatScanner",
+			IconResourcePath = Environment.ProcessPath,
+			ApplicationPath = Environment.ProcessPath,
+		};
+
+		JumpTask showOverlayTask = new()
+		{
+			Title = "Show Overlay",
+			Arguments = "/showOverlay",
+			Description = "Opens the interactive overlay of RatScanner",
+			IconResourcePath = Environment.ProcessPath,
+			ApplicationPath = Environment.ProcessPath,
+		};
+
+		JumpList jumpList = new JumpList();
+		jumpList.JumpItems.Add(showUITask);
+		jumpList.JumpItems.Add(showMinimalUITask);
+		jumpList.JumpItems.Add(showOverlayTask);
+		jumpList.ShowFrequentCategory = false;
+		jumpList.ShowRecentCategory = false;
+
+		JumpList.SetJumpList(Application.Current, jumpList);
+	}
+
 	private void AddTrayIcon()
 	{
 		_notifyIcon = new NotifyIcon
@@ -125,6 +166,7 @@ public partial class PageSwitcher : Window
 			}
 		};
 	}
+
 	private void OnContextMenuShowOverlay(object sender, EventArgs e) => ShowOverlay();
 	private void OnContextMenuShowUI(object sender, EventArgs e) => ShowUI();
 	private void OnContextMenuShowMinimalUI(object sender, EventArgs e) => ShowMinimalUI();
