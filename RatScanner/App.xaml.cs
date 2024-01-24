@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using SingleInstanceCore;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -24,6 +25,16 @@ public partial class App : Application, ISingleInstance
 
 	protected override void OnStartup(StartupEventArgs e)
 	{
+		// Setup single instance mode
+		var isFirstInstance = this.InitializeAsFirstInstance(RatConfig.SINGLE_INSTANCE_GUID);
+		if (!isFirstInstance)
+		{
+			SingleInstance.Cleanup();
+			Application.Current.Shutdown(2);
+			return;
+		}
+
+		new SplashScreen("Resources\\RatLogoMedium.png").Show(true, true);
 		base.OnStartup(e);
 
 		// Set current working directory to executable location
@@ -36,15 +47,6 @@ public partial class App : Application, ISingleInstance
 		// Install webview2 runtime if it is not already
 		var existing = _webview2RegKeys.Any(key => Registry.GetValue(key, "pv", null) != null);
 		if (!existing) InstallWebview2Runtime();
-
-		// Setup single instance mode
-		var guid = "{a057bb64-c126-4ef4-a4ed-3037c2e7bc89}";
-		var isFirstInstance = this.InitializeAsFirstInstance(guid);
-		if (!isFirstInstance)
-		{
-			SingleInstance.Cleanup();
-			Application.Current.Shutdown(2);
-		}
 	}
 
 	public void OnInstanceInvoked(string[] args)
