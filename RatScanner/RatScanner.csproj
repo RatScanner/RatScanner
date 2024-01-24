@@ -46,10 +46,6 @@
     <PackageReference Include="Tesseract" Version="5.2.0" />
   </ItemGroup>
 	
-  <ItemGroup>
-    <SplashScreen Include="Resources\RatLogoMedium.png" />
-  </ItemGroup>
-	
 	<ItemGroup>
 		<None Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
@@ -62,6 +58,12 @@
 
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Resources\RatLogoMedium.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Resource>
 	</ItemGroup>
 
 	<ItemGroup>
