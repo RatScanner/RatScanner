@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using NotifyIcon = System.Windows.Forms.NotifyIcon;
 using ContextMenuStrip = System.Windows.Forms.ContextMenuStrip;
+using System.Windows.Shell;
 
 namespace RatScanner;
 
