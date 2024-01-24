@@ -4,6 +4,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using NotifyIcon = System.Windows.Forms.NotifyIcon;
+using ContextMenuStrip = System.Windows.Forms.ContextMenuStrip;
+using System.Windows.Shell;
 
 namespace RatScanner;
 
@@ -16,6 +18,7 @@ public partial class PageSwitcher : Window
 	public const int DefaultHeight = 450;
 
 	private NotifyIcon _notifyIcon;
+	private ContextMenuStrip _contextMenuStrip;
 
 	private static PageSwitcher _instance;
 	public static PageSwitcher Instance => _instance ??= new PageSwitcher();
@@ -31,7 +34,8 @@ public partial class PageSwitcher : Window
 
 			InitializeComponent();
 			ResetWindowSize();
-			Navigate(new BlazorUI());
+			Navigate(BlazorUI.Instance);
+			AddJumpList();
 			AddTrayIcon();
 
 			if (RatConfig.LastWindowPositionX != int.MinValue || RatConfig.LastWindowPositionY != int.MinValue)
@@ -93,10 +97,47 @@ public partial class PageSwitcher : Window
 		}
 
 		base.OnClosed(e);
-		RatConfig.LastWindowPositionX = (int)this.Left;
-		RatConfig.LastWindowPositionY = (int)this.Top;
-		RatConfig.SaveConfig();
-		Application.Current.Shutdown();
+		ExitApplication();
+	}
+
+	private void AddJumpList()
+	{
+		JumpTask showUITask = new()
+		{
+			Title = "Show UI",
+			Arguments = "/showUI",
+			Description = "Opens the main interface of RatScanner",
+			IconResourcePath = Environment.ProcessPath,
+			ApplicationPath = Environment.ProcessPath,
+			
+		};
+
+		JumpTask showMinimalUITask = new()
+		{
+			Title = "Show Minimal UI",
+			Arguments = "/showMinimalUI",
+			Description = "Opens the minimal interface of RatScanner",
+			IconResourcePath = Environment.ProcessPath,
+			ApplicationPath = Environment.ProcessPath,
+		};
+
+		JumpTask showOverlayTask = new()
+		{
+			Title = "Show Overlay",
+			Arguments = "/showOverlay",
+			Description = "Opens the interactive overlay of RatScanner",
+			IconResourcePath = Environment.ProcessPath,
+			ApplicationPath = Environment.ProcessPath,
+		};
+
+		JumpList jumpList = new JumpList();
+		jumpList.JumpItems.Add(showUITask);
+		jumpList.JumpItems.Add(showMinimalUITask);
+		jumpList.JumpItems.Add(showOverlayTask);
+		jumpList.ShowFrequentCategory = false;
+		jumpList.ShowRecentCategory = false;
+
+		JumpList.SetJumpList(Application.Current, jumpList);
 	}
 
 	private void AddTrayIcon()
@@ -108,11 +149,59 @@ public partial class PageSwitcher : Window
 			Icon = Properties.Resources.RatLogoSmall,
 		};
 
-		_notifyIcon.Click += delegate
+		_contextMenuStrip = new ContextMenuStrip();
+
+		_contextMenuStrip.Items.Add("Show UI", null, OnContextMenuShowUI);
+		_contextMenuStrip.Items.Add("Show Minimal UI", null, OnContextMenuShowMinimalUI);
+		_contextMenuStrip.Items.Add("Show Overlay", null, OnContextMenuShowOverlay);
+		_contextMenuStrip.Items.Add("Exit", null, OnContextMenuExitApplication);
+
+		_notifyIcon.ContextMenuStrip = _contextMenuStrip;
+
+		_notifyIcon.MouseClick += (sender, e) =>
 		{
-			Show();
-			WindowState = WindowState.Normal;
+			if (e.Button == System.Windows.Forms.MouseButtons.Left)
+			{
+				Show();
+				WindowState = WindowState.Normal;
+			}
 		};
+	}
+
+	private void OnContextMenuShowOverlay(object sender, EventArgs e) => ShowOverlay();
+	private void OnContextMenuShowUI(object sender, EventArgs e) => ShowUI();
+	private void OnContextMenuShowMinimalUI(object sender, EventArgs e) => ShowMinimalUI();
+	private void OnContextMenuExitApplication(object sender, EventArgs e) => ExitApplication();
+
+	internal void ShowOverlay()
+	{
+		BlazorUI.BlazorInteractableOverlay.ShowOverlay();
+	}
+
+	internal void ShowUI()
+	{
+		RatConfig.LastWindowMode = RatConfig.WindowMode.Normal;
+		ResetWindowSize();
+		SetBackgroundOpacity(1);
+		ShowTitleBar();
+		Navigate(BlazorUI.Instance);
+	}
+
+	internal void ShowMinimalUI()
+	{
+		RatConfig.LastWindowMode = RatConfig.WindowMode.Minimal;
+		CollapseTitleBar();
+		SizeToContent = SizeToContent.WidthAndHeight;
+		SetBackgroundOpacity(RatConfig.MinimalUi.Opacity / 100f);
+		Navigate(MinimalMenu.Instance);
+	}
+
+	internal void ExitApplication()
+	{
+		RatConfig.LastWindowPositionX = (int)this.Left;
+		RatConfig.LastWindowPositionY = (int)this.Top;
+		RatConfig.SaveConfig();
+		Application.Current.Shutdown();
 	}
 
 	private void OnTitleBarMouseDown(object sender, MouseButtonEventArgs e)
@@ -126,14 +215,7 @@ public partial class PageSwitcher : Window
 		WindowState = WindowState.Minimized;
 	}
 
-	private void OnTitleBarMinimal(object sender, RoutedEventArgs e)
-	{
-		RatConfig.LastWindowMode = RatConfig.WindowMode.Minimal;
-		CollapseTitleBar();
-		SizeToContent = SizeToContent.WidthAndHeight;
-		SetBackgroundOpacity(RatConfig.MinimalUi.Opacity / 100f);
-		Navigate(new MinimalMenu());
-	}
+	private void OnTitleBarMinimal(object sender, RoutedEventArgs e) => ShowMinimalUI();
 
 	private void OnTitleBarClose(object sender, RoutedEventArgs e)
 	{

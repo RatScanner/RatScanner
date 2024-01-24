@@ -3,6 +3,7 @@
 @using RatScanner.View;
 @using RatScanner.FetchModels
 @using Color = MudBlazor.Color
+@using System.Diagnostics;
 @inject MenuVM MenuVM
 @inject RatScanner.VirtualScreenOffset VirtualScreenOffset
 @inject SettingsVM SettingsVM;
@@ -10,104 +11,106 @@
 @implements IDisposable
 
 <div id="click-away-background" style="position: absolute; width: 100%; height: 100%;"
-	 onmousedown="if (event.target == this) DotNet.invokeMethodAsync('RatScanner', 'JSHideOverlay')"></div>
+     onmousedown="if (event.target == this) DotNet.invokeMethodAsync('RatScanner', 'JSHideOverlay')"></div>
 <div style="width: 100%; height: 100%;">
-	<!--Disable pointer events to make clicks on layout divs passthorugh to the "click-away-background"-->
-	<div style="position: relative; top: 20%; pointer-events: none;">
-		<div class="d-flex align-content-center justify-center">
+    <!--Disable pointer events to make clicks on layout divs passthorugh to the "click-away-background"-->
+    <div style="position: relative; top: 20%; pointer-events: none;">
+        <div class="d-flex align-content-center justify-center">
 
-			<!--Enable pointer events again to make elements clickable-->
-			<div style="width: 40vw; pointer-events: auto;">
-				<MudPaper>
-					<MudTextField @ref="_searchTextField" T="string" Variant="Variant.Outlined"
-								  Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search"
-								  DebounceInterval="100" OnDebounceIntervalElapsed="ExecuteSearch" @bind-Value="@_searchText">
-					</MudTextField>
-				</MudPaper>
+            <!--Enable pointer events again to make elements clickable-->
+            <div style="width: 40vw; pointer-events: auto;">
+                <MudPaper>
+                    <MudTextField @ref="_searchTextField" T="string" Variant="Variant.Outlined"
+                                  Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search"
+                                  DebounceInterval="100" OnDebounceIntervalElapsed="ExecuteSearch" @bind-Value="@_searchText">
+                    </MudTextField>
+                </MudPaper>
 
-				<MudStack Spacing="2" Class="py-2">
-					@foreach (var searchResult in _searchResults)
-					{
-						if (searchResult.Data is FetchModels.TarkovDev.Item item)
-						{
-							<MudPaper Class="pa-2" Elevation="3" Style="height:8vh;">
-								<MudStack Row="true" Justify="Justify.SpaceBetween" Style="height: 100%;">
-									<!--Left side of the search result item-->
-									<MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" Style="">
-										<MudStack Justify="Justify.Center">
-											<MudPaper Style="height: 6vh; width: 6vh;" Outlined="true">
-												<MudImage Src="@item.BaseImageLink"
-														  Style="height: 6vh; width: 6vh; object-fit: contain;" />
-											</MudPaper>
-										</MudStack>
+                <MudStack Spacing="2" Class="py-2">
+                    @foreach (var searchResult in _searchResults)
+                    {
+                        if (searchResult.Data is FetchModels.TarkovDev.Item item)
+                        {
+                            <MudPaper Class="pa-2" Elevation="3" Style="height:8vh;">
+                                <MudStack Row="true" Justify="Justify.SpaceBetween" Style="height: 100%;">
+                                    <!--Left side of the search result item-->
+                                    <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" Style="">
+                                        <MudStack Justify="Justify.Center">
+                                            <MudPaper Style="height: 6vh; width: 6vh;" Outlined="true">
+                                                <MudImage Src="@item.BaseImageLink"
+                                                          Style="height: 6vh; width: 6vh; object-fit: contain;" />
+                                            </MudPaper>
+                                        </MudStack>
 
-										<MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Style="width: 4vw;">
-											<MudChip OnClose="() => { }" CloseIcon="@Icons.Filled.Checklist" Size="Size.Small"
-											 Variant="Variant.Outlined" Color="@(item.GetTaskRemaining() > 0 ? Color.Default : Color.Dark)">
-												@item.GetTaskRemaining().ToShortString()
-											</MudChip>
-											<MudChip OnClose="() => { }" CloseIcon="@Icons.Filled.House" Size="Size.Small"
-											 Variant="Variant.Outlined" Color="@(item.GetHideoutRemaining() > 0 ? Color.Default : Color.Dark)">
-												@item.GetHideoutRemaining().ToShortString()
-											</MudChip>
-										</MudStack>
+                                        <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Style="width: 4vw;">
+                                            <MudChip OnClose="() => { }" CloseIcon="@Icons.Filled.Checklist" Size="Size.Small"
+                                                     Variant="Variant.Outlined" Color="@(item.GetTaskRemaining() > 0 ? Color.Default : Color.Dark)">
+                                                @item.GetTaskRemaining().ToShortString()
+                                            </MudChip>
+                                            <MudChip OnClose="() => { }" CloseIcon="@Icons.Filled.House" Size="Size.Small"
+                                                     Variant="Variant.Outlined" Color="@(item.GetHideoutRemaining() > 0 ? Color.Default : Color.Dark)">
+                                                @item.GetHideoutRemaining().ToShortString()
+                                            </MudChip>
+                                        </MudStack>
 
-										<MudDivider Vertical="true" FlexItem="true" />
+                                        <MudDivider Vertical="true" FlexItem="true" />
 
-										<MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Start">
-											<MudText Class="ellipsis" Typo="Typo.h6" Style="max-width: 16vw">
-												@item.Name
-											</MudText>
-											<MudText>
-												@item.ShortName
-											</MudText>
-										</MudStack>
-									</MudStack>
+                                        <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Start">
+                                            <MudText Class="ellipsis" Typo="Typo.h6" Style="max-width: 16vw">
+                                                @item.Name
+                                            </MudText>
+                                            <MudText Align="Align.Center">
+                                                @item.ShortName
+                                                <MudIconButton Icon="@TARKOVDEV_ICON" Size="Size.Small" OnClick=@(() => OpenURL($"https://tarkov.dev/item/{item.Id}")) />
+                                                <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" OnClick=@(() => OpenURL(item.WikiLink)) />
+                                            </MudText>
+                                        </MudStack>
+                                    </MudStack>
 
-									<!--Right side of the search result item-->
-									<MudStack Row="true" Justify="Justify.FlexEnd">
-										<MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Style="width: 8vw" Spacing="0">
-											<MudText Typo="Typo.h6">
-												@item.Avg24HPrice.AsRubs()
-											</MudText>
-											<MudText>
-												@item.GetAvg24hMarketPricePerSlot().AsRubs()
-											</MudText>
-										</MudStack>
+                                    <!--Right side of the search result item-->
+                                    <MudStack Row="true" Justify="Justify.FlexEnd">
+                                        <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Style="width: 8vw" Spacing="0">
+                                            <MudText Typo="Typo.h6">
+                                                @item.Avg24HPrice.AsRubs()
+                                            </MudText>
+                                            <MudText>
+                                                @item.GetAvg24hMarketPricePerSlot().AsRubs()
+                                            </MudText>
+                                        </MudStack>
 
-										<MudDivider Vertical="true" FlexItem="true" />
+                                        <MudDivider Vertical="true" FlexItem="true" />
 
-										<MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Center" Style="width: 3vw" Spacing="0">
-											@{
-												var bestTrader = item.GetBestTraderOffer();
-												var traderImage = item.GetBestTraderOfferVendor()?.Trader.ImageLink;
-											}
+                                        <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Center" Style="width: 3vw" Spacing="0">
+                                            @{
+                                                var bestTrader = item.GetBestTraderOffer();
+                                                var traderImage = item.GetBestTraderOfferVendor()?.Trader.ImageLink;
+                                            }
                                             <MudAvatar Image="@traderImage"
-											   Size="Size.Medium" Style="float: left;" Square="true" Variant="Variant.Outlined" />
+                                                       Size="Size.Medium" Style="float: left;" Square="true" Variant="Variant.Outlined" />
                                             <MudText Typo="Typo.subtitle2" Style="float: right;">@bestTrader?.PriceRub.AsRubs()</MudText>
-										</MudStack>
-									</MudStack>
-								</MudStack>
-							</MudPaper>
-						}
-					}
-				</MudStack>
-			</div>
-		</div>
-	</div>
+                                        </MudStack>
+                                    </MudStack>
+                                </MudStack>
+                            </MudPaper>
+                        }
+                    }
+                </MudStack>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
-	.ellipsis {
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-		min-width: 0;
-	}
+    .ellipsis {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        min-width: 0;
+    }
 
-	.mud-select-input {
-		font-size: 2.00rem;
-	}
+    .mud-select-input {
+        font-size: 2.00rem;
+    }
 </style>
 
 @code {
@@ -118,6 +121,8 @@
     private string _searchText { get; set; }
 
     private IEnumerable<SearchResult> _searchResults { get; set; } = new List<SearchResult>();
+
+    const string TARKOVDEV_ICON = @"<svg xmlns=""http://www.w3.org/2000/svg"" viewBox=""0 0 62.3669 54.0232""><defs><style>.a{fill:#988a66;stroke:#1d1d1b;stroke-miterlimit:10;stroke-width:0.01px;}</style></defs><path class=""a"" d=""M24.2535,54.0116h-8.66c-1.0875-1.8775-8.1553-14.1034-10.39-18,2.24-3.8957,9.4148-16.32,10.39-18h8.66c-3.4163,5.9187-6.9759,12.0768-10.39,18Z""/><path class=""a"" d=""M51.1012,46.5131l-4.33,7.5c-2.17.0031-16.2915.011-20.7834-.0019-2.2539-3.8876-9.4261-16.3135-10.3935-17.9981l4.33-7.5c3.4177,5.918,6.9709,12.08,10.3935,17.998Z""/><path class=""a"" d=""M58.0312,19.5131l4.33,7.5C61.279,28.8935,54.2249,41.1273,51.9677,45.011c-4.4936.0081-18.8408.0065-20.7834.0019l-4.33-7.5c6.834-.0008,13.9468.0029,20.7835-.002Z""/><path class=""a"" d=""M38.1135.0116h8.66c1.0875,1.8775,8.1553,14.1034,10.39,18-2.24,3.8957-9.4148,16.32-10.39,18h-8.66c3.4162-5.9188,6.9758-12.0768,10.39-18Z""/><path class=""a"" d=""M11.2658,7.51l4.33-7.5c2.17-.0031,16.2915-.011,20.7835.002C38.6332,3.9,45.8053,16.3256,46.7727,18.01l-4.33,7.5C39.025,19.5921,35.4718,13.43,32.0492,7.512Z""/><path class=""a"" d=""M4.3358,34.51l-4.33-7.5C1.088,25.13,8.142,12.8958,10.3992,9.0122,14.8929,9.004,29.24,9.0057,31.1827,9.01l4.33,7.5c-6.8339.0008-13.9467-.0028-20.7835.002Z""/></svg>";
 
     private async void ExecuteSearch(string value)
     {
@@ -131,97 +136,106 @@
     private async Task<IEnumerable<SearchResult>> SearchItem(string value)
     {
         if (_items == null) _items = RatScannerMain.Instance.ItemDB?.Values?.ToList() ?? null;
-		if (_items == null) return null;
+        if (_items == null) return null;
 
-		if (string.IsNullOrEmpty(value)) return null;
-
-		value = SanitizeSearch(value);
+        if (string.IsNullOrEmpty(value)) return null;
 
         Func<FetchModels.TarkovDev.Item, SearchResult> filter = (item) =>
-			{
-				if (SanitizeSearch(item.Name) == value) return new(item, 5);
-				if (SanitizeSearch(item.ShortName) == value) return new(item, 10);
+            {
+                if (SanitizeSearch(item.Name) == value) return new(item, 5);
+                if (SanitizeSearch(item.ShortName) == value) return new(item, 10);
 
-				if (SanitizeSearch(item.Name).StartsWith(value)) return new(item, 20);
-				if (SanitizeSearch(item.ShortName).StartsWith(value)) return new(item, 20);
+                if (SanitizeSearch(item.Name).StartsWith(value)) return new(item, 20);
+                if (SanitizeSearch(item.ShortName).StartsWith(value)) return new(item, 20);
 
-				// Match every individual word (expensive)
-				string[] filters = value.Split(new[] { ' ' });
-				if (filters.All(filter => SanitizeSearch(item.Name).Contains(filter))) return new(item, 40);
-				if (filters.All(filter => SanitizeSearch(item.ShortName).Contains(filter))) return new(item, 40);
+                // Match every individual word (expensive)
+                string[] filters = value.Split(new[] { ' ' });
+                if (filters.All(filter => SanitizeSearch(item.Name).Contains(filter))) return new(item, 40);
+                if (filters.All(filter => SanitizeSearch(item.ShortName).Contains(filter))) return new(item, 40);
 
-				if (SanitizeSearch(item.Name).Contains(value)) return new(item, 60);
-				if (SanitizeSearch(item.ShortName).Contains(value)) return new(item, 60);
+                if (SanitizeSearch(item.Name).Contains(value)) return new(item, 60);
+                if (SanitizeSearch(item.ShortName).Contains(value)) return new(item, 60);
 
-				if (value.Length > 3 && SanitizeSearch(item.Id).StartsWith(value)) return new(item, 80);
-				if (value.Length > 3 && SanitizeSearch(item.Id).Contains(value)) return new(item, 100);
-				return new(null, -1);
-			};
+                if (value.Length > 3 && SanitizeSearch(item.Id).StartsWith(value)) return new(item, 80);
+                if (value.Length > 3 && SanitizeSearch(item.Id).Contains(value)) return new(item, 100);
+                return new(null, -1);
+            };
 
-		var matches = new List<SearchResult>();
+        var matches = new List<SearchResult>();
         foreach (var item in _items)
-		{
-			var match = filter(item);
-			if (match.Data == null) continue;
-			matches.Add(match);
-		}
+        {
+            var match = filter(item);
+            if (match.Data == null) continue;
+            matches.Add(match);
+        }
 
-		for (var i = 0; i < matches.Count; i++)
-		{
-			// Slightly penalize items with long names
-			matches[i].Score += (matches[i].Data as FetchModels.TarkovDev.Item).Name.Length * 0.002;
+        for (var i = 0; i < matches.Count; i++)
+        {
+            // Slightly penalize items with long names
+            matches[i].Score += (matches[i].Data as FetchModels.TarkovDev.Item).Name.Length * 0.002;
 
-			// Penalize weapon mods so the weapon it self will rank higher
+            // Penalize weapon mods so the weapon it self will rank higher
             if ((matches[i].Data as FetchModels.TarkovDev.Item).Types.Contains(ItemType.Mods)) matches[i].Score += 5;
-		}
+        }
 
-		return matches;
-	}
+        return matches;
+    }
 
-	private string SanitizeSearch(string value)
-	{
-		value = value.ToLower();
-		value = new string(value.Where(c => char.IsLetterOrDigit(c) || c == ' ').ToArray());
-		return value;
-	}
+    private string SanitizeSearch(string value)
+    {
+        value = value.ToLower();
+        value = new string(value.Where(c => char.IsLetterOrDigit(c) || c == ' ').ToArray());
+        return value;
+    }
 
-	[JSInvokable]
-	public static void JSHideOverlay()
-	{
-		BlazorUI.BlazorInteractableOverlay.HideOverlay();
-	}
+    [JSInvokable]
+    public static void JSHideOverlay()
+    {
+        BlazorUI.BlazorInteractableOverlay.HideOverlay();
+    }
 
-	[JSInvokable]
-	public static void JSShowOverlay()
-	{
-		_searchTextField.FocusAsync();
-		_searchTextField.SelectAsync();
-	}
+    [JSInvokable]
+    public static void JSShowOverlay()
+    {
+        _searchTextField.FocusAsync();
+        _searchTextField.SelectAsync();
+    }
 
-	protected override void OnInitialized()
-	{
-		MenuVM.PropertyChanged += PropertyChangeHandler;
-	}
+    protected override void OnInitialized()
+    {
+        MenuVM.PropertyChanged += PropertyChangeHandler;
+    }
 
-	private async void PropertyChangeHandler(object sender, EventArgs e)
-	{
-		await InvokeAsync(() => StateHasChanged());
-	}
+    private async void PropertyChangeHandler(object sender, EventArgs e)
+    {
+        await InvokeAsync(() => StateHasChanged());
+    }
 
-	public void Dispose()
-	{
-		MenuVM.PropertyChanged -= PropertyChangeHandler;
-	}
+    public void Dispose()
+    {
+        MenuVM.PropertyChanged -= PropertyChangeHandler;
+    }
 
-	public class SearchResult
-	{
-		public SearchResult(object data, float score)
-		{
-			Score = score;
-			Data = data;
-		}
+    public class SearchResult
+    {
+        public SearchResult(object data, float score)
+        {
+            Score = score;
+            Data = data;
+        }
 
-		public object Data;
-		public double Score;
-	}
+        public object Data;
+        public double Score;
+    }
+
+    private void OpenURL(string url)
+    {
+        if (string.IsNullOrEmpty(url)) return;
+        var psi = new ProcessStartInfo
+            {
+                FileName = url,
+                UseShellExecute = true,
+            };
+        Process.Start(psi);
+    }
 }

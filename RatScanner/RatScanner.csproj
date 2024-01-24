@@ -6,13 +6,13 @@
     <UseWindowsForms>True</UseWindowsForms>
     <ApplicationIcon>Resources\RatLogoSmall.ico</ApplicationIcon>
     <StartupObject>RatScanner.App</StartupObject>
-    <Version>3.6.2</Version>
+    <Version>3.6.5</Version>
     <ImplicitUsings>disable</ImplicitUsings>
-		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-		<RootNamespace>RatScanner</RootNamespace>
-		<SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <RootNamespace>RatScanner</RootNamespace>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
   </PropertyGroup>
-	
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
@@ -23,12 +23,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
-	
+
   <ItemGroup>
     <Resource Include="Resources\iconMods.png" />
     <Resource Include="Resources\settings.png" />
   </ItemGroup>
-	
+
   <ItemGroup>
     <PackageReference Include="DeepCloner" Version="0.10.4" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.15" />
@@ -45,28 +45,30 @@
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
     <PackageReference Include="Tesseract" Version="5.2.0" />
   </ItemGroup>
-	
+
   <ItemGroup>
-    <SplashScreen Include="Resources\RatLogoMedium.png" />
+    <None Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-	
-	<ItemGroup>
-		<None Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />
-	</ItemGroup>
-	
-	<ItemGroup>
-	  <Content Remove="wwwroot\fonts\bender.bold.otf" />
-	  <Content Remove="wwwroot\fonts\bender.regular.otf" />
-	  <Content Remove="wwwroot\interactableOverlay.html" />
-	</ItemGroup>
 
-	<ItemGroup>
-		<FrameworkReference Include="Microsoft.AspNetCore.App" />
-	</ItemGroup>
+  <ItemGroup>
+    <Content Remove="wwwroot\fonts\bender.bold.otf" />
+    <Content Remove="wwwroot\fonts\bender.regular.otf" />
+    <Content Remove="wwwroot\interactableOverlay.html" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<Content Update="_Imports.razor">
-			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-		</Content>
-	</ItemGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\RatLogoMedium.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="_Imports.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
 </Project>

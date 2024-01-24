@@ -72,7 +72,7 @@ public class RatScannerMain : INotifyPropertyChanged
 		Logger.LogInfo("Loading price data...");
 		ItemDB = TarkovDevAPI.GetItems().ToDictionary(x => x.Id, x => x);
 
-		ItemScans.Enqueue(new DefaultItemScan(ItemDB.ElementAt(16).Value)) ;
+		ItemScans.Enqueue(new DefaultItemScan(ItemDB.ElementAt(16).Value));
 
 		Logger.LogInfo("Initializing tarkov tracker database");
 		TarkovTrackerDB = new TarkovTrackerDB();
@@ -206,9 +206,10 @@ public class RatScannerMain : INotifyPropertyChanged
 	private Database RatStashDatabaseFromTarkovDev()
 	{
 		var rsItems = new List<RatStash.Item>();
-		foreach(var i in ItemDB.Values)
+		foreach (var i in ItemDB.Values)
 		{
-			rsItems.Add(new RatStash.Item() {
+			rsItems.Add(new RatStash.Item()
+			{
 				Id = i.Id,
 				Name = i.Name,
 				ShortName = i.ShortName,
