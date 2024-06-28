@@ -12,15 +12,14 @@ public class NeededResponseData
 	[JsonProperty("hideoutStations")]
 	public List<HideoutStation> HideoutStations { get; set; } = new();
 
-	// Get needed items from tasks and hideout station
 	public (List<NeededItem> tasks, List<NeededItem> hideout) GetNeededItems()
 	{
 		var neededItems = (new List<NeededItem>(), new List<NeededItem>());
-		foreach (var task in Tasks)
+		foreach (var task in Tasks ?? new())
 		{
 			neededItems.Item1.AddRange(task.GetNeededItems());
 		}
-		foreach (var station in HideoutStations)
+		foreach (var station in HideoutStations ?? new())
 		{
 			neededItems.Item2.AddRange(station.GetNeededItems());
 		}

@@ -51,14 +51,6 @@ public class NeededItem
 	public bool HasAlternatives { get; set; } = false;
 }
 
-// Item
-public class Item
-{
-	// Item id
-	[JsonProperty("id")]
-	public string Id { get; set; } = "";
-}
-
 public enum ProgressType
 {
 	TaskTurnin,

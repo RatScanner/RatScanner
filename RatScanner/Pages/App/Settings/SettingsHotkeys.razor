@@ -1,0 +1,103 @@
+﻿@page "/app/settings/hotkeys"
+@using RatScanner.Components;
+@inject SettingsVM SettingsVM
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+<div>
+    <MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
+        <MudItem xs="12">
+            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
+                <MudStack Spacing="0" Justify="Justify.SpaceBetween" Row="true">
+                    <MudItem>
+                        <MudText>
+                            Open Wiki
+                        </MudText>
+                    </MudItem>
+                    <MudItem>
+                        <HotkeySelector></HotkeySelector>
+                    </MudItem>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12">
+            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
+                <MudStack Spacing="0" Justify="Justify.SpaceBetween" Row="true">
+                    <MudItem>
+                        <MudText>
+                            Open Tarkov.dev
+                        </MudText>
+                    </MudItem>
+                    <MudItem>
+                        <HotkeySelector></HotkeySelector>
+                    </MudItem>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12">
+            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
+                <MudStack Spacing="0" Justify="Justify.SpaceBetween" Row="true">
+                    <MudItem>
+                        <MudText>
+                            Favorite item
+                        </MudText>
+                    </MudItem>
+                    <MudItem>
+                        <HotkeySelector></HotkeySelector>
+                    </MudItem>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12">
+            <div class="d-flex align-center justify-center mx-2 mb-1">
+                <MudText Typo="Typo.subtitle1" Color="Color.Inherit">Tarkov Tracker</MudText>
+            </div>
+        </MudItem>
+        <MudItem xs="12">
+            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
+                <MudStack Spacing="0" Justify="Justify.SpaceBetween" Row="true">
+                    <MudItem>
+                        <MudText>
+                            Add item
+                        </MudText>
+                    </MudItem>
+                    <MudItem>
+                        <HotkeySelector></HotkeySelector>
+                    </MudItem>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12">
+            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
+                <MudStack Spacing="0" Justify="Justify.SpaceBetween" Row="true">
+                    <MudItem>
+                        <MudText>
+                            Remove item
+                        </MudText>
+                    </MudItem>
+                    <MudItem>
+                        <HotkeySelector></HotkeySelector>
+                    </MudItem>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</div>
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        SettingsVM.PropertyChanged += PropertyChangeHandler;
+    }
+
+    private async void PropertyChangeHandler(object sender, EventArgs e)
+    {
+        await InvokeAsync(() => StateHasChanged());
+    }
+
+    public void Dispose()
+    {
+        SettingsVM.PropertyChanged -= PropertyChangeHandler;
+    }
+}

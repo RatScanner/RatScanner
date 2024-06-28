@@ -55,20 +55,9 @@ internal class MenuVM : INotifyPropertyChanged
 		}
 	}
 
-	private UserProgress GetUserProgress()
-	{
-		UserProgress progress = null;
-		if (RatConfig.Tracking.TarkovTracker.Enable && RatScannerMain.Instance.TarkovTrackerDB.Progress.Count >= 1)
-		{
-			var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
-			progress = teamProgress.FirstOrDefault(x => x.UserId == RatScannerMain.Instance.TarkovTrackerDB.Self);
-		}
-		return progress;
-	}
+	public int TaskRemaining => LastItem.GetTaskRemaining();
 
-	public int TaskRemaining => LastItem.GetTaskRemaining(!RatConfig.Tracking.ShowNonFIRNeeds, GetUserProgress());
-
-	public int HideoutRemaining => LastItem.GetHideoutRemaining(false, GetUserProgress());
+	public int HideoutRemaining => LastItem.GetHideoutRemaining();
 
 	public bool ItemNeeded => TaskRemaining + HideoutRemaining > 0;
 
@@ -83,8 +72,8 @@ internal class MenuVM : INotifyPropertyChanged
 			var needs = new List<KeyValuePair<string, KeyValuePair<int, int>>>();
 			foreach (var memberProgress in teamProgress)
 			{
-				var task = LastItem.GetTaskRemaining(!RatConfig.Tracking.ShowNonFIRNeeds, memberProgress);
-				var hideout = LastItem.GetHideoutRemaining(false, memberProgress);
+				var task = LastItem.GetTaskRemaining(memberProgress);
+				var hideout = LastItem.GetHideoutRemaining(memberProgress);
 
 				if (task == 0 && hideout == 0) continue;
 
@@ -106,7 +95,7 @@ internal class MenuVM : INotifyPropertyChanged
 
 	public (int task, int hideout) ItemTeamNeedsSummed => (ItemTeamNeeds.Sum(i => i.Value.Key), ItemTeamNeeds.Sum(i => i.Value.Value));
 
-	public bool ItemTeamNeeded => ItemTeamNeeds.Any();
+	public bool ItemTeamNeeded => ItemTeamNeeds != null && ItemTeamNeeds.Any();
 
 	public event PropertyChangedEventHandler PropertyChanged;
 
@@ -126,6 +115,7 @@ internal class MenuVM : INotifyPropertyChanged
 		OnPropertyChanged();
 	}
 
+	// Still used in minimal menu
 	public string IntToLongPrice(int? value)
 	{
 		if (value == null) return "0 ₽";
@@ -133,24 +123,5 @@ internal class MenuVM : INotifyPropertyChanged
 		var text = $"{value:n0}";
 		var numberGroupSeparator = NumberFormatInfo.CurrentInfo.NumberGroupSeparator;
 		return text.Replace(numberGroupSeparator, RatConfig.ToolTip.DigitGroupingSymbol) + " ₽";
-	}
-
-	public string IntToShortPrice(int? value)
-	{
-		if (value == null) return "₽ 0";
-
-		var priceStr = value.ToString();
-		if (priceStr.Length < 4) return "₽ " + priceStr;
-
-		var suffixes = new string[] { "", "K", "M", "B", "T" };
-
-		var result = priceStr[..3];
-
-		var dotPos = priceStr.Length % 3;
-		//if (dotPos != 0) result = result.Insert(dotPos, ".");
-		if (dotPos != 0) result = result[..dotPos];
-
-		result += " " + suffixes[(int)Math.Floor((priceStr.Length - 1) / 3f)];
-		return "₽ " + result;
 	}
 }

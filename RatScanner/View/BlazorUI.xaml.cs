@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Web.WebView2.Core;
 using MudBlazor.Services;
-using RatScanner.Controls;
 using RatScanner.ViewModel;
 using System;
 using System.Diagnostics;
@@ -19,27 +18,22 @@ namespace RatScanner.View;
 /// </summary>
 public partial class BlazorUI : UserControl, ISwitchable
 {
-	public HotkeySelector IconScanHotkeySelector { get; set; }
+	private static BlazorUI _instance = null;
+	public static BlazorUI Instance => _instance ??= new BlazorUI();
+
 	public static BlazorOverlay BlazorOverlay { get; set; }
 	public static BlazorInteractableOverlay BlazorInteractableOverlay { get; set; }
 
-	public BlazorUI()
+	private BlazorUI()
 	{
 		var serviceCollection = new ServiceCollection();
 		serviceCollection.AddWpfBlazorWebView();
 		serviceCollection.AddMudServices();
-		RatConfig.LoadConfig();
 
 		serviceCollection.AddSingleton<MenuVM>(s => new MenuVM(RatScannerMain.Instance));
 
 		var settingsVM = new SettingsVM();
 		serviceCollection.AddSingleton<SettingsVM>(s => settingsVM);
-
-		IconScanHotkeySelector = new HotkeySelector();
-		IconScanHotkeySelector.Hotkey = (Hotkey)settingsVM.IconScanHotkey;
-		IconScanHotkeySelector.Width = 0;
-		IconScanHotkeySelector.Height = 0;
-		serviceCollection.AddSingleton<HotkeySelector>(s => IconScanHotkeySelector);
 
 		var bounds = System.Windows.Forms.Screen.AllScreens.Select(screen => screen.Bounds);
 		var left = 0;
@@ -62,16 +56,13 @@ public partial class BlazorUI : UserControl, ISwitchable
 		BlazorOverlay ??= new BlazorOverlay(serviceProvider);
 		BlazorOverlay.Show();
 
-		//BlazorInteractableOverlay ??= new BlazorInteractableOverlay(serviceProvider);
-		//BlazorInteractableOverlay.Show();
+		BlazorInteractableOverlay ??= new BlazorInteractableOverlay(serviceProvider);
 
 		InitializeComponent();
 	}
 
 	private void BlazorUI_Loaded(object sender, RoutedEventArgs e)
 	{
-		Panel.SetZIndex(IconScanHotkeySelector, 100);
-		blazorUIGrid.Children.Add(IconScanHotkeySelector);
 		blazorWebView.WebView.DefaultBackgroundColor = System.Drawing.Color.Transparent;
 		blazorWebView.WebView.NavigationCompleted += WebView_Loaded;
 		blazorWebView.WebView.CoreWebView2InitializationCompleted += CoreWebView_Loaded;

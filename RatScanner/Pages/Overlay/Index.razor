@@ -40,14 +40,14 @@
                             @if (iconScan.Avg24hPrice >= iconScan.BestTraderPrice)
                             {
                                 <div class="stroke">
-                                    @MenuVM.IntToShortPrice(iconScan.Avg24hPrice)
+                                    @iconScan.MatchedItem.GetAvg24hMarketPrice().ToShortString()
                                 </div>
                             }
                             else
                             {
                                 <div class="d-flex align-center stroke">
-                                    @MenuVM.IntToShortPrice(iconScan.BestTraderPrice)
-                                    <MudAvatar Image="@($"https://tarkov.dev/images/{@iconScan.TraderName.ToLower()}-icon.jpg")"
+	                                @iconScan.MatchedItem.GetBestTrader().price.ToShortString()
+                                    <MudAvatar Image="@($"https://tarkov.dev/images/traders/{@iconScan.TraderName.ToLower()}-icon.jpg")"
                                                Size="Size.Small" Style="float: right;" Class="ml-1" />
                                 </div>
                             }
@@ -78,14 +78,14 @@
                     @if (itemScan.Avg24hPrice >= itemScan.BestTraderPrice)
                     {
                         <div class="stroke">
-                            @MenuVM.IntToShortPrice(itemScan.Avg24hPrice)
+                            @itemScan.MatchedItem.GetAvg24hMarketPrice().ToShortString()
                         </div>
                     }
                     else
                     {
                         <div class="d-flex align-center">
-                            @MenuVM.IntToShortPrice(itemScan.BestTraderPrice)
-                            <MudAvatar Image="@($"https://tarkov.dev/images/{@itemScan.TraderName.ToLower()}-icon.jpg")" Size="Size.Small" Style="float: right;" Class="ml-1" />
+                            @itemScan.MatchedItem.GetBestTrader().price.ToShortString()
+                            <MudAvatar Image="@($"https://tarkov.dev/images/traders/{@itemScan.TraderName.ToLower()}-icon.jpg")" Size="Size.Small" Style="float: right;" Class="ml-1" />
                         </div>
                     }
 

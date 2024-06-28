@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using RatScanner.Controls;
 using RatStash;
 using System;
 using System.Diagnostics;
@@ -24,6 +23,8 @@ internal static class RatConfig
 
 	// Version
 	public static string Version => Process.GetCurrentProcess().MainModule.FileVersionInfo.ProductVersion;
+
+	public const string SINGLE_INSTANCE_GUID = "{a057bb64-c126-4ef4-a4ed-3037c2e7bc89}";
 
 	// Paths
 	internal static class Paths
@@ -111,6 +112,7 @@ internal static class RatConfig
 		internal static class Search
 		{
 			internal static bool Enable = true;
+			internal static bool BlurBehind = true;
 			internal static Hotkey Hotkey = new(new[] { Key.N, Key.M }.ToList());
 		}
 	}
@@ -135,7 +137,7 @@ internal static class RatConfig
 		set { }
 	}
 #else
-		internal static bool LogDebug = false;
+	internal static bool LogDebug = false;
 #endif
 	internal static bool MinimizeToTray = false;
 	internal static bool AlwaysOnTop = true;
@@ -146,6 +148,9 @@ internal static class RatConfig
 	internal static int ScreenHeight = 1080;
 	internal static float ScreenScale = 1f;
 	internal static bool SetScreen = false;
+	internal static int LastWindowPositionX = int.MinValue;
+	internal static int LastWindowPositionY = int.MinValue;
+	internal static WindowMode LastWindowMode = WindowMode.Normal;
 
 	internal static float GameScale => RatScannerMain.Instance.RatEyeEngine.Config.ProcessingConfig.Scale;
 
@@ -189,9 +194,7 @@ internal static class RatConfig
 		config.Section = nameof(IconScan);
 		IconScan.Enable = config.ReadBool(nameof(IconScan.Enable), IconScan.Enable);
 		IconScan.ScanRotatedIcons = config.ReadBool(nameof(IconScan.ScanRotatedIcons), IconScan.ScanRotatedIcons);
-		var keyboardKeys = config.ReadEnumerableEnum(nameof(IconScan.Hotkey) + "Keyboard", IconScan.Hotkey.KeyboardKeys);
-		var mouseButtons = config.ReadEnumerableEnum(nameof(IconScan.Hotkey) + "Mouse", IconScan.Hotkey.MouseButtons);
-		IconScan.Hotkey = new Hotkey(keyboardKeys.ToList(), mouseButtons.ToList());
+		IconScan.Hotkey = config.ReadHotkey(nameof(IconScan.Hotkey), IconScan.Hotkey);
 		IconScan.UseCachedIcons = config.ReadBool(nameof(IconScan.UseCachedIcons), IconScan.UseCachedIcons);
 
 		config.Section = nameof(ToolTip);
@@ -219,9 +222,8 @@ internal static class RatConfig
 
 		config.Section = nameof(Overlay.Search);
 		Overlay.Search.Enable = config.ReadBool(nameof(Overlay.Search.Enable), Overlay.Search.Enable);
-		keyboardKeys = config.ReadEnumerableEnum(nameof(Overlay.Search.Hotkey) + "Keyboard", Overlay.Search.Hotkey.KeyboardKeys);
-		mouseButtons = config.ReadEnumerableEnum(nameof(Overlay.Search.Hotkey) + "Mouse", Overlay.Search.Hotkey.MouseButtons);
-		Overlay.Search.Hotkey = new Hotkey(keyboardKeys.ToList(), mouseButtons.ToList());
+		Overlay.Search.BlurBehind = config.ReadBool(nameof(Overlay.Search.BlurBehind), Overlay.Search.BlurBehind);
+		Overlay.Search.Hotkey = config.ReadHotkey(nameof(Overlay.Search.Hotkey), Overlay.Search.Hotkey);
 
 		config.Section = nameof(TarkovTools.RemoteControl);
 		TarkovTools.RemoteControl.SessionId = config.ReadString(nameof(TarkovTools.RemoteControl.SessionId));
@@ -239,6 +241,10 @@ internal static class RatConfig
 		MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), MinimizeToTray);
 		AlwaysOnTop = config.ReadBool(nameof(AlwaysOnTop), AlwaysOnTop);
 		LogDebug = config.ReadBool(nameof(LogDebug), LogDebug);
+
+		LastWindowPositionX = config.ReadInt(nameof(LastWindowPositionX), LastWindowPositionX);
+		LastWindowPositionY = config.ReadInt(nameof(LastWindowPositionY), LastWindowPositionY);
+		LastWindowMode = (WindowMode)config.ReadInt(nameof(LastWindowMode), (int)LastWindowMode);
 	}
 
 	internal static void SaveConfig()
@@ -253,8 +259,7 @@ internal static class RatConfig
 		config.Section = nameof(IconScan);
 		config.WriteBool(nameof(IconScan.Enable), IconScan.Enable);
 		config.WriteBool(nameof(IconScan.ScanRotatedIcons), IconScan.ScanRotatedIcons);
-		config.WriteEnumerableEnum(nameof(IconScan.Hotkey) + "Keyboard", IconScan.Hotkey.KeyboardKeys);
-		config.WriteEnumerableEnum(nameof(IconScan.Hotkey) + "Mouse", IconScan.Hotkey.MouseButtons);
+		config.WriteHotkey(nameof(IconScan.Hotkey), IconScan.Hotkey);
 		config.WriteBool(nameof(IconScan.UseCachedIcons), IconScan.UseCachedIcons);
 
 		config.Section = nameof(ToolTip);
@@ -287,6 +292,8 @@ internal static class RatConfig
 
 		config.Section = nameof(Overlay.Search);
 		config.WriteBool(nameof(Overlay.Search.Enable), Overlay.Search.Enable);
+		config.WriteBool(nameof(Overlay.Search.BlurBehind), Overlay.Search.BlurBehind);
+		config.WriteHotkey(nameof(Overlay.Search.Hotkey), Overlay.Search.Hotkey);
 
 		config.Section = "Other";
 		config.WriteInt(nameof(ScreenWidth), ScreenWidth);
@@ -296,6 +303,9 @@ internal static class RatConfig
 		config.WriteBool(nameof(AlwaysOnTop), AlwaysOnTop);
 		config.WriteBool(nameof(LogDebug), LogDebug);
 		config.WriteInt(nameof(ConfigVersion), ConfigVersion);
+		config.WriteInt(nameof(LastWindowPositionX), LastWindowPositionX);
+		config.WriteInt(nameof(LastWindowPositionY), LastWindowPositionY);
+		config.WriteInt(nameof(LastWindowMode), (int)LastWindowMode);
 	}
 
 	/// <summary>
@@ -315,6 +325,13 @@ internal static class RatConfig
 		Effective = 0,
 		Angular = 1,
 		Raw = 2,
+	}
+
+	public enum WindowMode
+	{
+		Normal = 0,
+		Minimal = 1,
+		Minimized = 2,
 	}
 
 	public static double GetScalingForScreen(Screen screen)

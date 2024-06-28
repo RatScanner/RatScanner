@@ -6,7 +6,7 @@
     <UseWindowsForms>True</UseWindowsForms>
     <ApplicationIcon>Resources\RatLogoSmall.ico</ApplicationIcon>
     <StartupObject>RatScanner.App</StartupObject>
-    <Version>3.5.4</Version>
+    <Version>3.6.5</Version>
     <ImplicitUsings>disable</ImplicitUsings>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 		<RootNamespace>RatScanner</RootNamespace>
@@ -31,25 +31,20 @@
 	
   <ItemGroup>
     <PackageReference Include="DeepCloner" Version="0.10.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="7.0.52" />
-    <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
-    <PackageReference Include="MudBlazor" Version="6.1.7" />
-    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.355802">
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="7.0.92" />
+    <PackageReference Include="MudBlazor" Version="6.10.0" />
+    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.421302">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="RatEye" Version="2.6.2" />
-    <PackageReference Include="RatStash" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="7.0.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="RatEye" Version="3.0.1" />
+    <PackageReference Include="RatStash" Version="5.0.0" />
     <PackageReference Include="SingleInstanceCore" Version="2.2.2" />
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
     <PackageReference Include="Tesseract" Version="5.2.0" />
     <PackageReference Include="Websocket.Client" Version="4.6.1" />
-  </ItemGroup>
-	
-  <ItemGroup>
-    <SplashScreen Include="Resources\RatLogoMedium.png" />
   </ItemGroup>
 	
 	<ItemGroup>
@@ -57,11 +52,19 @@
 	</ItemGroup>
 	
 	<ItemGroup>
+	  <Content Remove="wwwroot\fonts\bender.bold.otf" />
+	  <Content Remove="wwwroot\fonts\bender.regular.otf" />
 	  <Content Remove="wwwroot\interactableOverlay.html" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Resources\RatLogoMedium.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Resource>
 	</ItemGroup>
 
 	<ItemGroup>

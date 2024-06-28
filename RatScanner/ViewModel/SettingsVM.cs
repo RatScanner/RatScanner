@@ -1,5 +1,4 @@
-﻿using RatScanner.Controls;
-using RatStash;
+﻿using RatStash;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -45,10 +44,16 @@ internal class SettingsVM : INotifyPropertyChanged
 
 	public bool ShowTarkovTrackerTeam { get; set; }
 
+	// Interactable Overlay
+	public bool EnableIneractableOverlay { get; set; }
+	public bool BlurBehindSearch { get; set; }
+	public Hotkey InteractableOverlayHotkey { get; set; }
+
 	// Tarkov Tools settings
 	public string TarkovToolsRemoteControlSessionId { get; set; }
 	public bool TarkovToolsRemoteControlAutoSync { get; set; }
 	public bool TarkovToolsRemoteControlOpenAmmoChart { get; set; }
+
 	internal SettingsVM()
 	{
 		LoadSettings();
@@ -89,6 +94,10 @@ internal class SettingsVM : INotifyPropertyChanged
 		TarkovTrackerToken = RatConfig.Tracking.TarkovTracker.Token;
 		ShowTarkovTrackerTeam = RatConfig.Tracking.TarkovTracker.ShowTeam;
 
+		EnableIneractableOverlay = RatConfig.Overlay.Search.Enable;
+		BlurBehindSearch = RatConfig.Overlay.Search.BlurBehind;
+		InteractableOverlayHotkey = RatConfig.Overlay.Search.Hotkey;
+
 		TarkovToolsRemoteControlSessionId = RatConfig.TarkovTools.RemoteControl.SessionId;
 		TarkovToolsRemoteControlAutoSync = RatConfig.TarkovTools.RemoteControl.AutoSync;
 		TarkovToolsRemoteControlOpenAmmoChart = RatConfig.TarkovTools.RemoteControl.OpenAmmoChart;
@@ -112,7 +121,7 @@ internal class SettingsVM : INotifyPropertyChanged
 		RatConfig.IconScan.Enable = EnableIconScan;
 		RatConfig.IconScan.ScanRotatedIcons = ScanRotatedIcons;
 		RatConfig.IconScan.UseCachedIcons = UseCachedIcons;
-		RatConfig.IconScan.Hotkey = (Hotkey)IconScanHotkey;
+		RatConfig.IconScan.Hotkey = IconScanHotkey;
 
 		RatConfig.ToolTip.Duration = int.TryParse(ToolTipDuration, out var i) ? i : 0;
 		RatConfig.ToolTip.Duration = ToolTipMilli;
@@ -130,6 +139,10 @@ internal class SettingsVM : INotifyPropertyChanged
 
 		RatConfig.Tracking.TarkovTracker.Token = TarkovTrackerToken.Trim();
 		RatConfig.Tracking.TarkovTracker.ShowTeam = ShowTarkovTrackerTeam;
+
+		RatConfig.Overlay.Search.Enable = EnableIneractableOverlay;
+		RatConfig.Overlay.Search.BlurBehind = BlurBehindSearch;
+		RatConfig.Overlay.Search.Hotkey = InteractableOverlayHotkey;
 
 		RatConfig.TarkovTools.RemoteControl.SessionId = TarkovToolsRemoteControlSessionId;
 		RatConfig.TarkovTools.RemoteControl.AutoSync = TarkovToolsRemoteControlAutoSync;

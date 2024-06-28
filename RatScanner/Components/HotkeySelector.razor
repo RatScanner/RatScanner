@@ -1,0 +1,113 @@
+﻿@using System.Windows.Input;
+@implements IDisposable;
+
+<MudButton @ref="Button" @onclick="() => StartListening()"
+           Color="Color.Primary" Size="Size.Small"
+           Variant="Variant.Filled" DisableElevation="true"
+           Class="px-1 py-1" @attributes="InputAttributes">
+    <MudStack Spacing="0" AlignItems="AlignItems.Stretch" Justify="Justify.Center">
+        @if (string.IsNullOrEmpty(_tmpHotkey.HotkeyString))
+        {
+            <div>None</div>
+        }
+        else
+        {
+            <MudStack Spacing="1" Row="true" Justify="Justify.SpaceBetween">
+                @foreach (var key in _tmpHotkey.KeyboardKeys)
+                {
+                    <MudChip Variant="Variant.Outlined" Label="true"
+                     Size="Size.Small" Color="Color.Default"
+                     Class="px-2 ma-0">
+                        @key.ToString().ToLower().Replace("left", "l-").Replace("right", "r-")
+                    </MudChip>
+                }
+                @foreach (var button in _tmpHotkey.MouseButtons)
+                {
+                    <MudChip Variant="Variant.Outlined" Label="true"
+                     Size="Size.Small" Color="Color.Default"
+                     Class="px-2 ma-0">
+                        @((button.ToString().ToLower().Replace("left", "l-").Replace("right", "r-") + "-mouse")
+                            .Replace("--", "-").Replace("button", ""))
+                    </MudChip>
+                }
+            </MudStack>
+        }
+
+        @if (_listening)
+        {
+            <MudProgressLinear Class="mb-n1" Style="Width: 100%;" Indeterminate="true" />
+        }
+    </MudStack>
+</MudButton>
+
+@code {
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? InputAttributes { get; set; }
+
+    [Parameter]
+    public Hotkey Hotkey { get; set; } = new Hotkey();
+
+    private MudButton Button;
+
+    private Hotkey _tmpHotkey = new Hotkey();
+
+    private bool _listening = false;
+
+    private async void StartListening()
+    {
+        if (_listening) return;
+        Button.Disabled = true;
+        _listening = true;
+        _tmpHotkey = new Hotkey();
+        await InvokeAsync(() => StateHasChanged());
+    }
+
+    private async void StopListening(bool discard = false)
+    {
+        if (!_listening) return;
+
+        if (discard) _tmpHotkey = Hotkey;
+        else Hotkey.Set(_tmpHotkey);
+
+        _listening = false;
+        Button.Disabled = false;
+        await InvokeAsync(() => StateHasChanged());
+    }
+
+    protected override void OnInitialized()
+    {
+        _tmpHotkey = new Hotkey(Hotkey);
+        UserActivityHelper.OnKeyboardKeyUp += OnKeyUp;
+        UserActivityHelper.OnMouseButtonUp += OnKeyUp;
+        UserActivityHelper.OnKeyboardKeyDown += OnKeyDown;
+        UserActivityHelper.OnMouseButtonDown += OnKeyDown;
+    }
+
+    private void OnKeyUp(object sender, KeyUpEventArgs e)
+    {
+        StopListening();
+    }
+
+    private async void OnKeyDown(object sender, KeyDownEventArgs e)
+    {
+        if (!_listening) return;
+
+        if (e.Device == Device.Keyboard && e.Key == Key.Escape)
+        {
+            StopListening(true);
+            return;
+        }
+
+        if (e.Device == Device.Keyboard) _tmpHotkey.KeyboardKeys.Add(e.Key);
+        else if (e.Device == Device.Mouse) _tmpHotkey.MouseButtons.Add(e.MouseButton);
+        await InvokeAsync(() => StateHasChanged());
+    }
+
+    public void Dispose()
+    {
+        UserActivityHelper.OnKeyboardKeyUp -= OnKeyUp;
+        UserActivityHelper.OnMouseButtonUp -= OnKeyUp;
+        UserActivityHelper.OnKeyboardKeyDown -= OnKeyDown;
+        UserActivityHelper.OnMouseButtonDown -= OnKeyDown;
+    }
+}
