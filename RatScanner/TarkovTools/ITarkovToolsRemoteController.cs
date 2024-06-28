@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
@@ -37,16 +38,12 @@ public class TarkovToolsRemoteController : ITarkovToolsRemoteController
 
 	private string _sessionId;
 
-	public TarkovToolsRemoteController()
-	{
-		InitWebsocketClient();
-	}
-
 	private void InitWebsocketClient()
 	{
 		// Dispose (if necessary) and create new ws client
 		_client?.Dispose();
-		_client = new WebsocketClient(new Uri(wssUri));
+		var uri = QueryHelpers.AddQueryString(wssUri, "sessionid", _sessionId);
+		_client = new WebsocketClient(new Uri(uri));
 
 		// Setup timeouts
 		_client.ReconnectTimeout = TimeSpan.FromSeconds(5);
@@ -82,6 +79,9 @@ public class TarkovToolsRemoteController : ITarkovToolsRemoteController
 
 	private async Task ConnectInternalAsync()
 	{
+		if (_client == null)
+			InitWebsocketClient();
+
 		try
 		{
 			await _client.StartOrFail().ConfigureAwait(false);
@@ -99,8 +99,9 @@ public class TarkovToolsRemoteController : ITarkovToolsRemoteController
 		if (string.IsNullOrEmpty(_sessionId))
 			throw new TarkovToolsRemoteControllerException("Controller is not connected");
 
-		if (!_client.IsStarted) return ConnectInternalAsync();
-		return Task.CompletedTask;
+		return _client == null || !_client.IsStarted
+			? ConnectInternalAsync()
+			: Task.CompletedTask;
 	}
 
 	private void OnReconnect(ReconnectionInfo obj)
