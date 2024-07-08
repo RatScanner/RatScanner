@@ -17,10 +17,13 @@ namespace RatScanner.View;
 /// </summary>
 public partial class BlazorUI : UserControl, ISwitchable
 {
+	private static BlazorUI _instance = null;
+	public static BlazorUI Instance => _instance ??= new BlazorUI();
+
 	public static BlazorOverlay BlazorOverlay { get; set; }
 	public static BlazorInteractableOverlay BlazorInteractableOverlay { get; set; }
 
-	public BlazorUI()
+	private BlazorUI()
 	{
 		var serviceCollection = new ServiceCollection();
 		serviceCollection.AddWpfBlazorWebView();

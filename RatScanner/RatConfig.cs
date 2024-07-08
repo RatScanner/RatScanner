@@ -24,6 +24,8 @@ internal static class RatConfig
 	// Version
 	public static string Version => Process.GetCurrentProcess().MainModule.FileVersionInfo.ProductVersion;
 
+	public const string SINGLE_INSTANCE_GUID = "{a057bb64-c126-4ef4-a4ed-3037c2e7bc89}";
+
 	// Paths
 	internal static class Paths
 	{
