@@ -66,7 +66,7 @@ public static class TarkovDevAPI
 			return ((List<NeededItem> tasks, List<NeededItem> hideout))Cache[key].response;
 		}
 
-		var apiResponse = Get(NeededQuery);
+		var apiResponse = Get(TasksQuery);
 		var jsonSerializerSettings = new JsonSerializerSettings()
 		{
 			MissingMemberHandling = MissingMemberHandling.Ignore,
@@ -77,6 +77,32 @@ public static class TarkovDevAPI
 
 		var neededResponse = JsonConvert.DeserializeObject<NeededResponse>(apiResponse, jsonSerializerSettings);
 		var response = neededResponse.Data.GetNeededItems();
+
+		if (ttl > 0) Cache[key] = (time + ttl, response);
+
+		return response;
+	}
+
+	public static Task[] GetTasks(long ttl = 0xFFFFFF)
+	{
+		var time = DateTimeOffset.Now.ToUnixTimeSeconds();
+		var key = nameof(GetTasks);
+		if (Cache.ContainsKey(key) && time < Cache[key].expire)
+		{
+			return (Task[])Cache[key].response;
+		}
+
+		var apiResponse = Get(TasksQuery);
+		var jsonSerializerSettings = new JsonSerializerSettings()
+		{
+			MissingMemberHandling = MissingMemberHandling.Ignore,
+			NullValueHandling = NullValueHandling.Ignore,
+			TypeNameHandling = TypeNameHandling.Auto,
+			TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
+		};
+
+		var neededResponse = JsonConvert.DeserializeObject<ResponseData<Task[]>>(apiResponse, jsonSerializerSettings);
+		var response = neededResponse.Data.Data.ToArray();
 
 		if (ttl > 0) Cache[key] = (time + ttl, response);
 
@@ -274,9 +300,8 @@ public static class TarkovDevAPI
   }
 }";
 
-	const string NeededQuery = @"
-query {
-  tasks {
+	const string TasksQuery = @"{
+  data: tasks {
     id
     tarkovDataId
     name
@@ -379,7 +404,11 @@ query {
       }
     }
   }
-  hideoutStations {
+}
+";
+
+	const string HideoutStationsQuery = @"{
+  data: hideoutStations {
     id
     name
     normalizedName
@@ -419,6 +448,5 @@ query {
       }
     }
   }
-}
-";
+}";
 }

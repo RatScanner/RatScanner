@@ -26,9 +26,3 @@ public class NeededResponseData
 		return neededItems;
 	}
 }
-
-public class NeededResponse
-{
-	[JsonProperty("data")]
-	public NeededResponseData Data { get; set; }
-}

@@ -91,7 +91,10 @@
                                         </MudStack>
                                     </MudStack>
                                 </MudStack>
-                            </MudPaper>
+                                </MudPaper>
+                        } else if (searchResult.Data is FetchModels.TarkovDev.Task)
+                        {
+                            
                         }
                     }
                 </MudStack>
@@ -131,6 +134,11 @@
         tmp = tmp.Where(result => result != null && result.Data != null);
         tmp = tmp.OrderBy(result => result.Score).Take(4);
         _searchResults = tmp;
+    }
+
+    private async Task<IEnumerable<SearchResult>> SearchTasks(string value)
+    {
+        RatScannerMain.Instance.TarkovTrackerDB.
     }
 
     private async Task<IEnumerable<SearchResult>> SearchItem(string value)
