@@ -15,16 +15,13 @@ namespace RatScanner;
 /// <todo>
 /// We absolutely want to move this into the main project at some point
 /// </todo>
-public static class TarkovDevAPI
-{
-	private class ResponseData<T>
-	{
+public static class TarkovDevAPI {
+	private class ResponseData<T> {
 		[JsonProperty("data")]
 		public ResponseDataInner<T> Data { get; set; }
 	}
 
-	private class ResponseDataInner<T>
-	{
+	private class ResponseDataInner<T> {
 		[JsonProperty("data")]
 		public T Data { get; set; }
 	}
@@ -33,13 +30,11 @@ public static class TarkovDevAPI
 
 	private static readonly Dictionary<string, (long expire, object response)> Cache = new();
 
-	private static readonly HttpClient HttpClient = new(new HttpClientHandler
-	{
+	private static readonly HttpClient HttpClient = new(new HttpClientHandler {
 		AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
 	});
 
-	private static string Get(string query)
-	{
+	private static string Get(string query) {
 		var body = new Dictionary<string, string>() { { "query", query } };
 		var responseTask = HttpClient.PostAsJsonAsync(ApiEndpoint, body);
 		responseTask.Wait();
@@ -57,86 +52,37 @@ public static class TarkovDevAPI
 		return result;
 	}
 
-	public static (List<NeededItem> tasks, List<NeededItem> hideout) GetNeededItems(long ttl = 0xFFFFFF)
-	{
+	private static T GetCached<T>(string query, long ttl = 0xFFFFFF) {
 		var time = DateTimeOffset.Now.ToUnixTimeSeconds();
-		var key = nameof(GetNeededItems);
-		if (Cache.ContainsKey(key) && time < Cache[key].expire)
-		{
-			return ((List<NeededItem> tasks, List<NeededItem> hideout))Cache[key].response;
+		if (Cache.ContainsKey(query) && time < Cache[query].expire) {
+			return (T)Cache[query].response;
 		}
 
-		var apiResponse = Get(TasksQuery);
-		var jsonSerializerSettings = new JsonSerializerSettings()
-		{
+		var apiResponse = Get(query);
+		var jsonSerializerSettings = new JsonSerializerSettings() {
 			MissingMemberHandling = MissingMemberHandling.Ignore,
 			NullValueHandling = NullValueHandling.Ignore,
 			TypeNameHandling = TypeNameHandling.Auto,
 			TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
 		};
 
-		var neededResponse = JsonConvert.DeserializeObject<NeededResponse>(apiResponse, jsonSerializerSettings);
-		var response = neededResponse.Data.GetNeededItems();
+		var neededResponse = JsonConvert.DeserializeObject<ResponseData<T>>(apiResponse, jsonSerializerSettings);
+		var response = neededResponse.Data.Data;
 
-		if (ttl > 0) Cache[key] = (time + ttl, response);
-
-		return response;
-	}
-
-	public static Task[] GetTasks(long ttl = 0xFFFFFF)
-	{
-		var time = DateTimeOffset.Now.ToUnixTimeSeconds();
-		var key = nameof(GetTasks);
-		if (Cache.ContainsKey(key) && time < Cache[key].expire)
-		{
-			return (Task[])Cache[key].response;
-		}
-
-		var apiResponse = Get(TasksQuery);
-		var jsonSerializerSettings = new JsonSerializerSettings()
-		{
-			MissingMemberHandling = MissingMemberHandling.Ignore,
-			NullValueHandling = NullValueHandling.Ignore,
-			TypeNameHandling = TypeNameHandling.Auto,
-			TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
-		};
-
-		var neededResponse = JsonConvert.DeserializeObject<ResponseData<Task[]>>(apiResponse, jsonSerializerSettings);
-		var response = neededResponse.Data.Data.ToArray();
-
-		if (ttl > 0) Cache[key] = (time + ttl, response);
+		if (ttl > 0) Cache[query] = (time + ttl, response);
 
 		return response;
 	}
 
-	public static Item[] GetItems(long ttl = 0xFFFFFF)
-	{
-		var time = DateTimeOffset.Now.ToUnixTimeSeconds();
-		var key = nameof(ItemQuery);
-		if (Cache.ContainsKey(key) && time < Cache[key].expire)
-		{
-			return (Item[])Cache[key].response;
-		}
+	public static Task[] GetTasks() => GetCached<Task[]>(TasksQuery);
 
-		var apiResponse = Get(ItemQuery);
-		var jsonSerializerSettings = new JsonSerializerSettings()
-		{
-			MissingMemberHandling = MissingMemberHandling.Ignore,
-			NullValueHandling = NullValueHandling.Ignore,
-			TypeNameHandling = TypeNameHandling.Auto,
-			TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
-		};
-		System.IO.File.WriteAllText("test.json", apiResponse);
+	/// <summary>
+	/// Refreshes every hour
+	/// </summary>
+	public static Item[] GetItems() => GetCached<Item[]>(ItemsQuery, 60 * 60);
+	public static HideoutStation[] GetHideoutStations() => GetCached<HideoutStation[]>(HideoutStationsQuery);
 
-		var res = JsonConvert.DeserializeObject<ResponseData<Item[]>>(apiResponse, jsonSerializerSettings);
-		var response = res.Data.Data;
-
-		if (ttl > 0) Cache[key] = (time + ttl, response);
-
-		return response;
-	}
-
-	const string ItemQuery = @"{
+	const string ItemsQuery = @"{
   data: items {
     id
     name
