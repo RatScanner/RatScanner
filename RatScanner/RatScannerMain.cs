@@ -11,8 +11,10 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
+using RatScanner.TarkovTools;
 using MessageBox = System.Windows.MessageBox;
 using PixelFormat = System.Drawing.Imaging.PixelFormat;
 using Size = System.Drawing.Size;
@@ -26,6 +28,7 @@ public class RatScannerMain : INotifyPropertyChanged
 	internal static RatScannerMain Instance => _instance ??= new RatScannerMain();
 
 	internal readonly HotkeyManager HotkeyManager;
+	internal ITarkovToolsRemoteController TarkovToolsRemoteController { get; private set; }
 
 	private readonly BlazorOverlay _blazorOverlay;
 
@@ -101,6 +104,9 @@ public class RatScannerMain : INotifyPropertyChanged
 				}
 			}
 
+			TarkovToolsRemoteController = new TarkovToolsRemoteController();
+			InitTarkovToolsRemoteController();
+
 			Logger.LogInfo("Initializing RatEye...");
 			SetupRatEye();
 
@@ -114,6 +120,41 @@ public class RatScannerMain : INotifyPropertyChanged
 
 			Logger.LogInfo("Ready!");
 		}).Start();
+	}
+
+	private void InitTarkovToolsRemoteController()
+	{
+		if (!RatConfig.TarkovTools.RemoteControl.Enable)
+			return;
+
+		try
+		{
+			TarkovToolsRemoteController.Connect(RatConfig.TarkovTools.RemoteControl.SessionId);
+		}
+		catch (TarkovToolsRemoteControllerException e)
+		{
+			Logger.LogWarning(e.Message, e);
+		}
+	}
+
+	internal async Task OpenRemoteTarkovToolsItemAsync()
+	{
+		if (TarkovToolsRemoteController == null)
+			return;
+
+		if (!RatConfig.TarkovTools.RemoteControl.AutoSync)
+			return;
+
+		try
+		{
+			var openAmmoChart = RatConfig.TarkovTools.RemoteControl.OpenAmmoChart;
+			var item = ItemScans.LastOrDefault()?.MatchedItem;
+			await TarkovToolsRemoteController.OpenRemoteTarkovToolsAsync(item, openAmmoChart).ConfigureAwait(false);
+		}
+		catch (TarkovToolsRemoteControllerException e)
+		{
+			Logger.LogWarning(e.Message, e);
+		}
 	}
 
 	private void CheckForUpdates()

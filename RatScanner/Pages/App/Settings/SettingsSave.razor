@@ -14,10 +14,10 @@
 </MudGrid>
 
 @code {
-
 	private void SaveSettings()
 	{
 		SettingsVM.SaveSettings();
+		SettingsVM.LoadSettings();
 		StateHasChanged();
 		NavigationManager.NavigateTo("/app");
 	}

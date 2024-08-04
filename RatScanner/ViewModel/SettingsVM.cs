@@ -1,6 +1,8 @@
 ﻿using RatStash;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
+using RatScanner.TarkovTools;
 
 namespace RatScanner.ViewModel;
 
@@ -47,6 +49,11 @@ internal class SettingsVM : INotifyPropertyChanged
 	public bool BlurBehindSearch { get; set; }
 	public Hotkey InteractableOverlayHotkey { get; set; }
 
+	// Tarkov Tools settings
+	public string TarkovToolsRemoteControlSessionId { get; set; }
+	public bool TarkovToolsRemoteControlAutoSync { get; set; }
+	public bool TarkovToolsRemoteControlOpenAmmoChart { get; set; }
+
 	internal SettingsVM()
 	{
 		LoadSettings();
@@ -91,6 +98,10 @@ internal class SettingsVM : INotifyPropertyChanged
 		BlurBehindSearch = RatConfig.Overlay.Search.BlurBehind;
 		InteractableOverlayHotkey = RatConfig.Overlay.Search.Hotkey;
 
+		TarkovToolsRemoteControlSessionId = RatConfig.TarkovTools.RemoteControl.SessionId;
+		TarkovToolsRemoteControlAutoSync = RatConfig.TarkovTools.RemoteControl.AutoSync;
+		TarkovToolsRemoteControlOpenAmmoChart = RatConfig.TarkovTools.RemoteControl.OpenAmmoChart;
+
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
 	}
 
@@ -100,6 +111,7 @@ internal class SettingsVM : INotifyPropertyChanged
 		var updateTarkovTrackerToken = TarkovTrackerToken != RatConfig.Tracking.TarkovTracker.Token;
 		var updateResolution = ScreenWidth != RatConfig.ScreenWidth || ScreenHeight != RatConfig.ScreenHeight;
 		var updateLanguage = RatConfig.NameScan.Language != (Language)NameScanLanguage;
+		var updateSessionId = RatConfig.TarkovTools.RemoteControl.SessionId != TarkovToolsRemoteControlSessionId;
 
 		// Save config
 		RatConfig.NameScan.Enable = EnableNameScan;
@@ -132,6 +144,10 @@ internal class SettingsVM : INotifyPropertyChanged
 		RatConfig.Overlay.Search.BlurBehind = BlurBehindSearch;
 		RatConfig.Overlay.Search.Hotkey = InteractableOverlayHotkey;
 
+		RatConfig.TarkovTools.RemoteControl.SessionId = TarkovToolsRemoteControlSessionId;
+		RatConfig.TarkovTools.RemoteControl.AutoSync = TarkovToolsRemoteControlAutoSync;
+		RatConfig.TarkovTools.RemoteControl.OpenAmmoChart = TarkovToolsRemoteControlOpenAmmoChart;
+
 		RatConfig.ScreenWidth = ScreenWidth;
 		RatConfig.ScreenHeight = ScreenHeight;
 		RatConfig.ScreenScale = ScreenScale;
@@ -144,6 +160,7 @@ internal class SettingsVM : INotifyPropertyChanged
 		//if (updateMarketDB) RatScannerMain.Instance.MarketDB.Init();//TODO
 		if (updateTarkovTrackerToken) UpdateTarkovTrackerToken();
 		if (updateResolution || updateLanguage) RatScannerMain.Instance.SetupRatEye();
+		if (updateSessionId) UpdateTarkovToolsRemoteController();
 
 		RatEye.Config.LogDebug = RatConfig.LogDebug;
 		RatScannerMain.Instance.HotkeyManager.RegisterHotkeys();
@@ -167,6 +184,26 @@ internal class SettingsVM : INotifyPropertyChanged
 		Logger.ShowWarning($"The TarkovTracker API Token does not seem to work.\n\n{token}");
 
 		RatConfig.Tracking.TarkovTracker.Token = "";
+	}
+
+	private static void UpdateTarkovToolsRemoteController()
+	{
+		var controller = RatScannerMain.Instance.TarkovToolsRemoteController;
+		if (RatConfig.TarkovTools.RemoteControl.Enable)
+		{
+			try
+			{
+				controller.Connect(RatConfig.TarkovTools.RemoteControl.SessionId);
+			}
+			catch (TarkovToolsRemoteControllerException e)
+			{
+				Logger.LogWarning(e.Message, e);
+			}
+		}
+		else
+		{
+			 controller.Disconnect();
+		}
 	}
 
 	public event PropertyChangedEventHandler PropertyChanged;

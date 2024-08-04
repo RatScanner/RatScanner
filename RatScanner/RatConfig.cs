@@ -117,6 +117,18 @@ internal static class RatConfig
 		}
 	}
 
+	internal static class TarkovTools
+	{
+		internal static class RemoteControl
+		{
+			internal static bool Enable => !string.IsNullOrEmpty(SessionId);
+
+			internal static string SessionId = string.Empty;
+			internal static bool AutoSync = false;
+			internal static bool OpenAmmoChart = false;
+		}
+	}
+
 	// Other
 #if DEBUG
 	internal static bool LogDebug
@@ -213,6 +225,11 @@ internal static class RatConfig
 		Overlay.Search.BlurBehind = config.ReadBool(nameof(Overlay.Search.BlurBehind), Overlay.Search.BlurBehind);
 		Overlay.Search.Hotkey = config.ReadHotkey(nameof(Overlay.Search.Hotkey), Overlay.Search.Hotkey);
 
+		config.Section = nameof(TarkovTools.RemoteControl);
+		TarkovTools.RemoteControl.SessionId = config.ReadString(nameof(TarkovTools.RemoteControl.SessionId));
+		TarkovTools.RemoteControl.AutoSync = config.ReadBool(nameof(TarkovTools.RemoteControl.AutoSync));
+		TarkovTools.RemoteControl.OpenAmmoChart = config.ReadBool(nameof(TarkovTools.RemoteControl.OpenAmmoChart));
+
 		config.Section = "Other";
 		if (!SetScreen)
 		{
@@ -265,6 +282,11 @@ internal static class RatConfig
 		config.Section = nameof(Tracking.TarkovTracker);
 		config.WriteString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);
 		config.WriteBool(nameof(Tracking.TarkovTracker.ShowTeam), Tracking.TarkovTracker.ShowTeam);
+
+		config.Section = nameof(TarkovTools.RemoteControl);
+		config.WriteString(nameof(TarkovTools.RemoteControl.SessionId), TarkovTools.RemoteControl.SessionId);
+		config.WriteBool(nameof(TarkovTools.RemoteControl.AutoSync), TarkovTools.RemoteControl.AutoSync);
+		config.WriteBool(nameof(TarkovTools.RemoteControl.OpenAmmoChart), TarkovTools.RemoteControl.OpenAmmoChart);
 
 		config.Section = nameof(Overlay);
 

@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using RatScanner;
 
 public class ItemQueue : IEnumerable<ItemScan>
 {
@@ -23,6 +24,7 @@ public class ItemQueue : IEnumerable<ItemScan>
 	{
 		queue.Enqueue(item);
 		OnChanged();
+		RatScannerMain.Instance.OpenRemoteTarkovToolsItemAsync();
 	}
 
 	public void EnqueueRange<T>(List<T> items) where T : ItemScan

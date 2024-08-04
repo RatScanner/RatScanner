@@ -1,0 +1,70 @@
+﻿@page "/app/settings/tarkovTools"
+@inject SettingsVM SettingsVM
+@implements IDisposable
+<div>
+	<MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
+		<MudItem xs="12">
+			<div class="d-flex align-center justify-center mx-2 mb-1">
+				<MudText Typo="Typo.subtitle1" Color="Color.Inherit">Tarkov Tools Settings</MudText>
+			</div>
+		</MudItem>
+		<MudItem xs="12">
+			<MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
+				<MudGrid Spacing="0">
+					<MudItem xs="12">
+						<div class="d-flex align-center justify-center mx-2 mb-1">
+							<MudText Typo="Typo.subtitle1" Color="Color.Inherit">
+								Remote Control
+							</MudText>
+						</div>
+					</MudItem>
+					<MudItem xs="12">
+						<MudTextField @bind-Value="SettingsVM.TarkovToolsRemoteControlSessionId"
+						              Label="Session ID"
+						              Variant="Variant.Outlined"
+						              Margin="Margin.Dense"
+						              MaxLength="16"
+						              Adornment="Adornment.End"
+						              AdornmentIcon="@Icons.Material.Filled.Refresh"
+						              OnAdornmentClick="ResetSessionId"></MudTextField>
+					</MudItem>
+					<MudItem xs="12">
+						<MudCheckBox @bind-Checked="SettingsVM.TarkovToolsRemoteControlAutoSync" Label="Synchronize Item Scan" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+					</MudItem>
+					<MudItem xs="12">
+						<MudCheckBox @bind-Checked="SettingsVM.TarkovToolsRemoteControlOpenAmmoChart" Label="Open Ammo Chart" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+					</MudItem>
+				</MudGrid>
+			</MudPaper>
+		</MudItem>
+	</MudGrid>
+</div>
+@code {
+	protected override void OnInitialized()
+	{
+		SettingsVM.PropertyChanged += PropertyChangeHandler;
+	}
+
+	public void Dispose() => SettingsVM.PropertyChanged -= PropertyChangeHandler;
+
+	private async void PropertyChangeHandler(object sender, EventArgs e)
+	{
+		await InvokeAsync(() => StateHasChanged());
+	}
+
+	private void ResetSessionId() => SettingsVM.TarkovToolsRemoteControlSessionId = RandomAlphaNumString(12);
+
+	private static string RandomAlphaNumString(int length)
+	{
+		const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		var stringChars = new char[length];
+		var random = new Random();
+
+		for (var i = 0; i < stringChars.Length; i++)
+		{
+			stringChars[i] = chars[random.Next(chars.Length)];
+		}
+
+		return new string(stringChars);
+	}
+}

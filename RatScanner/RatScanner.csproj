@@ -44,6 +44,7 @@
     <PackageReference Include="SingleInstanceCore" Version="2.2.2" />
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
     <PackageReference Include="Tesseract" Version="5.2.0" />
+    <PackageReference Include="Websocket.Client" Version="4.6.1" />
   </ItemGroup>
 
   <ItemGroup>
