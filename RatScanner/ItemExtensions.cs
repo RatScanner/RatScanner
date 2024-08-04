@@ -19,7 +19,7 @@ public static class ItemExtensions {
 	public static int GetTaskRemaining(this Item item, UserProgress? progress = null)
 #pragma warning restore IDE0060 // Remove unused parameter
 	{
-		return 0;
+		return 3;
 		// TODO: Reimplement this
 		//progress ??= GetUserProgress();
 
@@ -55,7 +55,7 @@ public static class ItemExtensions {
 	public static int GetHideoutRemaining(this Item item, UserProgress? progress = null)
 #pragma warning restore IDE0060 // Remove unused parameter
 	{
-		throw new NotImplementedException();
+		return 4;
 		// TODO: Reimplement this
 		//progress ??= GetUserProgress();
 

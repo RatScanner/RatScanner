@@ -21,7 +21,7 @@ internal static class RatConfig {
 	private static extern IntPtr GetDpiForMonitor([In] IntPtr hmonitor, [In] DpiType dpiType, [Out] out uint dpiX, [Out] out uint dpiY);
 
 	// Version
-	public static string Version => Process.GetCurrentProcess().MainModule.FileVersionInfo.ProductVersion;
+	public static string Version => Process.GetCurrentProcess().MainModule?.FileVersionInfo.ProductVersion ?? "Unknown";
 
 	public const string SINGLE_INSTANCE_GUID = "{a057bb64-c126-4ef4-a4ed-3037c2e7bc89}";
 

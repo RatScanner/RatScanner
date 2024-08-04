@@ -44,8 +44,8 @@ public static class TarkovDevAPI {
 
 	private static T GetCached<T>(string query, long ttl = 0xFFFFFF) {
 		long time = DateTimeOffset.Now.ToUnixTimeSeconds();
-		if (Cache.ContainsKey(query) && time < Cache[query].expire) {
-			return (T)Cache[query].response;
+		if (Cache.TryGetValue(query, out (long expire, object response) value) && time < value.expire) {
+			return (T)value.response;
 		}
 
 		string apiResponse = Get(query);

@@ -98,7 +98,7 @@ internal class SimpleConfig {
 		}
 	}
 
-	internal Hotkey? ReadHotkey(string key, Hotkey? defaultValue = null) {
+	internal Hotkey ReadHotkey(string key, Hotkey? defaultValue = null) {
 		defaultValue ??= new Hotkey();
 		IEnumerable<System.Windows.Input.Key> keyboardKeys = ReadEnumerableEnum(key + "Keyboard", defaultValue.KeyboardKeys);
 		IEnumerable<System.Windows.Input.MouseButton> mouseButtons = ReadEnumerableEnum(key + "Mouse", defaultValue.MouseButtons);
