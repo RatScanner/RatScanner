@@ -58,7 +58,7 @@
             SetFunc = value => (int)(value * 100) + "%",
             GetFunc = text =>
             {
-                text = text.TrimEnd('%');
+                text = text?.TrimEnd('%') ?? "";
                 if (int.TryParse(text, out var num)) return num / 100f;
                 return 1;
             },
@@ -69,7 +69,7 @@
         SettingsVM.PropertyChanged += PropertyChangeHandler;
     }
 
-    private async void PropertyChangeHandler(object sender, EventArgs e)
+    private async void PropertyChangeHandler(object? sender, EventArgs e)
     {
         await InvokeAsync(() => StateHasChanged());
     }

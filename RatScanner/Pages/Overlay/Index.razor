@@ -56,13 +56,13 @@
                             @if (MenuVM.TaskRemaining > 0)
                             {
                                 <div class="d-flex align-center stroke">
-                                    @MenuVM.TaskRemaining <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" />
+                                    @MenuVM.TaskRemaining <MudIcon Icon="@Icons.Material.Filled.Checklist" Size="Size.Small" Class="ml-1" />
                                 </div>
                             }
                             @if (MenuVM.HideoutRemaining > 0)
                             {
                                 <div class="d-flex align-center stroke">
-                                    @MenuVM.HideoutRemaining <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" />
+                                    @MenuVM.HideoutRemaining <MudIcon Icon="@Icons.Material.Filled.House" Size="Size.Small" Class="ml-1" />
                                 </div>
                             }
                         </div>
@@ -93,11 +93,11 @@
 
                     @if (MenuVM.TaskRemaining > 0)
                     {
-                        <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" />
+                        <MudIcon Icon="@Icons.Material.Filled.Checklist" Size="Size.Small" Class="ml-1" />
                     }
                     @if (MenuVM.HideoutRemaining > 0)
                     {
-                        <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" />
+                        <MudIcon Icon="@Icons.Material.Filled.House" Size="Size.Small" Class="ml-1" />
                     }
                 </div>
             }
@@ -124,7 +124,7 @@
         MenuVM.PropertyChanged += PropertyChangeHandler;
     }
 
-    private async void PropertyChangeHandler(object sender, EventArgs e)
+    private async void PropertyChangeHandler(object? sender, EventArgs e)
     {
         await InvokeAsync(() => StateHasChanged());
     }

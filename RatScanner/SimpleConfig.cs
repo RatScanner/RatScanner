@@ -7,8 +7,7 @@ using System.Text;
 
 namespace RatScanner;
 
-internal class SimpleConfig
-{
+internal class SimpleConfig {
 	internal string Path;
 	internal string Section;
 	internal string EnumerableSeparator = ";";
@@ -19,119 +18,90 @@ internal class SimpleConfig
 	[DllImport("kernel32")]
 	private static extern int GetPrivateProfileString(string section, string key, string def, StringBuilder retVal, int size, string filePath);
 
-	internal SimpleConfig(string configPath, string section = "default")
-	{
+	internal SimpleConfig(string configPath, string section = "default") {
 		Path = configPath;
 		Section = section;
 	}
 
-	internal void WriteString(string key, string value)
-	{
+	internal void WriteString(string key, string value) {
 		WritePrivateProfileString(Section, key.ToLower(), value, Path);
 	}
 
-	internal void WriteInt(string key, int value)
-	{
+	internal void WriteInt(string key, int value) {
 		WriteString(key, value.ToString(CultureInfo.InvariantCulture));
 	}
 
-	internal void WriteFloat(string key, float value)
-	{
+	internal void WriteFloat(string key, float value) {
 		WriteString(key, value.ToString(CultureInfo.InvariantCulture));
 	}
 
-	internal void WriteBool(string key, bool value)
-	{
+	internal void WriteBool(string key, bool value) {
 		WriteString(key, value.ToString(CultureInfo.InvariantCulture));
 	}
 
-	internal void WriteEnumerableEnum<T>(string key, IEnumerable<T> value) where T : struct, IConvertible
-	{
-		if (value == null || !value.Any())
-		{
+	internal void WriteEnumerableEnum<T>(string key, IEnumerable<T> value) where T : struct, IConvertible {
+		if (value == null || !value.Any()) {
 			WriteString(key, "null");
 			return;
 		}
 		WriteString(key, string.Join(EnumerableSeparator, value));
 	}
 
-	internal void WriteHotkey(string key, Hotkey value)
-	{
+	internal void WriteHotkey(string key, Hotkey value) {
 		WriteEnumerableEnum(key + "Keyboard", value.KeyboardKeys);
 		WriteEnumerableEnum(key + "Mouse", value.MouseButtons);
 	}
 
-	internal string ReadString(string key, string defaultValue = "")
-	{
-		try
-		{
-			var temp = new StringBuilder(255);
+	internal string ReadString(string key, string defaultValue = "") {
+		try {
+			StringBuilder temp = new(255);
 			GetPrivateProfileString(Section, key.ToLower(), defaultValue, temp, short.MaxValue, Path);
 			return temp.ToString();
-		}
-		catch (Exception)
-		{
+		} catch (Exception) {
 			return defaultValue;
 		}
 	}
 
-	internal int ReadInt(string key, int defaultValue = 0)
-	{
-		try
-		{
+	internal int ReadInt(string key, int defaultValue = 0) {
+		try {
 			return int.Parse(ReadString(key), CultureInfo.InvariantCulture);
-		}
-		catch (Exception)
-		{
+		} catch (Exception) {
 			return defaultValue;
 		}
 	}
 
-	internal float ReadFloat(string key, float defaultValue = 0)
-	{
-		try
-		{
+	internal float ReadFloat(string key, float defaultValue = 0) {
+		try {
 			return float.Parse(ReadString(key), CultureInfo.InvariantCulture);
-		}
-		catch (Exception)
-		{
+		} catch (Exception) {
 			return defaultValue;
 		}
 	}
 
-	internal bool ReadBool(string key, bool defaultValue = false)
-	{
-		try
-		{
+	internal bool ReadBool(string key, bool defaultValue = false) {
+		try {
 			return bool.Parse(ReadString(key));
-		}
-		catch (Exception)
-		{
+		} catch (Exception) {
 			return defaultValue;
 		}
 	}
 
-	internal IEnumerable<TEnum> ReadEnumerableEnum<TEnum>(string key, IEnumerable<TEnum> defaultValue = null) where TEnum : struct, Enum
-	{
-		try
-		{
-			var readStrings = ReadString(key)?.Split(EnumerableSeparator);
+	internal IEnumerable<TEnum> ReadEnumerableEnum<TEnum>(string key, IEnumerable<TEnum> defaultValue = null) where TEnum : struct, Enum {
+		try {
+			string[]? readStrings = ReadString(key)?.Split(EnumerableSeparator);
 			if (readStrings[0] == "null") return Enumerable.Empty<TEnum>();
 			if (readStrings == null) return defaultValue;
 			if (readStrings.Length == 1 && readStrings[0] == "") return defaultValue;
 			return readStrings.Select(Enum.Parse<TEnum>);
-		}
-		catch (Exception)
-		{
+		} catch (Exception) {
 			return defaultValue;
 		}
 	}
 
-	internal Hotkey? ReadHotkey(string key, Hotkey defaultValue = null)
-	{
-		var keyboardKeys = ReadEnumerableEnum(key + "Keyboard", defaultValue.KeyboardKeys);
-		var mouseButtons = ReadEnumerableEnum(key + "Mouse", defaultValue.MouseButtons);
+	internal Hotkey? ReadHotkey(string key, Hotkey? defaultValue = null) {
+		defaultValue ??= new Hotkey();
+		IEnumerable<System.Windows.Input.Key> keyboardKeys = ReadEnumerableEnum(key + "Keyboard", defaultValue.KeyboardKeys);
+		IEnumerable<System.Windows.Input.MouseButton> mouseButtons = ReadEnumerableEnum(key + "Mouse", defaultValue.MouseButtons);
 		return new Hotkey(keyboardKeys.ToList(), mouseButtons.ToList());
-
 	}
 }

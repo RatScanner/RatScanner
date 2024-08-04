@@ -35,7 +35,7 @@
         SettingsVM.PropertyChanged += PropertyChangeHandler;
     }
 
-    private async void PropertyChangeHandler(object sender, EventArgs e)
+    private async void PropertyChangeHandler(object? sender, EventArgs e)
     {
         await InvokeAsync(() => StateHasChanged());
     }

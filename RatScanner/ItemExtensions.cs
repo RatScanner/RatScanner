@@ -1,23 +1,23 @@
 ﻿using RatScanner.FetchModels.TarkovTracker;
-using System.Linq;
 using RatScanner.TarkovDev.GraphQL;
+using System;
+using System.Linq;
 
 namespace RatScanner;
 
-public static class ItemExtensions
-{
-	private static UserProgress? GetUserProgress()
-	{
-		UserProgress progress = null;
-		if (RatConfig.Tracking.TarkovTracker.Enable && RatScannerMain.Instance.TarkovTrackerDB.Progress.Count >= 1)
-		{
-			var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
+public static class ItemExtensions {
+	private static UserProgress? GetUserProgress() {
+		UserProgress? progress = null;
+		if (RatConfig.Tracking.TarkovTracker.Enable && RatScannerMain.Instance.TarkovTrackerDB.Progress.Count >= 1) {
+			System.Collections.Generic.List<UserProgress> teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
 			progress = teamProgress.FirstOrDefault(x => x.UserId == RatScannerMain.Instance.TarkovTrackerDB.Self);
 		}
 		return progress;
 	}
 
+#pragma warning disable IDE0060 // Remove unused parameter
 	public static int GetTaskRemaining(this Item item, UserProgress? progress = null)
+#pragma warning restore IDE0060 // Remove unused parameter
 	{
 		return 0;
 		// TODO: Reimplement this
@@ -51,9 +51,11 @@ public static class ItemExtensions
 		//return count;
 	}
 
+#pragma warning disable IDE0060 // Remove unused parameter
 	public static int GetHideoutRemaining(this Item item, UserProgress? progress = null)
+#pragma warning restore IDE0060 // Remove unused parameter
 	{
-		return 0;
+		throw new NotImplementedException();
 		// TODO: Reimplement this
 		//progress ??= GetUserProgress();
 
@@ -84,14 +86,13 @@ public static class ItemExtensions
 		//return count;
 	}
 
-	public static int GetAvg24hMarketPricePerSlot(this Item item)
-	{
-		var price = item.Avg24HPrice.Value;
-		var size = item.Width * item.Height;
+	public static int GetAvg24hMarketPricePerSlot(this Item item) {
+		int price = item.Avg24HPrice.Value;
+		int size = item.Width * item.Height;
 		return price / size;
 	}
 
-	public static ItemPrice? GetBestTraderOffer(this Item item) => item.SellFor.Where(i => i.Vendor is TraderOffer).MaxBy(i => i.PriceRub);
+	public static ItemPrice? GetBestTraderOffer(this Item item) => item.SellFor?.Where(i => i.Vendor is TraderOffer).MaxBy(i => i.PriceRub);
 
 	public static TraderOffer? GetBestTraderOfferVendor(this Item item) => GetBestTraderOffer(item)?.Vendor as TraderOffer;
 }

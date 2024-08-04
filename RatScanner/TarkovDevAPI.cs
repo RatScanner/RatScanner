@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text.RegularExpressions;
 
 namespace RatScanner;
 
@@ -32,33 +31,33 @@ public static class TarkovDevAPI {
 	});
 
 	private static string Get(string query) {
-		var body = new Dictionary<string, string>() { { "query", query } };
-		var responseTask = HttpClient.PostAsJsonAsync(ApiEndpoint, body);
+		Dictionary<string, string> body = new() { { "query", query } };
+		System.Threading.Tasks.Task<HttpResponseMessage> responseTask = HttpClient.PostAsJsonAsync(ApiEndpoint, body);
 		responseTask.Wait();
 
 		if (responseTask.Result.StatusCode != HttpStatusCode.OK) throw new Exception("Tarkov.dev API request failed.");
-		var contentTask = responseTask.Result.Content.ReadAsStringAsync();
+		System.Threading.Tasks.Task<string> contentTask = responseTask.Result.Content.ReadAsStringAsync();
 		contentTask.Wait();
 
 		return contentTask.Result;
 	}
 
 	private static T GetCached<T>(string query, long ttl = 0xFFFFFF) {
-		var time = DateTimeOffset.Now.ToUnixTimeSeconds();
+		long time = DateTimeOffset.Now.ToUnixTimeSeconds();
 		if (Cache.ContainsKey(query) && time < Cache[query].expire) {
 			return (T)Cache[query].response;
 		}
 
-		var apiResponse = Get(query);
-		var jsonSerializerSettings = new JsonSerializerSettings() {
+		string apiResponse = Get(query);
+		JsonSerializerSettings jsonSerializerSettings = new() {
 			MissingMemberHandling = MissingMemberHandling.Ignore,
 			NullValueHandling = NullValueHandling.Ignore,
 			TypeNameHandling = TypeNameHandling.Auto,
 			TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
 		};
 
-		var neededResponse = JsonConvert.DeserializeObject<ResponseData<T>>(apiResponse, jsonSerializerSettings);
-		var response = neededResponse.Data.Data;
+		ResponseData<T>? neededResponse = JsonConvert.DeserializeObject<ResponseData<T>>(apiResponse, jsonSerializerSettings);
+		T? response = neededResponse.Data.Data;
 
 		if (ttl > 0) Cache[query] = (time + ttl, response);
 

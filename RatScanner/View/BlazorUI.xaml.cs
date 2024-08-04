@@ -15,30 +15,27 @@ namespace RatScanner.View;
 /// <summary>
 /// Interaction logic for BlazorUI.xaml
 /// </summary>
-public partial class BlazorUI : UserControl, ISwitchable
-{
+public partial class BlazorUI : UserControl, ISwitchable {
 	private static BlazorUI _instance = null;
 	public static BlazorUI Instance => _instance ??= new BlazorUI();
 
 	public static BlazorOverlay BlazorOverlay { get; set; }
 	public static BlazorInteractableOverlay BlazorInteractableOverlay { get; set; }
 
-	private BlazorUI()
-	{
-		var serviceCollection = new ServiceCollection();
+	private BlazorUI() {
+		ServiceCollection serviceCollection = new();
 		serviceCollection.AddWpfBlazorWebView();
 		serviceCollection.AddMudServices();
 
 		serviceCollection.AddSingleton<MenuVM>(s => new MenuVM(RatScannerMain.Instance));
 
-		var settingsVM = new SettingsVM();
+		SettingsVM settingsVM = new();
 		serviceCollection.AddSingleton<SettingsVM>(s => settingsVM);
 
-		var bounds = System.Windows.Forms.Screen.AllScreens.Select(screen => screen.Bounds);
-		var left = 0;
-		var top = 0;
-		foreach (var bound in bounds)
-		{
+		System.Collections.Generic.IEnumerable<System.Drawing.Rectangle> bounds = System.Windows.Forms.Screen.AllScreens.Select(screen => screen.Bounds);
+		int left = 0;
+		int top = 0;
+		foreach (System.Drawing.Rectangle bound in bounds) {
 			if (bound.Left < left) left = bound.Left;
 			if (bound.Top < top) top = bound.Top;
 		}
@@ -46,7 +43,7 @@ public partial class BlazorUI : UserControl, ISwitchable
 
 		serviceCollection.AddSingleton<TarkovTrackerDB>(s => RatScannerMain.Instance.TarkovTrackerDB);
 
-		var serviceProvider = serviceCollection.BuildServiceProvider();
+		ServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
 
 		Resources.Add("services", serviceProvider);
 
@@ -58,21 +55,18 @@ public partial class BlazorUI : UserControl, ISwitchable
 		InitializeComponent();
 	}
 
-	private void BlazorUI_Loaded(object sender, RoutedEventArgs e)
-	{
+	private void BlazorUI_Loaded(object? sender, RoutedEventArgs e) {
 		blazorWebView.WebView.DefaultBackgroundColor = System.Drawing.Color.Transparent;
 		blazorWebView.WebView.NavigationCompleted += WebView_Loaded;
 		blazorWebView.WebView.CoreWebView2InitializationCompleted += CoreWebView_Loaded;
 	}
 
-	private void WebView_Loaded(object sender, CoreWebView2NavigationCompletedEventArgs e)
-	{
+	private void WebView_Loaded(object? sender, CoreWebView2NavigationCompletedEventArgs e) {
 		// If we are running in a development/debugger mode, open dev tools to help out
 		if (Debugger.IsAttached) blazorWebView.WebView.CoreWebView2.OpenDevToolsWindow();
 	}
 
-	private void CoreWebView_Loaded(object sender, CoreWebView2InitializationCompletedEventArgs e)
-	{
+	private void CoreWebView_Loaded(object? sender, CoreWebView2InitializationCompletedEventArgs e) {
 		blazorWebView.WebView.CoreWebView2.SetVirtualHostNameToFolderMapping("local.data", "Data", CoreWebView2HostResourceAccessKind.Allow);
 		blazorWebView.WebView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
 		blazorWebView.WebView.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;
@@ -80,10 +74,8 @@ public partial class BlazorUI : UserControl, ISwitchable
 
 	private void UpdateElements() { }
 
-	private void HyperlinkRequestNavigate(object sender, RequestNavigateEventArgs e)
-	{
-		var psi = new ProcessStartInfo
-		{
+	private void HyperlinkRequestNavigate(object? sender, RequestNavigateEventArgs e) {
+		ProcessStartInfo psi = new() {
 			FileName = e.Uri.ToString(),
 			UseShellExecute = true,
 		};
@@ -91,24 +83,20 @@ public partial class BlazorUI : UserControl, ISwitchable
 		e.Handled = true;
 	}
 
-	public void UtilizeState(object state)
-	{
+	public void UtilizeState(object state) {
 		throw new NotImplementedException();
 	}
 
 	protected override void OnPreviewKeyDown(KeyEventArgs e) { }
 
-	private void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
-	{
-		if (e.ChangedButton == MouseButton.Left)
-		{
+	private void OnPreviewMouseDown(object? sender, MouseButtonEventArgs e) {
+		if (e.ChangedButton == MouseButton.Left) {
 			PageSwitcher.Instance.DragMove();
 			e.Handled = true;
 		}
 	}
 
-	public void OnOpen()
-	{
+	public void OnOpen() {
 		UpdateElements();
 	}
 

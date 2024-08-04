@@ -5,8 +5,7 @@ using System.Windows.Input;
 
 namespace RatScanner;
 
-internal class ActiveHotkey : Hotkey, IDisposable
-{
+internal class ActiveHotkey : Hotkey, IDisposable {
 	private event UserActivityHelper.KeyUpEventHandler HotkeyPressedEventHandler;
 
 	/// <summary>
@@ -23,8 +22,7 @@ internal class ActiveHotkey : Hotkey, IDisposable
 	/// <param name="hotkeyPressedEventHandler">The event handler which will be notified</param>
 	/// <param name="suppressHotkey"><see langword="true"/> if the hotkey should not be forwarded down the chain</param>
 	internal ActiveHotkey(Hotkey hotkey, UserActivityHelper.KeyUpEventHandler hotkeyPressedEventHandler, bool suppressHotkey = false) : base(hotkey.KeyboardKeys,
-		hotkey.MouseButtons)
-	{
+		hotkey.MouseButtons) {
 		HotkeyPressedEventHandler += hotkeyPressedEventHandler;
 		SuppressHotkey = suppressHotkey;
 		RegisterEventListeners();
@@ -38,8 +36,7 @@ internal class ActiveHotkey : Hotkey, IDisposable
 	/// <param name="enabled"><see langword="false"/> to disable the active hotkey by reference</param>
 	/// <param name="suppressHotkey"><see langword="true"/> if the hotkey should not be forwarded down the chain</param>
 	internal ActiveHotkey(Hotkey hotkey, UserActivityHelper.KeyUpEventHandler hotkeyPressedEventHandler, ref bool enabled, bool suppressHotkey = false) : base(
-		hotkey.KeyboardKeys, hotkey.MouseButtons)
-	{
+		hotkey.KeyboardKeys, hotkey.MouseButtons) {
 		HotkeyPressedEventHandler += hotkeyPressedEventHandler;
 		Enabled = enabled;
 		SuppressHotkey = suppressHotkey;
@@ -54,8 +51,7 @@ internal class ActiveHotkey : Hotkey, IDisposable
 	/// <param name="hotkeyPressedEventHandler">The event handler which will be notified</param>
 	/// <param name="suppressHotkey"><see langword="true"/> if the hotkey should not be forwarded down the chain</param>
 	internal ActiveHotkey(List<Key> keyboardKeys, List<MouseButton> mouseButtons, UserActivityHelper.KeyUpEventHandler hotkeyPressedEventHandler,
-		bool suppressHotkey = false) : base(keyboardKeys, mouseButtons)
-	{
+		bool suppressHotkey = false) : base(keyboardKeys, mouseButtons) {
 		HotkeyPressedEventHandler += hotkeyPressedEventHandler;
 		SuppressHotkey = suppressHotkey;
 		RegisterEventListeners();
@@ -70,56 +66,46 @@ internal class ActiveHotkey : Hotkey, IDisposable
 	/// <param name="enabled"><see langword="false"/> to disable the active hotkey by reference</param>
 	/// <param name="suppressHotkey"><see langword="true"/> if the hotkey should not be forwarded down the chain</param>
 	internal ActiveHotkey(List<Key> keyboardKeys, List<MouseButton> mouseButtons, UserActivityHelper.KeyUpEventHandler hotkeyPressedEventHandler, ref bool enabled,
-		bool suppressHotkey = false) : base(keyboardKeys, mouseButtons)
-	{
+		bool suppressHotkey = false) : base(keyboardKeys, mouseButtons) {
 		HotkeyPressedEventHandler += hotkeyPressedEventHandler;
 		SuppressHotkey = suppressHotkey;
 		Enabled = enabled;
 		RegisterEventListeners();
 	}
 
-	private void RegisterEventListeners()
-	{
+	private void RegisterEventListeners() {
 		if (RequiresKeyboard) UserActivityHelper.OnKeyboardKeyUp += OnKeyUp;
 		if (RequiresMouse) UserActivityHelper.OnMouseButtonUp += OnKeyUp;
 	}
 
-	private void UnregisterEventListeners()
-	{
+	private void UnregisterEventListeners() {
 		if (RequiresKeyboard) UserActivityHelper.OnKeyboardKeyUp -= OnKeyUp;
 		if (RequiresMouse) UserActivityHelper.OnMouseButtonUp -= OnKeyUp;
 	}
 
-	private void OnKeyUp(object sender, KeyUpEventArgs e)
-	{
+	private void OnKeyUp(object? sender, KeyUpEventArgs e) {
 		if (!Enabled) return;
-		if (IsPressed(e) && HotkeyPressedEventHandler != null)
-		{
+		if (IsPressed(e) && HotkeyPressedEventHandler != null) {
 			Logger.LogDebug("Pressed: " + ToString());
 			e.Handled |= SuppressHotkey;
 			Task.Run(() => HotkeyPressedEventHandler(sender, e));
 		}
 	}
 
-	internal bool IsPressed(KeyUpEventArgs e)
-	{
+	internal bool IsPressed(KeyUpEventArgs e) {
 		if (e == null) throw new ArgumentNullException(nameof(e), "KeyUpEventArgs can not be empty!");
 
-		var keyInHotkey = false;
+		bool keyInHotkey = false;
 
-		if (RequiresKeyboard)
-		{
-			foreach (var keyboardKey in KeyboardKeys)
-			{
+		if (RequiresKeyboard) {
+			foreach (Key keyboardKey in KeyboardKeys) {
 				if (!UserActivityHelper.IsKeyDown(keyboardKey)) return false;
 				if (e.Device == Device.Keyboard) keyInHotkey |= e.Key == keyboardKey;
 			}
 		}
 
-		if (RequiresMouse)
-		{
-			foreach (var mouseButton in MouseButtons)
-			{
+		if (RequiresMouse) {
+			foreach (MouseButton mouseButton in MouseButtons) {
 				if (!UserActivityHelper.IsMouseButtonDown(mouseButton)) return false;
 				if (e.Device == Device.Mouse) keyInHotkey |= e.MouseButton == mouseButton;
 			}
@@ -128,9 +114,7 @@ internal class ActiveHotkey : Hotkey, IDisposable
 		return keyInHotkey;
 	}
 
-	public void Dispose()
-	{
+	public void Dispose() {
 		UnregisterEventListeners();
-		HotkeyPressedEventHandler = null;
 	}
 }

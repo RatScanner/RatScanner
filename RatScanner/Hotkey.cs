@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Windows.Input;
 
 namespace RatScanner;
 
-public class Hotkey : INotifyPropertyChanged
-{
+public class Hotkey : INotifyPropertyChanged {
 	/// <summary>
 	/// Keyboard key of the selected hotkey
 	/// </summary>
@@ -21,23 +21,21 @@ public class Hotkey : INotifyPropertyChanged
 
 	public bool RequiresMouse;
 
-	public Hotkey(Hotkey hotkey)
-	{
+	public Hotkey(Hotkey hotkey) {
 		Set(hotkey);
 	}
 
-	public Hotkey(IEnumerable<Key>? keyboardKeys = null, IEnumerable<MouseButton>? mouseButtons = null)
-	{
+	public Hotkey(IEnumerable<Key>? keyboardKeys = null, IEnumerable<MouseButton>? mouseButtons = null) {
 		Set(keyboardKeys, mouseButtons);
 	}
 
-	public void Set(Hotkey hotkey)
-	{
+	[MemberNotNull(nameof(KeyboardKeys), nameof(MouseButtons))]
+	public void Set(Hotkey hotkey) {
 		Set(hotkey.KeyboardKeys, hotkey.MouseButtons);
 	}
 
-	public void Set(IEnumerable<Key>? keyboardKeys, IEnumerable<MouseButton>? mouseButtons)
-	{
+	[MemberNotNull(nameof(KeyboardKeys), nameof(MouseButtons))]
+	public void Set(IEnumerable<Key>? keyboardKeys, IEnumerable<MouseButton>? mouseButtons) {
 		KeyboardKeys = keyboardKeys?.ToHashSet() ?? new HashSet<Key>();
 		MouseButtons = mouseButtons?.ToHashSet() ?? new HashSet<MouseButton>();
 
@@ -45,29 +43,25 @@ public class Hotkey : INotifyPropertyChanged
 		RequiresMouse = MouseButtons.Count > 0;
 	}
 
-	public string HotkeyString
-	{
-		get
-		{
-			var keyboardString = string.Join('+', KeyboardKeys.ToList().OrderDescending());
-			var mouseString = string.Join('+', MouseButtons.ToList().OrderDescending());
+	public string HotkeyString {
+		get {
+			string keyboardString = string.Join('+', KeyboardKeys.ToList().OrderDescending());
+			string mouseString = string.Join('+', MouseButtons.ToList().OrderDescending());
 
-			var keyboardKeysEmpty = KeyboardKeys.Count == 0;
-			var mouseButtonsEmpty = MouseButtons.Count == 0;
+			bool keyboardKeysEmpty = KeyboardKeys.Count == 0;
+			bool mouseButtonsEmpty = MouseButtons.Count == 0;
 			if (!mouseButtonsEmpty && !keyboardKeysEmpty) return keyboardString + '+' + mouseString;
 			return keyboardString + mouseString;
 		}
 	}
 
-	public override string ToString()
-	{
+	public override string ToString() {
 		return HotkeyString;
 	}
 
-	public event PropertyChangedEventHandler PropertyChanged;
+	public event PropertyChangedEventHandler? PropertyChanged;
 
-	internal virtual void OnPropertyChanged(string propertyName = null)
-	{
+	internal virtual void OnPropertyChanged(string? propertyName = null) {
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 }

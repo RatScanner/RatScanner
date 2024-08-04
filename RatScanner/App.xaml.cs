@@ -13,8 +13,7 @@ namespace RatScanner;
 /// <summary>
 /// Interaction logic for App.xaml
 /// </summary>
-public partial class App : Application, ISingleInstance
-{
+public partial class App : Application, ISingleInstance {
 	private readonly string[] _webview2RegKeys = new[]
 	{
 		@"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}",
@@ -22,12 +21,10 @@ public partial class App : Application, ISingleInstance
 		@"HKEY_CURRENT_USER\Software\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}",
 	};
 
-	protected override void OnStartup(StartupEventArgs e)
-	{
+	protected override void OnStartup(StartupEventArgs e) {
 		// Setup single instance mode
-		var isFirstInstance = this.InitializeAsFirstInstance(RatConfig.SINGLE_INSTANCE_GUID);
-		if (!isFirstInstance)
-		{
+		bool isFirstInstance = this.InitializeAsFirstInstance(RatConfig.SINGLE_INSTANCE_GUID);
+		if (!isFirstInstance) {
 			SingleInstance.Cleanup();
 			Application.Current.Shutdown(2);
 			return;
@@ -44,16 +41,13 @@ public partial class App : Application, ISingleInstance
 #endif
 
 		// Install webview2 runtime if it is not already
-		var existing = _webview2RegKeys.Any(key => Registry.GetValue(key, "pv", null) != null);
+		bool existing = _webview2RegKeys.Any(key => Registry.GetValue(key, "pv", null) != null);
 		if (!existing) InstallWebview2Runtime();
 	}
 
-	public void OnInstanceInvoked(string[] args)
-	{
-		Application.Current.Dispatcher.Invoke(() =>
-		{
-			if (args.Length > 1)
-			{
+	public void OnInstanceInvoked(string[] args) {
+		Application.Current.Dispatcher.Invoke(() => {
+			if (args.Length > 1) {
 				OnInstanceInvokedWithArgs(args);
 				return;
 			}
@@ -68,10 +62,8 @@ public partial class App : Application, ISingleInstance
 		});
 	}
 
-	public void OnInstanceInvokedWithArgs(string[] args)
-	{
-		Action action = args[1] switch
-		{
+	public void OnInstanceInvokedWithArgs(string[] args) {
+		Action action = args[1] switch {
 			"/showUI" => PageSwitcher.Instance.ShowUI,
 			"/showMinimalUI" => PageSwitcher.Instance.ShowMinimalUI,
 			"/showOverlay" => PageSwitcher.Instance.ShowOverlay,
@@ -80,59 +72,50 @@ public partial class App : Application, ISingleInstance
 		action.Invoke();
 	}
 
-	private void InstallWebview2Runtime()
-	{
-		using var client = new WebClient();
+	private void InstallWebview2Runtime() {
+		using WebClient client = new();
 		client.DownloadFile("https://go.microsoft.com/fwlink/p/?LinkId=2124703", "MicrosoftEdgeWebview2Setup.exe");
 
-		var startInfo = new ProcessStartInfo();
+		ProcessStartInfo startInfo = new();
 		startInfo.CreateNoWindow = false;
 		startInfo.UseShellExecute = false;
 		startInfo.FileName = "MicrosoftEdgeWebview2Setup.exe";
 		startInfo.WindowStyle = ProcessWindowStyle.Hidden;
 		startInfo.Arguments = "/install";
 
-		try
-		{
+		try {
 			// Start the process with the info we specified.
 			// Call WaitForExit and then the using statement will close.
-			var exeProcess = Process.Start(startInfo);
+			Process? exeProcess = Process.Start(startInfo);
 			exeProcess.WaitForExit();
-		}
-		catch (Exception ex)
-		{
+		} catch (Exception ex) {
 			Logger.LogError("Could not install Webview2", ex);
 		}
 
-		try
-		{
+		try {
 			File.Delete("MicrosoftEdgeWebview2Setup.exe");
-		}
-		catch { }
+		} catch { }
 	}
 
-	private void SetupExceptionHandling()
-	{
-		AppDomain.CurrentDomain.UnhandledException += (s, e) =>
-		{
+	private void SetupExceptionHandling() {
+#pragma warning disable IDE0053 // Use expression body for lambda expression
+		AppDomain.CurrentDomain.UnhandledException += (s, e) => {
 			LogUnhandledException((Exception)e.ExceptionObject, "AppDomain.CurrentDomain.UnhandledException");
 		};
+#pragma warning restore IDE0053 // Use expression body for lambda expression
 
-		Application.Current.DispatcherUnhandledException += (s, e) =>
-		{
+		Application.Current.DispatcherUnhandledException += (s, e) => {
 			LogUnhandledException(e.Exception, "Application.Current.DispatcherUnhandledException");
 			e.Handled = true;
 		};
 
-		TaskScheduler.UnobservedTaskException += (s, e) =>
-		{
+		TaskScheduler.UnobservedTaskException += (s, e) => {
 			LogUnhandledException(e.Exception, "TaskScheduler.UnobservedTaskException");
 			e.SetObserved();
 		};
 	}
 
-	private void LogUnhandledException(Exception exception, string source)
-	{
+	private void LogUnhandledException(Exception exception, string source) {
 		exception.Data.Add("Source", source);
 		Logger.LogError(exception);
 	}

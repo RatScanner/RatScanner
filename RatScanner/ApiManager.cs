@@ -8,10 +8,8 @@ using System.Text;
 
 namespace RatScanner;
 
-public static class ApiManager
-{
-	public enum ResourceType
-	{
+public static class ApiManager {
+	public enum ResourceType {
 		ClientVersion,
 		ClientForceUpdateVersions,
 		DownloadLink,
@@ -27,44 +25,35 @@ public static class ApiManager
 	// Official RatScanner API URL
 	private const string BaseUrl = "https://api.ratscanner.com/v3";
 
-	public static string GetResource(ResourceType resource)
-	{
+	public static string GetResource(ResourceType resource) {
 		if (ResCache.ContainsKey(resource)) return ResCache[resource];
 
-		var resPath = resource.GetResourcePath();
+		string resPath = resource.GetResourcePath();
 
-		try
-		{
+		try {
 			Logger.LogInfo($"Loading resource \"{resPath}\"...");
-			var json = GetString($"{BaseUrl}/res/{resPath}");
-			var value = JsonConvert.DeserializeObject<Resource>(json)?.Value;
+			string json = GetString($"{BaseUrl}/res/{resPath}");
+			string value = JsonConvert.DeserializeObject<Resource>(json)?.Value ?? throw new NullReferenceException();
 			ResCache.Add(resource, value);
 			return value;
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			Logger.LogError($"Loading of resource \"{resPath}\" failed.", e);
 			return "[Loading failed]";
 		}
 	}
 
-	public static void DownloadFile(string url, string destination)
-	{
-		try
-		{
+	public static void DownloadFile(string url, string destination) {
+		try {
 			Logger.LogInfo($"Downloading file \"{url}\"...");
-			var contents = GetBytes(url);
+			byte[] contents = GetBytes(url);
 			File.WriteAllBytes(destination, contents);
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			Logger.LogError($"Downloading of file \"{url}\" failed.", e);
 		}
 	}
 
-	private static HttpWebRequest CreateRequest(string url, string bearerToken = null)
-	{
-		var request = WebRequest.CreateHttp(url);
+	private static HttpWebRequest CreateRequest(string url, string? bearerToken = null) {
+		HttpWebRequest request = WebRequest.CreateHttp(url);
 		request.Method = WebRequestMethods.Http.Get;
 		request.AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate;
 		request.UserAgent = $"RatScanner-Client/{RatConfig.Version}";
@@ -72,29 +61,25 @@ public static class ApiManager
 		return request;
 	}
 
-	private static byte[] GetBytes(string url, string bearerToken = null)
-	{
-		using var response = (HttpWebResponse)CreateRequest(url, bearerToken).GetResponse();
-		using var stream = response.GetResponseStream();
-		using var memoryStream = new MemoryStream();
+	private static byte[] GetBytes(string url, string? bearerToken = null) {
+		using HttpWebResponse response = (HttpWebResponse)CreateRequest(url, bearerToken).GetResponse();
+		using Stream stream = response.GetResponseStream();
+		using MemoryStream memoryStream = new();
 		stream.CopyTo(memoryStream);
 		return memoryStream.ToArray();
 	}
 
-	private static string GetString(string url, string bearerToken = null)
-	{
-		using var response = (HttpWebResponse)CreateRequest(url, bearerToken).GetResponse();
-		using var stream = response.GetResponseStream();
-		var noEncoding = string.IsNullOrEmpty(response.CharacterSet);
-		var encoding = noEncoding ? Encoding.UTF8 : Encoding.GetEncoding(response.CharacterSet);
-		var reader = new StreamReader(stream, encoding);
+	private static string GetString(string url, string? bearerToken = null) {
+		using HttpWebResponse response = (HttpWebResponse)CreateRequest(url, bearerToken).GetResponse();
+		using Stream stream = response.GetResponseStream();
+		bool noEncoding = string.IsNullOrEmpty(response.CharacterSet);
+		Encoding encoding = noEncoding ? Encoding.UTF8 : Encoding.GetEncoding(response.CharacterSet);
+		StreamReader reader = new(stream, encoding);
 		return reader.ReadToEnd();
 	}
 
-	public static string GetResourcePath(this ResourceType resourceType)
-	{
-		return resourceType switch
-		{
+	public static string GetResourcePath(this ResourceType resourceType) {
+		return resourceType switch {
 			ResourceType.ClientVersion => "RSClientVersion",
 			ResourceType.ClientForceUpdateVersions => "RSClientForceUpdateVersions",
 			ResourceType.DownloadLink => "RSDownloadLink",

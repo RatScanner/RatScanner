@@ -4,8 +4,7 @@ using System.Collections.Generic;
 namespace RatScanner.FetchModels.TarkovTracker;
 
 // Model representing the progress data of a TarkovTracker user
-public class UserProgress
-{
+public class UserProgress {
 	[JsonProperty("userId")]
 	public string UserId { get; set; } = "";
 

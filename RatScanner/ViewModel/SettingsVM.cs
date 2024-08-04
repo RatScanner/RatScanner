@@ -4,8 +4,7 @@ using System.Linq;
 
 namespace RatScanner.ViewModel;
 
-internal class SettingsVM : INotifyPropertyChanged
-{
+internal class SettingsVM : INotifyPropertyChanged {
 	public bool EnableNameScan { get; set; }
 	public bool EnableAutoNameScan { get; set; }
 	public int NameScanLanguage { get; set; }
@@ -47,13 +46,11 @@ internal class SettingsVM : INotifyPropertyChanged
 	public bool BlurBehindSearch { get; set; }
 	public Hotkey InteractableOverlayHotkey { get; set; }
 
-	internal SettingsVM()
-	{
+	internal SettingsVM() {
 		LoadSettings();
 	}
 
-	public void LoadSettings()
-	{
+	public void LoadSettings() {
 		EnableNameScan = RatConfig.NameScan.Enable;
 		EnableAutoNameScan = RatConfig.NameScan.EnableAuto;
 		NameScanLanguage = (int)RatConfig.NameScan.Language;
@@ -94,12 +91,11 @@ internal class SettingsVM : INotifyPropertyChanged
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
 	}
 
-	public void SaveSettings()
-	{
-		var updateMarketDB = NameScanLanguage != (int)RatConfig.NameScan.Language;
-		var updateTarkovTrackerToken = TarkovTrackerToken != RatConfig.Tracking.TarkovTracker.Token;
-		var updateResolution = ScreenWidth != RatConfig.ScreenWidth || ScreenHeight != RatConfig.ScreenHeight;
-		var updateLanguage = RatConfig.NameScan.Language != (Language)NameScanLanguage;
+	public void SaveSettings() {
+		bool updateMarketDB = NameScanLanguage != (int)RatConfig.NameScan.Language;
+		bool updateTarkovTrackerToken = TarkovTrackerToken != RatConfig.Tracking.TarkovTracker.Token;
+		bool updateResolution = ScreenWidth != RatConfig.ScreenWidth || ScreenHeight != RatConfig.ScreenHeight;
+		bool updateLanguage = RatConfig.NameScan.Language != (Language)NameScanLanguage;
 
 		// Save config
 		RatConfig.NameScan.Enable = EnableNameScan;
@@ -111,7 +107,7 @@ internal class SettingsVM : INotifyPropertyChanged
 		RatConfig.IconScan.UseCachedIcons = UseCachedIcons;
 		RatConfig.IconScan.Hotkey = IconScanHotkey;
 
-		RatConfig.ToolTip.Duration = int.TryParse(ToolTipDuration, out var i) ? i : 0;
+		RatConfig.ToolTip.Duration = int.TryParse(ToolTipDuration, out int i) ? i : 0;
 		RatConfig.ToolTip.Duration = ToolTipMilli;
 
 		RatConfig.MinimalUi.ShowName = ShowName;
@@ -155,24 +151,22 @@ internal class SettingsVM : INotifyPropertyChanged
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
 	}
 
-	private void UpdateTarkovTrackerToken()
-	{
-		var token = RatConfig.Tracking.TarkovTracker.Token;
+	private void UpdateTarkovTrackerToken() {
+		string token = RatConfig.Tracking.TarkovTracker.Token;
 		if (token == "") return;
 		RatScannerMain.Instance.TarkovTrackerDB.Token = RatConfig.Tracking.TarkovTracker.Token;
 		if (RatScannerMain.Instance.TarkovTrackerDB.Init()) return;
 
-		var visibleLength = (int)(token.Length * 0.25);
+		int visibleLength = (int)(token.Length * 0.25);
 		token = token[..visibleLength] + string.Concat(Enumerable.Repeat(" *", token.Length - visibleLength));
 		Logger.ShowWarning($"The TarkovTracker API Token does not seem to work.\n\n{token}");
 
 		RatConfig.Tracking.TarkovTracker.Token = "";
 	}
 
-	public event PropertyChangedEventHandler PropertyChanged;
+	public event PropertyChangedEventHandler? PropertyChanged;
 
-	internal virtual void OnPropertyChanged(string propertyName = null)
-	{
+	internal virtual void OnPropertyChanged(string? propertyName = null) {
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 }

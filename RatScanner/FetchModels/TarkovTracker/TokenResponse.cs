@@ -4,8 +4,7 @@ using System.Collections.Generic;
 namespace RatScanner.FetchModels.TarkovTracker;
 
 // Model representing a TarkovTracker Token's metadata
-public class TokenResponse
-{
+public class TokenResponse {
 	// This token
 	[JsonProperty("token")]
 	public string Id { get; set; } = "";

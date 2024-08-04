@@ -1,5 +1,6 @@
 ﻿using RatScanner.View;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
@@ -8,8 +9,7 @@ using OverlayC = RatScanner.RatConfig.Overlay;
 
 namespace RatScanner;
 
-internal class HotkeyManager
-{
+internal class HotkeyManager {
 	private long _last_mouse_click = 0;
 
 	internal ActiveHotkey NameScanHotkey;
@@ -17,14 +17,12 @@ internal class HotkeyManager
 	internal ActiveHotkey OpenInteractableOverlayHotkey;
 	internal ActiveHotkey CloseInteractableOverlayHotkey;
 
-	internal HotkeyManager()
-	{
+	internal HotkeyManager() {
 		UserActivityHelper.Start(true, true);
 		RegisterHotkeys();
 	}
 
-	~HotkeyManager()
-	{
+	~HotkeyManager() {
 		UnregisterHotkeys();
 		UserActivityHelper.Stop(true, true, false);
 	}
@@ -35,12 +33,17 @@ internal class HotkeyManager
 	/// <remarks>
 	/// Called by the constructor
 	/// </remarks>
-	internal void RegisterHotkeys()
-	{
+	[MemberNotNull(
+		nameof(NameScanHotkey),
+		nameof(IconScanHotkey),
+		nameof(OpenInteractableOverlayHotkey),
+		nameof(CloseInteractableOverlayHotkey))
+	]
+	internal void RegisterHotkeys() {
 		// Unregister hotkeys to prevent multiple listeners for the same hotkey
 		UnregisterHotkeys();
 
-		var nameScanHotkey = new Hotkey(null, new[] { MouseButton.Left });
+		Hotkey nameScanHotkey = new(null, new[] { MouseButton.Left });
 		NameScanHotkey = new ActiveHotkey(nameScanHotkey, OnNameScanHotkey, ref NameScan.Enable);
 		IconScanHotkey = new ActiveHotkey(IconScan.Hotkey, OnIconScanHotkey, ref IconScan.Enable);
 		OpenInteractableOverlayHotkey = new ActiveHotkey(OverlayC.Search.Hotkey, OnOpenInteractableOverlayHotkey, ref OverlayC.Search.Enable);
@@ -50,44 +53,32 @@ internal class HotkeyManager
 	/// <summary>
 	/// Unregister hotkeys
 	/// </summary>
-	internal void UnregisterHotkeys()
-	{
+	internal void UnregisterHotkeys() {
 		NameScanHotkey?.Dispose();
 		IconScanHotkey?.Dispose();
 		OpenInteractableOverlayHotkey?.Dispose();
 	}
 
-	private static void Wrap<T>(Func<T> func)
-	{
-		try
-		{
+	private static void Wrap<T>(Func<T> func) {
+		try {
 			func();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			Logger.LogError(e.Message, e);
 		}
 	}
 
-	private static void Wrap(Action action)
-	{
-		try
-		{
+	private static void Wrap(Action action) {
+		try {
 			action();
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			Logger.LogError(e.Message, e);
 		}
 	}
 
-	private void OnNameScanHotkey(object sender, KeyUpEventArgs e)
-	{
-		Wrap(() =>
-		{
+	private void OnNameScanHotkey(object? sender, KeyUpEventArgs e) {
+		Wrap(() => {
 			RatScannerMain.Instance.NameScan(UserActivityHelper.GetMousePosition());
-			if (_last_mouse_click + 500 < DateTimeOffset.Now.ToUnixTimeMilliseconds() && NameScan.EnableAuto)
-			{
+			if (_last_mouse_click + 500 < DateTimeOffset.Now.ToUnixTimeMilliseconds() && NameScan.EnableAuto) {
 				Thread.Sleep(200);  // wait for double click and ui
 				RatScannerMain.Instance.NameScanScreen();
 				_last_mouse_click = DateTimeOffset.Now.ToUnixTimeMilliseconds();
@@ -95,18 +86,15 @@ internal class HotkeyManager
 		});
 	}
 
-	private void OnIconScanHotkey(object sender, KeyUpEventArgs e)
-	{
+	private void OnIconScanHotkey(object? sender, KeyUpEventArgs e) {
 		Wrap(() => RatScannerMain.Instance.IconScan(UserActivityHelper.GetMousePosition()));
 	}
 
-	private void OnOpenInteractableOverlayHotkey(object sender, KeyUpEventArgs e)
-	{
+	private void OnOpenInteractableOverlayHotkey(object? sender, KeyUpEventArgs e) {
 		Wrap(() => Application.Current.Dispatcher.Invoke(() => Wrap(() => BlazorUI.BlazorInteractableOverlay.ShowOverlay())));
 	}
 
-	private void OnCloseInteractableOverlayHotkey(object sender, KeyUpEventArgs e)
-	{
+	private void OnCloseInteractableOverlayHotkey(object? sender, KeyUpEventArgs e) {
 		Wrap(() => Application.Current.Dispatcher.Invoke(() => Wrap(() => BlazorUI.BlazorInteractableOverlay.HideOverlay())));
 	}
 }

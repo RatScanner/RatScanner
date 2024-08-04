@@ -11,172 +11,149 @@ using System.Windows;
 
 namespace RatScanner;
 
-internal static class Logger
-{
+internal static class Logger {
 	private static readonly object SyncObject = new();
 
 	private static readonly Queue<string> Backlog = new();
 
 	private static bool Crashed = false;
 
-	internal static void LogInfo(string message)
-	{
+	internal static void LogInfo(string message) {
 		AppendToLog("[Info]  " + message);
 	}
 
-	internal static void LogWarning(string message, Exception e = null)
-	{
+	internal static void LogWarning(string message, Exception? e = null) {
 		AppendToLog("[Warning] " + message);
 		if (e != null) AppendToLog(e.ToString());
 	}
 
-	internal static void LogError(Exception e)
-	{
-		var message = e.GetBaseException().GetBaseException();
+	internal static void LogError(Exception e) {
+		Exception message = e.GetBaseException().GetBaseException();
 		LogError(message.Message, e);
 	}
 
-	internal static void LogError(string message, Exception e = null)
-	{
+	internal static void LogError(string message, Exception? e = null) {
 		if (Crashed) return;
 		Crashed = true;
 
 		// Log the error
-		var logMessage = "[Error] " + message;
-		var divider = new string('-', 20);
+		string logMessage = "[Error] " + message;
+		string divider = new('-', 20);
 		if (e != null) logMessage += $"\n {divider} \n {e}";
 		else logMessage += $"\n {divider} \n {Environment.StackTrace}";
 		AppendToLog(logMessage);
 
 		// Setup info box
-		var title = "RatScanner " + RatConfig.Version;
+		string title = "RatScanner " + RatConfig.Version;
 
 		// Ask to open FAQ
-		var faqBoxMessage = message + "\n\nThe FAQ will probably help with that.\nDo you want to open it now?";
-		var faqBoxResult = MessageBox.Show(faqBoxMessage, title, MessageBoxButton.YesNo, MessageBoxImage.Error);
+		string faqBoxMessage = message + "\n\nThe FAQ will probably help with that.\nDo you want to open it now?";
+		MessageBoxResult faqBoxResult = MessageBox.Show(faqBoxMessage, title, MessageBoxButton.YesNo, MessageBoxImage.Error);
 		if (faqBoxResult == MessageBoxResult.Yes) OpenFAQ(message);
 
 		// Ask for git issue creation
-		var gitBoxMessage = "Would you like to create a issue on GitHub?";
-		var gitBoxResult = MessageBox.Show(gitBoxMessage, title, MessageBoxButton.YesNo, MessageBoxImage.Question);
+		string gitBoxMessage = "Would you like to create a issue on GitHub?";
+		MessageBoxResult gitBoxResult = MessageBox.Show(gitBoxMessage, title, MessageBoxButton.YesNo, MessageBoxImage.Question);
 		if (gitBoxResult == MessageBoxResult.Yes) CreateGitHubIssue(message, e);
 
 		// Exit after error is handled
 		Environment.Exit(0);
 	}
 
-	internal static void LogDebugBitmap(Bitmap bitmap, string fileName = "bitmap")
-	{
+	internal static void LogDebugBitmap(Bitmap bitmap, string fileName = "bitmap") {
 		if (RatConfig.LogDebug) bitmap.Save(GetUniquePath(RatConfig.Paths.Debug, fileName, ".png"));
 	}
 
-	internal static void LogDebug(string message = "", [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = "")
-	{
+	internal static void LogDebug(string message = "", [CallerLineNumber] int lineNumber = 0, [CallerMemberName] string caller = "") {
 		if (!RatConfig.LogDebug) return;
 		message = $"{caller}:{lineNumber} -> {message}";
 		AppendToLog("[Debug] " + message);
 	}
 
-	internal static void ShowMessage(string message, string title = null)
-	{
+	internal static void ShowMessage(string message, string? title = null) {
 		LogInfo(message);
 		MessageBox.Show(message, title ?? "Rat Scanner " + RatConfig.Version, MessageBoxButton.OK, MessageBoxImage.Information);
 	}
 
-	internal static void ShowWarning(string message, string title = null)
-	{
+	internal static void ShowWarning(string message, string? title = null) {
 		LogWarning(message);
 		MessageBox.Show(message, title ?? "Rat Scanner " + RatConfig.Version, MessageBoxButton.OK, MessageBoxImage.Warning);
 	}
 
-	private static string GetUniquePath(string basePath, string fileName, string extension)
-	{
+	private static string GetUniquePath(string basePath, string fileName, string extension) {
 		fileName = fileName.Replace(' ', '_');
 
-		var index = 0;
-		var uniquePath = Path.Combine(basePath, fileName + index + extension);
+		int index = 0;
+		string uniquePath = Path.Combine(basePath, fileName + index + extension);
 
-		while (File.Exists(uniquePath))
-		{
+		while (File.Exists(uniquePath)) {
 			index += 1;
 			uniquePath = Path.Combine(basePath, fileName + index + extension);
 		}
 
-		Directory.CreateDirectory(Path.GetDirectoryName(uniquePath));
+		Directory.CreateDirectory(Path.GetDirectoryName(uniquePath) ?? throw new NullReferenceException());
 		return uniquePath;
 	}
 
-	private static void AppendToLog(string content)
-	{
-		var text = "[" + DateTime.UtcNow.ToUniversalTime().TimeOfDay + "] > " + content + "\n";
+	private static void AppendToLog(string content) {
+		string text = "[" + DateTime.UtcNow.ToUniversalTime().TimeOfDay + "] > " + content + "\n";
 		Backlog.Enqueue(text);
 		Task.Run(() => ProcessBacklog());
 	}
 
-	private static void AppendToLogRaw(string text)
-	{
+	private static void AppendToLogRaw(string text) {
 		Debug.WriteLine(text);
 		File.AppendAllText(RatConfig.Paths.LogFile, text, Encoding.UTF8);
 	}
 
-	private static void ProcessBacklog()
-	{
-		lock (SyncObject)
-		{
-			for (var i = 0; i < Backlog.Count; i++) AppendToLogRaw(Backlog.Dequeue());
+	private static void ProcessBacklog() {
+		lock (SyncObject) {
+			for (int i = 0; i < Backlog.Count; i++) AppendToLogRaw(Backlog.Dequeue());
 		}
 	}
 
-	internal static void Clear()
-	{
+	internal static void Clear() {
 		File.Delete(RatConfig.Paths.LogFile);
 	}
 
-	internal static void ClearMats(string pattern = "*.png")
-	{
-		var files = Directory.GetFiles(RatConfig.Paths.Data, pattern);
-		foreach (var file in files) File.Delete(file);
+	internal static void ClearMats(string pattern = "*.png") {
+		string[] files = Directory.GetFiles(RatConfig.Paths.Data, pattern);
+		foreach (string file in files) File.Delete(file);
 	}
 
-	internal static void ClearDebugMats()
-	{
+	internal static void ClearDebugMats() {
 		if (!Directory.Exists(RatConfig.Paths.Debug)) return;
 
-		var files = Directory.GetFiles(RatConfig.Paths.Debug, "*.png");
-		foreach (var file in files)
-			try
-			{
+		string[] files = Directory.GetFiles(RatConfig.Paths.Debug, "*.png");
+		foreach (string file in files)
+			try {
 				File.Delete(file);
-			}
-			catch (Exception)
-			{
+			} catch (Exception) {
 				LogDebug("Exception while deleting debug mats.");
 			}
 	}
 
-	private static void OpenFAQ(string message)
-	{
+	private static void OpenFAQ(string message) {
 		// Remove everything after ':' which is commonly a path
 		message = message.Split(':')[0];
-		var url = ApiManager.GetResource(ApiManager.ResourceType.FAQLink);
+		string url = ApiManager.GetResource(ApiManager.ResourceType.FAQLink);
 		url += "#:~:text=" + WebUtility.HtmlEncode(message);
 		OpenURL(url);
 	}
 
-	private static void CreateGitHubIssue(string message, Exception e)
-	{
-		var body = "**Error**\n" + message + "\n";
+	private static void CreateGitHubIssue(string message, Exception e) {
+		string body = "**Error**\n" + message + "\n";
 		if (e != null) body += "```\n" + LimitLength(e.ToString(), 1000) + "\n```\n";
 
 		body += "<details>\n<summary>Log</summary>\n\n```\n";
 		body += LimitLength(ReadAll(), 3000);
 		body += "\n```\n</details>";
 
-		var title = message;
+		string title = message;
 
-		var labels = "bug";
+		string labels = "bug";
 
-		var url = ApiManager.GetResource(ApiManager.ResourceType.GithubLink);
+		string url = ApiManager.GetResource(ApiManager.ResourceType.GithubLink);
 		url += "/issues/new";
 		url += "?body=" + WebUtility.UrlEncode(body);
 		url += "&title=" + WebUtility.UrlEncode(title);
@@ -185,23 +162,19 @@ internal static class Logger
 		OpenURL(url);
 	}
 
-	private static string LimitLength(string input, int length)
-	{
-		return input.Substring(0, input.Length > length ? length : input.Length);
+	private static string LimitLength(string input, int length) {
+		return input[..Math.Min(length, input.Length)];
 	}
 
-	private static void OpenURL(string url)
-	{
-		var psi = new ProcessStartInfo
-		{
+	private static void OpenURL(string url) {
+		ProcessStartInfo psi = new() {
 			FileName = url,
 			UseShellExecute = true,
 		};
 		Process.Start(psi);
 	}
 
-	private static string ReadAll()
-	{
+	private static string ReadAll() {
 		return File.ReadAllText(RatConfig.Paths.LogFile, Encoding.UTF8);
 	}
 }

@@ -5,28 +5,23 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
-public class ItemQueue : IEnumerable<ItemScan>
-{
+public class ItemQueue : IEnumerable<ItemScan> {
 	private readonly ConcurrentQueue<ItemScan> queue = new();
 	public event EventHandler Changed;
 
-	protected virtual void OnChanged()
-	{
-		while (queue.Count > 1 && !(DateTimeOffset.Now.ToUnixTimeMilliseconds() > queue.First().DissapearAt))
-		{
+	protected virtual void OnChanged() {
+		while (queue.Count > 1 && !(DateTimeOffset.Now.ToUnixTimeMilliseconds() > queue.First().DissapearAt)) {
 			if (!queue.TryDequeue(out _)) break;
 		}
 		Changed?.Invoke(this, EventArgs.Empty);
 	}
 
-	public virtual void Enqueue(ItemScan item)
-	{
+	public virtual void Enqueue(ItemScan item) {
 		queue.Enqueue(item);
 		OnChanged();
 	}
 
-	public void EnqueueRange<T>(List<T> items) where T : ItemScan
-	{
+	public void EnqueueRange<T>(List<T> items) where T : ItemScan {
 		items.ForEach(queue.Enqueue);
 		OnChanged();
 	}

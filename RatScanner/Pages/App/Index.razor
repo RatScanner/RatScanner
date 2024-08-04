@@ -50,10 +50,10 @@
         <MudItem xs="12">
             <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">
                 <div class="d-flex align-center">
-                    @_lastScannedItem.GetTaskRemaining() <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="ml-1" /> Quest
+                    @_lastScannedItem.GetTaskRemaining() <MudIcon Icon="@Icons.Material.Filled.Checklist" Size="Size.Small" Class="ml-1" /> Quest
                 </div>
                 <div class="d-flex align-center">
-                    @_lastScannedItem.GetHideoutRemaining() <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
+                    @_lastScannedItem.GetHideoutRemaining() <MudIcon Icon="@Icons.Material.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
                 </div>
             </MudPaper>
         </MudItem>
@@ -66,8 +66,8 @@
                                 <div class="d-flex justify-space-between">
                                     <div class="mx-1">@need.Key</div>
                                     <div class="d-flex align-center">
-                                        <MudIcon Icon="@Icons.Filled.Checklist" Size="Size.Small" Class="mr-1" /> @need.Value.Key
-                                        <MudIcon Icon="@Icons.Filled.House" Size="Size.Small" Class="ml-3 mr-1" /> @need.Value.Value
+                                        <MudIcon Icon="@Icons.Material.Filled.Checklist" Size="Size.Small" Class="mr-1" /> @need.Value.Key
+                                        <MudIcon Icon="@Icons.Material.Filled.House" Size="Size.Small" Class="ml-3 mr-1" /> @need.Value.Value
                                     </div>
                                 </div>
                             </MudItem>
@@ -109,7 +109,7 @@
 
     private List<TarkovDev.GraphQL.Item>? _items;
 
-    private MudAutocomplete<TarkovDev.GraphQL.Item> _searchBox { get; set; }
+    private MudAutocomplete<TarkovDev.GraphQL.Item> _searchBox { get; set; } = null!;
 
     protected override void OnInitialized() {
         MenuVM.PropertyChanged += PropertyChangeHandler;
@@ -194,7 +194,7 @@
         Process.Start(psi);
     }
 
-    private async void PropertyChangeHandler(object sender, EventArgs e) {
+    private async void PropertyChangeHandler(object? sender, EventArgs e) {
         await InvokeAsync(() => StateHasChanged());
     }
 

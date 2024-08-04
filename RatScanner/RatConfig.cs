@@ -13,8 +13,7 @@ using Key = System.Windows.Input.Key;
 
 namespace RatScanner;
 
-internal static class RatConfig
-{
+internal static class RatConfig {
 	[DllImport("user32.dll")]
 	private static extern IntPtr MonitorFromPoint([In] Point pt, [In] uint dwFlags);
 
@@ -27,8 +26,7 @@ internal static class RatConfig
 	public const string SINGLE_INSTANCE_GUID = "{a057bb64-c126-4ef4-a4ed-3037c2e7bc89}";
 
 	// Paths
-	internal static class Paths
-	{
+	internal static class Paths {
 		internal static string Base = AppDomain.CurrentDomain.BaseDirectory;
 		internal static string Data = Path.Combine(Base, "Data");
 		internal static string StaticIcon = Path.Combine(Data, "icons");
@@ -49,8 +47,7 @@ internal static class RatConfig
 	}
 
 	// Name Scan options
-	internal static class NameScan
-	{
+	internal static class NameScan {
 		internal static bool Enable = true;
 		internal static bool EnableAuto = false;
 		internal static Language Language = Language.English;
@@ -60,8 +57,7 @@ internal static class RatConfig
 	}
 
 	// Icon Scan options
-	internal static class IconScan
-	{
+	internal static class IconScan {
 		internal static bool Enable = true;
 		internal static float ConfWarnThreshold = 0.8f;
 		internal static bool ScanRotatedIcons = true;
@@ -72,15 +68,13 @@ internal static class RatConfig
 	}
 
 	// ToolTip options
-	internal static class ToolTip
-	{
+	internal static class ToolTip {
 		internal static string DigitGroupingSymbol = ".";
 		internal static int Duration = 1500;
 	}
 
 	// Minimal UI
-	internal static class MinimalUi
-	{
+	internal static class MinimalUi {
 		internal static bool ShowName = true;
 		internal static bool ShowAvgDayPrice = true;
 		internal static bool ShowPricePerSlot = true;
@@ -92,12 +86,10 @@ internal static class RatConfig
 	}
 
 	// Progress Tracking options
-	internal static class Tracking
-	{
+	internal static class Tracking {
 		internal static bool ShowNonFIRNeeds = true;
 
-		internal static class TarkovTracker
-		{
+		internal static class TarkovTracker {
 			internal static bool Enable => Token.Length > 0;
 
 			internal static string Token = "";
@@ -107,10 +99,8 @@ internal static class RatConfig
 	}
 
 	// Overlay options
-	internal static class Overlay
-	{
-		internal static class Search
-		{
+	internal static class Overlay {
+		internal static class Search {
 			internal static bool Enable = true;
 			internal static bool BlurBehind = true;
 			internal static Hotkey Hotkey = new(new[] { Key.N, Key.M }.ToList());
@@ -119,8 +109,7 @@ internal static class RatConfig
 
 	// Other
 #if DEBUG
-	internal static bool LogDebug
-	{
+	internal static bool LogDebug {
 		get => true;
 		set { }
 	}
@@ -142,22 +131,19 @@ internal static class RatConfig
 
 	internal static float GameScale => RatScannerMain.Instance.RatEyeEngine.Config.ProcessingConfig.Scale;
 
-	private static bool IsSupportedConfigVersion()
-	{
-		var config = new SimpleConfig(Paths.ConfigFile, "Other");
-		var readConfigVersion = config.ReadInt(nameof(ConfigVersion), -1);
-		var isSupportedConfigVersion = ConfigVersion == readConfigVersion;
+	private static bool IsSupportedConfigVersion() {
+		SimpleConfig config = new(Paths.ConfigFile, "Other");
+		int readConfigVersion = config.ReadInt(nameof(ConfigVersion), -1);
+		bool isSupportedConfigVersion = ConfigVersion == readConfigVersion;
 		if (!isSupportedConfigVersion) Logger.LogWarning("Config version (" + readConfigVersion + ") is not supported!");
 		return isSupportedConfigVersion;
 	}
 
-	internal static void LoadConfig()
-	{
-		var configFileExists = File.Exists(Paths.ConfigFile);
-		var isSupportedConfigVersion = IsSupportedConfigVersion();
-		if (configFileExists && !isSupportedConfigVersion)
-		{
-			var message = "Old config version detected!\n\n";
+	internal static void LoadConfig() {
+		bool configFileExists = File.Exists(Paths.ConfigFile);
+		bool isSupportedConfigVersion = IsSupportedConfigVersion();
+		if (configFileExists && !isSupportedConfigVersion) {
+			string message = "Old config version detected!\n\n";
 			message += "It will be removed and replaced with a new config file.\n";
 			message += "Please make sure to reconfigure your settings after.";
 			Logger.ShowMessage(message);
@@ -165,14 +151,12 @@ internal static class RatConfig
 			File.Delete(Paths.ConfigFile);
 			TrySetScreenConfig();
 			SaveConfig();
-		}
-		else if (!configFileExists)
-		{
+		} else if (!configFileExists) {
 			TrySetScreenConfig();
 			SaveConfig();
 		}
 
-		var config = new SimpleConfig(Paths.ConfigFile);
+		SimpleConfig config = new(Paths.ConfigFile);
 
 		config.Section = nameof(NameScan);
 		NameScan.Enable = config.ReadBool(nameof(NameScan.Enable), NameScan.Enable);
@@ -214,8 +198,7 @@ internal static class RatConfig
 		Overlay.Search.Hotkey = config.ReadHotkey(nameof(Overlay.Search.Hotkey), Overlay.Search.Hotkey);
 
 		config.Section = "Other";
-		if (!SetScreen)
-		{
+		if (!SetScreen) {
 			ScreenWidth = config.ReadInt(nameof(ScreenWidth), ScreenWidth);
 			ScreenHeight = config.ReadInt(nameof(ScreenHeight), ScreenHeight);
 			ScreenScale = config.ReadFloat(nameof(ScreenScale), ScreenScale);
@@ -230,9 +213,8 @@ internal static class RatConfig
 		LastWindowMode = (WindowMode)config.ReadInt(nameof(LastWindowMode), (int)LastWindowMode);
 	}
 
-	internal static void SaveConfig()
-	{
-		var config = new SimpleConfig(Paths.ConfigFile);
+	internal static void SaveConfig() {
+		SimpleConfig config = new(Paths.ConfigFile);
 
 		config.Section = nameof(NameScan);
 		config.WriteBool(nameof(NameScan.Enable), NameScan.Enable);
@@ -289,66 +271,58 @@ internal static class RatConfig
 	/// <summary>
 	/// Get the current screen config from tarkov's config files or default to the primary screen
 	/// </summary>
-	internal static void TrySetScreenConfig()
-	{
-		var (width, height, scale) = GetTarkovScreenConfig();
+	internal static void TrySetScreenConfig() {
+		(int width, int height, double scale) = GetTarkovScreenConfig();
 		ScreenWidth = width;
 		ScreenHeight = height;
 		ScreenScale = (float)scale;
 		SetScreen = true;
 	}
 
-	public enum DpiType
-	{
+	public enum DpiType {
 		Effective = 0,
 		Angular = 1,
 		Raw = 2,
 	}
 
-	public enum WindowMode
-	{
+	public enum WindowMode {
 		Normal = 0,
 		Minimal = 1,
 		Minimized = 2,
 	}
 
-	public static double GetScalingForScreen(Screen screen)
-	{
-		var pointOnScreen = new Point(screen.Bounds.X + 1, screen.Bounds.Y + 1);
-		var mon = MonitorFromPoint(pointOnScreen, 2 /*MONITOR_DEFAULTTONEAREST*/);
-		GetDpiForMonitor(mon, DpiType.Effective, out var dpiX, out _);
+	public static double GetScalingForScreen(Screen screen) {
+		Point pointOnScreen = new(screen.Bounds.X + 1, screen.Bounds.Y + 1);
+		nint mon = MonitorFromPoint(pointOnScreen, 2 /*MONITOR_DEFAULTTONEAREST*/);
+		GetDpiForMonitor(mon, DpiType.Effective, out uint dpiX, out _);
 		return dpiX / 96.0;
 	}
 
-	private static (int widht, int height, double scale) GetTarkovScreenConfig()
-	{
-		try
-		{
-			var configPath = Environment.ExpandEnvironmentVariables(@"%AppData%\Battlestate Games\Escape From Tarkov\Settings\Graphics.ini");
-			using var file = new FileStream(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-			using var reader = new StreamReader(file, Encoding.UTF8);
+	private static (int widht, int height, double scale) GetTarkovScreenConfig() {
+		try {
+			string configPath = Environment.ExpandEnvironmentVariables(@"%AppData%\Battlestate Games\Escape From Tarkov\Settings\Graphics.ini");
+			using FileStream file = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+			using StreamReader reader = new(file, Encoding.UTF8);
 
-			var json = JObject.Parse(reader.ReadToEnd());
+			JObject json = JObject.Parse(reader.ReadToEnd());
 
-			var activeDisplay = json["DisplaySettings"]["Display"].ToObject<int>();
-			var windowRes = json["Stored"][activeDisplay.ToString()]["WindowResolution"];
-			var width = windowRes["Width"].ToObject<int>();
-			var height = windowRes["Height"].ToObject<int>();
+			int activeDisplay = json["DisplaySettings"]["Display"].ToObject<int>();
+			JToken? windowRes = json["Stored"][activeDisplay.ToString()]["WindowResolution"];
+			int width = windowRes["Width"].ToObject<int>();
+			int height = windowRes["Height"].ToObject<int>();
 
-			var usedScreen = Screen.AllScreens[activeDisplay];
-			var scale = GetScalingForScreen(usedScreen);
+			Screen usedScreen = Screen.AllScreens[activeDisplay];
+			double scale = GetScalingForScreen(usedScreen);
 
 			return (width, height, scale);
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			Logger.LogWarning("Unable to query Escape From Tarkov graphic settings.", e);
 
-			var width = Screen.PrimaryScreen.Bounds.Width;
-			var height = Screen.PrimaryScreen.Bounds.Height;
-			var scale = GetScalingForScreen(Screen.PrimaryScreen);
+			int width = Screen.PrimaryScreen.Bounds.Width;
+			int height = Screen.PrimaryScreen.Bounds.Height;
+			double scale = GetScalingForScreen(Screen.PrimaryScreen);
 
-			var message = $"Detected {width}x{height} Resolution at {scale} Scale.\n\n";
+			string message = $"Detected {width}x{height} Resolution at {scale} Scale.\n\n";
 			message += "You can adjust this inside the settings.";
 			Logger.ShowMessage(message);
 

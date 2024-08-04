@@ -8,15 +8,12 @@ using System.Web;
 
 namespace RatScanner.ViewModel;
 
-internal class MenuVM : INotifyPropertyChanged
-{
+internal class MenuVM : INotifyPropertyChanged {
 	private RatScannerMain _dataSource;
 
-	public RatScannerMain DataSource
-	{
+	public RatScannerMain DataSource {
 		get => _dataSource;
-		set
-		{
+		set {
 			_dataSource = value;
 			OnPropertyChanged();
 		}
@@ -36,11 +33,9 @@ internal class MenuVM : INotifyPropertyChanged
 
 	public string Updated => DateTime.Parse(LastItem.Updated).ToLocalTime().ToString(CultureInfo.CurrentCulture);
 
-	public string WikiLink
-	{
-		get
-		{
-			var link = LastItem.WikiLink;
+	public string WikiLink {
+		get {
+			string? link = LastItem.WikiLink;
 			if (link.Length > 3) return link;
 			return $"https://escapefromtarkov.gamepedia.com/{HttpUtility.UrlEncode(LastItem.Name.Replace(" ", "_"))}";
 		}
@@ -52,27 +47,23 @@ internal class MenuVM : INotifyPropertyChanged
 
 	public bool ItemNeeded => TaskRemaining + HideoutRemaining > 0;
 
-	public List<KeyValuePair<string, KeyValuePair<int, int>>> ItemTeamNeeds
-	{
-		get
-		{
+	public List<KeyValuePair<string, KeyValuePair<int, int>>> ItemTeamNeeds {
+		get {
 			if (!RatConfig.Tracking.TarkovTracker.Enable) return null;
-			var progress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
-			var teamProgress = progress.Where(x => x.UserId != RatScannerMain.Instance.TarkovTrackerDB.Self);
+			List<FetchModels.TarkovTracker.UserProgress> progress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
+			IEnumerable<FetchModels.TarkovTracker.UserProgress> teamProgress = progress.Where(x => x.UserId != RatScannerMain.Instance.TarkovTrackerDB.Self);
 
-			var needs = new List<KeyValuePair<string, KeyValuePair<int, int>>>();
-			foreach (var memberProgress in teamProgress)
-			{
-				var task = LastItem.GetTaskRemaining(memberProgress);
-				var hideout = LastItem.GetHideoutRemaining(memberProgress);
+			List<KeyValuePair<string, KeyValuePair<int, int>>> needs = new();
+			foreach (FetchModels.TarkovTracker.UserProgress? memberProgress in teamProgress) {
+				int task = LastItem.GetTaskRemaining(memberProgress);
+				int hideout = LastItem.GetHideoutRemaining(memberProgress);
 
 				if (task == 0 && hideout == 0) continue;
 
-				var need = new KeyValuePair<int, int>(task, hideout);
+				KeyValuePair<int, int> need = new(task, hideout);
 
-				var name = memberProgress.DisplayName ?? "Unknown";
-				for (var i = 2; i < 99; i++)
-				{
+				string name = memberProgress.DisplayName ?? "Unknown";
+				for (int i = 2; i < 99; i++) {
 					if (needs.All(n => n.Key != name)) break;
 					name = $"{memberProgress.DisplayName} #{i}";
 				}
@@ -90,29 +81,25 @@ internal class MenuVM : INotifyPropertyChanged
 
 	public event PropertyChangedEventHandler PropertyChanged;
 
-	public MenuVM(RatScannerMain ratScanner)
-	{
+	public MenuVM(RatScannerMain ratScanner) {
 		DataSource = ratScanner;
 		DataSource.PropertyChanged += ModelPropertyChanged;
 	}
 
-	protected virtual void OnPropertyChanged(string propertyName = null)
-	{
+	protected virtual void OnPropertyChanged(string propertyName = null) {
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 
-	public void ModelPropertyChanged(object sender, PropertyChangedEventArgs e)
-	{
+	public void ModelPropertyChanged(object? sender, PropertyChangedEventArgs e) {
 		OnPropertyChanged();
 	}
 
 	// Still used in minimal menu
-	public string IntToLongPrice(int? value)
-	{
+	public string IntToLongPrice(int? value) {
 		if (value == null) return "0 ₽";
 
-		var text = $"{value:n0}";
-		var numberGroupSeparator = NumberFormatInfo.CurrentInfo.NumberGroupSeparator;
+		string text = $"{value:n0}";
+		string numberGroupSeparator = NumberFormatInfo.CurrentInfo.NumberGroupSeparator;
 		return text.Replace(numberGroupSeparator, RatConfig.ToolTip.DigitGroupingSymbol) + " ₽";
 	}
 }

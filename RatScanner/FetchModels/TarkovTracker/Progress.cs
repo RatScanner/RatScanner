@@ -2,8 +2,7 @@
 
 namespace RatScanner.FetchModels.TarkovTracker;
 
-public class Progress
-{
+public class Progress {
 	[JsonProperty("id")]
 	public string Id { get; set; } = "";
 

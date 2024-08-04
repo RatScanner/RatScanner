@@ -41,11 +41,11 @@
                                         </MudStack>
 
                                         <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Style="width: 4vw;">
-                                            <MudChip OnClose="() => { }" CloseIcon="@Icons.Filled.Checklist" Size="Size.Small"
+                                            <MudChip OnClose="() => { }" CloseIcon="@Icons.Material.Filled.Checklist" Size="Size.Small"
                                                      Variant="Variant.Outlined" Color="@(item.GetTaskRemaining() > 0 ? Color.Default : Color.Dark)">
                                                 @item.GetTaskRemaining().ToShortString()
                                             </MudChip>
-                                            <MudChip OnClose="() => { }" CloseIcon="@Icons.Filled.House" Size="Size.Small"
+                                            <MudChip OnClose="() => { }" CloseIcon="@Icons.Material.Filled.House" Size="Size.Small"
                                                      Variant="Variant.Outlined" Color="@(item.GetHideoutRemaining() > 0 ? Color.Default : Color.Dark)">
                                                 @item.GetHideoutRemaining().ToShortString()
                                             </MudChip>
@@ -116,7 +116,7 @@
 @code {
     private List<TarkovDev.GraphQL.Item>? _items;
 
-    private static MudTextField<string> _searchTextField { get; set; }
+    private static MudTextField<string> _searchTextField { get; set; } = null!;
 
     private string _searchText { get; set; }
 
@@ -141,11 +141,11 @@
 
     private async Task<IEnumerable<SearchResult>> SearchItem(string value) {
         if (_items == null) _items = RatScannerMain.Instance.ItemDB?.Values?.ToList() ?? null;
-        if (_items == null) return null;
+        if (_items == null) return Enumerable.Empty<SearchResult>();
 
-        if (string.IsNullOrEmpty(value)) return null;
+        if (string.IsNullOrEmpty(value)) return Enumerable.Empty<SearchResult>();
 
-        Func<TarkovDev.GraphQL.Item, SearchResult> filter = (item) => {
+        Func<TarkovDev.GraphQL.Item, SearchResult?> filter = (item) => {
             if (SanitizeSearch(item.Name) == value) return new(item, 5);
             if (SanitizeSearch(item.ShortName) == value) return new(item, 10);
 
@@ -162,28 +162,32 @@
 
             if (value.Length > 3 && SanitizeSearch(item.Id).StartsWith(value)) return new(item, 80);
             if (value.Length > 3 && SanitizeSearch(item.Id).Contains(value)) return new(item, 100);
-            return new(null, -1);
+            return null;
         };
 
-        var matches = new List<SearchResult>();
-        foreach (var item in _items) {
-            var match = filter(item);
-            if (match.Data == null) continue;
-            matches.Add(match);
-        }
+        List<SearchResult> matches = new List<SearchResult>();
+        await Task.Run(() => {
+            foreach (var item in _items) {
+                var match = filter(item);
+                if (match?.Data == null) continue;
+                matches.Add(match);
+            }
+        });
 
-        for (var i = 0; i < matches.Count; i++) {
+        for (int i = 0; i < matches.Count; i++) {
             // Slightly penalize items with long names
-            matches[i].Score += (matches[i].Data as TarkovDev.GraphQL.Item).Name.Length * 0.002;
+            if (!(matches[i].Data is TarkovDev.GraphQL.Item item)) continue;
+            matches[i].Score += (item.Name?.Length ?? 0) * 0.002;
 
             // Penalize weapon mods so the weapon it self will rank higher
-            if ((matches[i].Data as TarkovDev.GraphQL.Item).Types.Contains(TarkovDev.GraphQL.ItemType.Mods)) matches[i].Score += 5;
+            if (item.Types != null && item.Types.Contains(TarkovDev.GraphQL.ItemType.Mods)) matches[i].Score += 5;
         }
 
         return matches;
     }
 
-    private string SanitizeSearch(string value) {
+    private string SanitizeSearch(string? value) {
+        if (string.IsNullOrEmpty(value)) return string.Empty;
         value = value.ToLower().Trim();
         value = new string(value.Where(c => char.IsLetterOrDigit(c) || c == ' ').ToArray());
         return value;
@@ -204,7 +208,7 @@
         MenuVM.PropertyChanged += PropertyChangeHandler;
     }
 
-    private async void PropertyChangeHandler(object sender, EventArgs e) {
+    private async void PropertyChangeHandler(object? sender, EventArgs e) {
         await InvokeAsync(() => StateHasChanged());
     }
 
@@ -222,7 +226,7 @@
         public double Score;
     }
 
-    private void OpenURL(string url) {
+    private void OpenURL(string? url) {
         if (string.IsNullOrEmpty(url)) return;
         var psi = new ProcessStartInfo {
                 FileName = url,

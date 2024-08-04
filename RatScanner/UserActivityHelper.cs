@@ -7,8 +7,7 @@ using System.Windows.Input;
 
 namespace RatScanner;
 
-internal static class UserActivityHelper
-{
+internal static class UserActivityHelper {
 	[DllImport("user32.dll")]
 	private static extern int GetAsyncKeyState(int vKey);
 
@@ -20,40 +19,33 @@ internal static class UserActivityHelper
 	private static extern IntPtr GetModuleHandle(string name);
 
 	[StructLayout(LayoutKind.Sequential)]
-	private struct Win32Point
-	{
+	private struct Win32Point {
 		public int X;
 		public int Y;
 	}
 
-	public static bool IsVKeyDown(int vKey)
-	{
+	public static bool IsVKeyDown(int vKey) {
 		return (GetAsyncKeyState(vKey) & 0x8000) != 0;
 	}
 
-	public static bool IsKeyDown(Key key)
-	{
-		var vKey = KeyInterop.VirtualKeyFromKey(key);
+	public static bool IsKeyDown(Key key) {
+		int vKey = KeyInterop.VirtualKeyFromKey(key);
 		return IsVKeyDown(vKey);
 	}
 
-	public static bool IsMouseButtonDown(MouseButton mouseButton)
-	{
-		var vKey = MouseButtonToVKey(mouseButton);
+	public static bool IsMouseButtonDown(MouseButton mouseButton) {
+		int vKey = MouseButtonToVKey(mouseButton);
 		return IsVKeyDown(vKey);
 	}
 
-	public static Vector2 GetMousePosition()
-	{
-		var w32Mouse = new Win32Point();
+	public static Vector2 GetMousePosition() {
+		Win32Point w32Mouse = new();
 		GetCursorPos(ref w32Mouse);
 		return new Vector2(w32Mouse.X, w32Mouse.Y);
 	}
 
-	public static int MouseButtonToVKey(MouseButton mouseButton)
-	{
-		return mouseButton switch
-		{
+	public static int MouseButtonToVKey(MouseButton mouseButton) {
+		return mouseButton switch {
 			MouseButton.Left => 0x01,
 			MouseButton.Right => 0x02,
 			MouseButton.Middle => 0x04,
@@ -63,10 +55,8 @@ internal static class UserActivityHelper
 		};
 	}
 
-	public static MouseButton VKeyToMouseButton(int vKey)
-	{
-		return vKey switch
-		{
+	public static MouseButton VKeyToMouseButton(int vKey) {
+		return vKey switch {
 			0x01 => MouseButton.Left,
 			0x02 => MouseButton.Right,
 			0x04 => MouseButton.Middle,
@@ -78,9 +68,9 @@ internal static class UserActivityHelper
 
 	#region User activity hooks
 
-	internal delegate void KeyUpEventHandler(object sender, KeyUpEventArgs e);
+	internal delegate void KeyUpEventHandler(object? sender, KeyUpEventArgs e);
 
-	internal delegate void KeyDownEventHandler(object sender, KeyDownEventArgs e);
+	internal delegate void KeyDownEventHandler(object? sender, KeyDownEventArgs e);
 
 	/// <summary>
 	/// Occurs when the user releases any keyboard key
@@ -121,8 +111,7 @@ internal static class UserActivityHelper
 	private delegate int HookProc(int nCode, int wParam, IntPtr lParam);
 
 	[StructLayout(LayoutKind.Sequential)]
-	private class MouseHookStruct
-	{
+	private class MouseHookStruct {
 		internal Win32Point pt;
 		internal int hwnd;
 		internal int wHitTestCode;
@@ -130,8 +119,7 @@ internal static class UserActivityHelper
 	}
 
 	[StructLayout(LayoutKind.Sequential)]
-	private class MouseLLHookStruct
-	{
+	private class MouseLLHookStruct {
 		internal Win32Point pt;
 		internal int mouseData;
 		internal int flags;
@@ -141,8 +129,7 @@ internal static class UserActivityHelper
 
 
 	[StructLayout(LayoutKind.Sequential)]
-	public class KBDLLHOOKSTRUCT
-	{
+	public class KBDLLHOOKSTRUCT {
 		public uint vkCode;
 		public uint scanCode;
 		public KBDLLHOOKSTRUCTFlags flags;
@@ -151,8 +138,7 @@ internal static class UserActivityHelper
 	}
 
 	[Flags]
-	public enum KBDLLHOOKSTRUCTFlags : uint
-	{
+	public enum KBDLLHOOKSTRUCTFlags : uint {
 		LLKHF_EXTENDED = 0x01,
 		LLKHF_INJECTED = 0x10,
 		LLKHF_ALTDOWN = 0x20,
@@ -179,11 +165,9 @@ internal static class UserActivityHelper
 		int wParam,
 		IntPtr lParam);
 
-	internal static void Start(bool installMouseHook, bool installKeyboardHook)
-	{
+	internal static void Start(bool installMouseHook, bool installKeyboardHook) {
 		// Install Mouse hook only if it is not installed and must be installed
-		if (hMouseHook == 0 && installMouseHook)
-		{
+		if (hMouseHook == 0 && installMouseHook) {
 			// Create an instance of HookProc
 			MouseHookProcedure = MouseHookProc;
 			// Install hook
@@ -193,10 +177,9 @@ internal static class UserActivityHelper
 				GetModuleHandle(Process.GetCurrentProcess().MainModule.ModuleName),
 				0);
 			// If SetWindowsHookEx fails
-			if (hMouseHook == 0)
-			{
+			if (hMouseHook == 0) {
 				// Returns the error code returned by the last unmanaged function called using platform invoke that has the DllImportAttribute.SetLastError flag set
-				var errorCode = Marshal.GetLastWin32Error();
+				int errorCode = Marshal.GetLastWin32Error();
 				// Do cleanup
 				Stop(true, false, false);
 				// Initializes and throws a new instance of the Win32Exception class with the specified error
@@ -205,8 +188,7 @@ internal static class UserActivityHelper
 		}
 
 		// Install Keyboard hook only if it is not installed and must be installed
-		if (hKeyboardHook == 0 && installKeyboardHook)
-		{
+		if (hKeyboardHook == 0 && installKeyboardHook) {
 			// Create an instance of HookProc
 			KeyboardHookProcedure = KeyboardHookProc;
 			// Install hook
@@ -216,10 +198,9 @@ internal static class UserActivityHelper
 				GetModuleHandle(Process.GetCurrentProcess().MainModule.ModuleName),
 				0);
 			// If SetWindowsHookEx fails
-			if (hKeyboardHook == 0)
-			{
+			if (hKeyboardHook == 0) {
 				// Returns the error code returned by the last unmanaged function called using platform invoke that has the DllImportAttribute.SetLastError flag set
-				var errorCode = Marshal.GetLastWin32Error();
+				int errorCode = Marshal.GetLastWin32Error();
 				// Do cleanup
 				Stop(false, true, false);
 				// Initializes and throws a new instance of the Win32Exception class with the specified error
@@ -235,66 +216,56 @@ internal static class UserActivityHelper
 	/// <param name="uninstallKeyboardHook"><b>true</b> if keyboard hook must be uninstalled</param>
 	/// <param name="throwExceptions"><b>true</b> if exceptions which occurred during uninstalling must be thrown</param>
 	/// <exception cref="Win32Exception">Any windows problem.</exception>
-	internal static void Stop(bool uninstallMouseHook, bool uninstallKeyboardHook, bool throwExceptions)
-	{
+	internal static void Stop(bool uninstallMouseHook, bool uninstallKeyboardHook, bool throwExceptions) {
 		// If mouse hook set and must be uninstalled
-		if (hMouseHook != 0 && uninstallMouseHook)
-		{
+		if (hMouseHook != 0 && uninstallMouseHook) {
 			// Uninstall hook
-			var retMouse = UnhookWindowsHookEx(hMouseHook);
+			int retMouse = UnhookWindowsHookEx(hMouseHook);
 			// Reset invalid handle
 			hMouseHook = 0;
 			// If failed and exception must be thrown
-			if (retMouse == 0 && throwExceptions)
-			{
+			if (retMouse == 0 && throwExceptions) {
 				// Returns the error code returned by the last unmanaged function called using platform invoke that has the DllImportAttribute.SetLastError flag set
-				var errorCode = Marshal.GetLastWin32Error();
+				int errorCode = Marshal.GetLastWin32Error();
 				// Initializes and throws a new instance of the Win32Exception class with the specified error
 				throw new Win32Exception(errorCode);
 			}
 		}
 
 		// If keyboard hook set and must be uninstalled
-		if (hKeyboardHook != 0 && uninstallKeyboardHook)
-		{
+		if (hKeyboardHook != 0 && uninstallKeyboardHook) {
 			// Uninstall hook
-			var retKeyboard = UnhookWindowsHookEx(hKeyboardHook);
+			int retKeyboard = UnhookWindowsHookEx(hKeyboardHook);
 			// Reset invalid handle
 			hKeyboardHook = 0;
 			// If failed and exception must be thrown
-			if (retKeyboard == 0 && throwExceptions)
-			{
+			if (retKeyboard == 0 && throwExceptions) {
 				// Returns the error code returned by the last unmanaged function called using platform invoke that has the DllImportAttribute.SetLastError flag set
-				var errorCode = Marshal.GetLastWin32Error();
+				int errorCode = Marshal.GetLastWin32Error();
 				// Initializes and throws a new instance of the Win32Exception class with the specified error
 				throw new Win32Exception(errorCode);
 			}
 		}
 	}
 
-	private static int KeyboardHookProc(int nCode, int wParam, IntPtr lParam)
-	{
-		if (nCode < 0 || (OnKeyboardKeyUp == null && OnKeyboardKeyDown == null))
-		{
+	private static int KeyboardHookProc(int nCode, int wParam, IntPtr lParam) {
+		if (nCode < 0 || (OnKeyboardKeyUp == null && OnKeyboardKeyDown == null)) {
 			return CallNextHookEx(hKeyboardHook, nCode, wParam, lParam);
 		}
 
 		// Indicates if any of underlying events set the Handled flag
-		var handled = false;
+		bool handled = false;
 
 		// Read structure KeyboardHookStruct at lParam
-		var keyboardHookStruct = (KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(KBDLLHOOKSTRUCT));
+		KBDLLHOOKSTRUCT? keyboardHookStruct = (KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(KBDLLHOOKSTRUCT));
 
 		// Raise OnKeyboardKeyUp or OnKeyboardKeyDown event
-		if (OnKeyboardKeyUp != null && ((WM)wParam == WM.KEYUP || (WM)wParam == WM.SYSKEYUP))
-		{
-			var eventArgs = new KeyUpEventArgs((int)keyboardHookStruct.vkCode, Device.Keyboard);
+		if (OnKeyboardKeyUp != null && ((WM)wParam == WM.KEYUP || (WM)wParam == WM.SYSKEYUP)) {
+			KeyUpEventArgs eventArgs = new((int)keyboardHookStruct.vkCode, Device.Keyboard);
 			OnKeyboardKeyUp(null, eventArgs);
 			handled |= eventArgs.Handled;
-		}
-		else if (OnKeyboardKeyDown != null && ((WM)wParam == WM.KEYDOWN || (WM)wParam == WM.SYSKEYDOWN))
-		{
-			var eventArgs = new KeyDownEventArgs((int)keyboardHookStruct.vkCode, Device.Keyboard);
+		} else if (OnKeyboardKeyDown != null && ((WM)wParam == WM.KEYDOWN || (WM)wParam == WM.SYSKEYDOWN)) {
+			KeyDownEventArgs eventArgs = new((int)keyboardHookStruct.vkCode, Device.Keyboard);
 			OnKeyboardKeyDown(null, eventArgs);
 			handled |= eventArgs.Handled;
 		}
@@ -303,21 +274,18 @@ internal static class UserActivityHelper
 		return handled ? 1 : CallNextHookEx(hKeyboardHook, nCode, wParam, lParam);
 	}
 
-	private static int MouseHookProc(int nCode, int wParam, IntPtr lParam)
-	{
-		if (nCode < 0 || (OnMouseButtonUp == null && OnMouseButtonDown == null))
-		{
+	private static int MouseHookProc(int nCode, int wParam, IntPtr lParam) {
+		if (nCode < 0 || (OnMouseButtonUp == null && OnMouseButtonDown == null)) {
 			return CallNextHookEx(hKeyboardHook, nCode, wParam, lParam);
 		}
 
 		// Indicates if any of underlying events set the Handled flag
-		var handled = false;
+		bool handled = false;
 
 		// Read structure MouseLLHookStruct at lParam
-		var virtualKeycode = 0;
+		int virtualKeycode = 0;
 
-		var up = (WM)wParam switch
-		{
+		bool up = (WM)wParam switch {
 			WM.LBUTTONUP => true,
 			WM.RBUTTONUP => true,
 			WM.MBUTTONUP => true,
@@ -325,8 +293,7 @@ internal static class UserActivityHelper
 			_ => false,
 		};
 
-		switch ((WM)wParam)
-		{
+		switch ((WM)wParam) {
 			case WM.LBUTTONUP:
 			case WM.LBUTTONDOWN:
 				virtualKeycode = 0x01;
@@ -341,7 +308,7 @@ internal static class UserActivityHelper
 				break;
 			case WM.XBUTTONUP:
 			case WM.XBUTTONDOWN:
-				var mouseHookStruct = (MouseLLHookStruct)Marshal.PtrToStructure(lParam, typeof(MouseLLHookStruct));
+				MouseLLHookStruct? mouseHookStruct = (MouseLLHookStruct)Marshal.PtrToStructure(lParam, typeof(MouseLLHookStruct));
 				if (mouseHookStruct.mouseData == 0x10000) virtualKeycode = 0x05;
 				else if (mouseHookStruct.mouseData == 0x20000) virtualKeycode = 0x06;
 				break;
@@ -349,15 +316,12 @@ internal static class UserActivityHelper
 				return CallNextHookEx(hMouseHook, nCode, wParam, lParam);
 		}
 
-		if (up && OnMouseButtonUp != null)
-		{
-			var eventArgs = new KeyUpEventArgs(virtualKeycode, Device.Mouse);
+		if (up && OnMouseButtonUp != null) {
+			KeyUpEventArgs eventArgs = new(virtualKeycode, Device.Mouse);
 			OnMouseButtonUp(null, eventArgs);
 			handled |= eventArgs.Handled;
-		}
-		else if (!up && OnMouseButtonDown != null)
-		{
-			var eventArgs = new KeyDownEventArgs(virtualKeycode, Device.Mouse);
+		} else if (!up && OnMouseButtonDown != null) {
+			KeyDownEventArgs eventArgs = new(virtualKeycode, Device.Mouse);
 			OnMouseButtonDown(null, eventArgs);
 			handled |= eventArgs.Handled;
 		}
@@ -370,8 +334,7 @@ internal static class UserActivityHelper
 }
 
 #region WM
-public enum WM : uint
-{
+public enum WM : uint {
 	NULL = 0x0000,
 	CREATE = 0x0001,
 	DESTROY = 0x0002,
@@ -619,27 +582,22 @@ public enum WM : uint
 }
 #endregion
 
-internal class KeyUpEventArgs : EventArgs
-{
+internal class KeyUpEventArgs : EventArgs {
 	internal bool Handled = false;
 
 	internal int VKCode;
 
-	internal Key Key
-	{
-		get
-		{
-			var message = "Trying to access Key of non keyboard event. Check device property first.";
+	internal Key Key {
+		get {
+			string message = "Trying to access Key of non keyboard event. Check device property first.";
 			if (Device != Device.Keyboard) throw new Exception(message);
 			return KeyInterop.KeyFromVirtualKey(VKCode);
 		}
 	}
 
-	internal MouseButton MouseButton
-	{
-		get
-		{
-			var message = "Trying to access MouseButton of non mouse event. Check device property first.";
+	internal MouseButton MouseButton {
+		get {
+			string message = "Trying to access MouseButton of non mouse event. Check device property first.";
 			if (Device != Device.Mouse) throw new Exception(message);
 			return UserActivityHelper.VKeyToMouseButton(VKCode);
 		}
@@ -647,15 +605,13 @@ internal class KeyUpEventArgs : EventArgs
 
 	internal readonly Device Device;
 
-	internal KeyUpEventArgs(int vkCode, Device device)
-	{
+	internal KeyUpEventArgs(int vkCode, Device device) {
 		VKCode = vkCode;
 		Device = device;
 	}
 }
 
-internal class KeyDownEventArgs : EventArgs
-{
+internal class KeyDownEventArgs : EventArgs {
 	internal bool Handled = false;
 
 	internal int VKCode;
@@ -666,15 +622,13 @@ internal class KeyDownEventArgs : EventArgs
 
 	internal Device Device;
 
-	internal KeyDownEventArgs(int vkCode, Device device)
-	{
+	internal KeyDownEventArgs(int vkCode, Device device) {
 		VKCode = vkCode;
 		Device = device;
 	}
 }
 
-internal enum Device
-{
+internal enum Device {
 	Keyboard,
 	Mouse,
 }

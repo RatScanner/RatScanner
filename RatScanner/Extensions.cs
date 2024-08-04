@@ -2,29 +2,26 @@
 using System.Globalization;
 
 namespace RatScanner;
-public static class Extensions
-{
-	public static string ToShortString(this int value)
-	{
-		var str = value.ToString();
+public static class Extensions {
+	public static string ToShortString(this int value) {
+		string str = value.ToString();
 		if (str.Length < 4) return str;
 
-		var suffixes = new string[] { "", "K", "M", "B", "T", "Q" };
+		string[] suffixes = new string[] { "", "K", "M", "B", "T", "Q" };
 
-		var digits = str[..3];
+		string digits = str[..3];
 
-		var dotPos = str.Length % 3;
+		int dotPos = str.Length % 3;
 		if (dotPos != 0) digits = digits[..dotPos];
 
-		var suffix = suffixes[(int)Math.Floor((str.Length - 1) / 3f)];
+		string suffix = suffixes[(int)Math.Floor((str.Length - 1) / 3f)];
 		return $"{digits}{suffix}";
 	}
 	public static string ToShortString(this int? value) => ToShortString(value ?? 0);
 
-	public static string AsRubs(this int value)
-	{
-		var text = $"{value:n0}";
-		var numberGroupSeparator = NumberFormatInfo.CurrentInfo.NumberGroupSeparator;
+	public static string AsRubs(this int value) {
+		string text = $"{value:n0}";
+		string numberGroupSeparator = NumberFormatInfo.CurrentInfo.NumberGroupSeparator;
 		text = text.Replace(numberGroupSeparator, RatConfig.ToolTip.DigitGroupingSymbol);
 		return $"{text} ₽";
 	}
