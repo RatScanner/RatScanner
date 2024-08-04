@@ -69,172 +69,37 @@ public static class TarkovDevAPI {
 	/// <summary>
 	/// Refreshes every hour
 	/// </summary>
-	public static Item[] GetItems() => GetCached<Item[]>(ItemsQuery, 60 * 60);
+	public static Item[] GetItems(LanguageCode language, GameMode gameMode) => GetCached<Item[]>(ItemsQuery(language, gameMode), 60 * 60);
 	public static HideoutStation[] GetHideoutStations() => GetCached<HideoutStation[]>(HideoutStationsQuery);
 
-	const string ItemsQuery = @"{
-  data: items {
-    id
-    name
-    normalizedName
-    shortName
-    description
-    basePrice
-    updated
-    width
-    height
-    backgroundColor
-    iconLink
-    gridImageLink
-    baseImageLink
-    inspectImageLink
-    image512pxLink
-    image8xLink
-    wikiLink
-    types
-    avg24hPrice
-    properties {
-      __typename
-      ... on ItemPropertiesAmmo {
-        caliber
-        stackMaxSize
-        tracer
-        tracerColor
-        ammoType
-        projectileCount
-        damage
-        armorDamage
-        fragmentationChance
-        ricochetChance
-        penetrationChance
-        penetrationPower
-        accuracyModifier
-        recoilModifier
-        initialSpeed
-        lightBleedModifier
-        heavyBleedModifier
-        durabilityBurnFactor
-        heatFactor
-        staminaBurnPerDamage
-        ballisticCoeficient
-        bulletDiameterMilimeters
-        bulletMassGrams
-      }
-      ... on ItemPropertiesFoodDrink {
-        energy
-        hydration
-        units
-        stimEffects {
-          type
-          chance
-          delay
-          duration
-          value
-          percent
-          skillName
-          __typename
-        }
-      }
-      ... on ItemPropertiesStim {
-        useTime
-        cures
-        stimEffects {
-          type
-          chance
-          delay
-          duration
-          value
-          percent
-          skillName
-          __typename
-        }
-      }
-      ... on ItemPropertiesMedicalItem {
-        uses
-        useTime
-        cures
-      }
-      ... on ItemPropertiesMedKit {
-        hitpoints
-        useTime
-        maxHealPerUse
-        cures
-        hpCostLightBleeding
-        hpCostHeavyBleeding
-      }
-    }
-    conflictingSlotIds
-    accuracyModifier
-    recoilModifier
-    ergonomicsModifier
-    hasGrid
-    blocksHeadphones
-    link
-    lastLowPrice
-    changeLast48h
-    changeLast48hPercent
-    low24hPrice
-    high24hPrice
-    lastOfferCount
-    sellFor {
-      vendor {
-        __typename
-        name
-        normalizedName
-        ... on TraderOffer {
-          trader {
-            id
-            imageLink
-            name
-            normalizedName
-          }
-        }
-      }
-      priceRUB
-    }
-    buyFor {
-      vendor {
-        __typename
-        name
-        normalizedName
-        ... on TraderOffer {
-          trader {
-            id
-            imageLink
-            name
-            normalizedName
-          }
-        }
-      }
-      priceRUB
-    }
-    category {
-      id
-    }
-    categories {
-      id
-    }
-    bsgCategoryId
-    weight
-    velocity
-    loudness
-    bartersFor {
-      id
-      trader {
-        id
-      }
-    }
-    bartersUsing {
-      id
-    }
-    craftsFor {
-      id
-    }
-    craftsUsing {
-      id
-    }
-  }
-}";
+	private static string ItemsQuery(LanguageCode language, GameMode gameMode) {
+		return new QueryQueryBuilder().WithItems(new ItemQueryBuilder().WithAllScalarFields()
+			.WithProperties(new ItemPropertiesQueryBuilder().WithAllScalarFields()
+				.WithItemPropertiesAmmoFragment(new ItemPropertiesAmmoQueryBuilder().WithAllScalarFields())
+				.WithItemPropertiesFoodDrinkFragment(new ItemPropertiesFoodDrinkQueryBuilder().WithAllScalarFields()
+					.WithStimEffects(new StimEffectQueryBuilder().WithAllScalarFields()))
+				.WithItemPropertiesStimFragment(new ItemPropertiesStimQueryBuilder().WithAllScalarFields()
+					.WithStimEffects(new StimEffectQueryBuilder().WithAllScalarFields()))
+				.WithItemPropertiesMedicalItemFragment(new ItemPropertiesMedicalItemQueryBuilder().WithAllScalarFields())
+				.WithItemPropertiesMedKitFragment(new ItemPropertiesMedKitQueryBuilder().WithAllScalarFields()))
+			.WithSellFor(new ItemPriceQueryBuilder().WithAllScalarFields()
+				.WithVendor(new VendorQueryBuilder().WithAllScalarFields()
+					.WithTraderOfferFragment(new TraderOfferQueryBuilder().WithAllScalarFields()
+						.WithTrader(new TraderQueryBuilder().WithAllScalarFields()))))
+			.WithBuyFor(new ItemPriceQueryBuilder().WithAllScalarFields()
+				.WithVendor(new VendorQueryBuilder().WithAllScalarFields()
+					.WithTraderOfferFragment(new TraderOfferQueryBuilder().WithAllScalarFields()
+						.WithTrader(new TraderQueryBuilder().WithAllScalarFields()))))
+			.WithCategory(new ItemCategoryQueryBuilder().WithAllScalarFields())
+			.WithCategories(new ItemCategoryQueryBuilder().WithAllScalarFields())
+			.WithUsedInTasks(new TaskQueryBuilder().WithId())
+			.WithReceivedFromTasks(new TaskQueryBuilder().WithId())
+			.WithBartersFor(new BarterQueryBuilder().WithId())
+			.WithBartersUsing(new BarterQueryBuilder().WithId())
+			.WithCraftsFor(new CraftQueryBuilder().WithId())
+			.WithCraftsUsing(new CraftQueryBuilder().WithId())
+			, alias: "data", lang: language, gameMode: gameMode).Build();
+	}
 
 	const string TasksQuery = @"{
   data: tasks {

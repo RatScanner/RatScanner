@@ -65,7 +65,7 @@ public class RatScannerMain : INotifyPropertyChanged {
 		Logger.LogInfo($"Screen Info: {RatConfig.ScreenWidth}x{RatConfig.ScreenHeight} at {RatConfig.ScreenScale * 100}%");
 
 		Logger.LogInfo("Loading price data...");
-		ItemDB = TarkovDevAPI.GetItems().ToDictionary(x => x.Id, x => x);
+		ItemDB = TarkovDevAPI.GetItems(TarkovDev.GraphQL.LanguageCode.En, TarkovDev.GraphQL.GameMode.Regular).ToDictionary(x => x.Id, x => x);
 
 		ItemScans.Enqueue(new DefaultItemScan(ItemDB.ElementAt(16).Value));
 
