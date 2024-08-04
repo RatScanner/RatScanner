@@ -1,6 +1,7 @@
 ﻿@page "/"
 @page "/app"
 @using RatScanner.Scan
+@using RatScanner.TarkovDev.GraphQL;
 @using System.Diagnostics
 @inject MenuVM MenuVM
 @implements IDisposable
@@ -56,13 +57,11 @@
                 </div>
             </MudPaper>
         </MudItem>
-        @if (MenuVM.ItemTeamNeeds != null && MenuVM.ItemTeamNeeds.Any())
-        {
+        @if (MenuVM.ItemTeamNeeds != null && MenuVM.ItemTeamNeeds.Any()) {
             <MudItem xs="12">
                 <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">
                     <MudGrid Spacing="0" Class="pa-0 ma-0">
-                        @foreach (var need in MenuVM.ItemTeamNeeds)
-                        {
+                        @foreach (var need in MenuVM.ItemTeamNeeds) {
                             <MudItem xs="12" Class="pa-0 ma-0">
                                 <div class="d-flex justify-space-between">
                                     <div class="mx-1">@need.Key</div>
@@ -79,7 +78,7 @@
         }
         <MudItem xs="12">
             <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">
-                <MudAutocomplete @ref="_searchBox" T="FetchModels.TarkovDev.Item" Placeholder="Item Search" PopoverClass="searchBoxPopover" SelectValueOnTab="true" ValueChanged="SetSearchItem" MaxItems="5" AnchorOrigin="Origin.TopCenter" TransformOrigin="Origin.BottomCenter" CoerceValue="true" AdornmentIcon="@Icons.Material.Filled.Search" SearchFunc="@SearchItem" Margin="Margin.Dense" Dense="true" Variant="Variant.Outlined">
+                <MudAutocomplete @ref="_searchBox" T="TarkovDev.GraphQL.Item" Placeholder="Item Search" PopoverClass="searchBoxPopover" SelectValueOnTab="true" ValueChanged="SetSearchItem" MaxItems="5" AnchorOrigin="Origin.TopCenter" TransformOrigin="Origin.BottomCenter" CoerceValue="true" AdornmentIcon="@Icons.Material.Filled.Search" SearchFunc="@SearchItem" Margin="Margin.Dense" Dense="true" Variant="Variant.Outlined">
                     <ItemTemplate Context="item">
                         <MudPaper Class="ma-n1" Elevation="4">
                             <MudStack Row="true" Style="height: 48px">
@@ -106,19 +105,17 @@
 </style>
 
 @code {
-    private FetchModels.TarkovDev.Item _lastScannedItem => MenuVM?.LastItemScan?.Item;
+    private TarkovDev.GraphQL.Item _lastScannedItem => MenuVM?.LastItemScan?.Item;
 
-    private List<FetchModels.TarkovDev.Item>? _items;
+    private List<TarkovDev.GraphQL.Item>? _items;
 
-    private MudAutocomplete<FetchModels.TarkovDev.Item> _searchBox { get; set; }
+    private MudAutocomplete<TarkovDev.GraphQL.Item> _searchBox { get; set; }
 
-    protected override void OnInitialized()
-    {
+    protected override void OnInitialized() {
         MenuVM.PropertyChanged += PropertyChangeHandler;
     }
 
-    private async Task<IEnumerable<FetchModels.TarkovDev.Item>> SearchItem(string value)
-    {
+    private async Task<IEnumerable<TarkovDev.GraphQL.Item>> SearchItem(string value) {
         if (_items == null) _items = RatScannerMain.Instance.ItemDB?.Values?.ToList() ?? null;
         if (_items == null) return RatScannerMain.Instance.ItemDB.Values.Take(1);
 
@@ -126,37 +123,34 @@
 
         value = SanitizeSearch(value);
 
-        Func<FetchModels.TarkovDev.Item, (FetchModels.TarkovDev.Item item, int score)> filter = (item) =>
-            {
-                if (SanitizeSearch(item.Name) == value) return new(item, 5);
-                if (SanitizeSearch(item.ShortName) == value) return new(item, 10);
+        Func<TarkovDev.GraphQL.Item, (TarkovDev.GraphQL.Item item, int score)> filter = (item) => {
+            if (SanitizeSearch(item.Name) == value) return new(item, 5);
+            if (SanitizeSearch(item.ShortName) == value) return new(item, 10);
 
-                if (SanitizeSearch(item.Name).StartsWith(value)) return new(item, 20);
-                if (SanitizeSearch(item.ShortName).StartsWith(value)) return new(item, 20);
+            if (SanitizeSearch(item.Name).StartsWith(value)) return new(item, 20);
+            if (SanitizeSearch(item.ShortName).StartsWith(value)) return new(item, 20);
 
-                // Match every individual word (expensive)
-                string[] filters = value.Split(new[] { ' ' });
-                if (filters.All(filter => SanitizeSearch(item.Name).Contains(filter))) return new(item, 40);
-                if (filters.All(filter => SanitizeSearch(item.ShortName).Contains(filter))) return new(item, 40);
+            // Match every individual word (expensive)
+            string[] filters = value.Split(new[] { ' ' });
+            if (filters.All(filter => SanitizeSearch(item.Name).Contains(filter))) return new(item, 40);
+            if (filters.All(filter => SanitizeSearch(item.ShortName).Contains(filter))) return new(item, 40);
 
-                if (SanitizeSearch(item.Name).Contains(value)) return new(item, 60);
-                if (SanitizeSearch(item.ShortName).Contains(value)) return new(item, 60);
+            if (SanitizeSearch(item.Name).Contains(value)) return new(item, 60);
+            if (SanitizeSearch(item.ShortName).Contains(value)) return new(item, 60);
 
-                if (value.Length > 3 && SanitizeSearch(item.Id).StartsWith(value)) return new(item, 80);
-                if (value.Length > 3 && SanitizeSearch(item.Id).Contains(value)) return new(item, 100);
-                return new(null, -1);
-            };
+            if (value.Length > 3 && SanitizeSearch(item.Id).StartsWith(value)) return new(item, 80);
+            if (value.Length > 3 && SanitizeSearch(item.Id).Contains(value)) return new(item, 100);
+            return new(null, -1);
+        };
 
-        var matches = new List<(FetchModels.TarkovDev.Item item, int score)>();
-        foreach (var item in _items)
-        {
+        var matches = new List<(TarkovDev.GraphQL.Item item, int score)>();
+        foreach (var item in _items) {
             var match = filter(item);
             if (match.item == null) continue;
             matches.Add(match);
         }
 
-        for (var i = 0; i < matches.Count; i++)
-        {
+        for (var i = 0; i < matches.Count; i++) {
             // Slightly penalize items with long names
             matches[i] = (matches[i].item, (int)(matches[i].score + matches[i].item.Name.Length * 0.002f));
 
@@ -171,48 +165,40 @@
         return sortedMatches.Select(match => match.item);
     }
 
-    private string SanitizeSearch(string value)
-    {
-        value = value.ToLower();
+    private string SanitizeSearch(string value) {
+        value = value.ToLower().Trim();
         value = new string(value.Where(c => char.IsLetterOrDigit(c) || c == ' ').ToArray());
         return value;
     }
 
-    private async void SetSearchItem(FetchModels.TarkovDev.Item item)
-    {
+    private async void SetSearchItem(TarkovDev.GraphQL.Item item) {
         if (item == null) return;
         MenuVM.ItemScans.Enqueue(new DefaultItemScan(item));
         await _searchBox.Clear();
     }
 
-    private async void OpenWiki()
-    {
+    private async void OpenWiki() {
         OpenURL(_lastScannedItem.WikiLink);
     }
 
-    private async void OpenTarkovDev()
-    {
+    private async void OpenTarkovDev() {
         OpenURL(_lastScannedItem.Link);
     }
 
-    private void OpenURL(string url)
-    {
+    private void OpenURL(string url) {
         if (string.IsNullOrEmpty(url)) return;
-        var psi = new ProcessStartInfo
-            {
+        var psi = new ProcessStartInfo {
                 FileName = url,
                 UseShellExecute = true,
             };
         Process.Start(psi);
     }
 
-    private async void PropertyChangeHandler(object sender, EventArgs e)
-    {
+    private async void PropertyChangeHandler(object sender, EventArgs e) {
         await InvokeAsync(() => StateHasChanged());
     }
 
-    public void Dispose()
-    {
+    public void Dispose() {
         MenuVM.PropertyChanged -= PropertyChangeHandler;
     }
 

@@ -1,5 +1,4 @@
 ﻿using RatEye;
-using RatScanner.FetchModels;
 using RatScanner.Scan;
 using RatScanner.View;
 using RatStash;
@@ -51,7 +50,7 @@ public class RatScannerMain : INotifyPropertyChanged
 
 	public TarkovTrackerDB TarkovTrackerDB;
 
-	public Dictionary<string, FetchModels.TarkovDev.Item> ItemDB;
+	public Dictionary<string, TarkovDev.GraphQL.Item> ItemDB;
 	internal RatEyeEngine RatEyeEngine;
 
 	public event PropertyChangedEventHandler PropertyChanged;

@@ -1,5 +1,4 @@
-﻿using RatScanner.FetchModels.TarkovTracker;
-using RatScanner.Scan;
+﻿using RatScanner.Scan;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -27,7 +26,7 @@ internal class MenuVM : INotifyPropertyChanged
 
 	public ItemScan LastItemScan => ItemScans.LastOrDefault();
 
-	public FetchModels.TarkovDev.Item LastItem => LastItemScan.Item;
+	public TarkovDev.GraphQL.Item LastItem => LastItemScan.Item;
 
 	public string DiscordLink => ApiManager.GetResource(ApiManager.ResourceType.DiscordLink);
 
@@ -35,7 +34,7 @@ internal class MenuVM : INotifyPropertyChanged
 
 	public string PatreonLink => ApiManager.GetResource(ApiManager.ResourceType.PatreonLink);
 
-	public string Updated => LastItem.Updated.ToLocalTime().ToString(CultureInfo.CurrentCulture);
+	public string Updated => DateTime.Parse(LastItem.Updated).ToLocalTime().ToString(CultureInfo.CurrentCulture);
 
 	public string WikiLink
 	{

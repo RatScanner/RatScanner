@@ -6,7 +6,7 @@ public abstract class ItemScan
 
 // Base Scan Data
 {
-	public FetchModels.TarkovDev.Item Item { get; set; } = new FetchModels.TarkovDev.Item();
+	public TarkovDev.GraphQL.Item Item { get; set; } = new TarkovDev.GraphQL.Item();
 
 	public float Confidence { get; set; } = 0;
 

@@ -1,10 +1,7 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using RatScanner.FetchModels.TarkovDev;
+using RatScanner.TarkovDev.GraphQL;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -43,13 +40,7 @@ public static class TarkovDevAPI {
 		var contentTask = responseTask.Result.Content.ReadAsStringAsync();
 		contentTask.Wait();
 
-		var result = contentTask.Result;
-
-		// Hack to allow json deserialization
-		var replacement = @"""$type"":""RatScanner.FetchModels.TarkovDev.$1, RatScanner""$2";
-		result = Regex.Replace(result, @"""__typename"":\s?""(.*?)""(,?)", replacement);
-
-		return result;
+		return contentTask.Result;
 	}
 
 	private static T GetCached<T>(string query, long ttl = 0xFFFFFF) {

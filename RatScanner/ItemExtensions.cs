@@ -1,9 +1,6 @@
-﻿using RatScanner.FetchModels;
-using RatScanner.FetchModels.TarkovDev;
-using RatScanner.FetchModels.TarkovTracker;
-using RatStash;
+﻿using RatScanner.FetchModels.TarkovTracker;
 using System.Linq;
-using Item = RatScanner.FetchModels.TarkovDev.Item;
+using RatScanner.TarkovDev.GraphQL;
 
 namespace RatScanner;
 

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Win32;
-using RatStash;
 using System;
 using System.Runtime.InteropServices;
 using System.Windows;

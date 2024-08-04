@@ -1,5 +1,4 @@
-﻿using RatStash;
-using System;
+﻿using System;
 using System.Globalization;
 
 namespace RatScanner;

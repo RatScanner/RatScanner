@@ -6,7 +6,7 @@ public class DefaultItemScan : ItemScan
 {
 	public DefaultItemScan() { }
 
-	public DefaultItemScan(FetchModels.TarkovDev.Item item)
+	public DefaultItemScan(TarkovDev.GraphQL.Item item)
 	{
 		Item = item;
 
