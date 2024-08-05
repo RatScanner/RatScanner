@@ -1,4 +1,5 @@
-﻿using RatStash;
+﻿using RatScanner.TarkovDev.GraphQL;
+using RatStash;
 using System.ComponentModel;
 using System.Linq;
 
@@ -29,6 +30,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 	public int ScreenWidth { get; set; }
 	public int ScreenHeight { get; set; }
 	public float ScreenScale { get; set; }
+	public GameMode GameMode { get; set; }
 	public bool MinimizeToTray { get; set; }
 	public bool AlwaysOnTop { get; set; }
 	public bool LogDebug { get; set; }
@@ -75,6 +77,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 		ScreenWidth = RatConfig.ScreenWidth;
 		ScreenHeight = RatConfig.ScreenHeight;
 		ScreenScale = RatConfig.ScreenScale;
+		GameMode = RatConfig.GameMode;
 		MinimizeToTray = RatConfig.MinimizeToTray;
 		AlwaysOnTop = RatConfig.AlwaysOnTop;
 		LogDebug = RatConfig.LogDebug;
@@ -131,6 +134,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 		RatConfig.ScreenWidth = ScreenWidth;
 		RatConfig.ScreenHeight = ScreenHeight;
 		RatConfig.ScreenScale = ScreenScale;
+		RatConfig.GameMode = GameMode;
 		RatConfig.MinimizeToTray = MinimizeToTray;
 		RatConfig.AlwaysOnTop = AlwaysOnTop;
 		RatConfig.LogDebug = LogDebug;

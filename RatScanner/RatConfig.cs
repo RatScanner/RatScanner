@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using RatScanner.TarkovDev.GraphQL;
 using RatStash;
 using System;
 using System.Diagnostics;
@@ -116,6 +117,7 @@ internal static class RatConfig {
 #else
 	internal static bool LogDebug = false;
 #endif
+	internal static GameMode GameMode = GameMode.Regular;
 	internal static bool MinimizeToTray = false;
 	internal static bool AlwaysOnTop = true;
 	internal static int MarketDBRefreshTime = 30 * 60 * 1000; // 30 minutes
@@ -161,7 +163,7 @@ internal static class RatConfig {
 		config.Section = nameof(NameScan);
 		NameScan.Enable = config.ReadBool(nameof(NameScan.Enable), NameScan.Enable);
 		NameScan.EnableAuto = config.ReadBool(nameof(NameScan.EnableAuto), NameScan.EnableAuto);
-		NameScan.Language = (Language)config.ReadInt(nameof(NameScan.Language));
+		NameScan.Language = (Language)config.ReadInt(nameof(NameScan.Language), (int)NameScan.Language);
 
 		config.Section = nameof(IconScan);
 		IconScan.Enable = config.ReadBool(nameof(IconScan.Enable), IconScan.Enable);
@@ -204,6 +206,7 @@ internal static class RatConfig {
 			ScreenScale = config.ReadFloat(nameof(ScreenScale), ScreenScale);
 		}
 
+		GameMode = (GameMode)config.ReadInt(nameof(GameMode), (int)GameMode);
 		MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), MinimizeToTray);
 		AlwaysOnTop = config.ReadBool(nameof(AlwaysOnTop), AlwaysOnTop);
 		LogDebug = config.ReadBool(nameof(LogDebug), LogDebug);
@@ -259,6 +262,7 @@ internal static class RatConfig {
 		config.WriteInt(nameof(ScreenWidth), ScreenWidth);
 		config.WriteInt(nameof(ScreenHeight), ScreenHeight);
 		config.WriteFloat(nameof(ScreenScale), ScreenScale);
+		config.WriteInt(nameof(GameMode), (int)GameMode);
 		config.WriteBool(nameof(MinimizeToTray), MinimizeToTray);
 		config.WriteBool(nameof(AlwaysOnTop), AlwaysOnTop);
 		config.WriteBool(nameof(LogDebug), LogDebug);
