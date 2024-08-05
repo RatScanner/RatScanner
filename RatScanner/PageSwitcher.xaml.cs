@@ -20,7 +20,7 @@ public partial class PageSwitcher : Window {
 	private NotifyIcon _notifyIcon = null!;
 	private ContextMenuStrip _contextMenuStrip = new();
 
-	private static PageSwitcher _instance = new();
+	private static PageSwitcher _instance = null!;
 	public static PageSwitcher Instance => _instance ??= new PageSwitcher();
 
 	private UserControl? activeControl;

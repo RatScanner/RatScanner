@@ -12,7 +12,7 @@ namespace RatScanner.View;
 /// Interaction logic for MinimalMenu.xaml
 /// </summary>
 public partial class MinimalMenu : UserControl, ISwitchable {
-	private static MinimalMenu _instance = new();
+	private static MinimalMenu _instance = null!;
 	public static MinimalMenu Instance => _instance ??= new MinimalMenu();
 
 	private MinimalMenu() {

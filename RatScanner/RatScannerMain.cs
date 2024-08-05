@@ -21,7 +21,7 @@ using Timer = System.Threading.Timer;
 namespace RatScanner;
 
 public class RatScannerMain : INotifyPropertyChanged {
-	private static RatScannerMain _instance = null;
+	private static RatScannerMain _instance = null!;
 	internal static RatScannerMain Instance => _instance ??= new RatScannerMain();
 
 	internal readonly HotkeyManager HotkeyManager;
