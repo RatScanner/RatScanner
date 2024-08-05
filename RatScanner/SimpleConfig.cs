@@ -52,43 +52,49 @@ internal class SimpleConfig {
 		WriteEnumerableEnum(key + "Mouse", value.MouseButtons);
 	}
 
-	internal string ReadString(string key, string defaultValue = "") {
+	private string ReadStringInternal(string key) {
+		StringBuilder temp = new(255);
+		const string def = "RatScanner.Config.Default.Exception";
+		GetPrivateProfileString(Section, key.ToLower(), def, temp, short.MaxValue, Path);
+		string result = temp.ToString();
+		return result == def ? throw new Exception(def) : result;
+	}
+
+	internal string ReadString(string key, string defaultValue) {
 		try {
-			StringBuilder temp = new(255);
-			GetPrivateProfileString(Section, key.ToLower(), defaultValue, temp, short.MaxValue, Path);
-			return temp.ToString();
+			return ReadStringInternal(key);
 		} catch (Exception) {
 			return defaultValue;
 		}
 	}
 
-	internal int ReadInt(string key, int defaultValue = 0) {
+	internal int ReadInt(string key, int defaultValue) {
 		try {
-			return int.Parse(ReadString(key), CultureInfo.InvariantCulture);
+			return int.Parse(ReadStringInternal(key), CultureInfo.InvariantCulture);
 		} catch (Exception) {
 			return defaultValue;
 		}
 	}
 
-	internal float ReadFloat(string key, float defaultValue = 0) {
+	internal float ReadFloat(string key, float defaultValue) {
 		try {
-			return float.Parse(ReadString(key), CultureInfo.InvariantCulture);
+			return float.Parse(ReadStringInternal(key), CultureInfo.InvariantCulture);
 		} catch (Exception) {
 			return defaultValue;
 		}
 	}
 
-	internal bool ReadBool(string key, bool defaultValue = false) {
+	internal bool ReadBool(string key, bool defaultValue) {
 		try {
-			return bool.Parse(ReadString(key));
+			return bool.Parse(ReadStringInternal(key));
 		} catch (Exception) {
 			return defaultValue;
 		}
 	}
 
-	internal IEnumerable<TEnum> ReadEnumerableEnum<TEnum>(string key, IEnumerable<TEnum> defaultValue = null) where TEnum : struct, Enum {
+	internal IEnumerable<TEnum> ReadEnumerableEnum<TEnum>(string key, IEnumerable<TEnum> defaultValue) where TEnum : struct, Enum {
 		try {
-			string[]? readStrings = ReadString(key)?.Split(EnumerableSeparator);
+			string[]? readStrings = ReadStringInternal(key)?.Split(EnumerableSeparator);
 			if (readStrings[0] == "null") return Enumerable.Empty<TEnum>();
 			if (readStrings == null) return defaultValue;
 			if (readStrings.Length == 1 && readStrings[0] == "") return defaultValue;
@@ -98,7 +104,7 @@ internal class SimpleConfig {
 		}
 	}
 
-	internal Hotkey ReadHotkey(string key, Hotkey? defaultValue = null) {
+	internal Hotkey ReadHotkey(string key, Hotkey? defaultValue) {
 		defaultValue ??= new Hotkey();
 		IEnumerable<System.Windows.Input.Key> keyboardKeys = ReadEnumerableEnum(key + "Keyboard", defaultValue.KeyboardKeys);
 		IEnumerable<System.Windows.Input.MouseButton> mouseButtons = ReadEnumerableEnum(key + "Mouse", defaultValue.MouseButtons);
