@@ -9,7 +9,7 @@ public class UserProgress {
 	public string UserId { get; set; } = "";
 
 	[JsonProperty("displayName")]
-	public string DisplayName { get; set; } = "Unknown";
+	public string DisplayName { get; set; } = "Tarkov Citizen";
 
 	[JsonProperty("tasksProgress")]
 	public List<Progress> Tasks { get; set; } = new();

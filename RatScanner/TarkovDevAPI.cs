@@ -98,6 +98,7 @@ public static class TarkovDevAPI {
 			.WithBartersUsing(new BarterQueryBuilder().WithId())
 			.WithCraftsFor(new CraftQueryBuilder().WithId())
 			.WithCraftsUsing(new CraftQueryBuilder().WithId())
+			.WithTypes()
 			, alias: "data", lang: language, gameMode: gameMode).Build();
 	}
 

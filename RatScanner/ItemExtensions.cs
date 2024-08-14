@@ -1,55 +1,62 @@
 ﻿using RatScanner.FetchModels.TarkovTracker;
 using RatScanner.TarkovDev.GraphQL;
-using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace RatScanner;
 
 public static class ItemExtensions {
-	private static UserProgress? GetUserProgress() {
+	private static UserProgress GetUserProgress() {
 		UserProgress? progress = null;
 		if (RatConfig.Tracking.TarkovTracker.Enable && RatScannerMain.Instance.TarkovTrackerDB.Progress.Count >= 1) {
 			System.Collections.Generic.List<UserProgress> teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
 			progress = teamProgress.FirstOrDefault(x => x.UserId == RatScannerMain.Instance.TarkovTrackerDB.Self);
 		}
-		return progress;
+		return progress ?? new UserProgress();
 	}
 
-#pragma warning disable IDE0060 // Remove unused parameter
-	public static int GetTaskRemaining(this Item item, UserProgress? progress = null)
-#pragma warning restore IDE0060 // Remove unused parameter
-	{
-		return 3;
-		// TODO: Reimplement this
-		//progress ??= GetUserProgress();
+	public static int GetTaskRemaining(this Item item, UserProgress? progress = null) {
+		progress ??= GetUserProgress();
 
-		//var count = 0;
-		//var showNonFir = RatConfig.Tracking.ShowNonFIRNeeds;
-		//var needed = TarkovDevAPI.GetTasks();
-		//var neededItems = needed.Where(i => i.Id == item.Id && (i. || showNonFir));
+		int count = 0;
+		bool showNonFir = RatConfig.Tracking.ShowNonFIRNeeds;
 
-		//if (progress != null)
-		//{
-		//	neededItems = neededItems.Where(i => !progress.Tasks.Any(h => h.Id == i.TaskId && h.Complete));
-		//}
+		Task[] tasks = TarkovDevAPI.GetTasks();
 
-		//if (!neededItems.Any()) return 0;
+		foreach (Task task in tasks) {
+			// Skip if task is already completed
+			if (progress.Tasks.Any(p => p.Id == task.Id && p.Complete)) continue;
 
-		//foreach (var neededItem in neededItems)
-		//{
-		//	count += neededItem.Count;
-		//	if (progress == null) continue;
-
-		//	var taskProgress = progress.TaskObjectives.Where(part => part.Id == neededItem.ProgressId).ToList();
-		//	foreach (var p in taskProgress)
-		//	{
-		//		if (p.Complete) continue;
-		//		count -= p.Count;
-		//	}
-		//}
-
-		//return count;
+			if (task.Objectives == null) continue;
+			foreach (ITaskObjective? objective in task.Objectives) {
+				if (objective == null) continue;
+				if (objective is TaskObjectiveItem oGiveItem && oGiveItem.Type == "giveItem") {
+					if (oGiveItem.Item?.Id != item.Id) continue;    // Skip if item is not the one we are looking for
+					count += oGiveItem.Count;						// Add amount of items needed
+					// Substract amount of already collected items
+					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
+					foreach (var p in objectiveProgress) count -= p.Complete ? oGiveItem.Count : p.Count;
+				} else if (objective is TaskObjectiveItem oPlantItem && oPlantItem.Type == "plantItem") {
+					if (oPlantItem.Item?.Id != item.Id) continue;
+					count += oPlantItem.Count;
+					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
+					foreach (var p in objectiveProgress) count -= p.Complete ? oPlantItem.Count : p.Count;
+				} else if (objective is TaskObjectiveMark oMark && oMark.Type == "mark") {
+					if (oMark.MarkerItem?.Id != item.Id) continue;
+					count += 1;
+					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
+					foreach (var p in objectiveProgress) count -= 1;
+				} else if (objective is TaskObjectiveBuildItem oBuildWeapon && oBuildWeapon.Type == "buildWeapon") {
+					if (oBuildWeapon.Item?.Id != item.Id) continue;
+					count += 1;
+					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
+					foreach (var p in objectiveProgress) count -= 1;
+				}
+			}
+		}
+		return count;
 	}
+
 
 #pragma warning disable IDE0060 // Remove unused parameter
 	public static int GetHideoutRemaining(this Item item, UserProgress? progress = null)
@@ -87,7 +94,7 @@ public static class ItemExtensions {
 	}
 
 	public static int GetAvg24hMarketPricePerSlot(this Item item) {
-		int price = item.Avg24HPrice.Value;
+		int price = item.Avg24HPrice ?? 0;
 		int size = item.Width * item.Height;
 		return price / size;
 	}
