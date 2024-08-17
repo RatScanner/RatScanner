@@ -70,40 +70,29 @@ public static class ItemExtensions {
 		return count;
 	}
 
+	public static int GetHideoutRemaining(this Item item, UserProgress? progress = null) {
+		progress ??= GetUserProgress();
 
-#pragma warning disable IDE0060 // Remove unused parameter
-	public static int GetHideoutRemaining(this Item item, UserProgress? progress = null)
-#pragma warning restore IDE0060 // Remove unused parameter
-	{
-		return 4;
-		// TODO: Reimplement this
-		//progress ??= GetUserProgress();
+		int count = 0;
+		HideoutStation[] stations = TarkovDevAPI.GetHideoutStations();
 
-		//var count = 0;
-		//var needed = TarkovDevAPI.GetNeededItems().hideout;
-		//var neededItems = needed.Where(i => i.Id == item.Id);
+		foreach (HideoutStation station in stations) {
+			// Skip if station is already built
+			if (progress.HideoutModules.Any(p => p.Id == station.Id && p.Complete)) continue;
 
-		//if (progress != null)
-		//{
-		//	neededItems = neededItems.Where(i => !progress.HideoutModules.Any(h => h.Id == i.ModuleId && h.Complete));
-		//}
+			if (station.Levels == null) continue;
+			foreach (HideoutStationLevel? level in station.Levels) {
+				if (level?.ItemRequirements == null) continue;
+				foreach (RequirementItem? requiredItem in level.ItemRequirements) {
+					if (requiredItem?.Item?.Id != item.Id) continue;
 
-		//if (!neededItems.Any()) return 0;
-
-		//foreach (var neededItem in neededItems)
-		//{
-		//	count += neededItem.Count;
-		//	if (progress == null) continue;
-
-		//	var partProgress = progress.HideoutParts.Where(part => part.Id == neededItem.ProgressId).ToList();
-		//	foreach (var p in partProgress)
-		//	{
-		//		if (p.Complete) continue;
-		//		count -= p.Count;
-		//	}
-		//}
-
-		//return count;
+					count += requiredItem.Count;
+					List<Progress> objectiveProgress = progress.HideoutParts.Where(p => p.Id == level.Id).ToList();
+					foreach (Progress p in objectiveProgress) count -= p.Complete ? requiredItem.Count : p.Count;
+				}
+			}
+		}
+		return count;
 	}
 
 	public static int GetAvg24hMarketPricePerSlot(this Item item) {
