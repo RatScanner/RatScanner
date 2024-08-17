@@ -16,6 +16,16 @@ public static class ItemExtensions {
 	}
 
 	public static int GetTaskRemaining(this Item item, UserProgress? progress = null) {
+		// Compensation for Damage Tasks
+		// These tasks are not tracked by TarkovTracker
+		string[] excludedTasks = new string[] {
+			"61e6e5e0f5b9633f6719ed95",
+			"61e6e60223374d168a4576a6",
+			"61e6e621bfeab00251576265",
+			"61e6e615eea2935bc018a2c5",
+			"61e6e60c5ca3b3783662be27",
+		};
+
 		progress ??= GetUserProgress();
 
 		int count = 0;
@@ -27,30 +37,33 @@ public static class ItemExtensions {
 			// Skip if task is already completed
 			if (progress.Tasks.Any(p => p.Id == task.Id && p.Complete)) continue;
 
+			// Skip if task is to be excluded
+			if (excludedTasks.Contains(task.Id)) continue;
+
 			if (task.Objectives == null) continue;
 			foreach (ITaskObjective? objective in task.Objectives) {
 				if (objective == null) continue;
 				if (objective is TaskObjectiveItem oGiveItem && oGiveItem.Type == "giveItem") {
 					if (oGiveItem.Item?.Id != item.Id) continue;    // Skip if item is not the one we are looking for
-					count += oGiveItem.Count;						// Add amount of items needed
-					// Substract amount of already collected items
+					count += oGiveItem.Count;                       // Add amount of items needed
+																	// Substract amount of already collected items
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
-					foreach (var p in objectiveProgress) count -= p.Complete ? oGiveItem.Count : p.Count;
+					foreach (Progress p in objectiveProgress) count -= p.Complete ? oGiveItem.Count : p.Count;
 				} else if (objective is TaskObjectiveItem oPlantItem && oPlantItem.Type == "plantItem") {
 					if (oPlantItem.Item?.Id != item.Id) continue;
 					count += oPlantItem.Count;
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
-					foreach (var p in objectiveProgress) count -= p.Complete ? oPlantItem.Count : p.Count;
+					foreach (Progress p in objectiveProgress) count -= p.Complete ? oPlantItem.Count : p.Count;
 				} else if (objective is TaskObjectiveMark oMark && oMark.Type == "mark") {
 					if (oMark.MarkerItem?.Id != item.Id) continue;
 					count += 1;
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
-					foreach (var p in objectiveProgress) count -= 1;
+					foreach (Progress p in objectiveProgress) count -= 1;
 				} else if (objective is TaskObjectiveBuildItem oBuildWeapon && oBuildWeapon.Type == "buildWeapon") {
 					if (oBuildWeapon.Item?.Id != item.Id) continue;
 					count += 1;
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
-					foreach (var p in objectiveProgress) count -= 1;
+					foreach (Progress p in objectiveProgress) count -= 1;
 				}
 			}
 		}
