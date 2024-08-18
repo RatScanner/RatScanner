@@ -1,7 +1,7 @@
-﻿using RatScanner.TarkovDev.GraphQL;
-using RatStash;
+﻿using RatStash;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace RatScanner.ViewModel;
 
@@ -30,7 +30,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 	public int ScreenWidth { get; set; }
 	public int ScreenHeight { get; set; }
 	public float ScreenScale { get; set; }
-	public GameMode GameMode { get; set; }
+	public TarkovDev.GraphQL.GameMode GameMode { get; set; }
 	public bool MinimizeToTray { get; set; }
 	public bool AlwaysOnTop { get; set; }
 	public bool LogDebug { get; set; }
@@ -94,7 +94,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
 	}
 
-	public void SaveSettings() {
+	public async Task SaveSettings() {
 		bool updateMarketDB = NameScanLanguage != (int)RatConfig.NameScan.Language;
 		bool updateTarkovTrackerToken = TarkovTrackerToken != RatConfig.Tracking.TarkovTracker.Token;
 		bool updateResolution = ScreenWidth != RatConfig.ScreenWidth || ScreenHeight != RatConfig.ScreenHeight;
@@ -141,7 +141,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 		// Apply config
 		PageSwitcher.Instance.Topmost = RatConfig.AlwaysOnTop;
-		//if (updateMarketDB) RatScannerMain.Instance.MarketDB.Init();//TODO
+		await TarkovDevAPI.InitializeCache();
 		if (updateTarkovTrackerToken) UpdateTarkovTrackerToken();
 		if (updateResolution || updateLanguage) RatScannerMain.Instance.SetupRatEye();
 

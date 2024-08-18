@@ -77,9 +77,13 @@ public static class TarkovDevAPI {
 		Logger.LogInfo($"Refreshed cache in {swHttp.ElapsedMilliseconds}ms ({swJson.ElapsedMilliseconds}ms) for query: \"{query[..32].ReplaceLineEndings(" ")}...\"");
 	}
 
-	private static T GetCached<T>(string query, long ttl) {
+	private static T GetCached<T>(string query, long ttl, bool isRetry = false) {
 		if (!Cache.TryGetValue(query, out (long expire, object response) value)) {
-			throw new Exception("Query not found in cache. Was InitializeCache called?");
+			if (isRetry) throw new Exception("Retrying to fetch query response failed.");
+
+			Logger.LogInfo($"Query not found in cache. Query: \"{query[..32].ReplaceLineEndings(" ")}...\"");
+			Task.Run(() => QueueRequest<T>(query, ttl)).Wait();
+			return GetCached<T>(query, ttl, true);
 		}
 
 		// Queue request if cache is expired
@@ -89,12 +93,12 @@ public static class TarkovDevAPI {
 		return (T)value.response;
 	}
 
-	public static void InitializeCache() {
-		Task.WhenAll(
+	public static async Task InitializeCache() {
+		await Task.WhenAll(
 			Task.Run(() => QueueRequest<Item[]>(ItemsQuery(), RatConfig.MediumTTL)),
 			Task.Run(() => QueueRequest<TTask[]>(TasksQuery, RatConfig.LongTTL)),
 			Task.Run(() => QueueRequest<HideoutStation[]>(HideoutStationsQuery, RatConfig.LongTTL))
-		).Wait();
+		).ConfigureAwait(false);
 	}
 
 	public static Item[] GetItems(LanguageCode language, GameMode gameMode) => GetCached<Item[]>(ItemsQuery(language, gameMode), RatConfig.MediumTTL);

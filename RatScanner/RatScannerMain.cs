@@ -63,7 +63,7 @@ public class RatScannerMain : INotifyPropertyChanged {
 		Logger.LogInfo($"Screen Info: {RatConfig.ScreenWidth}x{RatConfig.ScreenHeight} at {RatConfig.ScreenScale * 100}%");
 
 		Logger.LogInfo("Initializing TarkovDev API...");
-		TarkovDevAPI.InitializeCache();
+		TarkovDevAPI.InitializeCache().Wait();
 
 		ItemScans.Enqueue(new DefaultItemScan(TarkovDevAPI.GetItems()[new Random().Next(TarkovDevAPI.GetItems().Length)]));
 
