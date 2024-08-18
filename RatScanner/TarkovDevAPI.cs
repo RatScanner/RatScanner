@@ -41,7 +41,7 @@ public static class TarkovDevAPI {
 	}
 
 	private static async Task QueueRequest<T>(string query, long ttl) {
-		Logger.LogInfo("Queueing request for query: " + query[..32].ReplaceLineEndings(" "));
+		Logger.LogInfo($"Queueing request for query: \"{query[..32].ReplaceLineEndings(" ")}...\"");
 
 		Stopwatch swHttp = new();
 		Stopwatch swJson = new();
@@ -74,7 +74,7 @@ public static class TarkovDevAPI {
 
 		swHttp.Stop();
 		swJson.Stop();
-		Logger.LogInfo($"Refreshed cache in {swHttp.ElapsedMilliseconds}ms ({swJson.ElapsedMilliseconds}ms) for query: \"{query[..32].ReplaceLineEndings(" ")}\"");
+		Logger.LogInfo($"Refreshed cache in {swHttp.ElapsedMilliseconds}ms ({swJson.ElapsedMilliseconds}ms) for query: \"{query[..32].ReplaceLineEndings(" ")}...\"");
 	}
 
 	private static T GetCached<T>(string query, long ttl) {
