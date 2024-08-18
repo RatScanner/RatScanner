@@ -22,9 +22,9 @@
 								VerticalAlignment="Center"
 								Orientation="Horizontal">
 			<Label Padding="0"
-							 VerticalAlignment="Center"
-							 Content="{Binding LastItem.Name}"
-							 d:Content="AKMN 7.62x39 assault rifle" />
+						 VerticalAlignment="Center"
+						 Content="{Binding LastItem.Name}"
+						 d:Content="AKMN 7.62x39 assault rifle" />
 		</StackPanel>
 		<Separator />
 
@@ -34,7 +34,7 @@
 				<Label Grid.Column="0"
 							 Content="Avg. Day Price" />
 				<Label Grid.Column="1"
-							 Content="{Binding LastItemScan.Avg24hPrice, Converter={StaticResource IntToLongPriceConverter}}"
+							 Content="{Binding LastItem.Avg24HPrice, Converter={StaticResource IntToLongPriceConverter}}"
 							 d:Content="88.000 ₽" />
 
 				<Grid.ColumnDefinitions>
@@ -47,7 +47,7 @@
 				<Label Grid.Column="0"
 							 Content="Price per Slot" />
 				<Label Grid.Column="1"
-							 Content="{Binding LastItemScan.PricePerSlot, Converter={StaticResource IntToLongPriceConverter}}"
+							 Content="{Binding PricePerSlot, Converter={StaticResource IntToLongPriceConverter}}"
 							 d:Content="11.000 ₽" />
 
 				<Grid.ColumnDefinitions>
@@ -61,10 +61,10 @@
 			<Separator />
 			<Grid>
 				<Label Grid.Column="0"
-							 Content="{Binding LastItemScan.TraderName}"
+							 Content="{Binding BestTraderOfferVendor.Name}"
 							 d:Content="Mechanic" />
 				<Label Grid.Column="1"
-							 Content="{Binding LastItemScan.BestTraderPrice, Converter={StaticResource IntToLongPriceConverter}}"
+							 Content="{Binding BestTraderOffer.PriceRub, Converter={StaticResource IntToLongPriceConverter}}"
 							 d:Content="53.516 ₽" />
 
 				<Grid.ColumnDefinitions>
@@ -76,7 +76,7 @@
 			<StackPanel.Style>
 				<Style TargetType="StackPanel">
 					<Style.Triggers>
-						<DataTrigger Binding="{Binding LastItemScan.TraderName}"
+						<DataTrigger Binding="{Binding BestTraderOfferVendor.Name}"
 												 Value="">
 							<Setter Property="Visibility"
 											Value="Collapsed" />

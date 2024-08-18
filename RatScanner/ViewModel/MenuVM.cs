@@ -1,4 +1,5 @@
 ﻿using RatScanner.Scan;
+using RatScanner.TarkovDev.GraphQL;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -23,7 +24,7 @@ internal class MenuVM : INotifyPropertyChanged {
 
 	public ItemScan LastItemScan => ItemScans.LastOrDefault() ?? throw new Exception("ItemQueue is empty!");
 
-	public TarkovDev.GraphQL.Item LastItem => LastItemScan.Item;
+	public Item LastItem => LastItemScan.Item;
 
 	public string DiscordLink => ApiManager.GetResource(ApiManager.ResourceType.DiscordLink);
 
@@ -40,6 +41,11 @@ internal class MenuVM : INotifyPropertyChanged {
 			return $"https://escapefromtarkov.gamepedia.com/{HttpUtility.UrlEncode(LastItem.Name.Replace(" ", "_"))}";
 		}
 	}
+
+	public int PricePerSlot => LastItem.GetAvg24hMarketPricePerSlot();
+
+	public ItemPrice? BestTraderOffer => LastItem.GetBestTraderOffer();
+	public TraderOffer? BestTraderOfferVendor => LastItem.GetBestTraderOfferVendor();
 
 	public int TaskRemaining => LastItem.GetTaskRemaining();
 
