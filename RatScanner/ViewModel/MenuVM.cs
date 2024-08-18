@@ -53,7 +53,7 @@ internal class MenuVM : INotifyPropertyChanged {
 
 	public bool ItemNeeded => TaskRemaining + HideoutRemaining > 0;
 
-	public List<KeyValuePair<string, KeyValuePair<int, int>>> ItemTeamNeeds {
+	public List<KeyValuePair<string, KeyValuePair<int, int>>>? ItemTeamNeeds {
 		get {
 			if (!RatConfig.Tracking.TarkovTracker.Enable) return null;
 			List<FetchModels.TarkovTracker.UserProgress> progress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
@@ -81,7 +81,7 @@ internal class MenuVM : INotifyPropertyChanged {
 		}
 	}
 
-	public (int task, int hideout) ItemTeamNeedsSummed => (ItemTeamNeeds.Sum(i => i.Value.Key), ItemTeamNeeds.Sum(i => i.Value.Value));
+	public (int task, int hideout) ItemTeamNeedsSummed => (ItemTeamNeeds?.Sum(i => i.Value.Key) ?? 0, ItemTeamNeeds?.Sum(i => i.Value.Value) ?? 0);
 
 	public bool ItemTeamNeeded => ItemTeamNeeds != null && ItemTeamNeeds.Any();
 
