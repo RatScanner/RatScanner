@@ -1,96 +1,97 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
-    <UseWPF>true</UseWPF>
-    <UseWindowsForms>True</UseWindowsForms>
-    <ApplicationIcon>Resources\RatLogoSmall.ico</ApplicationIcon>
-    <StartupObject>RatScanner.App</StartupObject>
-    <Version>3.7.1</Version>
-    <ImplicitUsings>disable</ImplicitUsings>
-    <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-    <RootNamespace>RatScanner</RootNamespace>
-    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
-    <nullable>Enable</nullable>
-    <!-- GraphQL generator properties -->
-    <GraphQlClientGenerator_ServiceUrl>https://api.tarkov.dev/graphql</GraphQlClientGenerator_ServiceUrl>
-    <GraphQlClientGenerator_Namespace>$(RootNamespace).TarkovDev.GraphQL</GraphQlClientGenerator_Namespace>
-    <GraphQlClientGenerator_IdTypeMapping>String</GraphQlClientGenerator_IdTypeMapping>
-    <GraphQlClientGenerator_DataClassMemberNullability>DefinedBySchema</GraphQlClientGenerator_DataClassMemberNullability>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
+		<UseWPF>true</UseWPF>
+		<UseWindowsForms>True</UseWindowsForms>
+		<ApplicationIcon>Resources\RatLogoSmall.ico</ApplicationIcon>
+		<StartupObject>RatScanner.App</StartupObject>
+		<Version>3.7.1</Version>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+		<RootNamespace>RatScanner</RootNamespace>
+		<SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+		<nullable>Enable</nullable>
+		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+		<!-- GraphQL generator properties -->
+		<GraphQlClientGenerator_ServiceUrl>https://api.tarkov.dev/graphql</GraphQlClientGenerator_ServiceUrl>
+		<GraphQlClientGenerator_Namespace>$(RootNamespace).TarkovDev.GraphQL</GraphQlClientGenerator_Namespace>
+		<GraphQlClientGenerator_IdTypeMapping>String</GraphQlClientGenerator_IdTypeMapping>
+		<GraphQlClientGenerator_DataClassMemberNullability>DefinedBySchema</GraphQlClientGenerator_DataClassMemberNullability>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DebugType>none</DebugType>
-    <DebugSymbols>false</DebugSymbols>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <DefineConstants>TRACE</DefineConstants>
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DebugType>none</DebugType>
+		<DebugSymbols>false</DebugSymbols>
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+		<DefineConstants>TRACE</DefineConstants>
+		<PlatformTarget>x64</PlatformTarget>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Resource Include="Resources\iconMods.png" />
-    <Resource Include="Resources\settings.png" />
-  </ItemGroup>
+	<ItemGroup>
+		<Resource Include="Resources\iconMods.png" />
+		<Resource Include="Resources\settings.png" />
+	</ItemGroup>
 
-  <ItemGroup>
+	<ItemGroup>
 
 
-    <!-- AdditionalFiles and GraphQlClientGenerator_ServiceUrl are mutually exclusive -->
-    <!-- <AdditionalFiles Include="GqlSchemaTibberApi.gql.schema.json" CacheObjects="true" /> -->
-    <!-- schema file name must end with ".gql.schema.json" -->
+		<!-- AdditionalFiles and GraphQlClientGenerator_ServiceUrl are mutually exclusive -->
+		<!-- <AdditionalFiles Include="GqlSchemaTibberApi.gql.schema.json" CacheObjects="true" /> -->
+		<!-- schema file name must end with ".gql.schema.json" -->
 
-    <CompilerVisibleProperty Include="GraphQlClientGenerator_ServiceUrl" />
-    <CompilerVisibleProperty Include="GraphQlClientGenerator_Namespace" />
-    <CompilerVisibleProperty Include="GraphQlClientGenerator_IdTypeMapping" />
-    <CompilerVisibleProperty Include="GraphQlClientGenerator_DataClassMemberNullability" />
-    <!-- other configuration properties -->
-    <!--<CompilerVisibleProperty Include="GraphQlClientGenerator_{ConfigurationProperty}" />-->
-  </ItemGroup>
+		<CompilerVisibleProperty Include="GraphQlClientGenerator_ServiceUrl" />
+		<CompilerVisibleProperty Include="GraphQlClientGenerator_Namespace" />
+		<CompilerVisibleProperty Include="GraphQlClientGenerator_IdTypeMapping" />
+		<CompilerVisibleProperty Include="GraphQlClientGenerator_DataClassMemberNullability" />
+		<!-- other configuration properties -->
+		<!--<CompilerVisibleProperty Include="GraphQlClientGenerator_{ConfigurationProperty}" />-->
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="DeepCloner" Version="0.10.4" />
-    <PackageReference Include="GraphQlClientGenerator" Version="0.9.22" IncludeAssets="analyzers" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.7" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="8.0.71" />
-    <PackageReference Include="MudBlazor" Version="6.10.0" />
-    <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.421302">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.7" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="RatEye" Version="4.0.0" />
-    <PackageReference Include="RatStash" Version="6.0.0" />
-    <PackageReference Include="SingleInstanceCore" Version="2.2.2" />
-    <PackageReference Include="System.Drawing.Common" Version="8.0.7" />
-    <PackageReference Include="Tesseract" Version="5.2.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="DeepCloner" Version="0.10.4" />
+		<PackageReference Include="GraphQlClientGenerator" Version="0.9.22" IncludeAssets="analyzers" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.7" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="8.0.71" />
+		<PackageReference Include="MudBlazor" Version="6.10.0" />
+		<PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.4.421302">
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.7" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="RatEye" Version="4.0.0" />
+		<PackageReference Include="RatStash" Version="6.0.0" />
+		<PackageReference Include="SingleInstanceCore" Version="2.2.2" />
+		<PackageReference Include="System.Drawing.Common" Version="8.0.7" />
+		<PackageReference Include="Tesseract" Version="5.2.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Content Remove="wwwroot\fonts\bender.bold.otf" />
-    <Content Remove="wwwroot\fonts\bender.regular.otf" />
-    <Content Remove="wwwroot\interactableOverlay.html" />
-  </ItemGroup>
+	<ItemGroup>
+		<Content Remove="wwwroot\fonts\bender.bold.otf" />
+		<Content Remove="wwwroot\fonts\bender.regular.otf" />
+		<Content Remove="wwwroot\interactableOverlay.html" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
-  </ItemGroup>
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Resource Include="Resources\RatLogoMedium.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
+	<ItemGroup>
+		<Resource Include="Resources\RatLogoMedium.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Resource>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Content Update="_Imports.razor">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-    </Content>
-  </ItemGroup>
+	<ItemGroup>
+		<Content Update="_Imports.razor">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+		</Content>
+	</ItemGroup>
 </Project>
