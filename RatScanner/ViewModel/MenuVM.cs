@@ -37,7 +37,7 @@ internal class MenuVM : INotifyPropertyChanged {
 	public string WikiLink {
 		get {
 			string? link = LastItem.WikiLink;
-			if (link.Length > 3) return link;
+			if (link?.Length > 3) return link;
 			return $"https://escapefromtarkov.gamepedia.com/{HttpUtility.UrlEncode(LastItem.Name.Replace(" ", "_"))}";
 		}
 	}

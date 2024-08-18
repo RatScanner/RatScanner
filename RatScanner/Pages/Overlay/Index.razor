@@ -38,7 +38,7 @@
                         </div>
 
                         <div style="overflow: hidden;">
-                            @if (item.Avg24HPrice >= item.GetBestTraderOffer().PriceRub)
+                            @if (item.Avg24HPrice >= item.GetBestTraderOffer()?.PriceRub)
                             {
                                 <div class="stroke">
                                     @item.Avg24HPrice.ToShortString().AsRubs()
@@ -47,8 +47,8 @@
                             else
                             {
                                 <div class="d-flex align-center stroke">
-                                    @item.GetBestTraderOffer().PriceRub.ToShortString().AsRubs()
-                                    <MudAvatar Image="@(item.GetBestTraderOfferVendor().Trader.ImageLink)"
+                                    @item.GetBestTraderOffer()?.PriceRub.ToShortString().AsRubs()
+                                    <MudAvatar Image="@(item.GetBestTraderOfferVendor()?.Trader?.ImageLink)"
                                                Size="Size.Small" Style="float: right;" Class="ml-1" />
                                 </div>
                             }
@@ -76,8 +76,7 @@
 	                                                   top: @(itemScan.GetToolTipPosition().Y - VirtualScreenOffset.YOffset)px;
 	                                                   background: #121212; padding: 4px;">
 
-                    @if (item.Avg24HPrice >= item.GetBestTraderOffer().PriceRub)
-                    {
+                    @if (item.Avg24HPrice >= item.GetBestTraderOffer()?.PriceRub) {
                         <div class="stroke">
                             @item.Avg24HPrice.ToShortString().AsRubs()
                         </div>
@@ -85,8 +84,8 @@
                     else
                     {
                         <div class="d-flex align-center stroke">
-                            @item.GetBestTraderOffer().PriceRub.ToShortString().AsRubs()
-                            <MudAvatar Image="@(item.GetBestTraderOfferVendor().Trader.ImageLink)"
+                            @item.GetBestTraderOffer()?.PriceRub.ToShortString().AsRubs()
+                            <MudAvatar Image="@(item.GetBestTraderOfferVendor()?.Trader?.ImageLink)"
                                        Size="Size.Small" Style="float: right;" Class="ml-1" />
                         </div>
                     }
@@ -110,7 +109,7 @@
     {
         var path = itemScan.IconPath;
 
-        if (string.IsNullOrEmpty(path)) return itemScan.Item.BaseImageLink;
+        if (string.IsNullOrEmpty(path)) return itemScan.Item.BaseImageLink ?? "";
 
         path = path.Replace("\\", "/");
         var pathEnd = path[path.IndexOf("Data/icons/")..path.Length];

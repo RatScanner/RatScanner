@@ -10,8 +10,8 @@
     <MudGrid Class="pa-0" Spacing="0">
         <MudItem xs="12">
             <div class="d-flex align-center justify-start mx-2 mt-2 mb-1">
-                <img src="@_lastScannedItem.IconLink" class="mr-2 mud-elevation-1" style="border-style: solid; border-width: 1px; border-color: #585D60; display: block; max-width: 64px; max-height: 64px; width: auto; height: auto;" />
-                <MudText Class="ellipsis" Style="display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;" Color="Color.Inherit">@_lastScannedItem.Name</MudText>
+                <img src="@MenuVM.LastItem.IconLink" class="mr-2 mud-elevation-1" style="border-style: solid; border-width: 1px; border-color: #585D60; display: block; max-width: 64px; max-height: 64px; width: auto; height: auto;" />
+                <MudText Class="ellipsis" Style="display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;" Color="Color.Inherit">@MenuVM.LastItem.Name</MudText>
             </div>
         </MudItem>
         <MudItem xs="6">
@@ -28,32 +28,33 @@
             <MudPaper Class="align-center justify-center pa-2 mx-2 my-1" Elevation="2">
                 <div class="d-flex justify-space-between align-center mt-2">
                     <MudText Typo="Typo.subtitle2">Recent Avg. Price</MudText>
-                    <MudText Typo="Typo.subtitle2">@_lastScannedItem.Avg24HPrice.AsRubs()</MudText>
+                    <MudText Typo="Typo.subtitle2">@MenuVM.LastItem.Avg24HPrice.AsRubs()</MudText>
                 </div>
                 <div class="d-flex justify-space-between align-center my-1">
                     <MudText Typo="Typo.subtitle2">Value per Slot</MudText>
-                    <MudText Typo="Typo.subtitle2">@_lastScannedItem.GetAvg24hMarketPricePerSlot().AsRubs()</MudText>
+                    <MudText Typo="Typo.subtitle2">@MenuVM.PricePerSlot.AsRubs()</MudText>
                 </div>
                 <MudDivider DividerType="DividerType.FullWidth" />
                 <div class="d-flex justify-space-between align-center mt-2">
                     <MudText Typo="Typo.subtitle2">Best Trader</MudText>
                     <div class="d-flex align-center">
-                        <MudAvatar Image="@(_lastScannedItem.GetBestTraderOfferVendor().Trader.ImageLink)" Size="Size.Small" Style="float: left;" Class="mr-1" Elevation="1" /><MudText Typo="Typo.subtitle2" Style="float: right;">@_lastScannedItem.GetBestTraderOfferVendor().Name</MudText>
+                        <MudAvatar Image="@(MenuVM.BestTraderOfferVendor?.Trader?.ImageLink)" Size="Size.Small" Style="float: left;" Class="mr-1" Elevation="1" />
+                        <MudText Typo="Typo.subtitle2" Style="float: right;">@MenuVM.BestTraderOfferVendor?.Name</MudText>
                     </div>
                 </div>
                 <div class="d-flex justify-space-between align-center my-1">
                     <MudText Typo="Typo.subtitle2">Trader Price</MudText>
-                    <MudText Typo="Typo.subtitle2">@_lastScannedItem.GetBestTraderOffer().PriceRub.AsRubs()</MudText>
+                    <MudText Typo="Typo.subtitle2">@(MenuVM.BestTraderOffer?.PriceRub.AsRubs() ?? 0.AsRubs())</MudText>
                 </div>
             </MudPaper>
         </MudItem>
         <MudItem xs="12">
             <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">
                 <div class="d-flex align-center">
-                    @_lastScannedItem.GetTaskRemaining() <MudIcon Icon="@Icons.Material.Filled.Checklist" Size="Size.Small" Class="ml-1" /> Quest
+                    @MenuVM.TaskRemaining <MudIcon Icon="@Icons.Material.Filled.Checklist" Size="Size.Small" Class="ml-1" /> Quest
                 </div>
                 <div class="d-flex align-center">
-                    @_lastScannedItem.GetHideoutRemaining() <MudIcon Icon="@Icons.Material.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
+                    @MenuVM.HideoutRemaining <MudIcon Icon="@Icons.Material.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
                 </div>
             </MudPaper>
         </MudItem>
@@ -105,8 +106,6 @@
 </style>
 
 @code {
-    private TarkovDev.GraphQL.Item _lastScannedItem => MenuVM?.LastItemScan?.Item;
-
     private List<TarkovDev.GraphQL.Item>? _items;
 
     private MudAutocomplete<TarkovDev.GraphQL.Item> _searchBox { get; set; } = null!;
@@ -177,11 +176,11 @@
     }
 
     private async void OpenWiki() {
-        OpenURL(_lastScannedItem.WikiLink);
+        OpenURL(MenuVM.LastItem.WikiLink);
     }
 
     private async void OpenTarkovDev() {
-        OpenURL(_lastScannedItem.Link);
+        OpenURL(MenuVM.LastItem.Link);
     }
 
     private void OpenURL(string url) {

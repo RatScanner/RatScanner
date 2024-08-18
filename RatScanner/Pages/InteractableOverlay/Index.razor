@@ -81,7 +81,7 @@
                                         <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Center" Style="width: 3vw" Spacing="0">
                                             @{
                                                 var bestTrader = item.GetBestTraderOffer();
-                                                var traderImage = item.GetBestTraderOfferVendor()?.Trader.ImageLink;
+                                                var traderImage = item.GetBestTraderOfferVendor()?.Trader?.ImageLink;
                                             }
                                             <MudAvatar Image="@traderImage"
                                                        Size="Size.Medium" Style="float: left;" Square="true" Variant="Variant.Outlined" />
@@ -118,7 +118,7 @@
 
     private static MudTextField<string> _searchTextField { get; set; } = null!;
 
-    private string _searchText { get; set; }
+    private string _searchText { get; set; } = "";
 
     private IEnumerable<SearchResult> _searchResults { get; set; } = new List<SearchResult>();
 
