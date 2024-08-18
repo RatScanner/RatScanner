@@ -6,17 +6,17 @@
     <UseWindowsForms>True</UseWindowsForms>
     <ApplicationIcon>Resources\RatLogoSmall.ico</ApplicationIcon>
     <StartupObject>RatScanner.App</StartupObject>
-    <Version>3.7.0</Version>
+    <Version>3.7.1</Version>
     <ImplicitUsings>disable</ImplicitUsings>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
     <RootNamespace>RatScanner</RootNamespace>
     <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
-		<nullable>Enable</nullable>
-		<!-- GraphQL generator properties -->
-		<GraphQlClientGenerator_ServiceUrl>https://api.tarkov.dev/graphql</GraphQlClientGenerator_ServiceUrl>
-		<GraphQlClientGenerator_Namespace>$(RootNamespace).TarkovDev.GraphQL</GraphQlClientGenerator_Namespace>
-		<GraphQlClientGenerator_IdTypeMapping>String</GraphQlClientGenerator_IdTypeMapping>
-		<GraphQlClientGenerator_DataClassMemberNullability>DefinedBySchema</GraphQlClientGenerator_DataClassMemberNullability>
+    <nullable>Enable</nullable>
+    <!-- GraphQL generator properties -->
+    <GraphQlClientGenerator_ServiceUrl>https://api.tarkov.dev/graphql</GraphQlClientGenerator_ServiceUrl>
+    <GraphQlClientGenerator_Namespace>$(RootNamespace).TarkovDev.GraphQL</GraphQlClientGenerator_Namespace>
+    <GraphQlClientGenerator_IdTypeMapping>String</GraphQlClientGenerator_IdTypeMapping>
+    <GraphQlClientGenerator_DataClassMemberNullability>DefinedBySchema</GraphQlClientGenerator_DataClassMemberNullability>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -35,20 +35,20 @@
     <Resource Include="Resources\settings.png" />
   </ItemGroup>
 
-	<ItemGroup>
-		
+  <ItemGroup>
 
-		<!-- AdditionalFiles and GraphQlClientGenerator_ServiceUrl are mutually exclusive -->
-		<!-- <AdditionalFiles Include="GqlSchemaTibberApi.gql.schema.json" CacheObjects="true" /> -->
-		<!-- schema file name must end with ".gql.schema.json" -->
 
-		<CompilerVisibleProperty Include="GraphQlClientGenerator_ServiceUrl" />
-		<CompilerVisibleProperty Include="GraphQlClientGenerator_Namespace" />
-		<CompilerVisibleProperty Include="GraphQlClientGenerator_IdTypeMapping" />
-		<CompilerVisibleProperty Include="GraphQlClientGenerator_DataClassMemberNullability" />
-		<!-- other configuration properties -->
-		<!--<CompilerVisibleProperty Include="GraphQlClientGenerator_{ConfigurationProperty}" />-->
-	</ItemGroup>
+    <!-- AdditionalFiles and GraphQlClientGenerator_ServiceUrl are mutually exclusive -->
+    <!-- <AdditionalFiles Include="GqlSchemaTibberApi.gql.schema.json" CacheObjects="true" /> -->
+    <!-- schema file name must end with ".gql.schema.json" -->
+
+    <CompilerVisibleProperty Include="GraphQlClientGenerator_ServiceUrl" />
+    <CompilerVisibleProperty Include="GraphQlClientGenerator_Namespace" />
+    <CompilerVisibleProperty Include="GraphQlClientGenerator_IdTypeMapping" />
+    <CompilerVisibleProperty Include="GraphQlClientGenerator_DataClassMemberNullability" />
+    <!-- other configuration properties -->
+    <!--<CompilerVisibleProperty Include="GraphQlClientGenerator_{ConfigurationProperty}" />-->
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="DeepCloner" Version="0.10.4" />
@@ -71,7 +71,7 @@
   <ItemGroup>
     <None Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-	
+
   <ItemGroup>
     <Content Remove="wwwroot\fonts\bender.bold.otf" />
     <Content Remove="wwwroot\fonts\bender.regular.otf" />
