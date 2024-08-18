@@ -2,15 +2,17 @@
 using RatScanner.TarkovDev.GraphQL;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Threading.Tasks;
+using Task = System.Threading.Tasks.Task;
+using TTask = RatScanner.TarkovDev.GraphQL.Task;
 
 namespace RatScanner;
 
-/// <todo>
-/// We absolutely want to move this into the main project at some point
-/// </todo>
 public static class TarkovDevAPI {
 	private class ResponseData<T> {
 		[JsonProperty("data")]
@@ -30,47 +32,85 @@ public static class TarkovDevAPI {
 		AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
 	});
 
-	private static string Get(string query) {
+	private static async Task<Stream> Get(string query) {
 		Dictionary<string, string> body = new() { { "query", query } };
-		System.Threading.Tasks.Task<HttpResponseMessage> responseTask = HttpClient.PostAsJsonAsync(ApiEndpoint, body);
-		responseTask.Wait();
+		HttpResponseMessage responseTask = await HttpClient.PostAsJsonAsync(ApiEndpoint, body);
 
-		if (responseTask.Result.StatusCode != HttpStatusCode.OK) throw new Exception("Tarkov.dev API request failed.");
-		System.Threading.Tasks.Task<string> contentTask = responseTask.Result.Content.ReadAsStringAsync();
-		contentTask.Wait();
-
-		return contentTask.Result;
+		if (responseTask.StatusCode != HttpStatusCode.OK) throw new Exception("Tarkov.dev API request failed.");
+		return await responseTask.Content.ReadAsStreamAsync();
 	}
 
-	private static T GetCached<T>(string query, long ttl = 0xFFFFFF) {
-		long time = DateTimeOffset.Now.ToUnixTimeSeconds();
-		if (Cache.TryGetValue(query, out (long expire, object response) value) && time < value.expire) {
-			return (T)value.response;
-		}
+	private static async Task QueueRequest<T>(string query, long ttl) {
+		Logger.LogInfo("Queueing request for query: " + query[..32].ReplaceLineEndings(" "));
 
-		string apiResponse = Get(query);
+		Stopwatch swHttp = new();
+		Stopwatch swJson = new();
+		swHttp.Start();
+
+		// Prevent multiple requests for the same query
+		Cache[query] = (long.MaxValue, Cache.GetValueOrDefault(query).response);
+
 		JsonSerializerSettings jsonSerializerSettings = new() {
 			MissingMemberHandling = MissingMemberHandling.Ignore,
 			NullValueHandling = NullValueHandling.Ignore,
 			TypeNameHandling = TypeNameHandling.Auto,
 			TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
 		};
+		JsonSerializer serializer = JsonSerializer.Create(jsonSerializerSettings);
 
-		ResponseData<T>? neededResponse = JsonConvert.DeserializeObject<ResponseData<T>>(apiResponse, jsonSerializerSettings);
+		using Stream s = await Get(query);
+		using StreamReader sr = new(s);
+		using JsonReader reader = new JsonTextReader(sr);
+
+		swJson.Start();
+		ResponseData<T>? neededResponse = serializer.Deserialize<ResponseData<T>>(reader);
+		if (neededResponse == null) throw new Exception("Failed to deserialize needed response");
 		T? response = neededResponse.Data.Data;
+		if (response == null) throw new Exception("Failed to deserialize response");
 
-		if (ttl > 0) Cache[query] = (time + ttl, response);
+		// Update cache
+		long time = DateTimeOffset.Now.ToUnixTimeSeconds();
+		Cache[query] = (time + ttl, response);
 
-		return response;
+		swHttp.Stop();
+		swJson.Stop();
+		Logger.LogInfo($"Refreshed cache in {swHttp.ElapsedMilliseconds}ms ({swJson.ElapsedMilliseconds}ms) for query: \"{query[..32].ReplaceLineEndings(" ")}\"");
 	}
 
-	public static Task[] GetTasks() => GetCached<Task[]>(TasksQuery);
+	private static T GetCached<T>(string query, long ttl) {
+		if (!Cache.TryGetValue(query, out (long expire, object response) value)) {
+			throw new Exception("Query not found in cache. Was InitializeCache called?");
+		}
+
+		// Queue request if cache is expired
+		long time = DateTimeOffset.Now.ToUnixTimeSeconds();
+		if (time > value.expire) Task.Run(() => QueueRequest<T>(query, ttl));
+
+		return (T)value.response;
+	}
+
+	public static void InitializeCache() {
+		Task.WhenAll(
+			Task.Run(() => QueueRequest<TTask[]>(TasksQuery, 60 * 60 * 12)),
+			Task.Run(() => QueueRequest<Item[]>(ItemsQuery(RatConfig.NameScan.Language.ToTarkovDevType(), RatConfig.GameMode), 60 * 60)),
+			Task.Run(() => QueueRequest<HideoutStation[]>(HideoutStationsQuery, 60 * 60 * 12))
+		).Wait();
+	}
+
+	/// <summary>
+	/// Refreshes every 12 hours
+	/// </summary>
+	public static TTask[] GetTasks() => GetCached<TTask[]>(TasksQuery, 60 * 60 * 12);
 
 	/// <summary>
 	/// Refreshes every hour
 	/// </summary>
 	public static Item[] GetItems(LanguageCode language, GameMode gameMode) => GetCached<Item[]>(ItemsQuery(language, gameMode), 60 * 60);
-	public static HideoutStation[] GetHideoutStations() => GetCached<HideoutStation[]>(HideoutStationsQuery);
+
+	/// <summary>
+	/// Refreshes every 12 hours
+	/// </summary>
+	public static HideoutStation[] GetHideoutStations() => GetCached<HideoutStation[]>(HideoutStationsQuery, 60 * 60 * 12);
 
 	private static string ItemsQuery(LanguageCode language, GameMode gameMode) {
 		return new QueryQueryBuilder().WithItems(new ItemQueryBuilder().WithAllScalarFields()

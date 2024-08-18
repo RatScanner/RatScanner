@@ -1,6 +1,5 @@
 ﻿using RatEye;
 using RatScanner.Scan;
-using RatScanner.View;
 using RatStash;
 using System;
 using System.Collections.Generic;
@@ -64,9 +63,12 @@ public class RatScannerMain : INotifyPropertyChanged {
 		Logger.LogInfo("----- RatScanner " + RatConfig.Version + " -----");
 		Logger.LogInfo($"Screen Info: {RatConfig.ScreenWidth}x{RatConfig.ScreenHeight} at {RatConfig.ScreenScale * 100}%");
 
+		Logger.LogInfo("Initializing TarkovDev API...");
+		TarkovDevAPI.InitializeCache();
+
 		Logger.LogInfo("Loading price data...");
 		// TODO Reload data when setting is changed
-		ItemDB = TarkovDevAPI.GetItems(TarkovDev.GraphQL.LanguageCode.En, RatConfig.GameMode).ToDictionary(x => x.Id, x => x);
+		ItemDB = TarkovDevAPI.GetItems(RatConfig.NameScan.Language.ToTarkovDevType(), RatConfig.GameMode).ToDictionary(x => x.Id, x => x);
 
 		ItemScans.Enqueue(new DefaultItemScan(ItemDB.ElementAt(16).Value));
 
