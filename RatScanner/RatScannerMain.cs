@@ -47,12 +47,6 @@ public class RatScannerMain : INotifyPropertyChanged {
 
 	public TarkovTrackerDB TarkovTrackerDB;
 
-	public Dictionary<string, TarkovDev.GraphQL.Item> ItemDB {
-		get {
-			TarkovDev.GraphQL.LanguageCode language = RatConfig.NameScan.Language.ToTarkovDevType();
-			return TarkovDevAPI.GetItems(language, RatConfig.GameMode).ToDictionary(x => x.Id, x => x);
-		}
-	}
 	internal RatEyeEngine RatEyeEngine;
 
 	public event PropertyChangedEventHandler? PropertyChanged;
@@ -71,7 +65,7 @@ public class RatScannerMain : INotifyPropertyChanged {
 		Logger.LogInfo("Initializing TarkovDev API...");
 		TarkovDevAPI.InitializeCache();
 
-		ItemScans.Enqueue(new DefaultItemScan(ItemDB.ElementAt(16).Value));
+		ItemScans.Enqueue(new DefaultItemScan(TarkovDevAPI.GetItems()[new Random().Next(TarkovDevAPI.GetItems().Length)]));
 
 		Logger.LogInfo("Initializing tarkov tracker database");
 		TarkovTrackerDB = new TarkovTrackerDB();
@@ -183,7 +177,7 @@ public class RatScannerMain : INotifyPropertyChanged {
 
 	private Database RatStashDatabaseFromTarkovDev() {
 		List<Item> rsItems = new();
-		foreach (TarkovDev.GraphQL.Item i in ItemDB.Values) {
+		foreach (TarkovDev.GraphQL.Item i in TarkovDevAPI.GetItems()) {
 			rsItems.Add(new RatStash.Item() {
 				Id = i.Id,
 				Name = i.Name,

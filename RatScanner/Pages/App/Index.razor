@@ -116,10 +116,9 @@
     }
 
     private async Task<IEnumerable<TarkovDev.GraphQL.Item>> SearchItem(string value) {
-        if (_items == null) _items = RatScannerMain.Instance.ItemDB?.Values?.ToList() ?? null;
-        if (_items == null) return RatScannerMain.Instance.ItemDB.Values.Take(1);
+        if (_items == null) _items = TarkovDevAPI.GetItems().ToList();
 
-        if (string.IsNullOrEmpty(value)) return RatScannerMain.Instance.ItemDB.Values.Take(1);
+        if (string.IsNullOrEmpty(value)) return TarkovDevAPI.GetItems().Take(1);
 
         value = SanitizeSearch(value);
 

@@ -140,8 +140,7 @@
     }
 
     private async Task<IEnumerable<SearchResult>> SearchItem(string value) {
-        if (_items == null) _items = RatScannerMain.Instance.ItemDB?.Values?.ToList() ?? null;
-        if (_items == null) return Enumerable.Empty<SearchResult>();
+        if (_items == null) _items = TarkovDevAPI.GetItems().ToList();
 
         if (string.IsNullOrEmpty(value)) return Enumerable.Empty<SearchResult>();
 

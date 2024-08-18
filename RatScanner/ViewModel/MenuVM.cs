@@ -19,9 +19,9 @@ internal class MenuVM : INotifyPropertyChanged {
 		}
 	}
 
-	public ItemQueue ItemScans => DataSource?.ItemScans;
+	public ItemQueue ItemScans => DataSource.ItemScans;
 
-	public ItemScan LastItemScan => ItemScans.LastOrDefault();
+	public ItemScan LastItemScan => ItemScans.LastOrDefault() ?? throw new Exception("ItemQueue is empty!");
 
 	public TarkovDev.GraphQL.Item LastItem => LastItemScan.Item;
 

@@ -1,20 +1,15 @@
 ﻿using RatEye;
 using RatEye.Processing;
 using System;
+using System.Linq;
 
 namespace RatScanner.Scan;
 
 public class ItemNameScan : ItemScan {
 	private Vector2 _toolTipPosition;
 
-	public ItemNameScan(Inspection inspection) {
-		Item = RatScannerMain.Instance.ItemDB[inspection.Item.Id];
-		Confidence = inspection.MarkerConfidence;
-		IconPath = inspection.IconPath;
-	}
-
 	public ItemNameScan(Inspection inspection, Vector2 toolTipPosition, int duration) {
-		Item = RatScannerMain.Instance.ItemDB[inspection.Item.Id];
+		Item = TarkovDevAPI.GetItems().FirstOrDefault(item => item.Id == inspection.Item.Id) ?? throw new Exception($"Unknown item: {inspection.Item.Id}");
 		Confidence = inspection.MarkerConfidence;
 		IconPath = inspection.IconPath;
 		_toolTipPosition = toolTipPosition;
