@@ -91,55 +91,48 @@ public static class TarkovDevAPI {
 
 	public static void InitializeCache() {
 		Task.WhenAll(
-			Task.Run(() => QueueRequest<TTask[]>(TasksQuery, 60 * 60 * 12)),
-			Task.Run(() => QueueRequest<Item[]>(ItemsQuery(RatConfig.NameScan.Language.ToTarkovDevType(), RatConfig.GameMode), 60 * 60)),
-			Task.Run(() => QueueRequest<HideoutStation[]>(HideoutStationsQuery, 60 * 60 * 12))
+			Task.Run(() => QueueRequest<Item[]>(ItemsQuery(), RatConfig.MediumTTL)),
+			Task.Run(() => QueueRequest<TTask[]>(TasksQuery, RatConfig.LongTTL)),
+			Task.Run(() => QueueRequest<HideoutStation[]>(HideoutStationsQuery, RatConfig.LongTTL))
 		).Wait();
 	}
 
-	/// <summary>
-	/// Refreshes every 12 hours
-	/// </summary>
-	public static TTask[] GetTasks() => GetCached<TTask[]>(TasksQuery, 60 * 60 * 12);
+	public static Item[] GetItems(LanguageCode language, GameMode gameMode) => GetCached<Item[]>(ItemsQuery(language, gameMode), RatConfig.MediumTTL);
+	public static Item[] GetItems() => GetCached<Item[]>(ItemsQuery(), RatConfig.MediumTTL);
 
-	/// <summary>
-	/// Refreshes every hour
-	/// </summary>
-	public static Item[] GetItems(LanguageCode language, GameMode gameMode) => GetCached<Item[]>(ItemsQuery(language, gameMode), 60 * 60);
+	public static TTask[] GetTasks() => GetCached<TTask[]>(TasksQuery, RatConfig.LongTTL);
 
-	/// <summary>
-	/// Refreshes every 12 hours
-	/// </summary>
-	public static HideoutStation[] GetHideoutStations() => GetCached<HideoutStation[]>(HideoutStationsQuery, 60 * 60 * 12);
+	public static HideoutStation[] GetHideoutStations() => GetCached<HideoutStation[]>(HideoutStationsQuery, RatConfig.LongTTL);
 
+	private static string ItemsQuery() => ItemsQuery(RatConfig.NameScan.Language.ToTarkovDevType(), RatConfig.GameMode);
 	private static string ItemsQuery(LanguageCode language, GameMode gameMode) {
 		return new QueryQueryBuilder().WithItems(new ItemQueryBuilder().WithAllScalarFields()
-			.WithProperties(new ItemPropertiesQueryBuilder().WithAllScalarFields()
-				.WithItemPropertiesAmmoFragment(new ItemPropertiesAmmoQueryBuilder().WithAllScalarFields())
-				.WithItemPropertiesFoodDrinkFragment(new ItemPropertiesFoodDrinkQueryBuilder().WithAllScalarFields()
-					.WithStimEffects(new StimEffectQueryBuilder().WithAllScalarFields()))
-				.WithItemPropertiesStimFragment(new ItemPropertiesStimQueryBuilder().WithAllScalarFields()
-					.WithStimEffects(new StimEffectQueryBuilder().WithAllScalarFields()))
-				.WithItemPropertiesMedicalItemFragment(new ItemPropertiesMedicalItemQueryBuilder().WithAllScalarFields())
-				.WithItemPropertiesMedKitFragment(new ItemPropertiesMedKitQueryBuilder().WithAllScalarFields()))
-			.WithSellFor(new ItemPriceQueryBuilder().WithAllScalarFields()
-				.WithVendor(new VendorQueryBuilder().WithAllScalarFields()
-					.WithTraderOfferFragment(new TraderOfferQueryBuilder().WithAllScalarFields()
-						.WithTrader(new TraderQueryBuilder().WithAllScalarFields()))))
-			.WithBuyFor(new ItemPriceQueryBuilder().WithAllScalarFields()
-				.WithVendor(new VendorQueryBuilder().WithAllScalarFields()
-					.WithTraderOfferFragment(new TraderOfferQueryBuilder().WithAllScalarFields()
-						.WithTrader(new TraderQueryBuilder().WithAllScalarFields()))))
-			.WithCategory(new ItemCategoryQueryBuilder().WithAllScalarFields())
-			.WithCategories(new ItemCategoryQueryBuilder().WithAllScalarFields())
-			.WithUsedInTasks(new TaskQueryBuilder().WithId())
-			.WithReceivedFromTasks(new TaskQueryBuilder().WithId())
-			.WithBartersFor(new BarterQueryBuilder().WithId())
-			.WithBartersUsing(new BarterQueryBuilder().WithId())
-			.WithCraftsFor(new CraftQueryBuilder().WithId())
-			.WithCraftsUsing(new CraftQueryBuilder().WithId())
-			.WithTypes()
-			, alias: "data", lang: language, gameMode: gameMode).Build();
+		.WithProperties(new ItemPropertiesQueryBuilder().WithAllScalarFields()
+			.WithItemPropertiesAmmoFragment(new ItemPropertiesAmmoQueryBuilder().WithAllScalarFields())
+			.WithItemPropertiesFoodDrinkFragment(new ItemPropertiesFoodDrinkQueryBuilder().WithAllScalarFields()
+				.WithStimEffects(new StimEffectQueryBuilder().WithAllScalarFields()))
+			.WithItemPropertiesStimFragment(new ItemPropertiesStimQueryBuilder().WithAllScalarFields()
+				.WithStimEffects(new StimEffectQueryBuilder().WithAllScalarFields()))
+			.WithItemPropertiesMedicalItemFragment(new ItemPropertiesMedicalItemQueryBuilder().WithAllScalarFields())
+			.WithItemPropertiesMedKitFragment(new ItemPropertiesMedKitQueryBuilder().WithAllScalarFields()))
+		.WithSellFor(new ItemPriceQueryBuilder().WithAllScalarFields()
+			.WithVendor(new VendorQueryBuilder().WithAllScalarFields()
+				.WithTraderOfferFragment(new TraderOfferQueryBuilder().WithAllScalarFields()
+					.WithTrader(new TraderQueryBuilder().WithAllScalarFields()))))
+		.WithBuyFor(new ItemPriceQueryBuilder().WithAllScalarFields()
+			.WithVendor(new VendorQueryBuilder().WithAllScalarFields()
+				.WithTraderOfferFragment(new TraderOfferQueryBuilder().WithAllScalarFields()
+					.WithTrader(new TraderQueryBuilder().WithAllScalarFields()))))
+		.WithCategory(new ItemCategoryQueryBuilder().WithAllScalarFields())
+		.WithCategories(new ItemCategoryQueryBuilder().WithAllScalarFields())
+		.WithUsedInTasks(new TaskQueryBuilder().WithId())
+		.WithReceivedFromTasks(new TaskQueryBuilder().WithId())
+		.WithBartersFor(new BarterQueryBuilder().WithId())
+		.WithBartersUsing(new BarterQueryBuilder().WithId())
+		.WithCraftsFor(new CraftQueryBuilder().WithId())
+		.WithCraftsUsing(new CraftQueryBuilder().WithId())
+		.WithTypes()
+		, alias: "data", lang: language, gameMode: gameMode).Build();
 	}
 
 	const string TasksQuery = @"{

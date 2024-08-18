@@ -47,7 +47,12 @@ public class RatScannerMain : INotifyPropertyChanged {
 
 	public TarkovTrackerDB TarkovTrackerDB;
 
-	public Dictionary<string, TarkovDev.GraphQL.Item> ItemDB;
+	public Dictionary<string, TarkovDev.GraphQL.Item> ItemDB {
+		get {
+			TarkovDev.GraphQL.LanguageCode language = RatConfig.NameScan.Language.ToTarkovDevType();
+			return TarkovDevAPI.GetItems(language, RatConfig.GameMode).ToDictionary(x => x.Id, x => x);
+		}
+	}
 	internal RatEyeEngine RatEyeEngine;
 
 	public event PropertyChangedEventHandler? PropertyChanged;
@@ -65,10 +70,6 @@ public class RatScannerMain : INotifyPropertyChanged {
 
 		Logger.LogInfo("Initializing TarkovDev API...");
 		TarkovDevAPI.InitializeCache();
-
-		Logger.LogInfo("Loading price data...");
-		// TODO Reload data when setting is changed
-		ItemDB = TarkovDevAPI.GetItems(RatConfig.NameScan.Language.ToTarkovDevType(), RatConfig.GameMode).ToDictionary(x => x.Id, x => x);
 
 		ItemScans.Enqueue(new DefaultItemScan(ItemDB.ElementAt(16).Value));
 
@@ -101,7 +102,6 @@ public class RatScannerMain : INotifyPropertyChanged {
 			}
 
 			Logger.LogInfo("Setting up timer routines...");
-			_marketDBRefreshTimer = new Timer(RefreshMarketDB, null, RatConfig.MarketDBRefreshTime, Timeout.Infinite);
 			_tarkovTrackerDBRefreshTimer = new Timer(RefreshTarkovTrackerDB, null, RatConfig.Tracking.TarkovTracker.RefreshTime, Timeout.Infinite);
 			_scanRefreshTimer = new Timer(RefreshOverlay, null, 1000, 100);
 
@@ -316,20 +316,13 @@ public class RatScannerMain : INotifyPropertyChanged {
 		return bmp;
 	}
 
-	private void RefreshOverlay(object? o = null) {
-		OnPropertyChanged();
-	}
-
-	private void RefreshMarketDB(object? o = null) {
-		Logger.LogInfo("Refreshing Market DB...");
-		// TODO
-		_marketDBRefreshTimer.Change(RatConfig.MarketDBRefreshTime, Timeout.Infinite);
-	}
-
 	private void RefreshTarkovTrackerDB(object? o = null) {
 		Logger.LogInfo("Refreshing TarkovTracker DB...");
 		TarkovTrackerDB.Init();
 		_tarkovTrackerDBRefreshTimer.Change(RatConfig.Tracking.TarkovTracker.RefreshTime, Timeout.Infinite);
+	}
+	private void RefreshOverlay(object? o = null) {
+		OnPropertyChanged();
 	}
 
 	protected virtual void OnPropertyChanged(string propertyName = null) {

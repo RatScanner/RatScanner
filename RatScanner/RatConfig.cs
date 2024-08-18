@@ -120,7 +120,9 @@ internal static class RatConfig {
 	internal static GameMode GameMode = GameMode.Regular;
 	internal static bool MinimizeToTray = false;
 	internal static bool AlwaysOnTop = true;
-	internal static int MarketDBRefreshTime = 30 * 60 * 1000; // 30 minutes
+	internal static int ShortTTL = 60 * 5; // 5 minutes
+	internal static int MediumTTL = 60 * 60 * 1; // 1 hour
+	internal static int LongTTL = 60 * 60 * 12; // 12 hours
 	private static int ConfigVersion => 2;
 
 	internal static int ScreenWidth = 1920;
