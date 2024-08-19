@@ -15,7 +15,8 @@ public class ItemIconScan : ItemScan {
 
 	public ItemIconScan(Icon icon, Vector2 toolTipPosition, int duration) {
 		Icon = icon;
-		Item = TarkovDevAPI.GetItems().FirstOrDefault(item => item.Id == icon.Item.Id) ?? throw new Exception($"Unknown item: {icon.Item.Id}");
+		RatStash.Item iconItem = icon.Item;
+		Item = TarkovDevAPI.GetItems().FirstOrDefault(item => item.Id == iconItem.Id) ?? throw new Exception($"Unknown item: {icon.Item.Id}");
 		ItemExtraInfo = icon.ItemExtraInfo;
 		Confidence = icon.DetectionConfidence;
 		Rotated = icon.Rotated;
