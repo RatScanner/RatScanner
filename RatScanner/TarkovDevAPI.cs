@@ -96,7 +96,7 @@ public static class TarkovDevAPI {
 	public static async Task InitializeCache() {
 		await Task.WhenAll(
 			Task.Run(() => QueueRequest<Item[]>(ItemsQuery(), RatConfig.MediumTTL)),
-			Task.Run(() => QueueRequest<TTask[]>(TasksQuery, RatConfig.LongTTL)),
+			Task.Run(() => QueueRequest<TTask[]>(TasksQuery(), RatConfig.LongTTL)),
 			Task.Run(() => QueueRequest<HideoutStation[]>(HideoutStationsQuery, RatConfig.LongTTL))
 		).ConfigureAwait(false);
 	}
@@ -104,7 +104,8 @@ public static class TarkovDevAPI {
 	public static Item[] GetItems(LanguageCode language, GameMode gameMode) => GetCached<Item[]>(ItemsQuery(language, gameMode), RatConfig.MediumTTL);
 	public static Item[] GetItems() => GetCached<Item[]>(ItemsQuery(), RatConfig.MediumTTL);
 
-	public static TTask[] GetTasks() => GetCached<TTask[]>(TasksQuery, RatConfig.LongTTL);
+	public static TTask[] GetTasks(LanguageCode language, GameMode gameMode) => GetCached<TTask[]>(TasksQuery(language, gameMode), RatConfig.LongTTL);
+	public static TTask[] GetTasks() => GetCached<TTask[]>(TasksQuery(), RatConfig.LongTTL);
 
 	public static HideoutStation[] GetHideoutStations() => GetCached<HideoutStation[]>(HideoutStationsQuery, RatConfig.LongTTL);
 
@@ -139,112 +140,30 @@ public static class TarkovDevAPI {
 		, alias: "data", lang: language, gameMode: gameMode).Build();
 	}
 
-	const string TasksQuery = @"{
-  data: tasks {
-    id
-    tarkovDataId
-    name
-    trader {
-      id
-      name
-    }
-    map {
-      id
-      name
-    }
-    wikiLink
-    minPlayerLevel
-    taskRequirements {
-      task {
-        id
-        name
-      }
-      status
-    }
-    traderLevelRequirements {
-      trader {
-        id
-        name
-      }
-      level
-    }
-    objectives {
-      __typename
-      id
-      type
-      description
-      optional
-      maps {
-        id
-        name
-      }
-      ... on TaskObjectiveBuildItem {
-        item {
-          id
-        }
-        containsAll {
-          id
-        }
-        containsOne {
-          id
-        }
-      }
-      ... on TaskObjectiveItem {
-        item {
-          id
-        }
-        count
-        foundInRaid
-        dogTagLevel
-        maxDurability
-        minDurability
-      }
-      ... on TaskObjectiveMark {
-        markerItem {
-          id
-        }
-      }
-      ... on TaskObjectiveShoot {
-        usingWeapon {
-          id
-        }
-        usingWeaponMods {
-          id
-        }
-        wearing {
-          id
-        }
-        notWearing {
-          id
-        }
-      }
-      ... on TaskObjectiveQuestItem {
-        id
-        type
-        description
-        optional
-        questItem {
-          id
-          name
-          shortName
-          description
-        }
-        count
-      }
-    }
-    factionName
-    neededKeys {
-      keys {
-        id
-      }
-      map {
-        id
-        name
-      }
-    }
-  }
-}
-";
+	private static string TasksQuery() => TasksQuery(RatConfig.NameScan.Language.ToTarkovDevType(), RatConfig.GameMode);
+	private static string TasksQuery(LanguageCode language, GameMode gameMode) {
+		return new QueryQueryBuilder().WithTasks(new TaskQueryBuilder().WithAllScalarFields()
+			.WithMap(new MapQueryBuilder().WithAllScalarFields())
+			.WithTrader(new TraderQueryBuilder().WithAllScalarFields())
+			.WithObjectives(new TaskObjectiveQueryBuilder().WithAllScalarFields()
+				.WithTaskObjectiveBasicFragment(new TaskObjectiveBasicQueryBuilder().WithAllScalarFields())
+				.WithTaskObjectiveBuildItemFragment(new TaskObjectiveBuildItemQueryBuilder().WithAllScalarFields())
+				.WithTaskObjectiveExperienceFragment(new TaskObjectiveExperienceQueryBuilder().WithAllScalarFields())
+				.WithTaskObjectiveExtractFragment(new TaskObjectiveExtractQueryBuilder().WithAllScalarFields())
+				.WithTaskObjectiveItemFragment(new TaskObjectiveItemQueryBuilder().WithAllScalarFields())
+				.WithTaskObjectiveMarkFragment(new TaskObjectiveMarkQueryBuilder().WithAllScalarFields())
+				.WithTaskObjectivePlayerLevelFragment(new TaskObjectivePlayerLevelQueryBuilder().WithAllScalarFields())
+				.WithTaskObjectiveQuestItemFragment(new TaskObjectiveQuestItemQueryBuilder().WithAllScalarFields())
+				.WithTaskObjectiveShootFragment(new TaskObjectiveShootQueryBuilder().WithAllScalarFields())
+				.WithTaskObjectiveSkillFragment(new TaskObjectiveSkillQueryBuilder().WithAllScalarFields())
+				.WithTaskObjectiveTaskStatusFragment(new TaskObjectiveTaskStatusQueryBuilder().WithAllScalarFields())
+				.WithTaskObjectiveTraderLevelFragment(new TaskObjectiveTraderLevelQueryBuilder().WithAllScalarFields())
+				.WithTaskObjectiveTraderStandingFragment(new TaskObjectiveTraderStandingQueryBuilder().WithAllScalarFields())
+				.WithTaskObjectiveUseItemFragment(new TaskObjectiveUseItemQueryBuilder().WithAllScalarFields()))
+			.WithTaskRequirements(new TaskStatusRequirementQueryBuilder().WithAllScalarFields()
+				.WithTask(new TaskQueryBuilder().WithAllScalarFields()))
+		, alias: "data", lang: language, gameMode: gameMode).Build();
+	}
 
 	const string HideoutStationsQuery = @"{
   data: hideoutStations {
