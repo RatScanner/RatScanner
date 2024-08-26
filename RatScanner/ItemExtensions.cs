@@ -44,15 +44,15 @@ public static class ItemExtensions {
 			foreach (ITaskObjective? objective in task.Objectives) {
 				if (objective == null) continue;
 				if (objective is TaskObjectiveItem oGiveItem && oGiveItem.Type == "giveItem") {
-					if (oGiveItem.Item?.Id != item.Id) continue;            // Skip if item is not the one we are looking for
-					if (!showNonFir && !oGiveItem.FoundInRaid) continue;    // Skip if item is not FIR
+					if ((!oGiveItem.Items?.Any(i => i?.Id == item.Id)) ?? true) continue;	// Skip if item is not the one we are looking for
+					if (!showNonFir && !oGiveItem.FoundInRaid) continue;					// Skip if item is not FIR
 					count += oGiveItem.Count;
 					// Substract amount of already collected items
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
 					foreach (Progress p in objectiveProgress) count -= p.Complete ? oGiveItem.Count : p.Count;
 				} else if (objective is TaskObjectiveItem oPlantItem && oPlantItem.Type == "plantItem") {
-					if (oPlantItem.Item?.Id != item.Id) continue;   // Skip if item is not the one we are looking for
-					if (!showNonFir) continue;                      // Skip if item is not FIR
+					if ((!oPlantItem.Items?.Any(i => i?.Id == item.Id)) ?? true) continue;	// Skip if item is not the one we are looking for
+					if (!showNonFir) continue;												// Skip if item is not FIR
 					count += oPlantItem.Count;
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
 					foreach (Progress p in objectiveProgress) count -= p.Complete ? oPlantItem.Count : p.Count;
