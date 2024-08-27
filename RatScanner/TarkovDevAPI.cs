@@ -41,10 +41,39 @@ public static class TarkovDevAPI {
 	}
 
 	private static async Task QueueRequest<T>(string query, long ttl) {
-		Logger.LogInfo($"Queueing request for query: \"{query[..32].ReplaceLineEndings(" ")}...\"");
+		try {
+			await QueueRequestInner<T>(query, ttl);
+		} catch (Exception e) {
+			Logger.LogWarning($"Failed to request query: \"{query[..32].ReplaceLineEndings(" ")}...\".", e);
 
+			if (RatConfig.ReadFromCache(query, out string cachedResponse)) {
+				Logger.LogInfo($"Read from offline cache for query: \"{query[..32].ReplaceLineEndings(" ")}...\"");
+
+				JsonSerializerSettings jsonSerializerSettings = new() {
+					MissingMemberHandling = MissingMemberHandling.Ignore,
+					NullValueHandling = NullValueHandling.Ignore,
+					TypeNameHandling = TypeNameHandling.Auto,
+					TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
+				};
+
+				ResponseData<T>? neededResponse = JsonConvert.DeserializeObject<ResponseData<T>?>(cachedResponse, jsonSerializerSettings);
+				if (neededResponse == null) throw new Exception("Failed to deserialize cached response");
+				T? response = neededResponse.Data.Data;
+				if (response == null) throw new Exception("Failed to deserialize response");
+
+				long time = DateTimeOffset.Now.ToUnixTimeSeconds();
+				Cache[query] = (time + RatConfig.SuperShortTTL, response);
+			}
+
+			if (!Cache.ContainsKey(query)) throw new Exception("Failed to fetch query response and no cache available.");
+		}
+	}
+
+	private static async Task QueueRequestInner<T>(string query, long ttl) {
+		Logger.LogInfo($"Queueing request for query: \"{query[..32].ReplaceLineEndings(" ")}...\"");
 		Stopwatch swHttp = new();
 		Stopwatch swJson = new();
+		Stopwatch swCache = new();
 		swHttp.Start();
 
 		// Prevent multiple requests for the same query
@@ -58,9 +87,9 @@ public static class TarkovDevAPI {
 		};
 		JsonSerializer serializer = JsonSerializer.Create(jsonSerializerSettings);
 
-		using Stream s = await Get(query);
-		using StreamReader sr = new(s);
-		using JsonReader reader = new JsonTextReader(sr);
+		using Stream stream = await Get(query);
+		using StreamReader streamReader = new(stream);
+		using JsonReader reader = new JsonTextReader(streamReader);
 
 		swJson.Start();
 		ResponseData<T>? neededResponse = serializer.Deserialize<ResponseData<T>>(reader);
@@ -72,9 +101,11 @@ public static class TarkovDevAPI {
 		long time = DateTimeOffset.Now.ToUnixTimeSeconds();
 		Cache[query] = (time + ttl, response);
 
-		swHttp.Stop();
-		swJson.Stop();
-		Logger.LogInfo($"Refreshed cache in {swHttp.ElapsedMilliseconds}ms ({swJson.ElapsedMilliseconds}ms) for query: \"{query[..32].ReplaceLineEndings(" ")}...\"");
+		swCache.Start();
+		stream.Position = 0;
+		string responseString = streamReader.ReadToEnd();
+		RatConfig.WriteToCache(query, responseString);
+		Logger.LogInfo($"Refreshed cache in {swHttp.ElapsedMilliseconds}ms ({swJson.ElapsedMilliseconds}ms) [{swCache.ElapsedMilliseconds}ms] for query: \"{query[..32].ReplaceLineEndings(" ")}...\"");
 	}
 
 	private static T GetCached<T>(string query, long ttl, bool isRetry = false) {
