@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -35,6 +36,8 @@ internal static class RatConfig {
 
 		private const string EftTempDir = "Battlestate Games\\EscapeFromTarkov\\";
 		private static readonly string EftTemp = Path.Combine(Path.GetTempPath(), EftTempDir);
+		private static readonly string TempDir = Path.Combine(Path.GetTempPath(), "RatScanner");
+		internal static readonly string CacheDir = Path.Combine(TempDir, "Cache");
 		internal static string DynamicIcon = Path.Combine(EftTemp, "Icon Cache");
 		internal static string StaticCorrelation = Path.Combine(StaticIcon, "correlation.json");
 		internal static string DynamicCorrelation = Path.Combine(DynamicIcon, "index.json");
@@ -122,6 +125,7 @@ internal static class RatConfig {
 	internal static GameMode GameMode = GameMode.Regular;
 	internal static bool MinimizeToTray = false;
 	internal static bool AlwaysOnTop = true;
+	internal static int SuperShortTTL = 30; // 30 seconds
 	internal static int ShortTTL = 60 * 5; // 5 minutes
 	internal static int MediumTTL = 60 * 60 * 1; // 1 hour
 	internal static int LongTTL = 60 * 60 * 12; // 12 hours
@@ -280,6 +284,24 @@ internal static class RatConfig {
 		config.WriteInt(nameof(LastWindowPositionX), LastWindowPositionX);
 		config.WriteInt(nameof(LastWindowPositionY), LastWindowPositionY);
 		config.WriteInt(nameof(LastWindowMode), (int)LastWindowMode);
+	}
+
+	internal static bool ReadFromCache(string key, out string value) {
+		byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(key));
+		string hash = string.Concat(Array.ConvertAll(hashBytes, b => b.ToString("X2")));
+
+		string path = Path.Combine(Paths.CacheDir, hash + ".data");
+		value = File.Exists(path) ? File.ReadAllText(path) : string.Empty;
+		return value != string.Empty;
+	}
+
+	internal static void WriteToCache(string key, string value) {
+		byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(key));
+		string hash = string.Concat(Array.ConvertAll(hashBytes, b => b.ToString("X2")));
+
+		string path = Path.Combine(Paths.CacheDir, hash + ".data");
+		Directory.CreateDirectory(Paths.CacheDir);
+		File.WriteAllText(path, value);
 	}
 
 	/// <summary>
