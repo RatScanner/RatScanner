@@ -67,6 +67,7 @@ If you still can't run the application, you are probably missing the WebView2 Ru
 ## Nothing happens when scanning
 - Check that you set your resolution correctly inside the settings
 - Try to run RatScanner as administrator
+- Try to disable HDR
 
 ## RatUpdater.exe could not be found! Please update manually.
 Downloaded the latest version [here][ratscanner-latest].
