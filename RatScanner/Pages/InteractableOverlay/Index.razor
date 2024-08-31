@@ -25,7 +25,7 @@
                 <MudPaper>
                     <MudTextField @ref="_searchTextField" T="string" Variant="Variant.Outlined"
                                   Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search"
-                                  DebounceInterval="100" OnDebounceIntervalElapsed="ExecuteSearch" @bind-Value="@_searchText">
+                                  DebounceInterval="20" OnDebounceIntervalElapsed="ExecuteSearch" @bind-Value="@_searchText">
                     </MudTextField>
                 </MudPaper>
 
@@ -94,6 +94,48 @@
                                 </MudStack>
 
                                 @if (i != 0) return;
+
+                                @if (item.Properties is ItemPropertiesAmmo ammoProp) {
+                                    <MudDivider Vertical="false" DividerType="DividerType.Middle" Class="mx-0 my-2" />
+
+                                    <MudStack Row="false">
+                                        <MudTable T="Item" Items="@item.GetAmmoOfSameCaliber()" Dense="true" FixedHeader="true" Elevation="0" Striped="true" Style="max-height: 300px; overflow-y: auto;" RowStyleFunc="@((ctx, _) => ctx.Id == item.Id ? "background: #FFFF8040;" : "")">
+                                            <HeaderContent>
+                                                <MudTh Style="">Name</MudTh>
+                                                <MudTh Style="text-align:right"><MudTableSortLabel SortBy="new Func<Item, object>(x=>x.Avg24HPrice)">Price</MudTableSortLabel></MudTh>
+                                                <MudTh Style="text-align:right"><MudTableSortLabel SortBy="new Func<Item, object>(x=>(x.Properties as ItemPropertiesAmmo).Damage)">Damage</MudTableSortLabel></MudTh>
+                                                <MudTh Style="text-align:right"><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Item, object>(x=>(x.Properties as ItemPropertiesAmmo).PenetrationPower)">Pen</MudTableSortLabel></MudTh>
+                                                <MudTh Style="text-align:right">Frag %</MudTh>
+                                                <MudTh Style="text-align:center">Armor Pen</MudTh>
+                                            </HeaderContent>
+                                            <RowTemplate>
+                                                @if (context.Properties is not ItemPropertiesAmmo ammo) return;
+                                                <MudTd Class="my-0 py-0">
+                                                    <MudStack Row="true" AlignItems="AlignItems.Center">
+                                                        <MudImage Src="@context.BaseImageLink" Style="width: 32px; height: 32px;" />
+                                                        <MudText Style="">@context.ShortName</MudText>
+                                                    </MudStack>
+                                                </MudTd>
+                                                <MudTd Style="text-align:right">@context.Avg24HPrice.AsRubs()</MudTd>
+                                                <MudTd Style="text-align:right">@ammo.Damage</MudTd>
+                                                <MudTd Style="text-align:right">@ammo.PenetrationPower</MudTd>
+                                                <MudTd Style="text-align:right">@((int)((ammo.FragmentationChance ?? 0m) * 100m))%</MudTd>
+                                                <MudTd Style="text-align:center">
+                                                    @* Iterate over int from 0 to 6 and add mudavatar with each index *@
+                                                    @for (int _i = 0; _i < 6; _i++) {
+                                                        int i = _i; // https://github.com/aspnet/Blazor.Docs/issues/371
+                                                        decimal value = Math.Clamp((ammo.PenetrationPower ?? 0m) / 10m - i, 0, 1);
+                                                        int hue = (int)(value * 120m);
+                                                        string style = $"background-color: hsl({hue},100%,40%);";
+                                                        <MudAvatar Size="Size.Small" Square="true" Variant="Variant.Outlined" Style="@style">
+                                                            @(i+1)
+                                                        </MudAvatar>
+                                                    }
+                                                </MudTd>
+                                            </RowTemplate>
+                                        </MudTable>
+                                    </MudStack>
+                                }
                             </MudPaper>
                         } else if (searchResult.Data is TarkovDev.GraphQL.Task task) {
                             <MudPaper Class="pa-2" Elevation="3" Style="">
@@ -261,6 +303,7 @@
     private string SanitizeSearch(string? value) {
         if (string.IsNullOrEmpty(value)) return string.Empty;
         value = value.ToLower().Trim();
+        value = value.Replace("-", " ");
         value = new string(value.Where(c => char.IsLetterOrDigit(c) || c == ' ').ToArray());
         return value;
     }

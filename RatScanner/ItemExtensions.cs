@@ -108,4 +108,9 @@ public static class ItemExtensions {
 	public static ItemPrice? GetBestTraderOffer(this Item item) => item.SellFor?.Where(i => i.Vendor is TraderOffer).MaxBy(i => i.PriceRub);
 
 	public static TraderOffer? GetBestTraderOfferVendor(this Item item) => GetBestTraderOffer(item)?.Vendor as TraderOffer;
+
+	public static IEnumerable<Item> GetAmmoOfSameCaliber(this Item item) {
+		if (item.Properties is not ItemPropertiesAmmo ammo) return Enumerable.Empty<Item>();
+		return TarkovDevAPI.GetItems().Where(i => i.Properties is ItemPropertiesAmmo a && ammo.Caliber == a.Caliber);
+	}
 }
