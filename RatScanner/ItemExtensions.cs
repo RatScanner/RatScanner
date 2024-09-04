@@ -81,11 +81,13 @@ public static class ItemExtensions {
 		HideoutStation[] stations = TarkovDevAPI.GetHideoutStations();
 
 		foreach (HideoutStation station in stations) {
-			// Skip if station is already built
-			if (progress.HideoutModules.Any(p => p.Id == station.Id && p.Complete)) continue;
-
 			if (station.Levels == null) continue;
 			foreach (HideoutStationLevel? level in station.Levels) {
+				if (level == null) continue;
+
+				// Skip if level is already built
+				if (progress.HideoutModules.Any(p => p.Id == level.Id && p.Complete)) continue;
+
 				if (level?.ItemRequirements == null) continue;
 				foreach (RequirementItem? requiredItem in level.ItemRequirements) {
 					if (requiredItem?.Item?.Id != item.Id) continue;
