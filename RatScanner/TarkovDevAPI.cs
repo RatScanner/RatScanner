@@ -128,7 +128,7 @@ public static class TarkovDevAPI {
 		await Task.WhenAll(
 			Task.Run(() => QueueRequest<Item[]>(ItemsQuery(), RatConfig.MediumTTL)),
 			Task.Run(() => QueueRequest<TTask[]>(TasksQuery(), RatConfig.LongTTL)),
-			Task.Run(() => QueueRequest<HideoutStation[]>(HideoutStationsQuery, RatConfig.LongTTL))
+			Task.Run(() => QueueRequest<HideoutStation[]>(HideoutStationsQuery(), RatConfig.LongTTL))
 		).ConfigureAwait(false);
 	}
 
@@ -138,7 +138,8 @@ public static class TarkovDevAPI {
 	public static TTask[] GetTasks(LanguageCode language, GameMode gameMode) => GetCached<TTask[]>(TasksQuery(language, gameMode), RatConfig.LongTTL);
 	public static TTask[] GetTasks() => GetCached<TTask[]>(TasksQuery(), RatConfig.LongTTL);
 
-	public static HideoutStation[] GetHideoutStations() => GetCached<HideoutStation[]>(HideoutStationsQuery, RatConfig.LongTTL);
+	public static HideoutStation[] GetHideoutStations(LanguageCode language, GameMode gameMode) => GetCached<HideoutStation[]>(HideoutStationsQuery(language, gameMode), RatConfig.LongTTL);
+	public static HideoutStation[] GetHideoutStations() => GetCached<HideoutStation[]>(HideoutStationsQuery(), RatConfig.LongTTL);
 
 	private static string ItemsQuery() => ItemsQuery(RatConfig.NameScan.Language.ToTarkovDevType(), RatConfig.GameMode);
 	private static string ItemsQuery(LanguageCode language, GameMode gameMode) {
@@ -196,46 +197,19 @@ public static class TarkovDevAPI {
 		, alias: "data", lang: language, gameMode: gameMode).Build();
 	}
 
-	const string HideoutStationsQuery = @"{
-  data: hideoutStations {
-    id
-    name
-    normalizedName
-    levels {
-      id
-      level
-      itemRequirements {
-        id
-        item {
-          id
-        }
-        count
-      }
-      stationLevelRequirements {
-        id
-        station {
-          id
-          name
-        }
-        level
-      }
-      crafts {
-        id
-        duration
-        requiredItems {
-          item {
-            id
-          }
-          count
-        }
-        rewardItems {
-          item {
-            id
-          }
-          count
-        }
-      }
-    }
-  }
-}";
+	private static string HideoutStationsQuery() => HideoutStationsQuery(RatConfig.NameScan.Language.ToTarkovDevType(), RatConfig.GameMode);
+	private static string HideoutStationsQuery(LanguageCode language, GameMode gameMode) {
+		return new QueryQueryBuilder().WithHideoutStations(new HideoutStationQueryBuilder().WithAllScalarFields()
+			.WithLevels(new HideoutStationLevelQueryBuilder().WithAllScalarFields()
+				.WithItemRequirements(new RequirementItemQueryBuilder().WithAllScalarFields()
+					.WithItem(new ItemQueryBuilder().WithAllScalarFields()))
+				.WithStationLevelRequirements(new RequirementHideoutStationLevelQueryBuilder().WithAllScalarFields()
+					.WithStation(new HideoutStationQueryBuilder().WithAllScalarFields()))
+				.WithCrafts(new CraftQueryBuilder().WithAllScalarFields()
+					.WithRequiredItems(new ContainedItemQueryBuilder().WithAllScalarFields()
+						.WithItem(new ItemQueryBuilder().WithAllScalarFields()))
+					.WithRewardItems(new ContainedItemQueryBuilder().WithAllScalarFields()
+						.WithItem(new ItemQueryBuilder().WithAllScalarFields()))))
+		, alias: "data", lang: language, gameMode: gameMode).Build();
+	}
 }
