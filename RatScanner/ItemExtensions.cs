@@ -81,11 +81,13 @@ public static class ItemExtensions {
 		HideoutStation[] stations = TarkovDevAPI.GetHideoutStations();
 
 		foreach (HideoutStation station in stations) {
-			// Skip if station is already built
-			if (progress.HideoutModules.Any(p => p.Id == station.Id && p.Complete)) continue;
-
 			if (station.Levels == null) continue;
 			foreach (HideoutStationLevel? level in station.Levels) {
+				if (level == null) continue;
+
+				// Skip if level is already built
+				if (progress.HideoutModules.Any(p => p.Id == level.Id && p.Complete)) continue;
+
 				if (level?.ItemRequirements == null) continue;
 				foreach (RequirementItem? requiredItem in level.ItemRequirements) {
 					if (requiredItem?.Item?.Id != item.Id) continue;
@@ -108,4 +110,9 @@ public static class ItemExtensions {
 	public static ItemPrice? GetBestTraderOffer(this Item item) => item.SellFor?.Where(i => i.Vendor is TraderOffer).MaxBy(i => i.PriceRub);
 
 	public static TraderOffer? GetBestTraderOfferVendor(this Item item) => GetBestTraderOffer(item)?.Vendor as TraderOffer;
+
+	public static IEnumerable<Item> GetAmmoOfSameCaliber(this Item item) {
+		if (item.Properties is not ItemPropertiesAmmo ammo) return Enumerable.Empty<Item>();
+		return TarkovDevAPI.GetItems().Where(i => i.Properties is ItemPropertiesAmmo a && ammo.Caliber == a.Caliber);
+	}
 }

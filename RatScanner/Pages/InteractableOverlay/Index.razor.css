@@ -3,3 +3,14 @@
 	filter: drop-shadow(-1px - 1px 0px #000000) drop-shadow(1px - 1px 0px #000000) drop-shadow(1px 1px 0px #000000) drop-shadow(-1px 1px 0px #000000);
 	/* ReSharper restore InvalidValue */
 }
+
+.fadeOut {
+	content: " ";
+	position: absolute;
+	left: 0;
+	right: 0;
+	height: 16px;
+	margin-top: -16px;
+	background: linear-gradient(to bottom, #ffffff00 0%, #1e1e1e 100%);
+	pointer-events: none;
+}
