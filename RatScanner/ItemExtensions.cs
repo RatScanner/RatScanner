@@ -93,7 +93,7 @@ public static class ItemExtensions {
 					if (requiredItem?.Item?.Id != item.Id) continue;
 
 					count += requiredItem.Count;
-					List<Progress> objectiveProgress = progress.HideoutParts.Where(p => p.Id == level.Id).ToList();
+					List<Progress> objectiveProgress = progress.HideoutParts.Where(p => p.Id == requiredItem.Id).ToList();
 					foreach (Progress p in objectiveProgress) count -= p.Complete ? requiredItem.Count : p.Count;
 				}
 			}
