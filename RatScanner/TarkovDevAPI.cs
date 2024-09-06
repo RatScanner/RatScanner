@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using RatScanner.TarkovDev.GraphQL;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -26,7 +27,7 @@ public static class TarkovDevAPI {
 
 	const string ApiEndpoint = "https://api.tarkov.dev/graphql";
 
-	private static readonly Dictionary<string, (long expire, object response)> Cache = new();
+	private static readonly ConcurrentDictionary<string, (long expire, object response)> Cache = new();
 
 	private static readonly HttpClient HttpClient = new(new HttpClientHandler {
 		AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
