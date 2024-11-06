@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace RatScanner;
@@ -25,6 +26,16 @@ internal class SimpleConfig {
 
 	internal void WriteString(string key, string value) {
 		WritePrivateProfileString(Section, key.ToLower(), value, Path);
+	}
+	internal void WriteSecureString(string key, string value) {
+		if (string.IsNullOrEmpty(value)) {
+			WriteString(key, value);
+			return;
+		}
+		byte[] bytes = Encoding.ASCII.GetBytes(value);
+		byte[] encryptedBytes = ProtectedData.Protect(bytes, null, DataProtectionScope.CurrentUser);
+		string hexString = Convert.ToHexString(encryptedBytes);
+		WritePrivateProfileString(Section, key.ToLower(), hexString, Path);
 	}
 
 	internal void WriteInt(string key, int value) {
@@ -53,7 +64,7 @@ internal class SimpleConfig {
 	}
 
 	private string ReadStringInternal(string key) {
-		StringBuilder temp = new(255);
+		StringBuilder temp = new(1024);
 		const string def = "RatScanner.Config.Default.Exception";
 		GetPrivateProfileString(Section, key.ToLower(), def, temp, short.MaxValue, Path);
 		string result = temp.ToString();
@@ -63,6 +74,18 @@ internal class SimpleConfig {
 	internal string ReadString(string key, string defaultValue) {
 		try {
 			return ReadStringInternal(key);
+		} catch (Exception) {
+			return defaultValue;
+		}
+	}
+
+	internal string ReadSecureString(string key, string defaultValue) {
+		try {
+			string hexString = ReadStringInternal(key);
+			if (string.IsNullOrEmpty(hexString)) return "";
+			byte[] encryptedBytes = Convert.FromHexString(hexString);
+			byte[] decryptedBytes = ProtectedData.Unprotect(encryptedBytes, null, DataProtectionScope.CurrentUser);
+			return Encoding.ASCII.GetString(decryptedBytes);
 		} catch (Exception) {
 			return defaultValue;
 		}

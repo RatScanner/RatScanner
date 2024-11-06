@@ -4,11 +4,17 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text;
+using System.Threading.Tasks;
+using static RatScanner.OAuth2;
 
 namespace RatScanner;
 
 public static class ApiManager {
+	static readonly HttpClient HttpClient = new();
+
 	public enum ResourceType {
 		ClientVersion,
 		ClientForceUpdateVersions,
@@ -24,6 +30,33 @@ public static class ApiManager {
 
 	// Official RatScanner API URL
 	private const string BaseUrl = "https://api.ratscanner.com/v3";
+
+	internal static async Task<OAuth2.Token?> ExchangeRefreshTokenForTokensAsync(Client client, Token token) {
+		Logger.LogInfo("Exchanging refresh token for tokens...");
+
+		JsonContent content = JsonContent.Create(new { client_id = client.Id, refresh_token = token.RefreshToken });
+		HttpRequestMessage request = new() {
+			Method = HttpMethod.Post,
+			RequestUri = new Uri($"{BaseUrl}/oauth/refresh"),
+			Content = content,
+		};
+
+		HttpResponseMessage response = await HttpClient.SendAsync(request);
+		string responseText = await response.Content.ReadAsStringAsync();
+
+		if (!response.IsSuccessStatusCode) {
+			Logger.LogWarning($"STATUS CODE: {response.StatusCode}");
+			Logger.LogInfo($"Content: {responseText}");
+			return null;
+		}
+
+		Dictionary<string, string> tokenEndpointDecoded = JsonConvert.DeserializeObject<Dictionary<string, string>>(responseText);
+
+		return new Token() {
+			AccessToken = tokenEndpointDecoded["access_token"],
+			RefreshToken = tokenEndpointDecoded["refresh_token"],
+		};
+	}
 
 	public static string GetResource(ResourceType resource) {
 		if (ResCache.ContainsKey(resource)) return ResCache[resource];
