@@ -2,6 +2,7 @@
 using RatScanner.TarkovDev.GraphQL;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
@@ -49,7 +50,9 @@ internal class MenuVM : INotifyPropertyChanged {
 
 	public int TaskRemaining => LastItem.GetTaskRemaining();
 
-	public int HideoutRemaining => LastItem.GetHideoutRemaining();
+	public int HideoutRemaining => LastItem.GetHideoutTotalRemaining();
+
+	public ObservableCollection<HideoutItemRemaining> HideoutItemRemaining => LastItem.GetHideoutRemainingItem();
 
 	public bool ItemNeeded => TaskRemaining + HideoutRemaining > 0;
 
@@ -62,7 +65,7 @@ internal class MenuVM : INotifyPropertyChanged {
 			List<KeyValuePair<string, KeyValuePair<int, int>>> needs = new();
 			foreach (FetchModels.TarkovTracker.UserProgress? memberProgress in teamProgress) {
 				int task = LastItem.GetTaskRemaining(memberProgress);
-				int hideout = LastItem.GetHideoutRemaining(memberProgress);
+				int hideout = LastItem.GetHideoutTotalRemaining(memberProgress);
 
 				if (task == 0 && hideout == 0) continue;
 

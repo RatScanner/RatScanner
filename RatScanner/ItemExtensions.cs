@@ -1,6 +1,8 @@
 ﻿using RatScanner.FetchModels.TarkovTracker;
 using RatScanner.TarkovDev.GraphQL;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace RatScanner;
@@ -74,16 +76,18 @@ public static class ItemExtensions {
 		return count;
 	}
 
-	public static int GetHideoutRemaining(this Item item, UserProgress? progress = null) {
+	public static ObservableCollection<HideoutItemRemaining> GetHideoutRemainingItem(this Item item, UserProgress? progress = null) {
 		progress ??= GetUserProgress();
 
-		int count = 0;
+		var hideoutRemainingItems = new ObservableCollection<HideoutItemRemaining>();
 		HideoutStation[] stations = TarkovDevAPI.GetHideoutStations();
 
 		foreach (HideoutStation station in stations) {
+
 			if (station.Levels == null) continue;
 			foreach (HideoutStationLevel? level in station.Levels) {
 				if (level == null) continue;
+				int count = 0;
 
 				// Skip if level is already built
 				if (progress.HideoutModules.Any(p => p.Id == level.Id && p.Complete)) continue;
@@ -91,14 +95,19 @@ public static class ItemExtensions {
 				if (level?.ItemRequirements == null) continue;
 				foreach (RequirementItem? requiredItem in level.ItemRequirements) {
 					if (requiredItem?.Item?.Id != item.Id) continue;
-
 					count += requiredItem.Count;
-					List<Progress> objectiveProgress = progress.HideoutParts.Where(p => p.Id == requiredItem.Id).ToList();
-					foreach (Progress p in objectiveProgress) count -= p.Complete ? requiredItem.Count : p.Count;
 				}
+
+				if(count < 1) continue;
+				hideoutRemainingItems.Add(new HideoutItemRemaining(count, station.Name, level.Level));
 			}
 		}
-		return count;
+
+		return hideoutRemainingItems;
+	}
+
+	public static int GetHideoutTotalRemaining(this Item item, UserProgress? progress = null) {
+		return GetHideoutRemainingItem(item, progress).Sum(x => x.ItemCount);
 	}
 
 	public static int GetAvg24hMarketPricePerSlot(this Item item) {

@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
+using System.Text;
 using System.Windows;
-using System.Windows.Data;
+using System.Windows.Controls;
 using System.Windows.Input;
 using RatScanner.ViewModel;
 using RCMinUi = RatScanner.RatConfig.FloatingTooltip;
@@ -56,6 +57,17 @@ public partial class FloatingTooltip : Window
 		var mousePosition = UserActivityHelper.GetMousePosition();
 		Instance.Top = mousePosition.Y;
 		Instance.Left = mousePosition.X;
+
+		MenuVM context = ((MenuVM)Instance.DataContext);
+
+		HideoutItemList.Children.Clear();
+		foreach (var hideoutItemRemaining in context.HideoutItemRemaining)
+		{
+			var label = new Label();
+			label.Content = "[" + hideoutItemRemaining.Level + "] " + hideoutItemRemaining.Name + " " + hideoutItemRemaining.ItemCount + "x";
+			HideoutItemList.Children.Add(label);
+		}
+
 		((Window)_instance).Show();
 	}
 
@@ -63,19 +75,11 @@ public partial class FloatingTooltip : Window
 	{
 		const Visibility v = Visibility.Visible;
 		const Visibility c = Visibility.Collapsed;
-
-		NameDisplay.Visibility = RCMinUi.ShowName ? v : c;
-		AvgDayPriceDisplay.Visibility = RCMinUi.ShowAvgDayPrice ? v : c;
-		PricePerSlotDisplay.Visibility = RCMinUi.ShowPricePerSlot ? v : c;
-		TraderPriceDisplay.Visibility = RCMinUi.ShowTraderPrice ? v : c;
-		TrackingDisplay.Visibility = RCMinUi.ShowQuestHideoutTracker ? v : c;
-		TeamTrackingDisplay.Visibility = RCMinUi.ShowQuestHideoutTeamTracker ? v : c;
-		UpdatedDisplay.Visibility = RCMinUi.ShowUpdated ? v : c;
 	}
 
 
-	private void FrameworkElement_OnTargetUpdated(object? sender, DataTransferEventArgs e)
+	public static string GetHideoutItemsString()
 	{
-		string test = "test";
+		return "Hideout items lol";
 	}
 }

@@ -14,7 +14,7 @@
         SizeToContent="WidthAndHeight"
         AllowsTransparency="True">
 
-	<StackPanel Background="Black" Opacity="0.85">
+	<StackPanel Background="Black" Opacity="0.85" Name="RandomName">
 		<StackPanel.Effect>
 			<DropShadowEffect BlurRadius="3"
 			                  ShadowDepth="1"
@@ -88,128 +88,10 @@
 			</StackPanel.Style>
 		</StackPanel>
 
-		<StackPanel x:Name="TrackingDisplay">
-			<StackPanel>
-				<Separator />
-				<Grid>
-					<Label Grid.Column="0"
-					       HorizontalAlignment="Left"
-					       Content="Needed Items" />
-					<StackPanel Grid.Column="1"
-					            Orientation="Horizontal"
-					            HorizontalAlignment="Right">
-						<Label Content="{Binding TaskRemaining, FallbackValue=0}" />
-						<Image Source="{StaticResource questIcon}"
-						       VerticalAlignment="Center"
-						       Height="20" />
-					</StackPanel>
-					<StackPanel Grid.Column="2"
-					            Orientation="Horizontal"
-					            HorizontalAlignment="Right">
-						<Label Content="{Binding HideoutRemaining, FallbackValue=0}" />
-						<Image Source="{StaticResource hideoutIcon}"
-						       VerticalAlignment="Center"
-						       Height="20" />
-					</StackPanel>
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="2*" />
-						<ColumnDefinition Width="*" />
-						<ColumnDefinition Width="*" />
-					</Grid.ColumnDefinitions>
-				</Grid>
-				<StackPanel.Style>
-					<Style TargetType="StackPanel">
-						<Setter Property="Visibility"
-						        Value="Visible" />
-						<Style.Triggers>
-							<DataTrigger Binding="{Binding ItemNeeded}"
-							             Value="False">
-								<Setter Property="Visibility"
-								        Value="Collapsed" />
-							</DataTrigger>
-						</Style.Triggers>
-					</Style>
-				</StackPanel.Style>
-			</StackPanel>
-		</StackPanel>
-
-		<StackPanel x:Name="TeamTrackingDisplay">
-			<StackPanel>
-				<Separator />
-				<ListView ItemsSource="{Binding ItemTeamNeeds}"
-				          Background="Transparent"
-				          BorderThickness="0">
-					<ListView.ItemContainerStyle>
-						<Style TargetType="ListViewItem">
-							<Setter Property="HorizontalContentAlignment"
-							        Value="Stretch" />
-							<Setter Property="Focusable"
-							        Value="False" />
-							<Setter Property="Template">
-								<Setter.Value>
-									<ControlTemplate TargetType="ListViewItem">
-										<ContentPresenter Margin="0, 2" />
-									</ControlTemplate>
-								</Setter.Value>
-							</Setter>
-						</Style>
-					</ListView.ItemContainerStyle>
-
-					<ListView.ItemTemplate>
-						<DataTemplate>
-							<Grid Height="17">
-								<Grid.Resources>
-									<Style TargetType="Label"
-									       BasedOn="{StaticResource {x:Type Label}}">
-										<Setter Property="Padding"
-										        Value="4, 0" />
-										<Setter Property="VerticalAlignment"
-										        Value="Center" />
-									</Style>
-								</Grid.Resources>
-								<Label Grid.Column="0"
-								       HorizontalAlignment="Left"
-								       Content="{Binding Key}" />
-								<StackPanel Grid.Column="1"
-								            Orientation="Horizontal"
-								            HorizontalAlignment="Right">
-									<Label Content="{Binding Value.Key, FallbackValue=0}" />
-									<Image Source="{StaticResource questIcon}"
-									       VerticalAlignment="Center"
-									       Height="20" />
-								</StackPanel>
-								<StackPanel Grid.Column="2"
-								            Orientation="Horizontal"
-								            HorizontalAlignment="Right">
-									<Label Content="{Binding Value.Value, FallbackValue=0}" />
-									<Image Source="{StaticResource hideoutIcon}"
-									       VerticalAlignment="Center"
-									       Height="20" />
-								</StackPanel>
-								<Grid.ColumnDefinitions>
-									<ColumnDefinition Width="2*" />
-									<ColumnDefinition Width="*" />
-									<ColumnDefinition Width="*" />
-								</Grid.ColumnDefinitions>
-							</Grid>
-						</DataTemplate>
-					</ListView.ItemTemplate>
-				</ListView>
-
-				<StackPanel.Style>
-					<Style TargetType="StackPanel">
-						<Setter Property="Visibility"
-						        Value="Visible" />
-						<Style.Triggers>
-							<DataTrigger Binding="{Binding ItemTeamNeeded}"
-							             Value="False">
-								<Setter Property="Visibility"
-								        Value="Collapsed" />
-							</DataTrigger>
-						</Style.Triggers>
-					</Style>
-				</StackPanel.Style>
-			</StackPanel>
+		<StackPanel>
+			<Separator />
+			<Label Content="Hideout:"/>
+			<StackPanel Name="HideoutItemList" />
 		</StackPanel>
 
 		<StackPanel x:Name="UpdatedDisplay">
