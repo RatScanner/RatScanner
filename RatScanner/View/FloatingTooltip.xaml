@@ -94,6 +94,12 @@
 			<StackPanel Name="HideoutItemList" />
 		</StackPanel>
 
+		<StackPanel>
+			<Separator />
+			<Label Content="Tasks:"/>
+			<StackPanel Name="TaskItemList" />
+		</StackPanel>
+
 		<StackPanel x:Name="UpdatedDisplay">
 			<Separator />
 			<Grid Margin="0,5,0,0">

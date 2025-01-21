@@ -50,6 +50,8 @@ internal class MenuVM : INotifyPropertyChanged {
 
 	public int TaskRemaining => LastItem.GetTaskRemaining();
 
+	public ObservableCollection<TaskItemRemaining> TaskItemRemaining => LastItem.GetTaskItemRemaining();
+
 	public int HideoutRemaining => LastItem.GetHideoutTotalRemaining();
 
 	public ObservableCollection<HideoutItemRemaining> HideoutItemRemaining => LastItem.GetHideoutRemainingItem();

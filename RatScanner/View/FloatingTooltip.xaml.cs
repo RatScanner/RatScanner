@@ -68,6 +68,14 @@ public partial class FloatingTooltip : Window
 			HideoutItemList.Children.Add(label);
 		}
 
+		TaskItemList.Children.Clear();
+		foreach (var taskItemRemaining in context.TaskItemRemaining)
+		{
+			var label = new Label();
+			label.Content = "[" + taskItemRemaining.Task.MinPlayerLevel + "] " + taskItemRemaining.Task.Trader.Name + "=>" + taskItemRemaining.Task.Name + " " + taskItemRemaining.ItemCount + "x";
+			TaskItemList.Children.Add(label);
+		}
+
 		((Window)_instance).Show();
 	}
 
