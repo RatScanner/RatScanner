@@ -77,6 +77,8 @@ internal static class RatConfig {
 		internal static int Duration = 1500;
 	}
 
+	internal static bool Use24HAverage = true;
+
 	// Minimal UI
 	internal static class MinimalUi {
 		internal static bool ShowName = true;
@@ -181,6 +183,9 @@ internal static class RatConfig {
 		ToolTip.Duration = config.ReadInt(nameof(ToolTip.Duration), ToolTip.Duration);
 		ToolTip.DigitGroupingSymbol = config.ReadString(nameof(ToolTip.DigitGroupingSymbol), ToolTip.DigitGroupingSymbol);
 
+		config.Section = nameof(Use24HAverage);
+		Use24HAverage = config.ReadBool(nameof(Use24HAverage), Use24HAverage);
+
 		config.Section = nameof(MinimalUi);
 		MinimalUi.ShowName = config.ReadBool(nameof(MinimalUi.ShowName), MinimalUi.ShowName);
 		MinimalUi.ShowAvgDayPrice = config.ReadBool(nameof(MinimalUi.ShowAvgDayPrice), MinimalUi.ShowAvgDayPrice);
@@ -239,6 +244,9 @@ internal static class RatConfig {
 		config.Section = nameof(ToolTip);
 		config.WriteInt(nameof(ToolTip.Duration), ToolTip.Duration);
 		config.WriteString(nameof(ToolTip.DigitGroupingSymbol), ToolTip.DigitGroupingSymbol);
+
+		config.Section = nameof(Use24HAverage);
+		config.WriteBool(nameof(Use24HAverage), Use24HAverage);
 
 		config.Section = nameof(MinimalUi);
 		config.WriteBool(nameof(MinimalUi.ShowName), MinimalUi.ShowName);

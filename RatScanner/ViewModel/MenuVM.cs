@@ -42,7 +42,9 @@ internal class MenuVM : INotifyPropertyChanged {
 		}
 	}
 
-	public int PricePerSlot => LastItem.GetAvg24hMarketPricePerSlot();
+	public int PricePerSlot => SettingsVM.Use24HAverage
+	? LastItem.GetAvg24hMarketPricePerSlot()
+	: LastItem.LastLowPrice ?? 0;
 
 	public ItemPrice? BestTraderOffer => LastItem.GetBestTraderOffer();
 	public TraderOffer? BestTraderOfferVendor => LastItem.GetBestTraderOfferVendor();
