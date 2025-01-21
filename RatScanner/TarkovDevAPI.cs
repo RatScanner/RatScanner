@@ -166,11 +166,13 @@ public static class TarkovDevAPI {
 		.WithUsedInTasks(new TaskQueryBuilder().WithId())
 		.WithReceivedFromTasks(new TaskQueryBuilder().WithId())
 		.WithBartersFor(new BarterQueryBuilder().WithId())
-		.WithBartersUsing(new BarterQueryBuilder().WithId())
+		.WithBartersUsing(new BarterQueryBuilder().WithId()
+			.WithTrader(new TraderQueryBuilder().WithAllScalarFields())
+			.WithRequiredItems(new ContainedItemQueryBuilder().WithCount().WithItem(new ItemQueryBuilder().WithName())))
 		.WithCraftsFor(new CraftQueryBuilder().WithId())
 		.WithCraftsUsing(new CraftQueryBuilder().WithId())
 		.WithTypes()
-		, alias: "data", lang: language, gameMode: gameMode).Build();
+		,alias: "data", lang: language, gameMode: gameMode).Build();
 	}
 
 	private static string TasksQuery() => TasksQuery(RatConfig.NameScan.Language.ToTarkovDevType(), RatConfig.GameMode);

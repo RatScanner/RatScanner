@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -61,38 +62,73 @@ public partial class FloatingTooltip : Window
 		MenuVM context = ((MenuVM)Instance.DataContext);
 
 		HideoutItemList.Children.Clear();
-		foreach (var hideoutItemRemaining in context.HideoutItemRemaining)
+		if (context.HideoutItemRemaining.Count > 0)
 		{
-			var label = new Label();
-			label.Content = "[" + hideoutItemRemaining.Level + "] " + hideoutItemRemaining.Name + " " + hideoutItemRemaining.ItemCount + "x";
-			HideoutItemList.Children.Add(label);
+			Label hideoutTitleLabel = new Label();
+			hideoutTitleLabel.Content = "Hideout: " + context.HideoutRemaining + "x";
+			HideoutItemList.Children.Add(hideoutTitleLabel);
+
+			var sortedHideoutItemRemaining = context.HideoutItemRemaining;
+			foreach (var hideoutItemRemaining in sortedHideoutItemRemaining)
+			{
+				var label = new Label();
+				label.Content = "[" + hideoutItemRemaining.Level + "] " + hideoutItemRemaining.Name + " " + hideoutItemRemaining.ItemCount + "x";
+				HideoutItemList.Children.Add(label);
+			}
 		}
+
 
 		TaskItemList.Children.Clear();
-		foreach (var taskItemRemaining in context.TaskItemRemaining)
+		if (context.TaskItemRemaining.Count > 0)
 		{
-			var label = new Label();
-			label.Content = "[" + taskItemRemaining.Task.MinPlayerLevel + "] " + taskItemRemaining.Task.Trader.Name + " => " + taskItemRemaining.Task.Name + " " + taskItemRemaining.ItemCount + "x";
-			TaskItemList.Children.Add(label);
+			Label hideoutTitleLabel = new Label();
+			hideoutTitleLabel.Content = "Tasks: " + context.TaskRemaining + "x";
+			TaskItemList.Children.Add(hideoutTitleLabel);
+
+			var sortedTaskItemRemaining = context.TaskItemRemaining.OrderBy(x => x.Task.Trader.Name).ThenBy(x => x.Task.MinPlayerLevel);
+			foreach (var taskItemRemaining in sortedTaskItemRemaining)
+			{
+				var label = new Label();
+				label.Content = "[" + taskItemRemaining.Task.MinPlayerLevel + "] " + taskItemRemaining.Task.Trader.Name + " => " + taskItemRemaining.Task.Name + " " + taskItemRemaining.ItemCount + "x";
+				TaskItemList.Children.Add(label);
+			}
 		}
 
+
 		BarterItemList.Children.Clear();
-		var item = context.LastItem;
-		foreach (var barter in item.BartersUsing)
+		if (context.LastItem.BartersUsing.Count > 0)
 		{
-			StringBuilder sb = new StringBuilder();
-			sb.Append("[" + barter.Level + "] ");
-			sb.Append(barter.Trader.Name);
-			sb.Append(" => ");
+			Label hideoutTitleLabel = new Label();
+			hideoutTitleLabel.Content = "Barters";
+			BarterItemList.Children.Add(hideoutTitleLabel);
 
-			foreach (var requiredItem in barter.RequiredItems)
+			var item = context.LastItem;
+			var sortedBarterItems = item.BartersUsing.OrderBy(x => x.Trader.Name).ThenBy(x => x.Level);
+			foreach (var barter in sortedBarterItems)
 			{
-				sb.Append(requiredItem.Item.Name).Append(" ").Append(requiredItem.Count).Append("x");
-			}
+				StringBuilder sb = new StringBuilder();
+				sb.Append("[" + barter.Level + "] ");
+				sb.Append(barter.Trader.Name);
+				sb.Append(" => ");
 
-			var label = new Label();
-			label.Content = sb.ToString();
-			TaskItemList.Children.Add(label);
+				for (var i = 0; i < barter.RequiredItems.Count; i++)
+				{
+					var requiredItem = barter.RequiredItems.ElementAt(i);
+					sb.Append(requiredItem.Item.Name).Append(" ").Append(requiredItem.Count).Append("x");
+
+					if (i < barter.RequiredItems.Count - 1)
+					{
+						sb.Append(" + ");
+					}
+				}
+
+				var rewardItem = barter.RequiredItems.First();
+				sb.Append(" == ").Append(rewardItem.Item.Name).Append(" ").Append(rewardItem.Count).Append("x");
+
+				var label = new Label();
+				label.Content = sb.ToString();
+				BarterItemList.Children.Add(label);
+			}
 		}
 
 		((Window)_instance).Show();

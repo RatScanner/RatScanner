@@ -90,19 +90,16 @@
 
 		<StackPanel>
 			<Separator />
-			<Label Content="Hideout:"/>
 			<StackPanel Name="HideoutItemList" />
 		</StackPanel>
 
 		<StackPanel>
 			<Separator />
-			<Label Content="Tasks:"/>
 			<StackPanel Name="TaskItemList" />
 		</StackPanel>
 
 		<StackPanel>
 			<Separator />
-			<Label Content="Barter:"/>
 			<StackPanel Name="BarterItemList" />
 		</StackPanel>
 
