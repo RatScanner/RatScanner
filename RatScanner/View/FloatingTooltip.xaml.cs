@@ -72,7 +72,26 @@ public partial class FloatingTooltip : Window
 		foreach (var taskItemRemaining in context.TaskItemRemaining)
 		{
 			var label = new Label();
-			label.Content = "[" + taskItemRemaining.Task.MinPlayerLevel + "] " + taskItemRemaining.Task.Trader.Name + "=>" + taskItemRemaining.Task.Name + " " + taskItemRemaining.ItemCount + "x";
+			label.Content = "[" + taskItemRemaining.Task.MinPlayerLevel + "] " + taskItemRemaining.Task.Trader.Name + " => " + taskItemRemaining.Task.Name + " " + taskItemRemaining.ItemCount + "x";
+			TaskItemList.Children.Add(label);
+		}
+
+		BarterItemList.Children.Clear();
+		var item = context.LastItem;
+		foreach (var barter in item.BartersUsing)
+		{
+			StringBuilder sb = new StringBuilder();
+			sb.Append("[" + barter.Level + "] ");
+			sb.Append(barter.Trader.Name);
+			sb.Append(" => ");
+
+			foreach (var requiredItem in barter.RequiredItems)
+			{
+				sb.Append(requiredItem.Item.Name).Append(" ").Append(requiredItem.Count).Append("x");
+			}
+
+			var label = new Label();
+			label.Content = sb.ToString();
 			TaskItemList.Children.Add(label);
 		}
 

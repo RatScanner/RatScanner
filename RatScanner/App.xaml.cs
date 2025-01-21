@@ -47,6 +47,7 @@ public partial class App : Application, ISingleInstance {
 		if (!existing) InstallWebview2Runtime();
 
 		var floatingTooltipWindow = new FloatingTooltip();
+		floatingTooltipWindow.Show();
 	}
 
 	public void OnInstanceInvoked(string[] args) {
