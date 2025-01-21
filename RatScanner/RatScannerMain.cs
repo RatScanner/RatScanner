@@ -82,7 +82,11 @@ public class RatScannerMain : INotifyPropertyChanged {
 		new Thread(() => {
 			Thread.Sleep(1000);
 			Logger.LogInfo("Checking for updates...");
-			CheckForUpdates();
+
+			// TODO Joosep Sisas - 22.01.2025 - This needs thorough testing before commiting
+			#if !DEBUG
+				CheckForUpdates();
+			#endif
 
 			Logger.LogInfo("Loading TarkovTracker data...");
 			if (RatConfig.Tracking.TarkovTracker.Enable) {
@@ -109,6 +113,7 @@ public class RatScannerMain : INotifyPropertyChanged {
 	private void CheckForUpdates() {
 		string mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ClientVersion);
 		if (RatConfig.Version == mostRecentVersion) return;
+
 		Logger.LogInfo("A new version is available: " + mostRecentVersion);
 
 		string forceVersions = ApiManager.GetResource(ApiManager.ResourceType.ClientForceUpdateVersions);
