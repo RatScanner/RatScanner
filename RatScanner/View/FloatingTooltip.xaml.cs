@@ -1,16 +1,10 @@
-﻿using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Interop;
 using RatScanner.ViewModel;
 using RCMinUi = RatScanner.RatConfig.FloatingTooltip;
 using Timer = System.Windows.Forms.Timer;
-using UserControl = System.Windows.Controls.UserControl;
 
 namespace RatScanner.View;
 
@@ -41,7 +35,7 @@ public partial class FloatingTooltip : Window
 
 	protected override void OnMouseLeave(MouseEventArgs e)
 	{
-		Application.Current.Dispatcher.Invoke(() => FloatingTooltip.Instance.Hide());
+		Application.Current.Dispatcher.Invoke(() => Instance.Hide());
 	}
 
 	protected virtual void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -52,7 +46,7 @@ public partial class FloatingTooltip : Window
 			{
 				LastItemName = vm.LastItem.Name;
 				ItemScansCount = vm.ItemScans.Count;
-				Application.Current.Dispatcher.Invoke(() => FloatingTooltip.Instance.Show());
+				Application.Current.Dispatcher.Invoke(() => Instance.Show());
 			}
 		}
 	}
