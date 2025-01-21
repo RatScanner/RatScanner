@@ -77,6 +77,20 @@ internal static class RatConfig {
 		internal static int Duration = 1500;
 	}
 
+	// Floating ToolTip options
+	internal static class FloatingTooltip {
+		internal static bool ShowName = true;
+		internal static bool ShowAvgDayPrice = true;
+		internal static bool ShowPricePerSlot = true;
+		internal static bool ShowTraderPrice = true;
+		internal static bool ShowUpdated = false;
+		internal static bool ShowQuestHideoutTracker = true;
+		internal static bool ShowQuestHideoutTeamTracker = false;
+		internal static int Opacity = 0;
+		internal static int Duration = 1500;
+		internal static bool IsEnabled = true;
+	}
+
 	// Minimal UI
 	internal static class MinimalUi {
 		internal static bool ShowName = true;
