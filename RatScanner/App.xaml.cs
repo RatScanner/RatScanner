@@ -46,7 +46,7 @@ public partial class App : Application, ISingleInstance {
 		bool existing = _webview2RegKeys.Any(key => Registry.GetValue(key, "pv", null) != null);
 		if (!existing) InstallWebview2Runtime();
 
-		var floatingTooltipWindow = new FloatingTooltipWindow();
+		var floatingTooltipWindow = new FloatingTooltip();
 	}
 
 	public void OnInstanceInvoked(string[] args) {

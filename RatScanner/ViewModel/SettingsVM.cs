@@ -47,6 +47,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 	public bool EnableIneractableOverlay { get; set; }
 	public bool BlurBehindSearch { get; set; }
 	public Hotkey InteractableOverlayHotkey { get; set; }
+	public bool IsFloatingTooltipWindowEnabled { get; set; }
 
 	internal SettingsVM() {
 		LoadSettings();
@@ -91,6 +92,8 @@ internal class SettingsVM : INotifyPropertyChanged {
 		BlurBehindSearch = RatConfig.Overlay.Search.BlurBehind;
 		InteractableOverlayHotkey = RatConfig.Overlay.Search.Hotkey;
 
+		IsFloatingTooltipWindowEnabled = RatConfig.FloatingTooltip.IsEnabled;
+
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
 	}
 
@@ -130,6 +133,8 @@ internal class SettingsVM : INotifyPropertyChanged {
 		RatConfig.Overlay.Search.Enable = EnableIneractableOverlay;
 		RatConfig.Overlay.Search.BlurBehind = BlurBehindSearch;
 		RatConfig.Overlay.Search.Hotkey = InteractableOverlayHotkey;
+
+		RatConfig.FloatingTooltip.IsEnabled = IsFloatingTooltipWindowEnabled;
 
 		RatConfig.ScreenWidth = ScreenWidth;
 		RatConfig.ScreenHeight = ScreenHeight;

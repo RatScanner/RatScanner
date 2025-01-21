@@ -14,10 +14,10 @@ using UserControl = System.Windows.Controls.UserControl;
 
 namespace RatScanner.View;
 
-public partial class FloatingTooltipWindow : Window
+public partial class FloatingTooltip : Window
 {
-	private static FloatingTooltipWindow _instance = null!;
-	public static FloatingTooltipWindow Instance => _instance ??= new FloatingTooltipWindow();
+	private static FloatingTooltip _instance = null!;
+	public static FloatingTooltip Instance => _instance ??= new FloatingTooltip();
 
 	private string LastItemName;
 	private int ItemScansCount;
@@ -26,7 +26,7 @@ public partial class FloatingTooltipWindow : Window
 
 	Timer fadeTimer;
 
-	public FloatingTooltipWindow()
+	public FloatingTooltip()
 	{
 		InitializeComponent();
 		Hide();
@@ -41,7 +41,7 @@ public partial class FloatingTooltipWindow : Window
 
 	protected override void OnMouseLeave(MouseEventArgs e)
 	{
-		Application.Current.Dispatcher.Invoke(() => FloatingTooltipWindow.Instance.Hide());
+		Application.Current.Dispatcher.Invoke(() => FloatingTooltip.Instance.Hide());
 	}
 
 	protected virtual void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -52,7 +52,7 @@ public partial class FloatingTooltipWindow : Window
 			{
 				LastItemName = vm.LastItem.Name;
 				ItemScansCount = vm.ItemScans.Count;
-				Application.Current.Dispatcher.Invoke(() => FloatingTooltipWindow.Instance.Show());
+				Application.Current.Dispatcher.Invoke(() => FloatingTooltip.Instance.Show());
 			}
 		}
 	}
