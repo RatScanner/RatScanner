@@ -122,7 +122,7 @@ public partial class FloatingTooltip : Window
 					}
 				}
 
-				var rewardItem = barter.RequiredItems.First();
+				var rewardItem = barter.RewardItems.First();
 				sb.Append(" == ").Append(rewardItem.Item.Name).Append(" ").Append(rewardItem.Count).Append("x");
 
 				var label = new Label();
