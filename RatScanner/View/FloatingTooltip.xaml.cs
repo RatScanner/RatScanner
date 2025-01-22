@@ -1,13 +1,17 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
+using System.Windows.Forms;
 using System.Windows.Media;
 using Force.DeepCloner;
 using RatScanner.ViewModel;
+using Application = System.Windows.Application;
 using Color = System.Drawing.Color;
+using Label = System.Windows.Controls.Label;
+using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using RcFloatingTooltip = RatScanner.RatConfig.FloatingTooltip;
 using RichTextBox = System.Windows.Forms.RichTextBox;
 using Timer = System.Windows.Forms.Timer;
@@ -71,10 +75,6 @@ public partial class FloatingTooltip : Window
 		HideoutItems.Visibility = RcFloatingTooltip.ShowHideoutInfo ? v : c;
 		BarterItemList.Visibility = RcFloatingTooltip.ShowBarterInfo ? v : c;
 		CraftItemList.Visibility = RcFloatingTooltip.ShowCraftsInfo ? v : c;
-
-		var mousePosition = UserActivityHelper.GetMousePosition();
-		Instance.Top = mousePosition.Y;
-		Instance.Left = mousePosition.X;
 
 		MenuVM context = ((MenuVM)Instance.DataContext);
 
@@ -194,6 +194,11 @@ public partial class FloatingTooltip : Window
 				CraftItemList.Children.Add(label);
 			}
 		}
+
+		var screenBounds = Screen.PrimaryScreen.Bounds;
+		var mousePosition = UserActivityHelper.GetMousePosition();
+		Instance.Top = Math.Min(screenBounds.Height, mousePosition.Y + Instance.Height) - Instance.Height;
+		Instance.Left = Math.Min(screenBounds.Width, mousePosition.X + Instance.Width) - Instance.Width;
 
 		((Window)_instance).Show();
 	}
