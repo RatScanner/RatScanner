@@ -110,8 +110,10 @@ public class RatScannerMain : INotifyPropertyChanged {
 	}
 
 	private void CheckForUpdates() {
-		string mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ClientVersion);
-		if (RatConfig.Version == mostRecentVersion) return;
+		var mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ClientVersion);
+
+		var shouldUpdate = ShouldUpdate(mostRecentVersion);
+		if (shouldUpdate) return;
 
 		Logger.LogInfo("A new version is available: " + mostRecentVersion);
 
@@ -126,6 +128,30 @@ public class RatScannerMain : INotifyPropertyChanged {
 		message += "Do you want to install it now?";
 		MessageBoxResult result = MessageBox.Show(message, "Rat Scanner Updater", MessageBoxButton.YesNo);
 		if (result == MessageBoxResult.Yes) UpdateRatScanner();
+	}
+
+	private static bool ShouldUpdate(string mostRecentVersion)
+	{
+		var currentVersion = RatConfig.Version;
+
+		var versions = currentVersion.Split();
+		var mostRecentVersions = mostRecentVersion.Split();
+
+		if (currentVersion == mostRecentVersion) return false;
+
+		bool shouldUpdate = false;
+		for (var i = 0; i < versions.Length; i++)
+		{
+			int version = Int32.Parse(versions[i]);
+			int recentVersion =Int32.Parse(mostRecentVersions[i]);
+
+			if (version < recentVersion)
+			{
+				shouldUpdate = true;
+			}
+		}
+
+		return shouldUpdate;
 	}
 
 	private void UpdateRatScanner() {
