@@ -94,6 +94,7 @@
 		<StackPanel Name="HideoutItems" />
 		<StackPanel Name="TaskItemList" />
 		<StackPanel Name="BarterItemList" />
+		<StackPanel Name="CraftItemList" />
 
 		<StackPanel x:Name="UpdatedDisplay">
 			<Separator />

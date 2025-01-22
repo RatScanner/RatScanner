@@ -143,6 +143,45 @@ public partial class FloatingTooltip : Window
 			}
 		}
 
+		CraftItemList.Children.Clear();
+		if (context.LastItem.CraftsUsing.Count > 0)
+		{
+			CraftItemList.Children.Add(new Separator());
+
+			Label craftTitle = new Label();
+			craftTitle.Foreground = Brushes.Orange;
+			craftTitle.Content = "Crafts";
+			CraftItemList.Children.Add(craftTitle);
+
+			var item = context.LastItem;
+			var sortedCraftItem = item.CraftsUsing.OrderBy(x => x.Station.Name).ThenBy(x => x.Level);
+			foreach (var craft in sortedCraftItem)
+			{
+				StringBuilder sb = new StringBuilder();
+				sb.Append("[" + craft.Level + "] ");
+				sb.Append(craft.Station.Name);
+				sb.Append(" => ");
+
+				for (var i = 0; i < craft.RequiredItems.Count; i++)
+				{
+					var requiredItem = craft.RequiredItems.ElementAt(i);
+					sb.Append(requiredItem.Item.Name).Append(" ").Append(requiredItem.Count).Append("x");
+
+					if (i < craft.RequiredItems.Count - 1)
+					{
+						sb.Append(" + ");
+					}
+				}
+
+				var rewardItem = craft.RewardItems.First();
+				sb.Append(" == ").Append(rewardItem.Item.Name).Append(" ").Append(rewardItem.Count).Append("x");
+
+				var label = new Label();
+				label.Content = sb.ToString();
+				CraftItemList.Children.Add(label);
+			}
+		}
+
 		((Window)_instance).Show();
 	}
 

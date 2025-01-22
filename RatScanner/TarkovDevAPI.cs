@@ -172,7 +172,15 @@ public static class TarkovDevAPI {
 			.WithRequiredItems(new ContainedItemQueryBuilder().WithCount().WithItem(new ItemQueryBuilder().WithName()))
 			.WithRewardItems(new ContainedItemQueryBuilder().WithCount().WithItem(new ItemQueryBuilder().WithName())))
 		.WithCraftsFor(new CraftQueryBuilder().WithId())
-		.WithCraftsUsing(new CraftQueryBuilder().WithId())
+		.WithCraftsUsing(new CraftQueryBuilder()
+			.WithId()
+			.WithLevel()
+			.WithStation(new HideoutStationQueryBuilder().WithName())
+			.WithRequiredItems(new ContainedItemQueryBuilder().WithCount().WithItem(new ItemQueryBuilder().WithName()))
+			.WithRewardItems(
+				new ContainedItemQueryBuilder()
+					.WithItem(new ItemQueryBuilder().WithName())
+					.WithCount()))
 		.WithTypes()
 		,alias: "data", lang: language, gameMode: gameMode).Build();
 	}
