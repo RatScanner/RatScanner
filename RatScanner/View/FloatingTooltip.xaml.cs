@@ -4,8 +4,12 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
+using Force.DeepCloner;
 using RatScanner.ViewModel;
+using Color = System.Drawing.Color;
 using RCMinUi = RatScanner.RatConfig.FloatingTooltip;
+using RichTextBox = System.Windows.Forms.RichTextBox;
 using Timer = System.Windows.Forms.Timer;
 
 namespace RatScanner.View;
@@ -61,14 +65,34 @@ public partial class FloatingTooltip : Window
 
 		MenuVM context = ((MenuVM)Instance.DataContext);
 
+		TaskItemList.Children.Clear();
+		if (context.TaskItemRemaining.Count > 0)
+		{
+			TaskItemList.Children.Add(new Separator());
+
+			Label hideoutTitle = new Label();
+			hideoutTitle.Foreground = Brushes.Orange;
+			hideoutTitle.Content = "Tasks: " + context.TaskRemaining + "x";
+			TaskItemList.Children.Add(hideoutTitle);
+
+			var sortedTaskItemRemaining = context.TaskItemRemaining.OrderBy(x => x.Task.Trader.Name).ThenBy(x => x.Task.MinPlayerLevel);
+			foreach (var taskItemRemaining in sortedTaskItemRemaining)
+			{
+				var label = new Label();
+				label.Content = taskItemRemaining.Task.MinPlayerLevel + "] " + taskItemRemaining.Task.Trader.Name + " => " + taskItemRemaining.Task.Name + " " + taskItemRemaining.ItemCount + "x";
+				TaskItemList.Children.Add(label);
+			}
+		}
+
 		HideoutItems.Children.Clear();
 		if (context.HideoutItemRemaining.Count > 0)
 		{
 			HideoutItems.Children.Add(new Separator());
 
-			Label hideoutTitleLabel = new Label();
-			hideoutTitleLabel.Content = "Hideout: " + context.HideoutRemaining + "x";
-			HideoutItems.Children.Add(hideoutTitleLabel);
+			Label hideoutTitle = new Label();
+			hideoutTitle.Foreground = Brushes.Orange;
+			hideoutTitle.Content = "Hideout: " + context.HideoutRemaining + "x";
+			HideoutItems.Children.Add(hideoutTitle);
 
 			var sortedHideoutItemRemaining = context.HideoutItemRemaining;
 			foreach (var hideoutItemRemaining in sortedHideoutItemRemaining)
@@ -80,33 +104,15 @@ public partial class FloatingTooltip : Window
 		}
 
 
-		TaskItemList.Children.Clear();
-		if (context.TaskItemRemaining.Count > 0)
-		{
-			TaskItemList.Children.Add(new Separator());
-
-			Label hideoutTitleLabel = new Label();
-			hideoutTitleLabel.Content = "Tasks: " + context.TaskRemaining + "x";
-			TaskItemList.Children.Add(hideoutTitleLabel);
-
-			var sortedTaskItemRemaining = context.TaskItemRemaining.OrderBy(x => x.Task.Trader.Name).ThenBy(x => x.Task.MinPlayerLevel);
-			foreach (var taskItemRemaining in sortedTaskItemRemaining)
-			{
-				var label = new Label();
-				label.Content = "[" + taskItemRemaining.Task.MinPlayerLevel + "] " + taskItemRemaining.Task.Trader.Name + " => " + taskItemRemaining.Task.Name + " " + taskItemRemaining.ItemCount + "x";
-				TaskItemList.Children.Add(label);
-			}
-		}
-
-
 		BarterItemList.Children.Clear();
 		if (context.LastItem.BartersUsing.Count > 0)
 		{
 			BarterItemList.Children.Add(new Separator());
 
-			Label hideoutTitleLabel = new Label();
-			hideoutTitleLabel.Content = "Barters";
-			BarterItemList.Children.Add(hideoutTitleLabel);
+			Label barterTitle = new Label();
+			barterTitle.Foreground = Brushes.Orange;
+			barterTitle.Content = "Barters";
+			BarterItemList.Children.Add(barterTitle);
 
 			var item = context.LastItem;
 			var sortedBarterItems = item.BartersUsing.OrderBy(x => x.Trader.Name).ThenBy(x => x.Level);
@@ -147,8 +153,21 @@ public partial class FloatingTooltip : Window
 	}
 
 
-	public static string GetHideoutItemsString()
+	private void rtb_AppendText(Color color, string text, RichTextBox box)
 	{
-		return "Hideout items lol";
+		// append the text to the RichTextBox control
+		int start = box.TextLength;
+		box.AppendText(text);
+		int end = box.TextLength;
+
+		// select the new text
+		box.Select(start, end - start);
+		// set the attributes of the new text
+		box.SelectionColor = color;
+		// unselect
+		box.Select(end, 0);
+
+		// only required for multi line text to scroll to the end
+		box.ScrollToCaret();
 	}
 }
