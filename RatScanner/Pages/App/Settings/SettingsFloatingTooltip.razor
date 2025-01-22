@@ -13,7 +13,16 @@
 	    <MudItem xs="12">
 		    <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
 			    <MudGrid Spacing="0" Class="pa-0 ma-0">
-				    <MudCheckBox @bind-Checked="@SettingsVM.IsFloatingTooltipWindowEnabled" Label="Enable tooltip UI" Dense="true" Size="Size.Small" Class="pa-0 ma-0" />
+				    <MudCheckBox @bind-Checked="@SettingsVM.IsFloatingTooltipEnabled" Label="Enable tooltip UI" Dense="true" Size="Size.Small" Class="pa-0 ma-0" />
+				    <MudCheckBox @bind-Checked="@SettingsVM.IsFloatingTooltipShowName" Label="Enable tooltip UI" Dense="true" Size="Size.Small" Class="pa-0 ma-0" />
+				    <MudCheckBox @bind-Checked="@SettingsVM.IsFloatingTooltipShowAvgDayPrice" Label="Enable tooltip UI" Dense="true" Size="Size.Small" Class="pa-0 ma-0" />
+				    <MudCheckBox @bind-Checked="@SettingsVM.IsFloatingTooltipShowPricePerSlot" Label="Enable tooltip UI" Dense="true" Size="Size.Small" Class="pa-0 ma-0" />
+				    <MudCheckBox @bind-Checked="@SettingsVM.IsFloatingTooltipShowTraderPrice" Label="Enable tooltip UI" Dense="true" Size="Size.Small" Class="pa-0 ma-0" />
+				    <MudCheckBox @bind-Checked="@SettingsVM.IsFloatingTooltipShowUpdated" Label="Enable tooltip UI" Dense="true" Size="Size.Small" Class="pa-0 ma-0" />
+				    <MudCheckBox @bind-Checked="@SettingsVM.IsFloatingTooltipShowTasksInfo" Label="Enable tooltip UI" Dense="true" Size="Size.Small" Class="pa-0 ma-0" />
+				    <MudCheckBox @bind-Checked="@SettingsVM.IsFloatingTooltipShowHideoutInfo" Label="Enable tooltip UI" Dense="true" Size="Size.Small" Class="pa-0 ma-0" />
+				    <MudCheckBox @bind-Checked="@SettingsVM.IsFloatingTooltipShowBarterInfo" Label="Enable tooltip UI" Dense="true" Size="Size.Small" Class="pa-0 ma-0" />
+				    <MudCheckBox @bind-Checked="@SettingsVM.IsFloatingTooltipShowCraftsInfo" Label="Enable tooltip UI" Dense="true" Size="Size.Small" Class="pa-0 ma-0" />
 			    </MudGrid>
 		    </MudPaper>
 	    </MudItem>

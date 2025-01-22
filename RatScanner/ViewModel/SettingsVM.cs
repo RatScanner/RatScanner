@@ -47,7 +47,18 @@ internal class SettingsVM : INotifyPropertyChanged {
 	public bool EnableIneractableOverlay { get; set; }
 	public bool BlurBehindSearch { get; set; }
 	public Hotkey InteractableOverlayHotkey { get; set; }
-	public bool IsFloatingTooltipWindowEnabled { get; set; }
+
+	// Floating Tooltip
+	public bool IsFloatingTooltipEnabled { get; set; }
+	public bool IsFloatingTooltipShowName { get; set; }
+	public bool IsFloatingTooltipShowAvgDayPrice { get; set; }
+	public bool IsFloatingTooltipShowPricePerSlot { get; set; }
+	public bool IsFloatingTooltipShowTraderPrice { get; set; }
+	public bool IsFloatingTooltipShowUpdated { get; set; }
+	public bool IsFloatingTooltipShowTasksInfo { get; set; }
+	public bool IsFloatingTooltipShowHideoutInfo { get; set; }
+	public bool IsFloatingTooltipShowBarterInfo { get; set; }
+	public bool IsFloatingTooltipShowCraftsInfo { get; set; }
 
 	internal SettingsVM() {
 		LoadSettings();
@@ -92,7 +103,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 		BlurBehindSearch = RatConfig.Overlay.Search.BlurBehind;
 		InteractableOverlayHotkey = RatConfig.Overlay.Search.Hotkey;
 
-		IsFloatingTooltipWindowEnabled = RatConfig.FloatingTooltip.IsEnabled;
+		IsFloatingTooltipEnabled = RatConfig.FloatingTooltip.IsEnabled;
 
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
 	}
@@ -134,7 +145,17 @@ internal class SettingsVM : INotifyPropertyChanged {
 		RatConfig.Overlay.Search.BlurBehind = BlurBehindSearch;
 		RatConfig.Overlay.Search.Hotkey = InteractableOverlayHotkey;
 
-		RatConfig.FloatingTooltip.IsEnabled = IsFloatingTooltipWindowEnabled;
+		// Floating tooltip
+		RatConfig.FloatingTooltip.IsEnabled = IsFloatingTooltipEnabled;
+		RatConfig.FloatingTooltip.ShowName = IsFloatingTooltipShowName;
+		RatConfig.FloatingTooltip.ShowAvgDayPrice = IsFloatingTooltipShowAvgDayPrice;
+		RatConfig.FloatingTooltip.ShowPricePerSlot = IsFloatingTooltipShowPricePerSlot;
+		RatConfig.FloatingTooltip.ShowTraderPrice = IsFloatingTooltipShowTraderPrice;
+		RatConfig.FloatingTooltip.ShowUpdated = IsFloatingTooltipShowUpdated;
+		RatConfig.FloatingTooltip.ShowTasksInfo = IsFloatingTooltipShowTasksInfo;
+		RatConfig.FloatingTooltip.ShowHideoutInfo = IsFloatingTooltipShowHideoutInfo;
+		RatConfig.FloatingTooltip.ShowBarterInfo = IsFloatingTooltipShowBarterInfo;
+		RatConfig.FloatingTooltip.ShowCraftsInfo = IsFloatingTooltipShowCraftsInfo;
 
 		RatConfig.ScreenWidth = ScreenWidth;
 		RatConfig.ScreenHeight = ScreenHeight;
