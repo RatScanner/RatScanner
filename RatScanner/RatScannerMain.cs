@@ -131,11 +131,10 @@ public class RatScannerMain : INotifyPropertyChanged {
 	private static bool ShouldUpdate(string mostRecentVersion)
 	{
 		var currentVersion = RatConfig.Version;
-
-		var versions = currentVersion.Split();
-		var mostRecentVersions = mostRecentVersion.Split();
-
 		if (currentVersion == mostRecentVersion) return false;
+
+		var versions = currentVersion.Split(".");
+		var mostRecentVersions = mostRecentVersion.Split(".");
 
 		bool shouldUpdate = false;
 		for (var i = 0; i < versions.Length; i++)
