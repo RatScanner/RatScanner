@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media;
+using RatEye;
 using RatScanner.ViewModel;
 using Application = System.Windows.Application;
 using Label = System.Windows.Controls.Label;
@@ -20,6 +21,7 @@ public partial class FloatingTooltip : Window
 	private static FloatingTooltip _instance = null!;
 	public static FloatingTooltip Instance => _instance ??= new FloatingTooltip();
 
+	private Vector2? mouseStartPosition;
 	private string LastItemName;
 	private int ItemScansCount;
 
@@ -39,9 +41,22 @@ public partial class FloatingTooltip : Window
 		UpdateElements();
 	}
 
-	protected override void OnMouseLeave(MouseEventArgs e)
+	protected override void OnMouseMove(MouseEventArgs e)
 	{
-		Application.Current.Dispatcher.Invoke(() => Instance.Hide());
+		Vector2 mousePosition = UserActivityHelper.GetMousePosition();
+		if (mouseStartPosition == null)
+		{
+			mouseStartPosition = mousePosition;
+		}
+		else if (Int32.Abs((mousePosition.X - mouseStartPosition.X)) > 10 ||
+		         Int32.Abs((mousePosition.Y - mouseStartPosition.Y)) > 10)
+		{
+			Application.Current.Dispatcher.Invoke(() =>
+			{
+				Instance.Hide();
+				mouseStartPosition = null;
+			});
+		}
 	}
 
 	protected virtual void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
