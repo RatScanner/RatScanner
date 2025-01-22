@@ -30,7 +30,7 @@ public partial class FloatingTooltip : Window
 
 	Timer fadeTimer;
 
-	public FloatingTooltip()
+	private FloatingTooltip()
 	{
 		InitializeComponent();
 		Hide();
@@ -38,9 +38,8 @@ public partial class FloatingTooltip : Window
 		DataContext = dataContext;
 		LastItemName = dataContext.LastItem.Name;
 		ItemScansCount = dataContext.ItemScans.Count;
-
-		UpdateElements();
 		dataContext.PropertyChanged += OnPropertyChanged;
+		UpdateElements();
 	}
 
 	protected override void OnMouseLeave(MouseEventArgs e)
@@ -50,32 +49,19 @@ public partial class FloatingTooltip : Window
 
 	protected virtual void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
 	{
-		if (RcFloatingTooltip.IsEnabled && sender != null && sender is MenuVM vm)
+		if (RcFloatingTooltip.Enable && sender is MenuVM vm)
 		{
 			if ((!vm.LastItem.Name.Equals(LastItemName) || vm.ItemScans.Count > ItemScansCount))
 			{
 				LastItemName = vm.LastItem.Name;
 				ItemScansCount = vm.ItemScans.Count;
-				Application.Current.Dispatcher.Invoke(() => Instance.Show());
+				Application.Current.Dispatcher.Invoke(() => Instance.ShowTooltip());
 			}
 		}
 	}
 
-	public void Show()
+	private void ShowTooltip()
 	{
-		const Visibility v = Visibility.Visible;
-		const Visibility c = Visibility.Collapsed;
-
-		NameDisplay.Visibility = RcFloatingTooltip.ShowName ? v : c;
-		AvgDayPriceDisplay.Visibility = RcFloatingTooltip.ShowAvgDayPrice ? v : c;
-		PricePerSlotDisplay.Visibility = RcFloatingTooltip.ShowPricePerSlot ? v : c;
-		TraderPriceDisplay.Visibility = RcFloatingTooltip.ShowTraderPrice ? v : c;
-		UpdatedDisplay.Visibility = RcFloatingTooltip.ShowUpdated ? v : c;
-		TaskItemList.Visibility = RcFloatingTooltip.ShowTasksInfo ? v : c;
-		HideoutItems.Visibility = RcFloatingTooltip.ShowHideoutInfo ? v : c;
-		BarterItemList.Visibility = RcFloatingTooltip.ShowBarterInfo ? v : c;
-		CraftItemList.Visibility = RcFloatingTooltip.ShowCraftsInfo ? v : c;
-
 		MenuVM context = ((MenuVM)Instance.DataContext);
 
 		TaskItemList.Children.Clear();
@@ -201,31 +187,22 @@ public partial class FloatingTooltip : Window
 		Instance.Top = Math.Min(screenBounds.Height, mousePosition.Y + Instance.Height) - Instance.Height;
 		Instance.Left = Math.Min(screenBounds.Width, mousePosition.X + Instance.Width) - Instance.Width;
 
-		((Window)_instance).Show();
+		Instance.Show();
 	}
 
-	private void UpdateElements()
+	public void UpdateElements()
 	{
 		const Visibility v = Visibility.Visible;
 		const Visibility c = Visibility.Collapsed;
-	}
 
-
-	private void rtb_AppendText(Color color, string text, RichTextBox box)
-	{
-		// append the text to the RichTextBox control
-		int start = box.TextLength;
-		box.AppendText(text);
-		int end = box.TextLength;
-
-		// select the new text
-		box.Select(start, end - start);
-		// set the attributes of the new text
-		box.SelectionColor = color;
-		// unselect
-		box.Select(end, 0);
-
-		// only required for multi line text to scroll to the end
-		box.ScrollToCaret();
+		NameDisplay.Visibility = RcFloatingTooltip.ShowName ? v : c;
+		AvgDayPriceDisplay.Visibility = RcFloatingTooltip.ShowAvgDayPrice ? v : c;
+		PricePerSlotDisplay.Visibility = RcFloatingTooltip.ShowPricePerSlot ? v : c;
+		TraderPriceDisplay.Visibility = RcFloatingTooltip.ShowTraderPrice ? v : c;
+		UpdatedDisplay.Visibility = RcFloatingTooltip.ShowUpdated ? v : c;
+		TaskItemList.Visibility = RcFloatingTooltip.ShowTasksInfo ? v : c;
+		HideoutItems.Visibility = RcFloatingTooltip.ShowHideoutInfo ? v : c;
+		BarterItemList.Visibility = RcFloatingTooltip.ShowBarterInfo ? v : c;
+		CraftItemList.Visibility = RcFloatingTooltip.ShowCraftsInfo ? v : c;
 	}
 }

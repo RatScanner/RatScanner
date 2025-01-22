@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using RatScanner.View;
 
 namespace RatScanner.ViewModel;
 
@@ -104,7 +105,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 		InteractableOverlayHotkey = RatConfig.Overlay.Search.Hotkey;
 
 		// Floating tooltip
-		IsFloatingTooltipEnabled = RatConfig.FloatingTooltip.IsEnabled;
+		IsFloatingTooltipEnabled = RatConfig.FloatingTooltip.Enable;
 		IsFloatingTooltipShowName = RatConfig.FloatingTooltip.ShowName;
 		IsFloatingTooltipShowAvgDayPrice = RatConfig.FloatingTooltip.ShowAvgDayPrice;
 		IsFloatingTooltipShowPricePerSlot = RatConfig.FloatingTooltip.ShowPricePerSlot;
@@ -114,6 +115,11 @@ internal class SettingsVM : INotifyPropertyChanged {
 		IsFloatingTooltipShowHideoutInfo = RatConfig.FloatingTooltip.ShowHideoutInfo;
 		IsFloatingTooltipShowBarterInfo = RatConfig.FloatingTooltip.ShowBarterInfo;
 		IsFloatingTooltipShowCraftsInfo = RatConfig.FloatingTooltip.ShowCraftsInfo;
+
+		if (IsFloatingTooltipEnabled)
+		{
+			FloatingTooltip.Instance.Hide();
+		}
 
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
 	}
@@ -156,7 +162,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 		RatConfig.Overlay.Search.Hotkey = InteractableOverlayHotkey;
 
 		// Floating tooltip
-		RatConfig.FloatingTooltip.IsEnabled = IsFloatingTooltipEnabled;
+		RatConfig.FloatingTooltip.Enable = IsFloatingTooltipEnabled;
 		RatConfig.FloatingTooltip.ShowName = IsFloatingTooltipShowName;
 		RatConfig.FloatingTooltip.ShowAvgDayPrice = IsFloatingTooltipShowAvgDayPrice;
 		RatConfig.FloatingTooltip.ShowPricePerSlot = IsFloatingTooltipShowPricePerSlot;
@@ -183,6 +189,11 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 		RatEye.Config.LogDebug = RatConfig.LogDebug;
 		RatScannerMain.Instance.HotkeyManager.RegisterHotkeys();
+
+		if (IsFloatingTooltipEnabled)
+		{
+			FloatingTooltip.Instance.Hide();
+		}
 
 		// Save config to file
 		Logger.LogInfo("Saving config...");

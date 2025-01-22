@@ -79,7 +79,7 @@ internal static class RatConfig {
 
 	// Floating ToolTip options
 	internal static class FloatingTooltip {
-		internal static bool IsEnabled = true;
+		internal static bool Enable = true;
 		internal static bool ShowName = true;
 		internal static bool ShowAvgDayPrice = true;
 		internal static bool ShowPricePerSlot = true;
@@ -218,6 +218,18 @@ internal static class RatConfig {
 		Overlay.Search.Enable = config.ReadBool(nameof(Overlay.Search.Enable), Overlay.Search.Enable);
 		Overlay.Search.BlurBehind = config.ReadBool(nameof(Overlay.Search.BlurBehind), Overlay.Search.BlurBehind);
 		Overlay.Search.Hotkey = config.ReadHotkey(nameof(Overlay.Search.Hotkey), Overlay.Search.Hotkey);
+
+		config.Section = nameof(FloatingTooltip);
+		FloatingTooltip.Enable = config.ReadBool(nameof(FloatingTooltip.Enable), FloatingTooltip.Enable);
+		FloatingTooltip.ShowName = config.ReadBool(nameof(FloatingTooltip.ShowName), FloatingTooltip.ShowName);
+		FloatingTooltip.ShowAvgDayPrice = config.ReadBool(nameof(FloatingTooltip.ShowAvgDayPrice), FloatingTooltip.ShowAvgDayPrice);
+		FloatingTooltip.ShowPricePerSlot = config.ReadBool(nameof(FloatingTooltip.ShowPricePerSlot), FloatingTooltip.ShowPricePerSlot);
+		FloatingTooltip.ShowTraderPrice = config.ReadBool(nameof(FloatingTooltip.ShowTraderPrice), FloatingTooltip.ShowTraderPrice);
+		FloatingTooltip.ShowUpdated = config.ReadBool(nameof(FloatingTooltip.ShowUpdated), FloatingTooltip.ShowUpdated);
+		FloatingTooltip.ShowTasksInfo = config.ReadBool(nameof(FloatingTooltip.ShowTasksInfo), FloatingTooltip.ShowTasksInfo);
+		FloatingTooltip.ShowHideoutInfo = config.ReadBool(nameof(FloatingTooltip.ShowHideoutInfo), FloatingTooltip.ShowHideoutInfo);
+		FloatingTooltip.ShowBarterInfo = config.ReadBool(nameof(FloatingTooltip.ShowBarterInfo), FloatingTooltip.ShowBarterInfo);
+		FloatingTooltip.ShowCraftsInfo = config.ReadBool(nameof(FloatingTooltip.ShowCraftsInfo), FloatingTooltip.ShowCraftsInfo);
 
 		config.Section = "Other";
 		if (!SetScreen) {

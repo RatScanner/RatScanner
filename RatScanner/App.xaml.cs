@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using RatScanner.View;
+using RatScanner.ViewModel;
 
 namespace RatScanner;
 
@@ -45,9 +46,6 @@ public partial class App : Application, ISingleInstance {
 		// Install webview2 runtime if it is not already
 		bool existing = _webview2RegKeys.Any(key => Registry.GetValue(key, "pv", null) != null);
 		if (!existing) InstallWebview2Runtime();
-
-		var floatingTooltipWindow = new FloatingTooltip();
-		floatingTooltipWindow.Show();
 	}
 
 	public void OnInstanceInvoked(string[] args) {
