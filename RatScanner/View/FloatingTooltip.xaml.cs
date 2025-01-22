@@ -21,6 +21,8 @@ public partial class FloatingTooltip : Window
 	private static FloatingTooltip _instance = null!;
 	public static FloatingTooltip Instance => _instance ??= new FloatingTooltip();
 
+	private const int MouseMovementUntilHide = 10;
+
 	private Vector2? mouseStartPosition;
 	private string LastItemName;
 	private int ItemScansCount;
@@ -48,8 +50,8 @@ public partial class FloatingTooltip : Window
 		{
 			mouseStartPosition = mousePosition;
 		}
-		else if (Int32.Abs((mousePosition.X - mouseStartPosition.X)) > 10 ||
-		         Int32.Abs((mousePosition.Y - mouseStartPosition.Y)) > 10)
+		else if (Int32.Abs((mousePosition.X - mouseStartPosition.X)) > MouseMovementUntilHide ||
+		         Int32.Abs((mousePosition.Y - mouseStartPosition.Y)) > MouseMovementUntilHide)
 		{
 			Application.Current.Dispatcher.Invoke(() =>
 			{
