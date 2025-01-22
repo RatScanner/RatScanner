@@ -110,8 +110,7 @@ public class RatScannerMain : INotifyPropertyChanged {
 	private void CheckForUpdates() {
 		var mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ClientVersion);
 
-		var shouldUpdate = ShouldUpdate(mostRecentVersion);
-		if (!shouldUpdate) return;
+		if(!ShouldUpdate(mostRecentVersion)) return;
 
 		Logger.LogInfo("A new version is available: " + mostRecentVersion);
 
