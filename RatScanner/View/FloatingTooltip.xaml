@@ -12,9 +12,11 @@
         Topmost="True"
         ResizeMode="NoResize"
         SizeToContent="WidthAndHeight"
-        AllowsTransparency="True">
+        AllowsTransparency="True"
+        Opacity="0.85"
+        Background="Black">
 
-	<StackPanel Background="Black" Opacity="0.85" Name="RandomName">
+	<StackPanel Name="RandomName" Margin="10" >
 		<StackPanel.Effect>
 			<DropShadowEffect BlurRadius="3"
 			                  ShadowDepth="1"
@@ -26,6 +28,7 @@
 			<Label Padding="0"
 			       VerticalAlignment="Center"
 			       Content="{Binding LastItem.Name}"
+			       Foreground="ForestGreen"
 			       d:Content="AKMN 7.62x39 assault rifle" />
 		</StackPanel>
 		<Separator />
@@ -40,8 +43,8 @@
 				       d:Content="88.000 ₽" />
 
 				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="100" />
 					<ColumnDefinition Width="*" />
-					<ColumnDefinition Width="Auto" />
 				</Grid.ColumnDefinitions>
 			</Grid>
 
@@ -53,8 +56,8 @@
 				       d:Content="11.000 ₽" />
 
 				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="100" />
 					<ColumnDefinition Width="*" />
-					<ColumnDefinition Width="Auto" />
 				</Grid.ColumnDefinitions>
 			</Grid>
 		</StackPanel>
@@ -70,8 +73,8 @@
 				       d:Content="53.516 ₽" />
 
 				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="100" />
 					<ColumnDefinition Width="*" />
-					<ColumnDefinition Width="Auto" />
 				</Grid.ColumnDefinitions>
 			</Grid>
 
