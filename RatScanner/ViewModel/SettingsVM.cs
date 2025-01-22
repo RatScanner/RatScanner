@@ -103,7 +103,17 @@ internal class SettingsVM : INotifyPropertyChanged {
 		BlurBehindSearch = RatConfig.Overlay.Search.BlurBehind;
 		InteractableOverlayHotkey = RatConfig.Overlay.Search.Hotkey;
 
+		// Floating tooltip
 		IsFloatingTooltipEnabled = RatConfig.FloatingTooltip.IsEnabled;
+		IsFloatingTooltipShowName = RatConfig.FloatingTooltip.ShowName;
+		IsFloatingTooltipShowAvgDayPrice = RatConfig.FloatingTooltip.ShowAvgDayPrice;
+		IsFloatingTooltipShowPricePerSlot = RatConfig.FloatingTooltip.ShowPricePerSlot;
+		IsFloatingTooltipShowTraderPrice = RatConfig.FloatingTooltip.ShowTraderPrice;
+		IsFloatingTooltipShowUpdated = RatConfig.FloatingTooltip.ShowUpdated;
+		IsFloatingTooltipShowTasksInfo = RatConfig.FloatingTooltip.ShowTasksInfo;
+		IsFloatingTooltipShowHideoutInfo = RatConfig.FloatingTooltip.ShowHideoutInfo;
+		IsFloatingTooltipShowBarterInfo = RatConfig.FloatingTooltip.ShowBarterInfo;
+		IsFloatingTooltipShowCraftsInfo = RatConfig.FloatingTooltip.ShowCraftsInfo;
 
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
 	}

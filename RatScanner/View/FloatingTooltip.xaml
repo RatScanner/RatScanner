@@ -16,7 +16,7 @@
         Opacity="0.85"
         Background="Black">
 
-	<StackPanel Name="RandomName" Margin="10" >
+	<StackPanel Name="FloatingWindowWrapper" Margin="10" >
 		<StackPanel.Effect>
 			<DropShadowEffect BlurRadius="3"
 			                  ShadowDepth="1"
@@ -30,8 +30,8 @@
 			       Content="{Binding LastItem.Name}"
 			       Foreground="ForestGreen"
 			       d:Content="AKMN 7.62x39 assault rifle" />
+			<Separator />
 		</StackPanel>
-		<Separator />
 
 		<StackPanel>
 			<Grid x:Name="AvgDayPriceDisplay"
@@ -91,8 +91,8 @@
 			</StackPanel.Style>
 		</StackPanel>
 
-		<StackPanel Name="HideoutItems" />
 		<StackPanel Name="TaskItemList" />
+		<StackPanel Name="HideoutItems" />
 		<StackPanel Name="BarterItemList" />
 		<StackPanel Name="CraftItemList" />
 

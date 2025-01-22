@@ -8,7 +8,7 @@ using System.Windows.Media;
 using Force.DeepCloner;
 using RatScanner.ViewModel;
 using Color = System.Drawing.Color;
-using RCMinUi = RatScanner.RatConfig.FloatingTooltip;
+using RcFloatingTooltip = RatScanner.RatConfig.FloatingTooltip;
 using RichTextBox = System.Windows.Forms.RichTextBox;
 using Timer = System.Windows.Forms.Timer;
 
@@ -46,7 +46,7 @@ public partial class FloatingTooltip : Window
 
 	protected virtual void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
 	{
-		if (RCMinUi.IsEnabled && sender != null && sender is MenuVM vm)
+		if (RcFloatingTooltip.IsEnabled && sender != null && sender is MenuVM vm)
 		{
 			if ((!vm.LastItem.Name.Equals(LastItemName) || vm.ItemScans.Count > ItemScansCount))
 			{
@@ -59,6 +59,19 @@ public partial class FloatingTooltip : Window
 
 	public void Show()
 	{
+		const Visibility v = Visibility.Visible;
+		const Visibility c = Visibility.Collapsed;
+
+		NameDisplay.Visibility = RcFloatingTooltip.ShowName ? v : c;
+		AvgDayPriceDisplay.Visibility = RcFloatingTooltip.ShowAvgDayPrice ? v : c;
+		PricePerSlotDisplay.Visibility = RcFloatingTooltip.ShowPricePerSlot ? v : c;
+		TraderPriceDisplay.Visibility = RcFloatingTooltip.ShowTraderPrice ? v : c;
+		UpdatedDisplay.Visibility = RcFloatingTooltip.ShowUpdated ? v : c;
+		TaskItemList.Visibility = RcFloatingTooltip.ShowTasksInfo ? v : c;
+		HideoutItems.Visibility = RcFloatingTooltip.ShowHideoutInfo ? v : c;
+		BarterItemList.Visibility = RcFloatingTooltip.ShowBarterInfo ? v : c;
+		CraftItemList.Visibility = RcFloatingTooltip.ShowCraftsInfo ? v : c;
+
 		var mousePosition = UserActivityHelper.GetMousePosition();
 		Instance.Top = mousePosition.Y;
 		Instance.Left = mousePosition.X;
@@ -66,7 +79,7 @@ public partial class FloatingTooltip : Window
 		MenuVM context = ((MenuVM)Instance.DataContext);
 
 		TaskItemList.Children.Clear();
-		if (context.TaskItemRemaining.Count > 0)
+		if (context.TaskItemRemaining.Count > 0 && RcFloatingTooltip.ShowTasksInfo)
 		{
 			TaskItemList.Children.Add(new Separator());
 
@@ -85,7 +98,7 @@ public partial class FloatingTooltip : Window
 		}
 
 		HideoutItems.Children.Clear();
-		if (context.HideoutItemRemaining.Count > 0)
+		if (context.HideoutItemRemaining.Count > 0 && RcFloatingTooltip.ShowHideoutInfo)
 		{
 			HideoutItems.Children.Add(new Separator());
 
@@ -105,7 +118,7 @@ public partial class FloatingTooltip : Window
 
 
 		BarterItemList.Children.Clear();
-		if (context.LastItem.BartersUsing.Count > 0)
+		if (context.LastItem.BartersUsing.Count > 0 && RcFloatingTooltip.ShowBarterInfo)
 		{
 			BarterItemList.Children.Add(new Separator());
 
@@ -144,7 +157,7 @@ public partial class FloatingTooltip : Window
 		}
 
 		CraftItemList.Children.Clear();
-		if (context.LastItem.CraftsUsing.Count > 0)
+		if (context.LastItem.CraftsUsing.Count > 0 && RcFloatingTooltip.ShowCraftsInfo)
 		{
 			CraftItemList.Children.Add(new Separator());
 
