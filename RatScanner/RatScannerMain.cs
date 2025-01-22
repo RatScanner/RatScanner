@@ -83,9 +83,7 @@ public class RatScannerMain : INotifyPropertyChanged {
 			Thread.Sleep(1000);
 			Logger.LogInfo("Checking for updates...");
 
-			#if !DEBUG
-				CheckForUpdates();
-			#endif
+			CheckForUpdates();
 
 			Logger.LogInfo("Loading TarkovTracker data...");
 			if (RatConfig.Tracking.TarkovTracker.Enable) {
