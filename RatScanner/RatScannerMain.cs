@@ -83,7 +83,6 @@ public class RatScannerMain : INotifyPropertyChanged {
 			Thread.Sleep(1000);
 			Logger.LogInfo("Checking for updates...");
 
-			// TODO Joosep Sisas - 22.01.2025 - This needs thorough testing before commiting
 			#if !DEBUG
 				CheckForUpdates();
 			#endif
