@@ -195,6 +195,7 @@ public partial class FloatingTooltip : Window
 			}
 		}
 
+		// TODO Joosep Sisas - 22.01.2024 - Maybe there is a better solution?
 		var screenBounds = Screen.PrimaryScreen.Bounds;
 		var mousePosition = UserActivityHelper.GetMousePosition();
 		Instance.Top = Math.Min(screenBounds.Height, mousePosition.Y + Instance.Height) - Instance.Height;
