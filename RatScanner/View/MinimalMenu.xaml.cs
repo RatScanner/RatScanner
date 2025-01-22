@@ -1,7 +1,6 @@
 ﻿using RatEye;
 using RatScanner.ViewModel;
 using System.Windows;
-using System.Windows.Data;
 using System.Windows.Forms;
 using System.Windows.Input;
 using RCMinUi = RatScanner.RatConfig.MinimalUi;

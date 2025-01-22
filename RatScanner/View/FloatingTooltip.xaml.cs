@@ -6,14 +6,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media;
-using Force.DeepCloner;
 using RatScanner.ViewModel;
 using Application = System.Windows.Application;
-using Color = System.Drawing.Color;
 using Label = System.Windows.Controls.Label;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using RcFloatingTooltip = RatScanner.RatConfig.FloatingTooltip;
-using RichTextBox = System.Windows.Forms.RichTextBox;
 using Timer = System.Windows.Forms.Timer;
 
 namespace RatScanner.View;
@@ -181,7 +178,6 @@ public partial class FloatingTooltip : Window
 			}
 		}
 
-		// TODO Joosep Sisas - 22.01.2024 - Maybe there is a better solution?
 		var screenBounds = Screen.PrimaryScreen.Bounds;
 		var mousePosition = UserActivityHelper.GetMousePosition();
 		Instance.Top = Math.Min(screenBounds.Height, mousePosition.Y + Instance.Height) - Instance.Height;

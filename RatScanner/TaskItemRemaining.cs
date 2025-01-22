@@ -13,9 +13,4 @@ public class TaskItemRemaining
 	public int ItemCount { get; set; }
 	public Task Task { get; set; }
 
-
-	public string ToFloatingUiString()
-	{
-		return "[" + Task.MinPlayerLevel + "] " + Task.Trader.Name + "=>" + Task.Name + " " + ItemCount + "x";
-	}
 }

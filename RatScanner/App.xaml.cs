@@ -7,9 +7,6 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using RatScanner.View;
-using RatScanner.ViewModel;
 
 namespace RatScanner;
 

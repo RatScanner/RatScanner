@@ -1,7 +1,6 @@
 ﻿using RatScanner.FetchModels.TarkovTracker;
 using RatScanner.TarkovDev.GraphQL;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -21,7 +20,7 @@ public static class ItemExtensions {
 	{
 		return GetTaskItemRemaining(item, progress).Sum(x => x.ItemCount);
 	}
-	
+
 	public static ObservableCollection<TaskItemRemaining> GetTaskItemRemaining(this Item item, UserProgress? progress = null) {
 		// Compensation for Damage Tasks
 		// These tasks are not tracked by TarkovTracker
