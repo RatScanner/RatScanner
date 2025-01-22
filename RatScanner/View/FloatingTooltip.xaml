@@ -88,20 +88,9 @@
 			</StackPanel.Style>
 		</StackPanel>
 
-		<StackPanel>
-			<Separator />
-			<StackPanel Name="HideoutItemList" />
-		</StackPanel>
-
-		<StackPanel>
-			<Separator />
-			<StackPanel Name="TaskItemList" />
-		</StackPanel>
-
-		<StackPanel>
-			<Separator />
-			<StackPanel Name="BarterItemList" />
-		</StackPanel>
+		<StackPanel Name="HideoutItems" />
+		<StackPanel Name="TaskItemList" />
+		<StackPanel Name="BarterItemList" />
 
 		<StackPanel x:Name="UpdatedDisplay">
 			<Separator />

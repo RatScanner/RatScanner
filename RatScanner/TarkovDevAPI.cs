@@ -167,6 +167,7 @@ public static class TarkovDevAPI {
 		.WithReceivedFromTasks(new TaskQueryBuilder().WithId())
 		.WithBartersFor(new BarterQueryBuilder().WithId())
 		.WithBartersUsing(new BarterQueryBuilder().WithId()
+			.WithLevel()
 			.WithTrader(new TraderQueryBuilder().WithAllScalarFields())
 			.WithRequiredItems(new ContainedItemQueryBuilder().WithCount().WithItem(new ItemQueryBuilder().WithName()))
 			.WithRewardItems(new ContainedItemQueryBuilder().WithCount().WithItem(new ItemQueryBuilder().WithName())))

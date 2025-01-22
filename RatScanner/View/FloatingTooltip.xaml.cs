@@ -61,19 +61,21 @@ public partial class FloatingTooltip : Window
 
 		MenuVM context = ((MenuVM)Instance.DataContext);
 
-		HideoutItemList.Children.Clear();
+		HideoutItems.Children.Clear();
 		if (context.HideoutItemRemaining.Count > 0)
 		{
+			HideoutItems.Children.Add(new Separator());
+
 			Label hideoutTitleLabel = new Label();
 			hideoutTitleLabel.Content = "Hideout: " + context.HideoutRemaining + "x";
-			HideoutItemList.Children.Add(hideoutTitleLabel);
+			HideoutItems.Children.Add(hideoutTitleLabel);
 
 			var sortedHideoutItemRemaining = context.HideoutItemRemaining;
 			foreach (var hideoutItemRemaining in sortedHideoutItemRemaining)
 			{
 				var label = new Label();
 				label.Content = "[" + hideoutItemRemaining.Level + "] " + hideoutItemRemaining.Name + " " + hideoutItemRemaining.ItemCount + "x";
-				HideoutItemList.Children.Add(label);
+				HideoutItems.Children.Add(label);
 			}
 		}
 
@@ -81,6 +83,8 @@ public partial class FloatingTooltip : Window
 		TaskItemList.Children.Clear();
 		if (context.TaskItemRemaining.Count > 0)
 		{
+			TaskItemList.Children.Add(new Separator());
+
 			Label hideoutTitleLabel = new Label();
 			hideoutTitleLabel.Content = "Tasks: " + context.TaskRemaining + "x";
 			TaskItemList.Children.Add(hideoutTitleLabel);
@@ -98,6 +102,8 @@ public partial class FloatingTooltip : Window
 		BarterItemList.Children.Clear();
 		if (context.LastItem.BartersUsing.Count > 0)
 		{
+			BarterItemList.Children.Add(new Separator());
+
 			Label hideoutTitleLabel = new Label();
 			hideoutTitleLabel.Content = "Barters";
 			BarterItemList.Children.Add(hideoutTitleLabel);
