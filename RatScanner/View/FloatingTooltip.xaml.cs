@@ -43,6 +43,11 @@ public partial class FloatingTooltip : Window
 		UpdateElements();
 	}
 
+	protected override void OnMouseLeave(MouseEventArgs e)
+	{
+		Instance.HideTooltip();
+	}
+
 	protected override void OnMouseMove(MouseEventArgs e)
 	{
 		Vector2 mousePosition = UserActivityHelper.GetMousePosition();
@@ -55,8 +60,7 @@ public partial class FloatingTooltip : Window
 		{
 			Application.Current.Dispatcher.Invoke(() =>
 			{
-				Instance.Hide();
-				mouseStartPosition = null;
+				Instance.HideTooltip();
 			});
 		}
 	}
@@ -72,6 +76,12 @@ public partial class FloatingTooltip : Window
 				Application.Current.Dispatcher.Invoke(() => Instance.ShowTooltip());
 			}
 		}
+	}
+
+	private void HideTooltip()
+	{
+		mouseStartPosition = null;
+		Hide();
 	}
 
 	private void ShowTooltip()
@@ -197,8 +207,8 @@ public partial class FloatingTooltip : Window
 
 		var screenBounds = Screen.PrimaryScreen.Bounds;
 		var mousePosition = UserActivityHelper.GetMousePosition();
-		Instance.Top = Math.Min(screenBounds.Height, mousePosition.Y + Instance.Height) - Instance.Height;
-		Instance.Left = Math.Min(screenBounds.Width, mousePosition.X + Instance.Width) - Instance.Width;
+		Instance.Top = Math.Min(screenBounds.Height, mousePosition.Y - MouseMovementUntilHide + Instance.Height) - Instance.Height;
+		Instance.Left = Math.Min(screenBounds.Width, mousePosition.X - MouseMovementUntilHide + Instance.Width) - Instance.Width;
 
 		Instance.Show();
 	}
