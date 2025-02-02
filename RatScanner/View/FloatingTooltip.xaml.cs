@@ -2,13 +2,14 @@
 using RatScanner.ViewModel;
 using System;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
-using System.Windows.Media;
 using Application = System.Windows.Application;
+using Brushes = System.Windows.Media.Brushes;
 using Label = System.Windows.Controls.Label;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using RcFloatingTooltip = RatScanner.RatConfig.FloatingTooltip;
@@ -180,10 +181,9 @@ public partial class FloatingTooltip : Window {
 			}
 		}
 
-		System.Drawing.Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
 		Vector2 mousePosition = UserActivityHelper.GetMousePosition();
-		Instance.Top = Math.Min(screenBounds.Height, mousePosition.Y - MouseMovementUntilHide + Instance.Height) - Instance.Height;
-		Instance.Left = Math.Min(screenBounds.Width, mousePosition.X - MouseMovementUntilHide + Instance.Width) - Instance.Width;
+		Instance.Top = Math.Min(RatConfig.ScreenHeight, mousePosition.Y - MouseMovementUntilHide + Instance.Height) - Instance.Height;
+		Instance.Left = Math.Min(RatConfig.ScreenWidth, mousePosition.X - MouseMovementUntilHide + Instance.Width) - Instance.Width;
 
 		Instance.Show();
 	}
