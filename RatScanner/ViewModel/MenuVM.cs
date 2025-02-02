@@ -33,7 +33,7 @@ internal class MenuVM : INotifyPropertyChanged {
 
 	public string PatreonLink => ApiManager.GetResource(ApiManager.ResourceType.PatreonLink);
 
-	public string Updated => DateTime.Parse(LastItem.Updated).ToLocalTime().ToString(CultureInfo.CurrentCulture);
+	public string Updated => LastItem.Updated == null ? "Unknown" : DateTime.Parse(LastItem.Updated).ToLocalTime().ToString(CultureInfo.CurrentCulture);
 
 	public string WikiLink {
 		get {
