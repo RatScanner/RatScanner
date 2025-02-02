@@ -1,8 +1,8 @@
-﻿using RatStash;
+﻿using RatScanner.View;
+using RatStash;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
-using RatScanner.View;
 
 namespace RatScanner.ViewModel;
 
@@ -116,8 +116,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 		IsFloatingTooltipShowBarterInfo = RatConfig.FloatingTooltip.ShowBarterInfo;
 		IsFloatingTooltipShowCraftsInfo = RatConfig.FloatingTooltip.ShowCraftsInfo;
 
-		if (IsFloatingTooltipEnabled)
-		{
+		if (IsFloatingTooltipEnabled) {
 			FloatingTooltip.Instance.Hide();
 		}
 
@@ -190,8 +189,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 		RatEye.Config.LogDebug = RatConfig.LogDebug;
 		RatScannerMain.Instance.HotkeyManager.RegisterHotkeys();
 
-		if (IsFloatingTooltipEnabled)
-		{
+		if (IsFloatingTooltipEnabled) {
 			FloatingTooltip.Instance.Hide();
 		}
 

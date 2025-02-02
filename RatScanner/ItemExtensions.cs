@@ -16,8 +16,7 @@ public static class ItemExtensions {
 		return progress ?? new UserProgress();
 	}
 
-	public static int GetTaskRemaining(this Item item, UserProgress? progress = null)
-	{
+	public static int GetTaskRemaining(this Item item, UserProgress? progress = null) {
 		return GetTaskItemRemaining(item, progress).Sum(x => x.ItemCount);
 	}
 
@@ -37,7 +36,7 @@ public static class ItemExtensions {
 		bool showNonFir = RatConfig.Tracking.ShowNonFIRNeeds;
 
 		Task[] tasks = TarkovDevAPI.GetTasks();
-		var taskRemainingItems = new ObservableCollection<TaskItemRemaining>();
+		ObservableCollection<TaskItemRemaining> taskRemainingItems = new();
 
 		foreach (Task task in tasks) {
 			// Skip if task is already completed
@@ -52,15 +51,15 @@ public static class ItemExtensions {
 			foreach (ITaskObjective? objective in task.Objectives) {
 				if (objective == null) continue;
 				if (objective is TaskObjectiveItem oGiveItem && oGiveItem.Type == "giveItem") {
-					if ((!oGiveItem.Items?.Any(i => i?.Id == item.Id)) ?? true) continue;	// Skip if item is not the one we are looking for
-					if (!showNonFir && !oGiveItem.FoundInRaid) continue;					// Skip if item is not FIR
+					if ((!oGiveItem.Items?.Any(i => i?.Id == item.Id)) ?? true) continue;   // Skip if item is not the one we are looking for
+					if (!showNonFir && !oGiveItem.FoundInRaid) continue;                    // Skip if item is not FIR
 					count += oGiveItem.Count;
 					// Substract amount of already collected items
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
 					foreach (Progress p in objectiveProgress) count -= p.Complete ? oGiveItem.Count : p.Count;
 				} else if (objective is TaskObjectiveItem oPlantItem && oPlantItem.Type == "plantItem") {
-					if ((!oPlantItem.Items?.Any(i => i?.Id == item.Id)) ?? true) continue;	// Skip if item is not the one we are looking for
-					if (!showNonFir) continue;												// Skip if item is not FIR
+					if ((!oPlantItem.Items?.Any(i => i?.Id == item.Id)) ?? true) continue;  // Skip if item is not the one we are looking for
+					if (!showNonFir) continue;                                              // Skip if item is not FIR
 					count += oPlantItem.Count;
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
 					foreach (Progress p in objectiveProgress) count -= p.Complete ? oPlantItem.Count : p.Count;
@@ -79,7 +78,7 @@ public static class ItemExtensions {
 				}
 			}
 
-			if(count < 1) continue;
+			if (count < 1) continue;
 			taskRemainingItems.Add(new TaskItemRemaining(count, task));
 		}
 		return taskRemainingItems;
@@ -88,7 +87,7 @@ public static class ItemExtensions {
 	public static ObservableCollection<HideoutItemRemaining> GetHideoutRemainingItem(this Item item, UserProgress? progress = null) {
 		progress ??= GetUserProgress();
 
-		var hideoutRemainingItems = new ObservableCollection<HideoutItemRemaining>();
+		ObservableCollection<HideoutItemRemaining> hideoutRemainingItems = new();
 		HideoutStation[] stations = TarkovDevAPI.GetHideoutStations();
 
 		foreach (HideoutStation station in stations) {
@@ -110,7 +109,7 @@ public static class ItemExtensions {
 					foreach (Progress p in objectiveProgress) count -= p.Complete ? requiredItem.Count : p.Count;
 				}
 
-				if(count < 1) continue;
+				if (count < 1) continue;
 				hideoutRemainingItems.Add(new HideoutItemRemaining(count, station.Name, level.Level));
 			}
 		}

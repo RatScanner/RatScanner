@@ -1,4 +1,6 @@
-﻿using System;
+﻿using RatEye;
+using RatScanner.ViewModel;
+using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -6,8 +8,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Media;
-using RatEye;
-using RatScanner.ViewModel;
 using Application = System.Windows.Application;
 using Label = System.Windows.Controls.Label;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
@@ -16,8 +16,7 @@ using Timer = System.Windows.Forms.Timer;
 
 namespace RatScanner.View;
 
-public partial class FloatingTooltip : Window
-{
+public partial class FloatingTooltip : Window {
 	private static FloatingTooltip _instance = null!;
 	public static FloatingTooltip Instance => _instance ??= new FloatingTooltip();
 
@@ -31,11 +30,10 @@ public partial class FloatingTooltip : Window
 
 	Timer fadeTimer;
 
-	private FloatingTooltip()
-	{
+	private FloatingTooltip() {
 		InitializeComponent();
 		Hide();
-		var dataContext = new MenuVM(RatScannerMain.Instance);
+		MenuVM dataContext = new(RatScannerMain.Instance);
 		DataContext = dataContext;
 		LastItemName = dataContext.LastItem.Name;
 		ItemScansCount = dataContext.ItemScans.Count;
@@ -43,34 +41,25 @@ public partial class FloatingTooltip : Window
 		UpdateElements();
 	}
 
-	protected override void OnMouseLeave(MouseEventArgs e)
-	{
+	protected override void OnMouseLeave(MouseEventArgs e) {
 		Instance.HideTooltip();
 	}
 
-	protected override void OnMouseMove(MouseEventArgs e)
-	{
+	protected override void OnMouseMove(MouseEventArgs e) {
 		Vector2 mousePosition = UserActivityHelper.GetMousePosition();
-		if (mouseStartPosition == null)
-		{
+		if (mouseStartPosition == null) {
 			mouseStartPosition = mousePosition;
-		}
-		else if (Int32.Abs((mousePosition.X - mouseStartPosition.X)) > MouseMovementUntilHide ||
-		         Int32.Abs((mousePosition.Y - mouseStartPosition.Y)) > MouseMovementUntilHide)
-		{
-			Application.Current.Dispatcher.Invoke(() =>
-			{
+		} else if (Int32.Abs((mousePosition.X - mouseStartPosition.X)) > MouseMovementUntilHide ||
+				   Int32.Abs((mousePosition.Y - mouseStartPosition.Y)) > MouseMovementUntilHide) {
+			Application.Current.Dispatcher.Invoke(() => {
 				Instance.HideTooltip();
 			});
 		}
 	}
 
-	protected virtual void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
-	{
-		if (RcFloatingTooltip.Enable && sender is MenuVM vm)
-		{
-			if ((!vm.LastItem.Name.Equals(LastItemName) || vm.ItemScans.Count > ItemScansCount))
-			{
+	protected virtual void OnPropertyChanged(object? sender, PropertyChangedEventArgs e) {
+		if (RcFloatingTooltip.Enable && sender is MenuVM vm) {
+			if ((!vm.LastItem.Name.Equals(LastItemName) || vm.ItemScans.Count > ItemScansCount)) {
 				LastItemName = vm.LastItem.Name;
 				ItemScansCount = vm.ItemScans.Count;
 				Application.Current.Dispatcher.Invoke(() => Instance.ShowTooltip());
@@ -78,49 +67,43 @@ public partial class FloatingTooltip : Window
 		}
 	}
 
-	private void HideTooltip()
-	{
+	private void HideTooltip() {
 		mouseStartPosition = null;
 		Hide();
 	}
 
-	private void ShowTooltip()
-	{
+	private void ShowTooltip() {
 		MenuVM context = ((MenuVM)Instance.DataContext);
 
 		TaskItemList.Children.Clear();
-		if (context.TaskItemRemaining.Count > 0 && RcFloatingTooltip.ShowTasksInfo)
-		{
+		if (context.TaskItemRemaining.Count > 0 && RcFloatingTooltip.ShowTasksInfo) {
 			TaskItemList.Children.Add(new Separator());
 
-			Label hideoutTitle = new Label();
+			Label hideoutTitle = new();
 			hideoutTitle.Foreground = Brushes.Orange;
 			hideoutTitle.Content = "Tasks: " + context.TaskRemaining + "x";
 			TaskItemList.Children.Add(hideoutTitle);
 
-			var sortedTaskItemRemaining = context.TaskItemRemaining.OrderBy(x => x.Task.Trader.Name).ThenBy(x => x.Task.MinPlayerLevel);
-			foreach (var taskItemRemaining in sortedTaskItemRemaining)
-			{
-				var label = new Label();
+			IOrderedEnumerable<TaskItemRemaining> sortedTaskItemRemaining = context.TaskItemRemaining.OrderBy(x => x.Task.Trader.Name).ThenBy(x => x.Task.MinPlayerLevel);
+			foreach (TaskItemRemaining? taskItemRemaining in sortedTaskItemRemaining) {
+				Label label = new();
 				label.Content = taskItemRemaining.Task.MinPlayerLevel + "] " + taskItemRemaining.Task.Trader.Name + " => " + taskItemRemaining.Task.Name + " " + taskItemRemaining.ItemCount + "x";
 				TaskItemList.Children.Add(label);
 			}
 		}
 
 		HideoutItems.Children.Clear();
-		if (context.HideoutItemRemaining.Count > 0 && RcFloatingTooltip.ShowHideoutInfo)
-		{
+		if (context.HideoutItemRemaining.Count > 0 && RcFloatingTooltip.ShowHideoutInfo) {
 			HideoutItems.Children.Add(new Separator());
 
-			Label hideoutTitle = new Label();
+			Label hideoutTitle = new();
 			hideoutTitle.Foreground = Brushes.Orange;
 			hideoutTitle.Content = "Hideout: " + context.HideoutRemaining + "x";
 			HideoutItems.Children.Add(hideoutTitle);
 
-			var sortedHideoutItemRemaining = context.HideoutItemRemaining;
-			foreach (var hideoutItemRemaining in sortedHideoutItemRemaining)
-			{
-				var label = new Label();
+			System.Collections.ObjectModel.ObservableCollection<HideoutItemRemaining> sortedHideoutItemRemaining = context.HideoutItemRemaining;
+			foreach (HideoutItemRemaining hideoutItemRemaining in sortedHideoutItemRemaining) {
+				Label label = new();
 				label.Content = "[" + hideoutItemRemaining.Level + "] " + hideoutItemRemaining.Name + " " + hideoutItemRemaining.ItemCount + "x";
 				HideoutItems.Children.Add(label);
 			}
@@ -128,93 +111,84 @@ public partial class FloatingTooltip : Window
 
 
 		BarterItemList.Children.Clear();
-		if (context.LastItem.BartersUsing.Count > 0 && RcFloatingTooltip.ShowBarterInfo)
-		{
+		if (context.LastItem.BartersUsing.Count > 0 && RcFloatingTooltip.ShowBarterInfo) {
 			BarterItemList.Children.Add(new Separator());
 
-			Label barterTitle = new Label();
+			Label barterTitle = new();
 			barterTitle.Foreground = Brushes.Orange;
 			barterTitle.Content = "Barters";
 			BarterItemList.Children.Add(barterTitle);
 
-			var item = context.LastItem;
-			var sortedBarterItems = item.BartersUsing.OrderBy(x => x.Trader.Name).ThenBy(x => x.Level);
-			foreach (var barter in sortedBarterItems)
-			{
-				StringBuilder sb = new StringBuilder();
+			TarkovDev.GraphQL.Item item = context.LastItem;
+			IOrderedEnumerable<TarkovDev.GraphQL.Barter?> sortedBarterItems = item.BartersUsing.OrderBy(x => x.Trader.Name).ThenBy(x => x.Level);
+			foreach (TarkovDev.GraphQL.Barter? barter in sortedBarterItems) {
+				StringBuilder sb = new();
 				sb.Append("[" + barter.Level + "] ");
 				sb.Append(barter.Trader.Name);
 				sb.Append(" => ");
 
-				for (var i = 0; i < barter.RequiredItems.Count; i++)
-				{
-					var requiredItem = barter.RequiredItems.ElementAt(i);
+				for (int i = 0; i < barter.RequiredItems.Count; i++) {
+					TarkovDev.GraphQL.ContainedItem? requiredItem = barter.RequiredItems.ElementAt(i);
 					sb.Append(requiredItem.Item.Name).Append(" ").Append(requiredItem.Count).Append("x");
 
-					if (i < barter.RequiredItems.Count - 1)
-					{
+					if (i < barter.RequiredItems.Count - 1) {
 						sb.Append(" + ");
 					}
 				}
 
-				var rewardItem = barter.RewardItems.First();
+				TarkovDev.GraphQL.ContainedItem? rewardItem = barter.RewardItems.First();
 				sb.Append(" == ").Append(rewardItem.Item.Name).Append(" ").Append(rewardItem.Count).Append("x");
 
-				var label = new Label();
+				Label label = new();
 				label.Content = sb.ToString();
 				BarterItemList.Children.Add(label);
 			}
 		}
 
 		CraftItemList.Children.Clear();
-		if (context.LastItem.CraftsUsing.Count > 0 && RcFloatingTooltip.ShowCraftsInfo)
-		{
+		if (context.LastItem.CraftsUsing.Count > 0 && RcFloatingTooltip.ShowCraftsInfo) {
 			CraftItemList.Children.Add(new Separator());
 
-			Label craftTitle = new Label();
+			Label craftTitle = new();
 			craftTitle.Foreground = Brushes.Orange;
 			craftTitle.Content = "Crafts";
 			CraftItemList.Children.Add(craftTitle);
 
-			var item = context.LastItem;
-			var sortedCraftItem = item.CraftsUsing.OrderBy(x => x.Station.Name).ThenBy(x => x.Level);
-			foreach (var craft in sortedCraftItem)
-			{
-				StringBuilder sb = new StringBuilder();
+			TarkovDev.GraphQL.Item item = context.LastItem;
+			IOrderedEnumerable<TarkovDev.GraphQL.Craft?> sortedCraftItem = item.CraftsUsing.OrderBy(x => x.Station.Name).ThenBy(x => x.Level);
+			foreach (TarkovDev.GraphQL.Craft? craft in sortedCraftItem) {
+				StringBuilder sb = new();
 				sb.Append("[" + craft.Level + "] ");
 				sb.Append(craft.Station.Name);
 				sb.Append(" => ");
 
-				for (var i = 0; i < craft.RequiredItems.Count; i++)
-				{
-					var requiredItem = craft.RequiredItems.ElementAt(i);
+				for (int i = 0; i < craft.RequiredItems.Count; i++) {
+					TarkovDev.GraphQL.ContainedItem? requiredItem = craft.RequiredItems.ElementAt(i);
 					sb.Append(requiredItem.Item.Name).Append(" ").Append(requiredItem.Count).Append("x");
 
-					if (i < craft.RequiredItems.Count - 1)
-					{
+					if (i < craft.RequiredItems.Count - 1) {
 						sb.Append(" + ");
 					}
 				}
 
-				var rewardItem = craft.RewardItems.First();
+				TarkovDev.GraphQL.ContainedItem? rewardItem = craft.RewardItems.First();
 				sb.Append(" == ").Append(rewardItem.Item.Name).Append(" ").Append(rewardItem.Count).Append("x");
 
-				var label = new Label();
+				Label label = new();
 				label.Content = sb.ToString();
 				CraftItemList.Children.Add(label);
 			}
 		}
 
-		var screenBounds = Screen.PrimaryScreen.Bounds;
-		var mousePosition = UserActivityHelper.GetMousePosition();
+		System.Drawing.Rectangle screenBounds = Screen.PrimaryScreen.Bounds;
+		Vector2 mousePosition = UserActivityHelper.GetMousePosition();
 		Instance.Top = Math.Min(screenBounds.Height, mousePosition.Y - MouseMovementUntilHide + Instance.Height) - Instance.Height;
 		Instance.Left = Math.Min(screenBounds.Width, mousePosition.X - MouseMovementUntilHide + Instance.Width) - Instance.Width;
 
 		Instance.Show();
 	}
 
-	public void UpdateElements()
-	{
+	public void UpdateElements() {
 		const Visibility v = Visibility.Visible;
 		const Visibility c = Visibility.Collapsed;
 

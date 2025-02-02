@@ -108,9 +108,9 @@ public class RatScannerMain : INotifyPropertyChanged {
 	}
 
 	private void CheckForUpdates() {
-		var mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ClientVersion);
+		string mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ClientVersion);
 
-		if(!ShouldUpdate(mostRecentVersion)) return;
+		if (!ShouldUpdate(mostRecentVersion)) return;
 
 		Logger.LogInfo("A new version is available: " + mostRecentVersion);
 
@@ -127,22 +127,19 @@ public class RatScannerMain : INotifyPropertyChanged {
 		if (result == MessageBoxResult.Yes) UpdateRatScanner();
 	}
 
-	private static bool ShouldUpdate(string mostRecentVersion)
-	{
-		var currentVersion = RatConfig.Version;
+	private static bool ShouldUpdate(string mostRecentVersion) {
+		string currentVersion = RatConfig.Version;
 		if (currentVersion == mostRecentVersion) return false;
 
-		var versions = currentVersion.Split(".");
-		var mostRecentVersions = mostRecentVersion.Split(".");
+		string[] versions = currentVersion.Split(".");
+		string[] mostRecentVersions = mostRecentVersion.Split(".");
 
 		bool shouldUpdate = false;
-		for (var i = 0; i < versions.Length; i++)
-		{
+		for (int i = 0; i < versions.Length; i++) {
 			int version = Int32.Parse(versions[i]);
-			int recentVersion =Int32.Parse(mostRecentVersions[i]);
+			int recentVersion = Int32.Parse(mostRecentVersions[i]);
 
-			if (version < recentVersion)
-			{
+			if (version < recentVersion) {
 				shouldUpdate = true;
 			}
 		}

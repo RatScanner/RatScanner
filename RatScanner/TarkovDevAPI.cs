@@ -182,7 +182,7 @@ public static class TarkovDevAPI {
 					.WithItem(new ItemQueryBuilder().WithName())
 					.WithCount()))
 		.WithTypes()
-		,alias: "data", lang: language, gameMode: gameMode).Build();
+		, alias: "data", lang: language, gameMode: gameMode).Build();
 	}
 
 	private static string TasksQuery() => TasksQuery(RatConfig.NameScan.Language.ToTarkovDevType(), RatConfig.GameMode);

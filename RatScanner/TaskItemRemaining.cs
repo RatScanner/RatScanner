@@ -2,10 +2,8 @@
 
 namespace RatScanner;
 
-public class TaskItemRemaining
-{
-	public TaskItemRemaining(int itemCount, Task task)
-	{
+public class TaskItemRemaining {
+	public TaskItemRemaining(int itemCount, Task task) {
 		ItemCount = itemCount;
 		Task = task;
 	}
