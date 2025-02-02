@@ -88,7 +88,7 @@ public partial class FloatingTooltip : Window {
 			IOrderedEnumerable<TaskItemRemaining> sortedTaskItemRemaining = context.TaskItemRemaining.OrderBy(x => x.Task.Trader.Name).ThenBy(x => x.Task.MinPlayerLevel);
 			foreach (TaskItemRemaining? taskItemRemaining in sortedTaskItemRemaining) {
 				Label label = new();
-				label.Content = taskItemRemaining.Task.MinPlayerLevel + "] " + taskItemRemaining.Task.Trader.Name + " => " + taskItemRemaining.Task.Name + " " + taskItemRemaining.ItemCount + "x";
+				label.Content = "[" + taskItemRemaining.Task.MinPlayerLevel + "] " + taskItemRemaining.Task.Trader.Name + " => " + taskItemRemaining.Task.Name + " " + taskItemRemaining.ItemCount + "x";
 				TaskItemList.Children.Add(label);
 			}
 		}
