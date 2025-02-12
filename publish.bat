@@ -10,7 +10,7 @@ dotnet publish RatScanner/RatScanner.csproj -c Release -o publish --runtime win-
 
 :: Download Updater
 echo Adding latest updater build...
-curl -L "https://github.com/RatScanner/RatUpdater/releases/latest/download/RatUpdater.exe" --output "publish/RatUpdater.exe"
+:: curl -L "https://github.com/RatScanner/RatUpdater/releases/latest/download/RatUpdater.exe" --output "publish/RatUpdater.exe"
 
 :: Zip
 where 7z
