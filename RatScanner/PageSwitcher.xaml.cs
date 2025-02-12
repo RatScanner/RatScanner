@@ -52,6 +52,8 @@ public partial class PageSwitcher : Window {
 		Width = DefaultWidth;
 		Height = DefaultHeight;
 
+		if (RatConfig.Tracking.ShowKappaNeeds) Height += 35;
+
 		// Avoid window stretching when using minimal menu
 		MaxWidth = DefaultWidth;
 	}

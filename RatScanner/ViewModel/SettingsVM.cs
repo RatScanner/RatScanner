@@ -38,6 +38,8 @@ internal class SettingsVM : INotifyPropertyChanged {
 	// Progress Tracking Settings
 	public bool ShowNonFIRNeeds { get; set; }
 
+	public bool ShowKappaNeeds { get; set; }
+
 	// TarkovTracker Specific Tracking Settings
 	public string TarkovTrackerToken { get; set; }
 
@@ -83,6 +85,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 		LogDebug = RatConfig.LogDebug;
 
 		ShowNonFIRNeeds = RatConfig.Tracking.ShowNonFIRNeeds;
+		ShowKappaNeeds = RatConfig.Tracking.ShowKappaNeeds;
 
 		TarkovTrackerToken = RatConfig.Tracking.TarkovTracker.Token;
 		ShowTarkovTrackerTeam = RatConfig.Tracking.TarkovTracker.ShowTeam;
@@ -123,6 +126,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 		RatConfig.MinimalUi.Opacity = Opacity;
 
 		RatConfig.Tracking.ShowNonFIRNeeds = ShowNonFIRNeeds;
+		RatConfig.Tracking.ShowKappaNeeds = ShowKappaNeeds;
 
 		RatConfig.Tracking.TarkovTracker.Token = TarkovTrackerToken.Trim();
 		RatConfig.Tracking.TarkovTracker.ShowTeam = ShowTarkovTrackerTeam;
@@ -141,6 +145,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 		// Apply config
 		PageSwitcher.Instance.Topmost = RatConfig.AlwaysOnTop;
+		PageSwitcher.Instance.ResetWindowSize();
 		await TarkovDevAPI.InitializeCache();
 		if (updateTarkovTrackerToken) UpdateTarkovTrackerToken();
 		if (updateResolution || updateLanguage) RatScannerMain.Instance.SetupRatEye();
