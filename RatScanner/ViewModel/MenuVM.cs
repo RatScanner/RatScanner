@@ -47,11 +47,17 @@ internal class MenuVM : INotifyPropertyChanged {
 	public ItemPrice? BestTraderOffer => LastItem.GetBestTraderOffer();
 	public TraderOffer? BestTraderOfferVendor => LastItem.GetBestTraderOfferVendor();
 
-	public int TaskRemaining => LastItem.GetTaskRemaining();
+    public (int count, int kappaCount) TaskRemainingResult => LastItem.GetTaskRemaining();
 
+    public int TaskRemaining => TaskRemainingResult.count;
+
+    public int TaskRemainingKappa => TaskRemainingResult.kappaCount;
+	
 	public int HideoutRemaining => LastItem.GetHideoutRemaining();
 
 	public bool ItemNeeded => TaskRemaining + HideoutRemaining > 0;
+
+	public bool ShowKappaNeeds => RatConfig.Tracking.ShowKappaNeeds;
 
 	public List<KeyValuePair<string, KeyValuePair<int, int>>>? ItemTeamNeeds {
 		get {
@@ -61,7 +67,7 @@ internal class MenuVM : INotifyPropertyChanged {
 
 			List<KeyValuePair<string, KeyValuePair<int, int>>> needs = new();
 			foreach (FetchModels.TarkovTracker.UserProgress? memberProgress in teamProgress) {
-				int task = LastItem.GetTaskRemaining(memberProgress);
+				int task = LastItem.GetTaskRemaining(memberProgress).Item1;
 				int hideout = LastItem.GetHideoutRemaining(memberProgress);
 
 				if (task == 0 && hideout == 0) continue;
