@@ -59,7 +59,7 @@ public static class ItemExtensions {
 				} else if (objective is TaskObjectiveItem oPlantItem && oPlantItem.Type == "plantItem") {
 					if ((!oPlantItem.Items?.Any(i => i?.Id == item.Id)) ?? true) continue;	// Skip if item is not the one we are looking for
 					if (!showNonFir) continue;												// Skip if item is not FIR
-					needed oPlantItem.Count;
+					needed = oPlantItem.Count;
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
 					foreach (Progress p in objectiveProgress) needed -= p.Complete ? oPlantItem.Count : p.Count;
 					count += needed;
@@ -80,7 +80,6 @@ public static class ItemExtensions {
 					foreach (Progress p in objectiveProgress) needed -= 1;
 					count += needed;
 					if (task.KappaRequired == true) kappaCount += needed;
-
 				}
 			}
 		}
