@@ -82,6 +82,7 @@ public class RatScannerMain : INotifyPropertyChanged {
 		new Thread(() => {
 			Thread.Sleep(1000);
 			Logger.LogInfo("Checking for updates...");
+
 			CheckForUpdates();
 
 			Logger.LogInfo("Loading TarkovTracker data...");
@@ -108,7 +109,9 @@ public class RatScannerMain : INotifyPropertyChanged {
 
 	private void CheckForUpdates() {
 		string mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ClientVersion);
-		if (RatConfig.Version == mostRecentVersion) return;
+
+		if (!ShouldUpdate(mostRecentVersion)) return;
+
 		Logger.LogInfo("A new version is available: " + mostRecentVersion);
 
 		string forceVersions = ApiManager.GetResource(ApiManager.ResourceType.ClientForceUpdateVersions);
@@ -122,6 +125,26 @@ public class RatScannerMain : INotifyPropertyChanged {
 		message += "Do you want to install it now?";
 		MessageBoxResult result = MessageBox.Show(message, "Rat Scanner Updater", MessageBoxButton.YesNo);
 		if (result == MessageBoxResult.Yes) UpdateRatScanner();
+	}
+
+	private static bool ShouldUpdate(string mostRecentVersion) {
+		string currentVersion = RatConfig.Version;
+		if (currentVersion == mostRecentVersion) return false;
+
+		string[] versions = currentVersion.Split(".");
+		string[] mostRecentVersions = mostRecentVersion.Split(".");
+
+		bool shouldUpdate = false;
+		for (int i = 0; i < versions.Length; i++) {
+			int version = Int32.Parse(versions[i]);
+			int recentVersion = Int32.Parse(mostRecentVersions[i]);
+
+			if (version < recentVersion) {
+				shouldUpdate = true;
+			}
+		}
+
+		return shouldUpdate;
 	}
 
 	private void UpdateRatScanner() {

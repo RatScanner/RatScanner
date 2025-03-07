@@ -1,0 +1,117 @@
+﻿<Window x:Class="RatScanner.View.FloatingTooltip"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:RatScanner.View"
+        xmlns:viewmodel="clr-namespace:RatScanner.ViewModel"
+        d:DataContext="{d:DesignInstance Type=viewmodel:MenuVM}"
+        mc:Ignorable="d"
+        WindowStyle="None"
+        Focusable="False"
+        Topmost="True"
+        ResizeMode="NoResize"
+        SizeToContent="WidthAndHeight"
+        AllowsTransparency="True"
+        Opacity="0.85"
+        Background="Black">
+
+	<StackPanel Name="FloatingWindowWrapper" Margin="10" >
+		<StackPanel.Effect>
+			<DropShadowEffect BlurRadius="3"
+			                  ShadowDepth="1"
+			                  Color="#000000" />
+		</StackPanel.Effect>
+		<StackPanel x:Name="NameDisplay" Margin="2"
+		            VerticalAlignment="Center"
+		            Orientation="Horizontal">
+			<Label Padding="0"
+			       VerticalAlignment="Center"
+			       Content="{Binding LastItem.Name}"
+			       Foreground="ForestGreen"
+			       d:Content="AKMN 7.62x39 assault rifle" />
+			<Separator />
+		</StackPanel>
+
+		<StackPanel>
+			<Grid x:Name="AvgDayPriceDisplay"
+			      Margin="0,5,0,0">
+				<Label Grid.Column="0"
+				       Content="Avg. Day Price" />
+				<Label Grid.Column="1"
+				       Content="{Binding LastItem.Avg24HPrice, Converter={StaticResource IntToLongPriceConverter}}"
+				       d:Content="88.000 ₽" />
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="100" />
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
+			</Grid>
+
+			<Grid x:Name="PricePerSlotDisplay">
+				<Label Grid.Column="0"
+				       Content="Price per Slot" />
+				<Label Grid.Column="1"
+				       Content="{Binding PricePerSlot, Converter={StaticResource IntToLongPriceConverter}}"
+				       d:Content="11.000 ₽" />
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="100" />
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
+			</Grid>
+		</StackPanel>
+
+		<StackPanel x:Name="TraderPriceDisplay">
+			<Separator />
+			<Grid>
+				<Label Grid.Column="0"
+				       Content="{Binding BestTraderOfferVendor.Name}"
+				       d:Content="Mechanic" />
+				<Label Grid.Column="1"
+				       Content="{Binding BestTraderOffer.PriceRub, Converter={StaticResource IntToLongPriceConverter}}"
+				       d:Content="53.516 ₽" />
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="100" />
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
+			</Grid>
+
+			<StackPanel.Style>
+				<Style TargetType="StackPanel">
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding BestTraderOfferVendor.Name}"
+						             Value="">
+							<Setter Property="Visibility"
+							        Value="Collapsed" />
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</StackPanel.Style>
+		</StackPanel>
+
+		<StackPanel Name="TaskItemList" />
+		<StackPanel Name="HideoutItems" />
+		<StackPanel Name="BarterItemList" />
+		<StackPanel Name="CraftItemList" />
+
+		<StackPanel x:Name="UpdatedDisplay">
+			<Separator />
+			<Grid Margin="0,5,0,0">
+				<Label Grid.Column="0"
+				       Content="Updated"
+				       FontSize="10" />
+				<Label Grid.Column="1"
+				       Content="{Binding Updated}"
+				       d:Content="04.07.2021 14:31"
+				       FontSize="10" />
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
+			</Grid>
+		</StackPanel>
+	</StackPanel>
+</Window>

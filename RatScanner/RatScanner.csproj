@@ -70,6 +70,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Content Include="Data\**">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Include="wwwroot\**" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
 

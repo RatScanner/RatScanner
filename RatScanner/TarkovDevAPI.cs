@@ -166,9 +166,21 @@ public static class TarkovDevAPI {
 		.WithUsedInTasks(new TaskQueryBuilder().WithId())
 		.WithReceivedFromTasks(new TaskQueryBuilder().WithId())
 		.WithBartersFor(new BarterQueryBuilder().WithId())
-		.WithBartersUsing(new BarterQueryBuilder().WithId())
+		.WithBartersUsing(new BarterQueryBuilder().WithId()
+			.WithLevel()
+			.WithTrader(new TraderQueryBuilder().WithAllScalarFields())
+			.WithRequiredItems(new ContainedItemQueryBuilder().WithCount().WithItem(new ItemQueryBuilder().WithName()))
+			.WithRewardItems(new ContainedItemQueryBuilder().WithCount().WithItem(new ItemQueryBuilder().WithName())))
 		.WithCraftsFor(new CraftQueryBuilder().WithId())
-		.WithCraftsUsing(new CraftQueryBuilder().WithId())
+		.WithCraftsUsing(new CraftQueryBuilder()
+			.WithId()
+			.WithLevel()
+			.WithStation(new HideoutStationQueryBuilder().WithName())
+			.WithRequiredItems(new ContainedItemQueryBuilder().WithCount().WithItem(new ItemQueryBuilder().WithName()))
+			.WithRewardItems(
+				new ContainedItemQueryBuilder()
+					.WithItem(new ItemQueryBuilder().WithName())
+					.WithCount()))
 		.WithTypes()
 		, alias: "data", lang: language, gameMode: gameMode).Build();
 	}
