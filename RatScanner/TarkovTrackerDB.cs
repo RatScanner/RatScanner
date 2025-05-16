@@ -16,8 +16,6 @@ public class TarkovTrackerDB {
 	public string Self = "";
 	public string? Token;
 
-	private const string TarkovTrackerUrl = "https://tarkovtracker.io/api/v2";
-
 	// Set up the TarkovTracker DB
 	public bool Init() {
 		if (!ValidToken()) return false;
@@ -92,7 +90,7 @@ public class TarkovTrackerDB {
 	// Checks the token metadata endpoint for TarkovTracker
 	private TeamProgressResponse GetTeamProgress() {
 		try {
-			string responseStr = APIClient.Get($"{TarkovTrackerUrl}/team/progress", _token.Id);
+			string responseStr = APIClient.Get($"{RatConfig.Tracking.TarkovTracker.Endpoint}/team/progress", _token.Id);
 			return JsonConvert.DeserializeObject<TeamProgressResponse>(responseStr) ?? new();
 		} catch (WebException e) {
 			HttpStatusCode? status = (e.Response as HttpWebResponse)?.StatusCode;
@@ -106,7 +104,7 @@ public class TarkovTrackerDB {
 	// Checks the token metadata endpoint for TarkovTracker
 	private ProgressResponse GetProgress() {
 		try {
-			string responseStr = APIClient.Get($"{TarkovTrackerUrl}/progress", _token.Id);
+			string responseStr = APIClient.Get($"{RatConfig.Tracking.TarkovTracker.Endpoint}/progress", _token.Id);
 			return JsonConvert.DeserializeObject<ProgressResponse>(responseStr) ?? new();
 		} catch (WebException e) {
 			HttpStatusCode? status = (e.Response as HttpWebResponse)?.StatusCode;
@@ -132,7 +130,7 @@ public class TarkovTrackerDB {
 		string? working_token = Token;
 		if (custom_token != null) working_token = custom_token;
 
-		string responseStr = APIClient.Get($"{TarkovTrackerUrl}/token", working_token);
+		string responseStr = APIClient.Get($"{RatConfig.Tracking.TarkovTracker.Endpoint}/token", working_token);
 		TokenResponse? result = JsonConvert.DeserializeObject<TokenResponse>(responseStr);
 		return result ?? throw new Exception("Failed to deserialize token response");
 	}
