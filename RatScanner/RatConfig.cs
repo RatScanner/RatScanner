@@ -94,6 +94,7 @@ internal static class RatConfig {
 		internal static bool ShowNonFIRNeeds = true;
 
 		internal static class TarkovTracker {
+			internal static string Endpoint = "https://tarkovtracker.io/api/v2";
 			internal static bool Enable => Token.Length > 0;
 
 			internal static string Token = "";
@@ -109,6 +110,12 @@ internal static class RatConfig {
 			internal static bool BlurBehind = true;
 			internal static Hotkey Hotkey = new(new[] { Key.N, Key.M }.ToList());
 		}
+	}
+
+	// OAuth2 refresh tokens
+	internal static class OAuthRefreshToken {
+		internal static string Discord = "";
+		internal static string Patreon = "";
 	}
 
 	// Other
@@ -195,7 +202,8 @@ internal static class RatConfig {
 		Tracking.ShowNonFIRNeeds = config.ReadBool(nameof(Tracking.ShowNonFIRNeeds), Tracking.ShowNonFIRNeeds);
 
 		config.Section = nameof(Tracking.TarkovTracker);
-		Tracking.TarkovTracker.Token = config.ReadString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);
+		Tracking.TarkovTracker.Endpoint = config.ReadString(nameof(Tracking.TarkovTracker.Endpoint), Tracking.TarkovTracker.Endpoint);
+		Tracking.TarkovTracker.Token = config.ReadSecureString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);
 		Tracking.TarkovTracker.ShowTeam = config.ReadBool(nameof(Tracking.TarkovTracker.ShowTeam), Tracking.TarkovTracker.ShowTeam);
 
 		config.Section = nameof(Overlay);
@@ -204,6 +212,10 @@ internal static class RatConfig {
 		Overlay.Search.Enable = config.ReadBool(nameof(Overlay.Search.Enable), Overlay.Search.Enable);
 		Overlay.Search.BlurBehind = config.ReadBool(nameof(Overlay.Search.BlurBehind), Overlay.Search.BlurBehind);
 		Overlay.Search.Hotkey = config.ReadHotkey(nameof(Overlay.Search.Hotkey), Overlay.Search.Hotkey);
+
+		config.Section = nameof(OAuthRefreshToken);
+		OAuthRefreshToken.Discord = config.ReadSecureString(nameof(OAuthRefreshToken.Discord), OAuthRefreshToken.Discord);
+		OAuthRefreshToken.Patreon = config.ReadSecureString(nameof(OAuthRefreshToken.Patreon), OAuthRefreshToken.Patreon);
 
 		config.Section = "Other";
 		if (!SetScreen) {
@@ -254,7 +266,8 @@ internal static class RatConfig {
 		config.WriteBool(nameof(Tracking.ShowNonFIRNeeds), Tracking.ShowNonFIRNeeds);
 
 		config.Section = nameof(Tracking.TarkovTracker);
-		config.WriteString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);
+		config.WriteString(nameof(Tracking.TarkovTracker.Endpoint), Tracking.TarkovTracker.Endpoint);
+		config.WriteSecureString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);
 		config.WriteBool(nameof(Tracking.TarkovTracker.ShowTeam), Tracking.TarkovTracker.ShowTeam);
 
 		config.Section = nameof(Overlay);
@@ -263,6 +276,10 @@ internal static class RatConfig {
 		config.WriteBool(nameof(Overlay.Search.Enable), Overlay.Search.Enable);
 		config.WriteBool(nameof(Overlay.Search.BlurBehind), Overlay.Search.BlurBehind);
 		config.WriteHotkey(nameof(Overlay.Search.Hotkey), Overlay.Search.Hotkey);
+
+		config.Section = nameof(OAuthRefreshToken);
+		config.WriteSecureString(nameof(OAuthRefreshToken.Discord), OAuthRefreshToken.Discord);
+		config.WriteSecureString(nameof(OAuthRefreshToken.Patreon), OAuthRefreshToken.Patreon);
 
 		config.Section = "Other";
 		config.WriteInt(nameof(ScreenWidth), ScreenWidth);
