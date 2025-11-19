@@ -86,6 +86,43 @@
 			</StackPanel.Style>
 		</StackPanel>
 
+		<StackPanel x:Name="KappaDisplay">
+			<StackPanel>
+				<Separator />
+				<Grid>
+					<Label Grid.Column="0"
+							 HorizontalAlignment="Left"
+							 Content="Needed for Kappa" />
+					<StackPanel Grid.Column="1"
+										Orientation="Horizontal"
+										HorizontalAlignment="Right">
+						<Label Content="{Binding TaskRemainingKappa, FallbackValue=0}" />
+						<Image Source="{StaticResource kappaIcon}"
+								 VerticalAlignment="Center"
+								 Width="20"
+								 Height="16" />
+					</StackPanel>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="2*" />
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+				</Grid>
+				<StackPanel.Style>
+					<Style TargetType="StackPanel">
+						<Setter Property="Visibility"
+									Value="Visible" />
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding KappaNeeded}"
+												 Value="False">
+								<Setter Property="Visibility"
+											Value="Collapsed" />
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</StackPanel.Style>
+			</StackPanel>
+		</StackPanel>
+
 		<StackPanel x:Name="TrackingDisplay">
 			<StackPanel>
 				<Separator />

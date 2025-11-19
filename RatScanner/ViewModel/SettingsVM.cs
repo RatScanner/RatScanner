@@ -23,6 +23,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 	public bool ShowPricePerSlot { get; set; }
 	public bool ShowTraderPrice { get; set; }
 	public bool ShowUpdated { get; set; }
+	public bool ShowKappa { get; set; }
 	public bool ShowQuestHideoutTracker { get; set; }
 	public bool ShowQuestHideoutTeamTracker { get; set; }
 	public int Opacity { get; set; }
@@ -71,6 +72,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 		ShowAvgDayPrice = RatConfig.MinimalUi.ShowAvgDayPrice;
 		ShowPricePerSlot = RatConfig.MinimalUi.ShowPricePerSlot;
 		ShowTraderPrice = RatConfig.MinimalUi.ShowTraderPrice;
+		ShowKappa = RatConfig.MinimalUi.ShowKappa;
 		ShowQuestHideoutTracker = RatConfig.MinimalUi.ShowQuestHideoutTracker;
 		ShowQuestHideoutTeamTracker = RatConfig.MinimalUi.ShowQuestHideoutTeamTracker;
 		ShowUpdated = RatConfig.MinimalUi.ShowUpdated;
@@ -120,6 +122,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 		RatConfig.MinimalUi.ShowAvgDayPrice = ShowAvgDayPrice;
 		RatConfig.MinimalUi.ShowPricePerSlot = ShowPricePerSlot;
 		RatConfig.MinimalUi.ShowTraderPrice = ShowTraderPrice;
+		RatConfig.MinimalUi.ShowKappa = ShowKappa;
 		RatConfig.MinimalUi.ShowQuestHideoutTracker = ShowQuestHideoutTracker;
 		RatConfig.MinimalUi.ShowQuestHideoutTeamTracker = ShowQuestHideoutTeamTracker;
 		RatConfig.MinimalUi.ShowUpdated = ShowUpdated;

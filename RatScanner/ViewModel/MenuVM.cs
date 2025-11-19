@@ -52,6 +52,8 @@ internal class MenuVM : INotifyPropertyChanged {
     public int TaskRemaining => TaskRemainingResult.count;
 
     public int TaskRemainingKappa => TaskRemainingResult.kappaCount;
+
+	public bool KappaNeeded => TaskRemainingKappa > 0;
 	
 	public int HideoutRemaining => LastItem.GetHideoutRemaining();
 
