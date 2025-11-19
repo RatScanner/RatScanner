@@ -16,8 +16,6 @@ public class TarkovTrackerDB {
 	public string Self = "";
 	public string? Token;
 
-	private const string TarkovTrackerUrl = "https://tarkovtracker.org/api/v2";
-
 	// Set up the TarkovTracker DB
 	public bool Init() {
 		if (!ValidToken()) return false;
