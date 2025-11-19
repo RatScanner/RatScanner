@@ -61,4 +61,5 @@ public partial class MinimalMenu : UserControl, ISwitchable {
 		double delta = e.PreviousSize.Width - e.NewSize.Width;
 		PageSwitcher.Instance.Left += delta;
 	}
+
 }

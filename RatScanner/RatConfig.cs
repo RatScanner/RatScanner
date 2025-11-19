@@ -77,6 +77,20 @@ internal static class RatConfig {
 		internal static int Duration = 1500;
 	}
 
+	// Floating ToolTip options
+	internal static class FloatingTooltip {
+		internal static bool Enable = true;
+		internal static bool ShowName = true;
+		internal static bool ShowAvgDayPrice = true;
+		internal static bool ShowPricePerSlot = true;
+		internal static bool ShowTraderPrice = true;
+		internal static bool ShowUpdated = true;
+		internal static bool ShowTasksInfo = true;
+		internal static bool ShowHideoutInfo = true;
+		internal static bool ShowBarterInfo = true;
+		internal static bool ShowCraftsInfo = true;
+	}
+
 	// Minimal UI
 	internal static class MinimalUi {
 		internal static bool ShowName = true;
@@ -216,6 +230,18 @@ internal static class RatConfig {
 		config.Section = nameof(OAuthRefreshToken);
 		OAuthRefreshToken.Discord = config.ReadSecureString(nameof(OAuthRefreshToken.Discord), OAuthRefreshToken.Discord);
 		OAuthRefreshToken.Patreon = config.ReadSecureString(nameof(OAuthRefreshToken.Patreon), OAuthRefreshToken.Patreon);
+
+		config.Section = nameof(FloatingTooltip);
+		FloatingTooltip.Enable = config.ReadBool(nameof(FloatingTooltip.Enable), FloatingTooltip.Enable);
+		FloatingTooltip.ShowName = config.ReadBool(nameof(FloatingTooltip.ShowName), FloatingTooltip.ShowName);
+		FloatingTooltip.ShowAvgDayPrice = config.ReadBool(nameof(FloatingTooltip.ShowAvgDayPrice), FloatingTooltip.ShowAvgDayPrice);
+		FloatingTooltip.ShowPricePerSlot = config.ReadBool(nameof(FloatingTooltip.ShowPricePerSlot), FloatingTooltip.ShowPricePerSlot);
+		FloatingTooltip.ShowTraderPrice = config.ReadBool(nameof(FloatingTooltip.ShowTraderPrice), FloatingTooltip.ShowTraderPrice);
+		FloatingTooltip.ShowUpdated = config.ReadBool(nameof(FloatingTooltip.ShowUpdated), FloatingTooltip.ShowUpdated);
+		FloatingTooltip.ShowTasksInfo = config.ReadBool(nameof(FloatingTooltip.ShowTasksInfo), FloatingTooltip.ShowTasksInfo);
+		FloatingTooltip.ShowHideoutInfo = config.ReadBool(nameof(FloatingTooltip.ShowHideoutInfo), FloatingTooltip.ShowHideoutInfo);
+		FloatingTooltip.ShowBarterInfo = config.ReadBool(nameof(FloatingTooltip.ShowBarterInfo), FloatingTooltip.ShowBarterInfo);
+		FloatingTooltip.ShowCraftsInfo = config.ReadBool(nameof(FloatingTooltip.ShowCraftsInfo), FloatingTooltip.ShowCraftsInfo);
 
 		config.Section = "Other";
 		if (!SetScreen) {

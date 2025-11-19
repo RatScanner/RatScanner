@@ -49,8 +49,8 @@
                                                 @item.GetTaskRemaining().ToShortString()
                                             </MudChip>
                                             <MudChip OnClose="() => { }" CloseIcon="@Icons.Material.Filled.House" Size="Size.Small"
-                                                     Variant="Variant.Outlined" Color="@(item.GetHideoutRemaining() > 0 ? Color.Success : Color.Default)">
-                                                @item.GetHideoutRemaining().ToShortString()
+                                                     Variant="Variant.Outlined" Color="@(item.GetHideoutTotalRemaining() > 0 ? Color.Success : Color.Default)">
+                                                @item.GetHideoutTotalRemaining().ToShortString()
                                             </MudChip>
                                         </MudStack>
 

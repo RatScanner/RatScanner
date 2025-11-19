@@ -1,0 +1,46 @@
+﻿@page "/app/settings/floatingTooltip"
+@layout SettingsLayout
+@inject SettingsVM SettingsVM
+
+@implements IDisposable
+<div>
+    <MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
+        <MudItem xs="12">
+            <div class="d-flex align-center justify-center mx-2 mb-1">
+                <MudText Typo="Typo.subtitle1" Color="Color.Inherit">Floating Tooltip Window Settings</MudText>
+            </div>
+        </MudItem>
+	    <MudItem xs="12">
+		    <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
+			    <MudGrid Spacing="0" Class="pa-0 ma-0">
+				    <MudCheckBox @bind-Checked="@SettingsVM.IsFloatingTooltipEnabled" Label="Enable tooltip UI" Dense="true" Size="Size.Small" Class="pa-0 ma-0" />
+				    <MudCheckBox @bind-Checked="@SettingsVM.IsFloatingTooltipShowName" Label="Name" Dense="true" Size="Size.Small" Class="pa-0 ma-0" />
+				    <MudCheckBox @bind-Checked="@SettingsVM.IsFloatingTooltipShowAvgDayPrice" Label="Avg. Daily Price " Dense="true" Size="Size.Small" Class="pa-0 ma-0" />
+				    <MudCheckBox @bind-Checked="@SettingsVM.IsFloatingTooltipShowPricePerSlot" Label="Price per Slot" Dense="true" Size="Size.Small" Class="pa-0 ma-0" />
+				    <MudCheckBox @bind-Checked="@SettingsVM.IsFloatingTooltipShowTraderPrice" Label="Trader Price" Dense="true" Size="Size.Small" Class="pa-0 ma-0" />
+				    <MudCheckBox @bind-Checked="@SettingsVM.IsFloatingTooltipShowTasksInfo" Label="Show tasks" Dense="true" Size="Size.Small" Class="pa-0 ma-0" />
+				    <MudCheckBox @bind-Checked="@SettingsVM.IsFloatingTooltipShowHideoutInfo" Label="Show hideout upgrades" Dense="true" Size="Size.Small" Class="pa-0 ma-0" />
+				    <MudCheckBox @bind-Checked="@SettingsVM.IsFloatingTooltipShowBarterInfo" Label="Show barters" Dense="true" Size="Size.Small" Class="pa-0 ma-0" />
+				    <MudCheckBox @bind-Checked="@SettingsVM.IsFloatingTooltipShowCraftsInfo" Label="Show crafts" Dense="true" Size="Size.Small" Class="pa-0 ma-0" />
+				    <MudCheckBox @bind-Checked="@SettingsVM.IsFloatingTooltipShowUpdated" Label="Updated Timestamp" Dense="true" Size="Size.Small" Class="pa-0 ma-0" />
+			    </MudGrid>
+		    </MudPaper>
+	    </MudItem>
+    </MudGrid>
+</div>
+
+@code {
+
+    protected override void OnInitialized() {
+        SettingsVM.PropertyChanged += PropertyChangeHandler;
+    }
+
+    private async void PropertyChangeHandler(object? sender, EventArgs e) {
+        await InvokeAsync(() => StateHasChanged());
+    }
+
+    public void Dispose() {
+        SettingsVM.PropertyChanged -= PropertyChangeHandler;
+    }
+
+}
