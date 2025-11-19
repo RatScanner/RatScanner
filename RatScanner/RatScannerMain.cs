@@ -168,9 +168,6 @@ public class RatScannerMain : INotifyPropertyChanged {
 				InventoryConfig = new Config.Processing.Inventory() {
 					OptimizeHighlighted = highlighted,
 				},
-				InspectionConfig = new Config.Processing.Inspection() {
-					MarkerThreshold = 0.9f,
-				},
 			},
 		};
 	}
