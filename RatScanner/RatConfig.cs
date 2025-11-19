@@ -97,7 +97,7 @@ internal static class RatConfig {
 		internal static bool ShowKappaNeeds = false;
 
 		internal static class TarkovTracker {
-			internal static string Endpoint = "https://tarkovtracker.io/api/v2";
+			internal static string Endpoint = "https://tarkovtracker.org/api/v2";
 			internal static bool Enable => Token.Length > 0;
 
 			internal static string Token = "";

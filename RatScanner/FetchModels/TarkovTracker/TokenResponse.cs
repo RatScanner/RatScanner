@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
 namespace RatScanner.FetchModels.TarkovTracker;
 
@@ -12,4 +13,8 @@ public class TokenResponse {
 	// An array of string representations of this token's permissions
 	[JsonProperty("permissions")]
 	public List<string> Permissions { get; set; } = new();
+
+	// extra fields
+	[JsonExtensionData]
+	private IDictionary<string, JToken> _extraStuff;
 }
