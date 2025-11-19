@@ -15,7 +15,7 @@ public static class ItemExtensions {
 		return progress ?? new UserProgress();
 	}
 
-	public static int GetTaskRemaining(this Item item, UserProgress? progress = null) {
+	public static (int count, int kappaCount) GetTaskRemaining(this Item item, UserProgress? progress = null) {
 		// Compensation for Damage Tasks
 		// These tasks are not tracked by TarkovTracker
 		string[] excludedTasks = new string[] {
@@ -28,7 +28,10 @@ public static class ItemExtensions {
 
 		progress ??= GetUserProgress();
 
+		int needed = 0;
 		int count = 0;
+		int kappaCount = 0;
+		
 		bool showNonFir = RatConfig.Tracking.ShowNonFIRNeeds;
 
 		Task[] tasks = TarkovDevAPI.GetTasks();
@@ -44,34 +47,43 @@ public static class ItemExtensions {
 			foreach (ITaskObjective? objective in task.Objectives) {
 				if (objective == null) continue;
 				if (objective is TaskObjectiveItem oGiveItem && oGiveItem.Type == "giveItem") {
-					if ((!oGiveItem.Items?.Any(i => i?.Id == item.Id)) ?? true) continue;   // Skip if item is not the one we are looking for
-					if (!showNonFir && !oGiveItem.FoundInRaid) continue;                    // Skip if item is not FIR
-					count += oGiveItem.Count;
-					// Substract amount of already collected items
+					if ((!oGiveItem.Items?.Any(i => i?.Id == item.Id)) ?? true) continue;	// Skip if item is not the one we are looking for
+					if (!showNonFir && !oGiveItem.FoundInRaid) continue;					// Skip if item is not FIR
+					needed = oGiveItem.Count;
+					if (task.KappaRequired == true) kappaCount += oGiveItem.Count;
+					// Subtract amount of already collected items
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
-					foreach (Progress p in objectiveProgress) count -= p.Complete ? oGiveItem.Count : p.Count;
+					foreach (Progress p in objectiveProgress) needed -= p.Complete ? oGiveItem.Count : p.Count;
+					count += needed;
+					if (task.KappaRequired == true) kappaCount += needed;
 				} else if (objective is TaskObjectiveItem oPlantItem && oPlantItem.Type == "plantItem") {
-					if ((!oPlantItem.Items?.Any(i => i?.Id == item.Id)) ?? true) continue;  // Skip if item is not the one we are looking for
-					if (!showNonFir) continue;                                              // Skip if item is not FIR
-					count += oPlantItem.Count;
+					if ((!oPlantItem.Items?.Any(i => i?.Id == item.Id)) ?? true) continue;	// Skip if item is not the one we are looking for
+					if (!showNonFir) continue;												// Skip if item is not FIR
+					needed = oPlantItem.Count;
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
-					foreach (Progress p in objectiveProgress) count -= p.Complete ? oPlantItem.Count : p.Count;
+					foreach (Progress p in objectiveProgress) needed -= p.Complete ? oPlantItem.Count : p.Count;
+					count += needed;
+					if (task.KappaRequired == true) kappaCount += needed;
 				} else if (objective is TaskObjectiveMark oMark && oMark.Type == "mark") {
 					if (oMark.MarkerItem?.Id != item.Id) continue;  // Skip if item is not the one we are looking for
 					if (!showNonFir) continue;                      // Skip if item is not FIR
-					count += 1;
+					needed = 1;
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
-					foreach (Progress p in objectiveProgress) count -= 1;
+					foreach (Progress p in objectiveProgress) needed -= 1;
+					count += needed;
+					if (task.KappaRequired == true) kappaCount += needed;
 				} else if (objective is TaskObjectiveBuildItem oBuildWeapon && oBuildWeapon.Type == "buildWeapon") {
 					if (oBuildWeapon.Item?.Id != item.Id) continue; // Skip if item is not the one we are looking for
 					if (!showNonFir) continue;                      // Skip if item is not FIR
-					count += 1;
+					needed = 1;
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
-					foreach (Progress p in objectiveProgress) count -= 1;
+					foreach (Progress p in objectiveProgress) needed -= 1;
+					count += needed;
+					if (task.KappaRequired == true) kappaCount += needed;
 				}
 			}
 		}
-		return count;
+		return (count, kappaCount);
 	}
 
 	public static int GetHideoutRemaining(this Item item, UserProgress? progress = null) {
