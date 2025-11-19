@@ -108,6 +108,7 @@ internal static class RatConfig {
 		internal static bool ShowNonFIRNeeds = true;
 
 		internal static class TarkovTracker {
+			internal static string Endpoint = "https://tarkovtracker.io/api/v2";
 			internal static bool Enable => Token.Length > 0;
 
 			internal static string Token = "";
@@ -215,6 +216,7 @@ internal static class RatConfig {
 		Tracking.ShowNonFIRNeeds = config.ReadBool(nameof(Tracking.ShowNonFIRNeeds), Tracking.ShowNonFIRNeeds);
 
 		config.Section = nameof(Tracking.TarkovTracker);
+		Tracking.TarkovTracker.Endpoint = config.ReadString(nameof(Tracking.TarkovTracker.Endpoint), Tracking.TarkovTracker.Endpoint);
 		Tracking.TarkovTracker.Token = config.ReadSecureString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);
 		Tracking.TarkovTracker.ShowTeam = config.ReadBool(nameof(Tracking.TarkovTracker.ShowTeam), Tracking.TarkovTracker.ShowTeam);
 
@@ -290,6 +292,7 @@ internal static class RatConfig {
 		config.WriteBool(nameof(Tracking.ShowNonFIRNeeds), Tracking.ShowNonFIRNeeds);
 
 		config.Section = nameof(Tracking.TarkovTracker);
+		config.WriteString(nameof(Tracking.TarkovTracker.Endpoint), Tracking.TarkovTracker.Endpoint);
 		config.WriteSecureString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);
 		config.WriteBool(nameof(Tracking.TarkovTracker.ShowTeam), Tracking.TarkovTracker.ShowTeam);
 
