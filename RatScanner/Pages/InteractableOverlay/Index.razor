@@ -4,7 +4,6 @@
 @using Task = System.Threading.Tasks.Task;
 @using TTask = RatScanner.TarkovDev.GraphQL.Task;
 @using RatScanner.View;
-@using RatScanner.FetchModels
 @using Color = MudBlazor.Color
 @using System.Diagnostics;
 @inject MenuVM MenuVM
@@ -31,7 +30,7 @@
 
                 <MudStack Spacing="2" Class="py-2">
                     @for (int _i = 0; _i < _searchResults.Count(); _i++) {
-                        int i = _i; // https://github.com/aspnet/Blazor.Docs/issues/371
+                        int i = _i;
                         SearchResult searchResult = _searchResults.ElementAt(i);
                         if (searchResult.Data is TarkovDev.GraphQL.Item item) {
                             <MudPaper Class="pa-2" Elevation="3" Style="">
@@ -121,9 +120,8 @@
                                                 <MudTd Style="text-align:right">@ammo.PenetrationPower</MudTd>
                                                 <MudTd Style="text-align:right">@((int)((ammo.FragmentationChance ?? 0m) * 100m))%</MudTd>
                                                 <MudTd Style="text-align:center">
-                                                    @* Iterate over int from 0 to 6 and add mudavatar with each index *@
                                                     @for (int _i = 0; _i < 6; _i++) {
-                                                        int i = _i; // https://github.com/aspnet/Blazor.Docs/issues/371
+                                                        int i = _i;
                                                         decimal value = Math.Clamp((ammo.PenetrationPower ?? 0m) / 10m - i, 0, 1);
                                                         int hue = (int)(value * 120m);
                                                         string style = $"background-color: hsl({hue},100%,40%);";
@@ -140,12 +138,10 @@
                         } else if (searchResult.Data is TarkovDev.GraphQL.Task task) {
                             <MudPaper Class="pa-2" Elevation="3" Style="">
                                 <MudStack Row="true" Justify="Justify.SpaceBetween" Style="height: 6vh;">
-                                    <!--Left side of the search result item-->
                                     <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1;">
                                         <MudStack Justify="Justify.Center">
                                             <MudPaper Style="height: 100%;" Outlined="true">
-                                                <MudImage Src="@task.TaskImageLink"
-                                                          Style="height: 100%;" />
+                                                <MudImage Src="@task.TaskImageLink" Style="height: 100%;" />
                                             </MudPaper>
                                         </MudStack>
 
@@ -159,7 +155,6 @@
                                             </MudText>
                                         </MudStack>
                                     </MudStack>
-                                    <!--Right side of the search result item-->
                                     <MudStack Row="true" Justify="Justify.FlexEnd">
                                         <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Spacing="0">
                                             <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Center" Spacing="0">
@@ -177,13 +172,32 @@
                                     <div class="fadeOut" style="top: 200px;"></div>
                                     @foreach (ITaskObjective? objective in task.Objectives ?? Enumerable.Empty<ITaskObjective?>()) {
                                         if (objective == null) continue;
-                                        <MudStack Row="true" Justify="Justify.FlexStart" Class="">
-                                            <MudIcon Icon="@Constants.Icon.TaskObjective.FromType(objective.Type)" />
-                                            <MudText>
-                                                @objective.Description
-                                            </MudText>
+                                        <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                                            <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" AlignItems="AlignItems.Center">
+                                                <MudIcon Icon="@Constants.Icon.TaskObjective.FromType(objective.Type)" />
+                                                <MudText Class="flex-1">@objective.Description</MudText>
+                                            </MudStack>
+                                            @if (HasMapForObjective(objective)) {
+                                                <MudIconButton Icon="@Icons.Material.Filled.Map" 
+                                                              Size="Size.Small" 
+                                                              Color="Color.Primary"
+                                                              Title="View on map"
+                                                              OnClick="@(() => OpenMapForObjective(task, objective))" />
+                                            }
                                         </MudStack>
                                     }
+                                </MudStack>
+                            </MudPaper>
+                        } else if (searchResult.Data is Map map) {
+                            <MudPaper Class="pa-2" Elevation="3" Style="cursor: pointer;" @onclick="() => OpenMapViewer(map)">
+                                <MudStack Row="true" Justify="Justify.SpaceBetween" Style="height: 6vh;">
+                                    <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" AlignItems="AlignItems.Center">
+                                        <MudIcon Icon="@Icons.Material.Filled.Map" Size="Size.Large" Color="Color.Primary" />
+                                        <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Start">
+                                            <MudText Class="ellipsis" Typo="Typo.h6" Style="max-width: 16vw">@map.Name</MudText>
+                                            <MudText Typo="Typo.caption">Click to view map</MudText>
+                                        </MudStack>
+                                    </MudStack>
                                 </MudStack>
                             </MudPaper>
                         }
@@ -194,6 +208,58 @@
     </div>
 </div>
 
+@if (_selectedMap != null) {
+    <div class="map-viewer-overlay" @onclick="CloseMapViewer">
+        <div class="map-viewer-header" @onclick:stopPropagation="true">
+            <MudPaper Class="pa-2">
+                <MudText Typo="Typo.h5">@_selectedMap.Name</MudText>
+                @if (_selectedTask != null && _selectedObjective != null) {
+                    <MudDivider Class="my-1" />
+                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                        <MudIcon Icon="@Constants.Icon.TaskObjective.FromType(_selectedObjective.Type)" Size="Size.Small" />
+                        <MudText Typo="Typo.body2">@_selectedTask.Name</MudText>
+                    </MudStack>
+                    <MudText Typo="Typo.caption" Class="mt-1">@_selectedObjective.Description</MudText>
+                }
+                <MudText Typo="Typo.caption" Class="mt-1">Scroll to zoom • Drag to pan</MudText>
+            </MudPaper>
+        </div>
+        <div class="map-viewer-close" @onclick:stopPropagation="true">
+            <MudIconButton Icon="@Icons.Material.Filled.Close" Size="Size.Large" Color="Color.Error" OnClick="CloseMapViewer" />
+        </div>
+        <div class="map-viewer-container" 
+             @onclick:stopPropagation="true"
+             @onwheel="HandleWheel"
+             @onmousedown="HandleMouseDown"
+             @onmousemove="HandleMouseMove"
+             @onmouseup="HandleMouseUp"
+             @onmouseleave="HandleMouseUp">
+            <div class="map-transform-wrapper @(_isDragging ? "dragging" : "")"
+                 style="transform: translate(@(_translateX)px, @(_translateY)px) scale(@_scale.ToString(System.Globalization.CultureInfo.InvariantCulture));">
+                <img src="@($"https://local.data/maps/{_selectedMap.Id}.svg")" 
+                     class="map-image"
+                     draggable="false" />
+                
+                @* Render objective markers *@
+                @if (_selectedObjectiveZones != null && _selectedObjective != null) {
+                    @foreach (var zone in _selectedObjectiveZones.Where(z => z?.Position != null)) {
+                        var pos = zone!.Position!;
+                        <div class="objective-marker" 
+                             style="left: @(pos.X)%; top: @(pos.Y)%;">
+                            <div class="marker-icon">
+                                <MudIcon Icon="@Constants.Icon.TaskObjective.FromType(_selectedObjective.Type)" 
+                                        Size="Size.Large" 
+                                        Color="Color.Warning" />
+                            </div>
+                            <div class="marker-label">@_selectedObjective.Type</div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+}
+
 <style>
     .ellipsis {
         overflow: hidden;
@@ -202,28 +268,161 @@
         min-width: 0;
     }
 
-    .mud-select-input {
-        font-size: 2.00rem;
+    .map-viewer-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.95);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .map-viewer-header {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 10000;
+        max-width: 400px;
+    }
+
+    .map-viewer-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 10000;
+    }
+
+    .map-viewer-container {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        cursor: grab;
+        user-select: none;
+        -webkit-user-select: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .map-viewer-container:active,
+    .map-transform-wrapper.dragging {
+        cursor: grabbing;
+    }
+
+    .map-transform-wrapper {
+        transform-origin: center center;
+        transition: transform 0.1s ease-out;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .map-image {
+        max-height: 50vh;
+        max-width: 70vw;
+        height: auto;
+        width: auto;
+        display: block;
+        pointer-events: none;
+    }
+
+    .objective-marker {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        pointer-events: auto;
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        animation: markerPulse 2s ease-in-out infinite;
+    }
+
+    .marker-icon {
+        background: rgba(255, 152, 0, 0.9);
+        border-radius: 50%;
+        padding: 8px;
+        box-shadow: 0 0 20px rgba(255, 152, 0, 0.8);
+        border: 2px solid #fff;
+    }
+
+    .marker-label {
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        margin-top: 4px;
+        font-size: 12px;
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    @@keyframes markerPulse {
+        0%, 100% {
+            transform: translate(-50%, -50%) scale(1);
+        }
+        50% {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+    }
+
+    .objective-marker:hover .marker-icon {
+        background: rgba(255, 193, 7, 1);
+        box-shadow: 0 0 30px rgba(255, 193, 7, 1);
     }
 </style>
 
 @code {
     private static MudTextField<string> _searchTextField { get; set; } = null!;
-
     private string _searchText { get; set; } = "";
-
     private IEnumerable<SearchResult> _searchResults { get; set; } = new List<SearchResult>();
+
+    // Map viewer state
+    private Map? _selectedMap = null;
+    private TTask? _selectedTask = null;
+    private ITaskObjective? _selectedObjective = null;
+    private List<TaskZone?>? _selectedObjectiveZones = null;
+    private double _scale = 1.0;
+    private double _translateX = 0;
+    private double _translateY = 0;
+    private bool _isDragging = false;
+    private double _lastMouseX = 0;
+    private double _lastMouseY = 0;
 
     private async void ExecuteSearch(string value) {
         var sanitizedValue = SanitizeSearch(value);
-
         var results = Enumerable.Empty<SearchResult>();
         results = results.Concat(await SearchItem(sanitizedValue));
         results = results.Concat(await SearchTasks(sanitizedValue));
-
+        results = results.Concat(await SearchMaps(sanitizedValue));
         results = results.Where(result => result != null && result.Data != null);
         results = results.OrderBy(result => result.Score).Take(4);
         _searchResults = results;
+    }
+
+    private async Task<IEnumerable<SearchResult>> SearchMaps(string value) {
+        if (string.IsNullOrEmpty(value)) return Enumerable.Empty<SearchResult>();
+        
+        Func<Map, SearchResult?> filter = (map) => {
+            if (SanitizeSearch(map.Name) == value) return new(map, 3);
+            if (SanitizeSearch(map.Name).StartsWith(value)) return new(map, 15);
+            if (SanitizeSearch(map.Name).Contains(value)) return new(map, 45);
+            return null;
+        };
+
+        List<SearchResult> matches = new();
+        await Task.Run(() => {
+            foreach (var map in TarkovDevAPI.GetMaps()) {
+                var match = filter(map);
+                if (match?.Data == null) continue;
+                matches.Add(match);
+            }
+        });
+        return matches;
     }
 
     private async Task<IEnumerable<SearchResult>> SearchTasks(string value) {
@@ -232,19 +431,15 @@
         Func<TarkovDev.GraphQL.Task, SearchResult?> filter = (task) => {
             if (SanitizeSearch(task.Name) == value) return new(task, 4);
             if (SanitizeSearch(task.Name).StartsWith(value)) return new(task, 10);
-
-            // Match every individual word (expensive)
             string[] filters = value.Split(new[] { ' ' });
             if (filters.All(filter => SanitizeSearch(task.Name).Contains(filter))) return new(task, 30);
-
             if (SanitizeSearch(task.Name).Contains(value)) return new(task, 50);
-
             if (value.Length > 3 && SanitizeSearch(task.Id).StartsWith(value)) return new(task, 80);
             if (value.Length > 3 && SanitizeSearch(task.Id).Contains(value)) return new(task, 100);
             return null;
         };
 
-        List<SearchResult> matches = new List<SearchResult>();
+        List<SearchResult> matches = new();
         await Task.Run(() => {
             foreach (var task in TarkovDevAPI.GetTasks()) {
                 var match = filter(task);
@@ -252,7 +447,6 @@
                 matches.Add(match);
             }
         });
-
         return matches;
     }
 
@@ -262,24 +456,19 @@
         Func<TarkovDev.GraphQL.Item, SearchResult?> filter = (item) => {
             if (SanitizeSearch(item.Name) == value) return new(item, 5);
             if (SanitizeSearch(item.ShortName) == value) return new(item, 10);
-
             if (SanitizeSearch(item.Name).StartsWith(value)) return new(item, 20);
             if (SanitizeSearch(item.ShortName).StartsWith(value)) return new(item, 20);
-
-            // Match every individual word (expensive)
             string[] filters = value.Split(new[] { ' ' });
             if (filters.All(filter => SanitizeSearch(item.Name).Contains(filter))) return new(item, 40);
             if (filters.All(filter => SanitizeSearch(item.ShortName).Contains(filter))) return new(item, 40);
-
             if (SanitizeSearch(item.Name).Contains(value)) return new(item, 60);
             if (SanitizeSearch(item.ShortName).Contains(value)) return new(item, 60);
-
             if (value.Length > 3 && SanitizeSearch(item.Id).StartsWith(value)) return new(item, 80);
             if (value.Length > 3 && SanitizeSearch(item.Id).Contains(value)) return new(item, 100);
             return null;
         };
 
-        List<SearchResult> matches = new List<SearchResult>();
+        List<SearchResult> matches = new();
         await Task.Run(() => {
             foreach (var item in TarkovDevAPI.GetItems()) {
                 var match = filter(item);
@@ -289,14 +478,11 @@
         });
 
         for (int i = 0; i < matches.Count; i++) {
-            // Slightly penalize items with long names
             if (!(matches[i].Data is TarkovDev.GraphQL.Item item)) continue;
             matches[i].Score += (item.Name?.Length ?? 0) * 0.002;
-
-            // Penalize weapon mods so the weapon it self will rank higher
-            if (item.Types != null && item.Types.Contains(TarkovDev.GraphQL.ItemType.Mods)) matches[i].Score += 5;
+            if (item.Types != null && item.Types.Contains(TarkovDev.GraphQL.ItemType.Mods)) 
+                matches[i].Score += 5;
         }
-
         return matches;
     }
 
@@ -306,6 +492,93 @@
         value = value.Replace("-", " ");
         value = new string(value.Where(c => char.IsLetterOrDigit(c) || c == ' ').ToArray());
         return value;
+    }
+
+    // Map viewer methods
+    private bool HasMapForObjective(ITaskObjective objective) {
+        // Check if objective has zones with positions
+        if (objective is TaskObjectiveBasic basicObj && basicObj.Zones != null && basicObj.Zones.Any(z => z?.Position != null)) return true;
+        if (objective is TaskObjectiveItem itemObj && itemObj.Zones != null && itemObj.Zones.Any(z => z?.Position != null)) return true;
+        if (objective is TaskObjectiveMark markObj && markObj.Zones != null && markObj.Zones.Any(z => z?.Position != null)) return true;
+        if (objective is TaskObjectiveQuestItem questItemObj && questItemObj.Zones != null && questItemObj.Zones.Any(z => z?.Position != null)) return true;
+        if (objective is TaskObjectiveUseItem useItemObj && useItemObj.Zones != null && useItemObj.Zones.Any(z => z?.Position != null)) return true;
+        
+        return false;
+    }
+
+    private void OpenMapForObjective(TTask task, ITaskObjective objective) {
+        // Get zones from the objective
+        ICollection<TaskZone?>? zones = null;
+        
+        if (objective is TaskObjectiveBasic basicObj) zones = basicObj.Zones;
+        else if (objective is TaskObjectiveItem itemObj) zones = itemObj.Zones;
+        else if (objective is TaskObjectiveMark markObj) zones = markObj.Zones;
+        else if (objective is TaskObjectiveQuestItem questItemObj) zones = questItemObj.Zones;
+        else if (objective is TaskObjectiveUseItem useItemObj) zones = useItemObj.Zones;
+        
+        if (zones == null || !zones.Any()) return;
+        
+        // Get the first zone with a position
+        TaskZone? zone = zones.FirstOrDefault(z => z?.Position != null);
+        
+        // Find the matching map
+        if (zone?.Map?.Id == null) return;
+        Map? map = TarkovDevAPI.GetMaps().FirstOrDefault(m => m.Id == zone.Map.Id);
+        
+        if (map == null) return;
+        
+        _selectedTask = task;
+        _selectedObjective = objective;
+        _selectedObjectiveZones = zones.Where(z => z?.Position != null).ToList();
+        OpenMapViewer(map);
+    }
+
+    private void OpenMapViewer(Map map) {
+        _selectedMap = map;
+        _scale = 1.0;
+        _translateX = 0;
+        _translateY = 0;
+        _isDragging = false;
+        StateHasChanged();
+    }
+
+    private void CloseMapViewer() {
+        _selectedMap = null;
+        _selectedTask = null;
+        _selectedObjective = null;
+        _selectedObjectiveZones = null;
+        StateHasChanged();
+    }
+
+    private void HandleWheel(WheelEventArgs e) {
+        double zoomFactor = e.DeltaY < 0 ? 1.1 : 0.9;
+        _scale = Math.Clamp(_scale * zoomFactor, 0.3, 5.0);
+        StateHasChanged();
+    }
+
+    private void HandleMouseDown(MouseEventArgs e) {
+        _isDragging = true;
+        _lastMouseX = e.ClientX;
+        _lastMouseY = e.ClientY;
+    }
+
+    private void HandleMouseMove(MouseEventArgs e) {
+        if (!_isDragging) return;
+        
+        double deltaX = e.ClientX - _lastMouseX;
+        double deltaY = e.ClientY - _lastMouseY;
+        
+        _translateX += deltaX;
+        _translateY += deltaY;
+        
+        _lastMouseX = e.ClientX;
+        _lastMouseY = e.ClientY;
+        
+        StateHasChanged();
+    }
+
+    private void HandleMouseUp(MouseEventArgs e) {
+        _isDragging = false;
     }
 
     [JSInvokable]
@@ -336,7 +609,6 @@
             Score = score;
             Data = data;
         }
-
         public object Data;
         public double Score;
     }
@@ -344,9 +616,9 @@
     private void OpenURL(string? url) {
         if (string.IsNullOrEmpty(url)) return;
         var psi = new ProcessStartInfo {
-                FileName = url,
-                UseShellExecute = true,
-            };
+            FileName = url,
+            UseShellExecute = true,
+        };
         Process.Start(psi);
     }
 }
