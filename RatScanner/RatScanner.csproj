@@ -75,6 +75,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Content Remove="Data\maps.json" />
 		<Content Remove="wwwroot\fonts\bender.bold.otf" />
 		<Content Remove="wwwroot\fonts\bender.regular.otf" />
 		<Content Remove="wwwroot\interactableOverlay.html" />

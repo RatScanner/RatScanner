@@ -28,7 +28,7 @@
          @onmouseleave="HandleMouseUp">
         <div class="map-transform-wrapper @(_isDragging ? "dragging" : "")"
              style="transform: translate(@(_translateX)px, @(_translateY)px) scale(@(_scale.ToString(System.Globalization.CultureInfo.InvariantCulture)));">
-            <img src="@($"https://local.data/maps/{Map.Id}.svg")" 
+            <img src="@MapDataLoader.GetMapSvgUrl(Map?.Id)"
                  class="map-image"
                  draggable="false" />
             
