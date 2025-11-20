@@ -1,0 +1,97 @@
+@using RatScanner.TarkovDev.GraphQL
+@using TTask = RatScanner.TarkovDev.GraphQL.Task;
+@using System.Diagnostics;
+
+<MudPaper Class="pa-2" Elevation="3" Style="">
+    <MudStack Row="true" Justify="Justify.SpaceBetween" Style="height: 6vh;">
+        <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1;">
+            <MudStack Justify="Justify.Center">
+                <MudPaper Style="height: 100%;" Outlined="true">
+                    <MudImage Src="@Task.TaskImageLink" Style="height: 100%;" />
+                </MudPaper>
+            </MudStack>
+
+            <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Start">
+                <MudText Class="ellipsis" Typo="Typo.h6" Style="max-width: 16vw">
+                    @Task.Name
+                </MudText>
+                <MudText Align="Align.Center">
+                    <MudIconButton Icon="@Constants.Icon.TarkovDev" Size="Size.Small" OnClick=@(() => OpenURL($"https://tarkov.dev/task/{Task.Id}")) />
+                    <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" OnClick=@(() => OpenURL(Task.WikiLink)) />
+                </MudText>
+            </MudStack>
+        </MudStack>
+        <MudStack Row="true" Justify="Justify.FlexEnd">
+            <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Spacing="0">
+                <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Center" Spacing="0">
+                    <MudAvatar Image="@Task.Trader?.ImageLink"
+                               Size="Size.Large" Style="float: left;" Square="true" Variant="Variant.Outlined" />
+                </MudStack>
+            </MudStack>
+        </MudStack>
+    </MudStack>
+
+    @if (IsExpanded) {
+        <MudDivider Vertical="false" DividerType="DividerType.Middle" Class="mx-0 my-2" />
+
+        <MudStack Row="false" Style="max-height:200px; overflow:hidden; position:relative">
+            <div class="fadeOut" style="top: 200px;"></div>
+            @foreach (ITaskObjective? objective in Task.Objectives ?? Enumerable.Empty<ITaskObjective?>()) {
+                if (objective == null) continue;
+                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                    <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" AlignItems="AlignItems.Center">
+                        <MudIcon Icon="@Constants.Icon.TaskObjective.FromType(objective.Type)" />
+                        <MudText Class="flex-1">@objective.Description</MudText>
+                    </MudStack>
+                    @if (HasMapForObjective(objective)) {
+                        <MudIconButton Icon="@Icons.Material.Filled.Map" 
+                                      Size="Size.Small" 
+                                      Color="Color.Primary"
+                                      Title="View on map"
+                                      OnClick="@(() => OnMapClick.InvokeAsync((Task, objective)))" />
+                    }
+                </MudStack>
+            }
+        </MudStack>
+    }
+</MudPaper>
+
+<style>
+    .ellipsis {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        min-width: 0;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public required TTask Task { get; set; }
+
+    [Parameter]
+    public bool IsExpanded { get; set; }
+
+    [Parameter]
+    public EventCallback<(TTask task, ITaskObjective objective)> OnMapClick { get; set; }
+
+    private bool HasMapForObjective(ITaskObjective objective) {
+        // Check if objective has zones with positions
+        if (objective is TaskObjectiveBasic basicObj && basicObj.Zones != null && basicObj.Zones.Any(z => z?.Position != null)) return true;
+        if (objective is TaskObjectiveItem itemObj && itemObj.Zones != null && itemObj.Zones.Any(z => z?.Position != null)) return true;
+        if (objective is TaskObjectiveMark markObj && markObj.Zones != null && markObj.Zones.Any(z => z?.Position != null)) return true;
+        if (objective is TaskObjectiveQuestItem questItemObj && questItemObj.Zones != null && questItemObj.Zones.Any(z => z?.Position != null)) return true;
+        if (objective is TaskObjectiveUseItem useItemObj && useItemObj.Zones != null && useItemObj.Zones.Any(z => z?.Position != null)) return true;
+        
+        return false;
+    }
+
+    private void OpenURL(string? url) {
+        if (string.IsNullOrEmpty(url)) return;
+        var psi = new ProcessStartInfo {
+            FileName = url,
+            UseShellExecute = true,
+        };
+        Process.Start(psi);
+    }
+}

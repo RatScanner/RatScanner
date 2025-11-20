@@ -1,0 +1,221 @@
+@using RatScanner.TarkovDev.GraphQL
+@using TTask = RatScanner.TarkovDev.GraphQL.Task;
+
+<div class="map-viewer-overlay" @onclick="OnClose">
+    <div class="map-viewer-header" @onclick:stopPropagation="true">
+        <MudPaper Class="pa-2">
+            <MudText Typo="Typo.h5">@Map.Name</MudText>
+            @if (Task != null && Objective != null) {
+                <MudDivider Class="my-1" />
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
+                    <MudIcon Icon="@Constants.Icon.TaskObjective.FromType(Objective.Type)" Size="Size.Small" />
+                    <MudText Typo="Typo.body2">@Task.Name</MudText>
+                </MudStack>
+                <MudText Typo="Typo.caption" Class="mt-1">@Objective.Description</MudText>
+            }
+            <MudText Typo="Typo.caption" Class="mt-1">Scroll to zoom • Drag to pan</MudText>
+        </MudPaper>
+    </div>
+    <div class="map-viewer-close" @onclick:stopPropagation="true">
+        <MudIconButton Icon="@Icons.Material.Filled.Close" Size="Size.Large" Color="Color.Error" OnClick="OnClose" />
+    </div>
+    <div class="map-viewer-container" 
+         @onclick:stopPropagation="true"
+         @onwheel="HandleWheel"
+         @onmousedown="HandleMouseDown"
+         @onmousemove="HandleMouseMove"
+         @onmouseup="HandleMouseUp"
+         @onmouseleave="HandleMouseUp">
+        <div class="map-transform-wrapper @(_isDragging ? "dragging" : "")"
+             style="transform: translate(@(_translateX)px, @(_translateY)px) scale(@(_scale.ToString(System.Globalization.CultureInfo.InvariantCulture)));">
+            <img src="@($"https://local.data/maps/{Map.Id}.svg")" 
+                 class="map-image"
+                 draggable="false" />
+            
+            @* Render objective markers *@
+            @if (ObjectiveZones != null && Objective != null) {
+                @foreach (var zone in ObjectiveZones.Where(z => z?.Position != null)) {
+                    var pos = zone!.Position!;
+                    <div class="objective-marker" 
+                         style="left: @(pos.X)%; top: @(pos.Y)%;">
+                        <div class="marker-icon">
+                            <MudIcon Icon="@Constants.Icon.TaskObjective.FromType(Objective.Type)" 
+                                    Size="Size.Large" 
+                                    Color="Color.Warning" />
+                        </div>
+                        <div class="marker-label">@Objective.Type</div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .map-viewer-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.95);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .map-viewer-header {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 10000;
+        max-width: 400px;
+    }
+
+    .map-viewer-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 10000;
+    }
+
+    .map-viewer-container {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        cursor: grab;
+        user-select: none;
+        -webkit-user-select: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .map-viewer-container:active,
+    .map-transform-wrapper.dragging {
+        cursor: grabbing;
+    }
+
+    .map-transform-wrapper {
+        transform-origin: center center;
+        transition: transform 0.1s ease-out;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .map-image {
+        max-height: 50vh;
+        max-width: 70vw;
+        height: auto;
+        width: auto;
+        display: block;
+        pointer-events: none;
+    }
+
+    .objective-marker {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        pointer-events: auto;
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        animation: markerPulse 2s ease-in-out infinite;
+    }
+
+    .marker-icon {
+        background: rgba(255, 152, 0, 0.9);
+        border-radius: 50%;
+        padding: 8px;
+        box-shadow: 0 0 20px rgba(255, 152, 0, 0.8);
+        border: 2px solid #fff;
+    }
+
+    .marker-label {
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        margin-top: 4px;
+        font-size: 12px;
+        white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    @@keyframes markerPulse {
+        0%, 100% {
+            transform: translate(-50%, -50%) scale(1);
+        }
+        50% {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+    }
+
+    .objective-marker:hover .marker-icon {
+        background: rgba(255, 193, 7, 1);
+        box-shadow: 0 0 30px rgba(255, 193, 7, 1);
+    }
+</style>
+
+@code {
+    [Parameter]
+    public required Map Map { get; set; }
+
+    [Parameter]
+    public TTask? Task { get; set; }
+
+    [Parameter]
+    public ITaskObjective? Objective { get; set; }
+
+    [Parameter]
+    public List<TaskZone?>? ObjectiveZones { get; set; }
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    private double _scale = 1.0;
+    private double _translateX = 0;
+    private double _translateY = 0;
+    private bool _isDragging = false;
+    private double _lastMouseX = 0;
+    private double _lastMouseY = 0;
+
+    protected override void OnInitialized()
+    {
+        _scale = 1.0;
+        _translateX = 0;
+        _translateY = 0;
+        _isDragging = false;
+    }
+
+    private void HandleWheel(WheelEventArgs e) {
+        double zoomFactor = e.DeltaY < 0 ? 1.1 : 0.9;
+        _scale = Math.Clamp(_scale * zoomFactor, 0.3, 5.0);
+    }
+
+    private void HandleMouseDown(MouseEventArgs e) {
+        _isDragging = true;
+        _lastMouseX = e.ClientX;
+        _lastMouseY = e.ClientY;
+    }
+
+    private void HandleMouseMove(MouseEventArgs e) {
+        if (!_isDragging) return;
+        
+        double deltaX = e.ClientX - _lastMouseX;
+        double deltaY = e.ClientY - _lastMouseY;
+        
+        _translateX += deltaX;
+        _translateY += deltaY;
+        
+        _lastMouseX = e.ClientX;
+        _lastMouseY = e.ClientY;
+    }
+
+    private void HandleMouseUp(MouseEventArgs e) {
+        _isDragging = false;
+    }
+}

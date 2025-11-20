@@ -1,0 +1,30 @@
+@using RatScanner.TarkovDev.GraphQL
+
+<MudPaper Class="pa-2" Elevation="3" Style="cursor: pointer;" @onclick="OnMapClick">
+    <MudStack Row="true" Justify="Justify.SpaceBetween" Style="height: 6vh;">
+        <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" AlignItems="AlignItems.Center">
+            <MudIcon Icon="@Icons.Material.Filled.Map" Size="Size.Large" Color="Color.Primary" />
+            <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Start">
+                <MudText Class="ellipsis" Typo="Typo.h6" Style="max-width: 16vw">@Map.Name</MudText>
+                <MudText Typo="Typo.caption">Click to view map</MudText>
+            </MudStack>
+        </MudStack>
+    </MudStack>
+</MudPaper>
+
+<style>
+    .ellipsis {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        min-width: 0;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public required Map Map { get; set; }
+
+    [Parameter]
+    public EventCallback OnMapClick { get; set; }
+}
