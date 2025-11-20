@@ -129,7 +129,8 @@ public static class TarkovDevAPI {
 		await Task.WhenAll(
 			Task.Run(() => QueueRequest<Item[]>(ItemsQuery(), RatConfig.MediumTTL)),
 			Task.Run(() => QueueRequest<TTask[]>(TasksQuery(), RatConfig.LongTTL)),
-			Task.Run(() => QueueRequest<HideoutStation[]>(HideoutStationsQuery(), RatConfig.LongTTL))
+			Task.Run(() => QueueRequest<HideoutStation[]>(HideoutStationsQuery(), RatConfig.LongTTL)),
+			Task.Run(() => QueueRequest<Map[]>(MapsQuery(), RatConfig.LongTTL))
 		).ConfigureAwait(false);
 	}
 
@@ -141,6 +142,9 @@ public static class TarkovDevAPI {
 
 	public static HideoutStation[] GetHideoutStations(LanguageCode language, GameMode gameMode) => GetCached<HideoutStation[]>(HideoutStationsQuery(language, gameMode), RatConfig.LongTTL);
 	public static HideoutStation[] GetHideoutStations() => GetCached<HideoutStation[]>(HideoutStationsQuery(), RatConfig.LongTTL);
+
+	public static Map[] GetMaps(LanguageCode language, GameMode gameMode) => GetCached<Map[]>(MapsQuery(language, gameMode), RatConfig.LongTTL);
+	public static Map[] GetMaps() => GetCached<Map[]>(MapsQuery(), RatConfig.LongTTL);
 
 	private static string ItemsQuery() => ItemsQuery(RatConfig.NameScan.Language.ToTarkovDevType(), RatConfig.GameMode);
 	private static string ItemsQuery(LanguageCode language, GameMode gameMode) {
@@ -237,6 +241,19 @@ public static class TarkovDevAPI {
 						.WithItem(new ItemQueryBuilder().WithAllScalarFields()))
 					.WithRewardItems(new ContainedItemQueryBuilder().WithAllScalarFields()
 						.WithItem(new ItemQueryBuilder().WithAllScalarFields()))))
+		, alias: "data", lang: language, gameMode: gameMode).Build();
+	}
+
+	private static string MapsQuery() => MapsQuery(RatConfig.NameScan.Language.ToTarkovDevType(), RatConfig.GameMode);
+	private static string MapsQuery(LanguageCode language, GameMode gameMode)
+	{
+		return new QueryQueryBuilder().WithMaps(new MapQueryBuilder().WithAllScalarFields()
+			.WithExtracts(new MapExtractQueryBuilder().WithAllScalarFields()
+				.WithPosition(new MapPositionQueryBuilder().WithAllScalarFields())
+				.WithTransferItem(new ContainedItemQueryBuilder().WithAllScalarFields()
+					.WithItem(new ItemQueryBuilder().WithId())))
+			.WithTransits(new MapTransitQueryBuilder().WithAllScalarFields()
+				.WithPosition(new MapPositionQueryBuilder().WithAllScalarFields()))
 		, alias: "data", lang: language, gameMode: gameMode).Build();
 	}
 }
