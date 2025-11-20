@@ -180,20 +180,45 @@ public static class TarkovDevAPI {
 			.WithMap(new MapQueryBuilder().WithAllScalarFields())
 			.WithTrader(new TraderQueryBuilder().WithAllScalarFields())
 			.WithObjectives(new TaskObjectiveQueryBuilder().WithAllScalarFields()
-				.WithTaskObjectiveBasicFragment(new TaskObjectiveBasicQueryBuilder().WithAllScalarFields())
-				.WithTaskObjectiveBuildItemFragment(new TaskObjectiveBuildItemQueryBuilder().WithAllScalarFields().WithItem(new ItemQueryBuilder().WithAllScalarFields()))
+				.WithTaskObjectiveBasicFragment(new TaskObjectiveBasicQueryBuilder().WithAllScalarFields()
+					.WithZones(new TaskZoneQueryBuilder().WithMap(new MapQueryBuilder().WithId()).WithPosition(new MapPositionQueryBuilder().WithAllScalarFields())))
+
+				.WithTaskObjectiveBuildItemFragment(new TaskObjectiveBuildItemQueryBuilder().WithAllScalarFields()
+					.WithItem(new ItemQueryBuilder().WithAllScalarFields()))
+
 				.WithTaskObjectiveExperienceFragment(new TaskObjectiveExperienceQueryBuilder().WithAllScalarFields())
+
 				.WithTaskObjectiveExtractFragment(new TaskObjectiveExtractQueryBuilder().WithAllScalarFields())
-				.WithTaskObjectiveItemFragment(new TaskObjectiveItemQueryBuilder().WithAllScalarFields().WithItems(new ItemQueryBuilder().WithAllScalarFields()))
-				.WithTaskObjectiveMarkFragment(new TaskObjectiveMarkQueryBuilder().WithAllScalarFields().WithMarkerItem(new ItemQueryBuilder().WithAllScalarFields()))
+
+				.WithTaskObjectiveItemFragment(new TaskObjectiveItemQueryBuilder().WithAllScalarFields()
+					.WithZones(new TaskZoneQueryBuilder().WithMap(new MapQueryBuilder().WithId()).WithPosition(new MapPositionQueryBuilder().WithAllScalarFields()))
+					.WithItems(new ItemQueryBuilder().WithAllScalarFields()))
+
+				.WithTaskObjectiveMarkFragment(new TaskObjectiveMarkQueryBuilder().WithAllScalarFields()
+					.WithZones(new TaskZoneQueryBuilder().WithMap(new MapQueryBuilder().WithId()).WithPosition(new MapPositionQueryBuilder().WithAllScalarFields()))
+					.WithMarkerItem(new ItemQueryBuilder().WithAllScalarFields()))
+
 				.WithTaskObjectivePlayerLevelFragment(new TaskObjectivePlayerLevelQueryBuilder().WithAllScalarFields())
-				.WithTaskObjectiveQuestItemFragment(new TaskObjectiveQuestItemQueryBuilder().WithAllScalarFields().WithQuestItem(new QuestItemQueryBuilder().WithAllScalarFields()))
+
+				.WithTaskObjectiveQuestItemFragment(new TaskObjectiveQuestItemQueryBuilder().WithAllScalarFields()
+					.WithZones(new TaskZoneQueryBuilder().WithMap(new MapQueryBuilder().WithId()).WithPosition(new MapPositionQueryBuilder().WithAllScalarFields()))
+					.WithQuestItem(new QuestItemQueryBuilder().WithAllScalarFields()))
+
 				.WithTaskObjectiveShootFragment(new TaskObjectiveShootQueryBuilder().WithAllScalarFields())
+
 				.WithTaskObjectiveSkillFragment(new TaskObjectiveSkillQueryBuilder().WithAllScalarFields())
+
 				.WithTaskObjectiveTaskStatusFragment(new TaskObjectiveTaskStatusQueryBuilder().WithAllScalarFields())
-				.WithTaskObjectiveTraderLevelFragment(new TaskObjectiveTraderLevelQueryBuilder().WithAllScalarFields().WithTrader(new TraderQueryBuilder().WithAllScalarFields()))
-				.WithTaskObjectiveTraderStandingFragment(new TaskObjectiveTraderStandingQueryBuilder().WithAllScalarFields().WithTrader(new TraderQueryBuilder().WithAllScalarFields()))
-				.WithTaskObjectiveUseItemFragment(new TaskObjectiveUseItemQueryBuilder().WithAllScalarFields().WithUseAny(new ItemQueryBuilder().WithAllScalarFields())))
+
+				.WithTaskObjectiveTraderLevelFragment(new TaskObjectiveTraderLevelQueryBuilder().WithAllScalarFields()
+					.WithTrader(new TraderQueryBuilder().WithAllScalarFields()))
+
+				.WithTaskObjectiveTraderStandingFragment(new TaskObjectiveTraderStandingQueryBuilder().WithAllScalarFields()
+					.WithTrader(new TraderQueryBuilder().WithAllScalarFields()))
+
+				.WithTaskObjectiveUseItemFragment(new TaskObjectiveUseItemQueryBuilder().WithAllScalarFields()
+					.WithZones(new TaskZoneQueryBuilder().WithMap(new MapQueryBuilder().WithId()).WithPosition(new MapPositionQueryBuilder().WithAllScalarFields()))
+					.WithUseAny(new ItemQueryBuilder().WithAllScalarFields())))
 			.WithTaskRequirements(new TaskStatusRequirementQueryBuilder().WithAllScalarFields()
 				.WithTask(new TaskQueryBuilder().WithAllScalarFields()))
 		, alias: "data", lang: language, gameMode: gameMode).Build();
