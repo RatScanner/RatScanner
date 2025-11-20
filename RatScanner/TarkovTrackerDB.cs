@@ -41,7 +41,7 @@ public class TarkovTrackerDB {
 		return false;
 	}
 
-	private void UpdateToken() {
+	public void UpdateToken() {
 		// Attempt to verify the token
 		try {
 			TokenResponse? newToken = GetToken();

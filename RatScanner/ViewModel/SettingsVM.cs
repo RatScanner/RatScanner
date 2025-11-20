@@ -46,6 +46,8 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 	public bool ShowTarkovTrackerTeam { get; set; }
 
+	public RatConfig.TarkovTrackerBackend TarkovTrackerBackend { get; set; }
+
 	// Interactable Overlay
 	public bool EnableIneractableOverlay { get; set; }
 	public bool BlurBehindSearch { get; set; }
@@ -91,6 +93,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 		TarkovTrackerToken = RatConfig.Tracking.TarkovTracker.Token;
 		ShowTarkovTrackerTeam = RatConfig.Tracking.TarkovTracker.ShowTeam;
+		TarkovTrackerBackend = RatConfig.Tracking.TarkovTracker.Backend;
 
 		EnableIneractableOverlay = RatConfig.Overlay.Search.Enable;
 		BlurBehindSearch = RatConfig.Overlay.Search.BlurBehind;
@@ -102,6 +105,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 	public async Task SaveSettings() {
 		bool updateMarketDB = NameScanLanguage != (int)RatConfig.NameScan.Language;
 		bool updateTarkovTrackerToken = TarkovTrackerToken != RatConfig.Tracking.TarkovTracker.Token;
+		bool updateTarkovTrackerBackend = TarkovTrackerBackend != RatConfig.Tracking.TarkovTracker.Backend;
 		bool updateResolution = ScreenWidth != RatConfig.ScreenWidth || ScreenHeight != RatConfig.ScreenHeight;
 		bool updateLanguage = RatConfig.NameScan.Language != (Language)NameScanLanguage;
 
@@ -133,6 +137,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 		RatConfig.Tracking.TarkovTracker.Token = TarkovTrackerToken.Trim();
 		RatConfig.Tracking.TarkovTracker.ShowTeam = ShowTarkovTrackerTeam;
+		RatConfig.Tracking.TarkovTracker.Backend = TarkovTrackerBackend;
 
 		RatConfig.Overlay.Search.Enable = EnableIneractableOverlay;
 		RatConfig.Overlay.Search.BlurBehind = BlurBehindSearch;
@@ -150,7 +155,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 		PageSwitcher.Instance.Topmost = RatConfig.AlwaysOnTop;
 		PageSwitcher.Instance.ResetWindowSize();
 		await TarkovDevAPI.InitializeCache();
-		if (updateTarkovTrackerToken) UpdateTarkovTrackerToken();
+		if (updateTarkovTrackerToken || updateTarkovTrackerBackend) UpdateTarkovTrackerToken();
 		if (updateResolution || updateLanguage) RatScannerMain.Instance.SetupRatEye();
 
 		RatEye.Config.LogDebug = RatConfig.LogDebug;
@@ -167,7 +172,11 @@ internal class SettingsVM : INotifyPropertyChanged {
 		string token = RatConfig.Tracking.TarkovTracker.Token;
 		if (token == "") return;
 		RatScannerMain.Instance.TarkovTrackerDB.Token = RatConfig.Tracking.TarkovTracker.Token;
-		if (RatScannerMain.Instance.TarkovTrackerDB.Init()) return;
+		var db = RatScannerMain.Instance.TarkovTrackerDB;
+		if (db.TestToken(token)) {
+			db.UpdateToken();
+			return;
+		}
 
 		int visibleLength = (int)(token.Length * 0.25);
 		token = token[..visibleLength] + string.Concat(Enumerable.Repeat(" *", token.Length - visibleLength));

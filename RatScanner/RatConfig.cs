@@ -97,13 +97,21 @@ internal static class RatConfig {
 		internal static bool ShowKappaNeeds = false;
 
 		internal static class TarkovTracker {
-			internal static string Endpoint = "https://tarkovtracker.io/api/v2";
+			internal static TarkovTrackerBackend Backend = TarkovTrackerBackend.TarkovTrackerIO;
+			internal static string Endpoint => Backend == TarkovTrackerBackend.TarkovTrackerIO 
+				? "https://tarkovtracker.io/api/v2" 
+				: "https://tarkovtracker.org/api/v2";
 			internal static bool Enable => Token.Length > 0;
 
 			internal static string Token = "";
 			internal static bool ShowTeam = true;
 			internal static int RefreshTime = 5 * 60 * 1000; // 5 minutes
 		}
+	}
+
+	public enum TarkovTrackerBackend {
+		TarkovTrackerIO,
+		TarkovTrackerORG,
 	}
 
 	// Overlay options
@@ -207,7 +215,7 @@ internal static class RatConfig {
 		Tracking.ShowKappaNeeds = config.ReadBool(nameof(Tracking.ShowKappaNeeds), Tracking.ShowKappaNeeds);
 
 		config.Section = nameof(Tracking.TarkovTracker);
-		Tracking.TarkovTracker.Endpoint = config.ReadString(nameof(Tracking.TarkovTracker.Endpoint), Tracking.TarkovTracker.Endpoint);
+		Tracking.TarkovTracker.Backend = (TarkovTrackerBackend)config.ReadInt(nameof(Tracking.TarkovTracker.Backend), (int)Tracking.TarkovTracker.Backend);
 		Tracking.TarkovTracker.Token = config.ReadSecureString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);
 		Tracking.TarkovTracker.ShowTeam = config.ReadBool(nameof(Tracking.TarkovTracker.ShowTeam), Tracking.TarkovTracker.ShowTeam);
 
@@ -273,7 +281,7 @@ internal static class RatConfig {
 		config.WriteBool(nameof(Tracking.ShowKappaNeeds), Tracking.ShowKappaNeeds);
 
 		config.Section = nameof(Tracking.TarkovTracker);
-		config.WriteString(nameof(Tracking.TarkovTracker.Endpoint), Tracking.TarkovTracker.Endpoint);
+		config.WriteInt(nameof(Tracking.TarkovTracker.Backend), (int)Tracking.TarkovTracker.Backend);
 		config.WriteSecureString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);
 		config.WriteBool(nameof(Tracking.TarkovTracker.ShowTeam), Tracking.TarkovTracker.ShowTeam);
 

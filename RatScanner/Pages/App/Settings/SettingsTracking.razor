@@ -1,4 +1,5 @@
 ﻿@page "/app/settings/tracking"
+@using static RatScanner.RatConfig
 @inject SettingsVM SettingsVM
 @inject RatScanner.TarkovTrackerDB TarkovTrackerDB
 @implements IDisposable
@@ -26,6 +27,12 @@
                         <div class="d-flex justify-center">
                             TarkovTracker
                         </div>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudSelect @bind-Value="SettingsVM.TarkovTrackerBackend" T="TarkovTrackerBackend" Label="Backend" Variant="Variant.Outlined" Margin="Margin.Dense">
+                            <MudSelectItem T="TarkovTrackerBackend" Value="@TarkovTrackerBackend.TarkovTrackerIO">TarkovTracker.io</MudSelectItem>
+                            <MudSelectItem T="TarkovTrackerBackend" Value="@TarkovTrackerBackend.TarkovTrackerORG">TarkovTracker.org</MudSelectItem>
+                        </MudSelect>
                     </MudItem>
                     <MudItem xs="12">
                         <MudTextField @bind-Value="SettingsVM.TarkovTrackerToken" Validation="@(new Func<string, IEnumerable<string>>(CheckToken))" Label="API Token" InputType="@PasswordInput" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TokenShowClick"></MudTextField>
