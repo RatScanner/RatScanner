@@ -50,7 +50,6 @@ public static class ItemExtensions {
 					if ((!oGiveItem.Items?.Any(i => i?.Id == item.Id)) ?? true) continue;	// Skip if item is not the one we are looking for
 					if (!showNonFir && !oGiveItem.FoundInRaid) continue;					// Skip if item is not FIR
 					needed = oGiveItem.Count;
-					if (task.KappaRequired == true) kappaCount += oGiveItem.Count;
 					// Subtract amount of already collected items
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
 					foreach (Progress p in objectiveProgress) needed -= p.Complete ? oGiveItem.Count : p.Count;
