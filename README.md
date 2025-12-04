@@ -26,7 +26,7 @@ Please consider [supporting](#Support-the-project) the project to help finance t
 
 ## Can I get banned for using Rat Scanner?
 
-While Battlestate Games does not support nor is affiliated with this project, it exists since two years with over 1.000 players using it every day in their games. So far there has not been a single instance in which RatScanner was proven to have caused any ban.
+While Battlestate Games does not support nor is affiliated with this project, it has existed over 5 years with over 1.000 players using it every day in their games. So far there has not been a single instance in which RatScanner was proven to have caused any ban.
 
 <br/>
 
