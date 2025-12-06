@@ -65,7 +65,8 @@ public class RatScannerMain : INotifyPropertyChanged {
 		Logger.LogInfo("Initializing TarkovDev API...");
 		TarkovDevAPI.InitializeCache().Wait();
 
-		ItemScans.Enqueue(new DefaultItemScan(TarkovDevAPI.GetItems()[new Random().Next(TarkovDevAPI.GetItems().Length)]));
+		var items = TarkovDevAPI.GetItems();
+		ItemScans.Enqueue(new DefaultItemScan(items[new Random().Next(items.Length)]));
 
 		Logger.LogInfo("Initializing tarkov tracker database");
 		TarkovTrackerDB = new TarkovTrackerDB();
