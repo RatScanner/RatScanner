@@ -52,6 +52,30 @@ public static class TarkovDevAPI {
 	}
 
 	/// <summary>
+	/// Tries to load data from offline cache
+	/// </summary>
+	/// <returns>True if cache was loaded successfully</returns>
+	private static bool TryLoadFromOfflineCache<T>(string baseQueryKey, long ttl) where T : class {
+		if (Cache.ContainsKey(baseQueryKey)) return true;
+
+		if (RatConfig.ReadFromCache(baseQueryKey, out string cachedResponse)) {
+			try {
+				ResponseData<T[]>? neededResponse = JsonConvert.DeserializeObject<ResponseData<T[]>?>(cachedResponse, JsonSettings);
+				if (neededResponse?.Data?.Data != null) {
+					long time = DateTimeOffset.Now.ToUnixTimeSeconds();
+					// Use expired TTL so background refresh will be triggered
+					Cache[baseQueryKey] = (time - 1, neededResponse.Data.Data);
+					Logger.LogInfo($"Loaded {neededResponse.Data.Data.Length} items from offline cache for: \"{baseQueryKey}\"");
+					return true;
+				}
+			} catch (Exception e) {
+				Logger.LogWarning($"Failed to load offline cache for: \"{baseQueryKey}\"", e);
+			}
+		}
+		return false;
+	}
+
+	/// <summary>
 	/// Fetches paginated data in batches and combines results
 	/// </summary>
 	private static async Task QueuePaginatedRequest<T>(string baseQueryKey, Func<int, int, string> queryBuilder, long ttl) where T : class {
@@ -177,6 +201,32 @@ public static class TarkovDevAPI {
 		return (T[])value.response;
 	}
 
+	/// <summary>
+	/// Initializes cache from offline storage first, then queues background refresh.
+	/// Returns true if all caches were loaded from offline storage.
+	/// </summary>
+	public static bool TryInitializeCacheFromOffline() {
+		Logger.LogInfo("Attempting to load API cache from offline storage...");
+		
+		bool itemsLoaded = TryLoadFromOfflineCache<Item>(ItemsQueryKey(), RatConfig.MediumTTL);
+		bool tasksLoaded = TryLoadFromOfflineCache<TTask>(TasksQueryKey(), RatConfig.LongTTL);
+		bool hideoutLoaded = TryLoadFromOfflineCache<HideoutStation>(HideoutStationsQueryKey(), RatConfig.LongTTL);
+		bool mapsLoaded = TryLoadFromOfflineCache<Map>(MapsQueryKey(), RatConfig.LongTTL);
+
+		bool allLoaded = itemsLoaded && tasksLoaded && hideoutLoaded && mapsLoaded;
+		
+		if (allLoaded) {
+			Logger.LogInfo("All API caches loaded from offline storage");
+		} else {
+			Logger.LogWarning($"Offline cache status - Items: {itemsLoaded}, Tasks: {tasksLoaded}, Hideout: {hideoutLoaded}, Maps: {mapsLoaded}");
+		}
+
+		return allLoaded;
+	}
+
+	/// <summary>
+	/// Full cache initialization - waits for all requests to complete
+	/// </summary>
 	public static async Task InitializeCache() {
 		await Task.WhenAll(
 			Task.Run(() => QueuePaginatedRequest<Item>(ItemsQueryKey(), ItemsQueryPaginated, RatConfig.MediumTTL)),

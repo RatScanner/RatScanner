@@ -63,7 +63,17 @@ public class RatScannerMain : INotifyPropertyChanged {
 		Logger.LogInfo($"Screen Info: {RatConfig.ScreenWidth}x{RatConfig.ScreenHeight} at {RatConfig.ScreenScale * 100}%");
 
 		Logger.LogInfo("Initializing TarkovDev API...");
-		TarkovDevAPI.InitializeCache().Wait();
+		
+		// Try to load from offline cache first for faster startup
+		if (TarkovDevAPI.TryInitializeCacheFromOffline()) {
+			// Cache loaded from offline storage, queue background refresh
+			Logger.LogInfo("Using offline cache for fast startup, refreshing in background...");
+			_ = TarkovDevAPI.InitializeCache();
+		} else {
+			// No offline cache available, wait for network requests
+			Logger.LogWarning("No complete offline cache available, fetching from network...");
+			TarkovDevAPI.InitializeCache().Wait();
+		}
 
 		var items = TarkovDevAPI.GetItems();
 		ItemScans.Enqueue(new DefaultItemScan(items[new Random().Next(items.Length)]));
