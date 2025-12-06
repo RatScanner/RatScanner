@@ -27,7 +27,7 @@
          @onmouseup="HandleMouseUp"
          @onmouseleave="HandleMouseUp">
         <div class="map-transform-wrapper @(_isDragging ? "dragging" : "")"
-             style="transform: translate(@(_translateX)px, @(_translateY)px) scale(@(_scale.ToString(System.Globalization.CultureInfo.InvariantCulture)));">
+             style="transform: translate(@(_translateX)px, @(_translateY)px) translate(-50%, -50%) scale(@(_scale.ToString(System.Globalization.CultureInfo.InvariantCulture)));">
             <img src="@MapDataLoader.GetMapSvgUrl(Map?.Id)"
                  class="map-image"
                  draggable="false" />
@@ -87,9 +87,7 @@
         cursor: grab;
         user-select: none;
         -webkit-user-select: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        position: relative;
     }
 
     .map-viewer-container:active,
@@ -98,12 +96,11 @@
     }
 
     .map-transform-wrapper {
+        position: absolute;
+        top: 50%;
+        left: 50%;
         transform-origin: center center;
         transition: transform 0.1s ease-out;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
     }
 
     .map-image {
@@ -113,6 +110,9 @@
         width: auto;
         display: block;
         pointer-events: none;
+        position: relative;
+        left: -50%;
+        top: -50%;
     }
 
     .objective-marker {
