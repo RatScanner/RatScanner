@@ -41,9 +41,11 @@
                                             IsExpanded="@(i == 0)" 
                                             OnMapClick="@((tuple) => OpenMapForObjective(tuple.task, tuple.objective))" />
                         } 
+                        @* TODO: Re-enable map search results when MapViewer is fixed
                         else if (searchResult.Data is Map map) {
                             <MapSearchResult Map="@map" OnMapClick="@(() => OpenMapViewer(map))" />
                         }
+                        *@
                     }
                 </MudStack>
             </div>
@@ -51,6 +53,7 @@
     </div>
 </div>
 
+@* TODO: Re-enable MapViewer when it is fixed
 @if (_selectedMap != null) {
     <MapViewer Map="@_selectedMap"
               Task="@_selectedTask"
@@ -58,6 +61,7 @@
               ObjectiveZones="@_selectedObjectiveZones"
               OnClose="@CloseMapViewer" />
 }
+*@
 
 @code {
     private static MudTextField<string> _searchTextField { get; set; } = null!;
@@ -76,13 +80,17 @@
         var results = Enumerable.Empty<SearchResult>();
         results = results.Concat(await _searchService.SearchItemsAsync(sanitizedValue));
         results = results.Concat(await _searchService.SearchTasksAsync(sanitizedValue));
-        results = results.Concat(await _searchService.SearchMapsAsync(sanitizedValue));
+        // TODO: Re-enable map search when MapViewer is fixed
+        // results = results.Concat(await _searchService.SearchMapsAsync(sanitizedValue));
         results = results.Where(result => result != null && result.Data != null);
         results = results.OrderBy(result => result.Score).Take(4);
         _searchResults = results;
     }
 
     private void OpenMapForObjective(TTask task, ITaskObjective objective) {
+        // TODO: Re-enable when MapViewer is fixed
+        return;
+        
         // Get zones from the objective
         ICollection<TaskZone?>? zones = null;
         
