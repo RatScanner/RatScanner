@@ -4,14 +4,10 @@
 @inject IJSRuntime JSRuntime;
 @implements IDisposable
 
-<MudGrid Class="px-2 my-2" Spacing="0" Style="position: fixed; bottom: 0">
-    <MudItem xs="6" Class="d-flex justify-start pr-1">
-        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Class="light-green darken-3" FullWidth="true" OnClick="SaveSettings">Save</MudButton>
-    </MudItem>
-    <MudItem xs="6" Class="d-flex justify-end pl-1">
-        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" FullWidth="true" OnClick="DiscardSettings">Cancel</MudButton>
-    </MudItem>
-</MudGrid>
+<div Class="d-flex justify-space-between align-center ma-1" Style="position: absolute; bottom: 0; left: 0; right: 0;">
+    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Save" Class="light-green darken-3 ma-1" FullWidth="true" OnClick="SaveSettings">Save</MudButton>
+    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error" Class="ma-1" FullWidth="true" OnClick="DiscardSettings">Cancel</MudButton>
+</div>
 
 <MudOverlay @bind-Visible="_showSpinner" Absolute="true" DarkBackground ZIndex="9999">
     <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
