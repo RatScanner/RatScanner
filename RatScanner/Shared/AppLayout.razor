@@ -4,66 +4,20 @@
 @inject MenuVM MenuVM;
 @inject IJSRuntime JSRuntime;
 
-<div style="width: 100%; height: 100%">
-	<MudLayout>
-		<MudAppBar Elevation="1" Bottom="false" Dense="true">
-			<MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer"/>
-			RatScanner
-			<MudSpacer/>
-			<MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Edge="Edge.End" OnClick="@(() => OpenURL(MenuVM.GithubLink))"/>
-			<MudIconButton Icon="@Constants.Icon.Discord" Edge="Edge.End" OnClick="@(() => OpenURL(MenuVM.DiscordLink))" Style="color: #5865f2"/>
-			<MudIconButton Icon="@Constants.Icon.Patreon" Edge="Edge.End" OnClick="@(() => OpenURL(MenuVM.PatreonLink))" Style="color: #FF424D"/>
-		</MudAppBar>
-		<MudDrawer @bind-Open="@drawerOpen" Elevation="1" Anchor="Anchor.Left" Variant="@DrawerVariant.Responsive">
-			<MudDrawerHeader LinkToIndex="true">
-				<div>
-					<img src="RatLogoMedium.png" width="20%" style="vertical-align: middle;"/>
-					<span style="font-size: 150%; vertical-align: bottom;">
-						Rat Scanner
-						<span style="font-size: 50%;">
-							<text>v</text>@MenuVM.GetType().Assembly.GetName().Version.ToString(3)
-						</span>
-					</span>
-				</div>
-			</MudDrawerHeader>
-			<MudNavMenu>
-				<MudNavLink Href="/app" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">Dashboard</MudNavLink>
-				<MudNavGroup Title="Settings" Expanded="true" HideExpandIcon="true" Icon="@Icons.Material.Filled.Settings">
-					<MudNavLink Href="/app/settings/general">General</MudNavLink>
-					<MudNavLink Href="/app/settings/scanning">Scanning</MudNavLink>
-					<MudNavLink Href="/app/settings/tracking">Tracking</MudNavLink>
-                    <MudNavLink Href="/app/settings/minimal">Minimal UI</MudNavLink>
-                    <MudNavLink Href="/app/settings/interactableOverlay">Overlay</MudNavLink>
-                    @*<MudNavLink Href="/app/settings/hotkeys">Hotkeys</MudNavLink>*@
-				</MudNavGroup>
-			</MudNavMenu>
-		</MudDrawer>
-        <MudMainContent Class="mt-2">
-			@Body
-		</MudMainContent>
-	</MudLayout>
+<div class="app-container">
+	@Body
 </div>
 
-@code {
-
-	[CascadingParameter]
-	public Error Error { get; set; }
-
-	bool drawerOpen = true;
-
-	private void OpenURL(string url)
-	{
-		var psi = new ProcessStartInfo
-		{
-			FileName = url,
-			UseShellExecute = true,
-		};
-		Process.Start(psi);
-	}
-
-	void ToggleDrawer()
-	{
-		drawerOpen = !drawerOpen;
-	}
-
-}
+<style>
+    .app-container {
+        position: relative;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        border: 2px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        overflow: hidden;
+        background: #121212;
+    }
+</style>
