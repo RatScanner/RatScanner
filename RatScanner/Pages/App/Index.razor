@@ -15,19 +15,26 @@
     <!-- Header Bar -->
     <div class="header-bar" @onmousedown="StartDrag" @onmousedown:stopPropagation="false">
         <div class="header-left">
+            <MudIconButton Icon="@Icons.Material.Filled.Settings"
+                           Size="Size.Small"
+                           Class="header-button"
+                           Href="/app/settings/general"
+                           @onmousedown:stopPropagation="true" />
+            <MudDivider Vertical="true" FlexItem="true" />
             <img src="RatLogoMedium.png" width="20" class="header-logo" />
             <MudText Typo="Typo.subtitle1" Class="header-title">RatScanner</MudText>
             <MudText Typo="Typo.caption" Color="Color.Secondary">v@(RatConfig.Version)</MudText>
         </div>
         <div class="header-right" @onmousedown:stopPropagation="true">
-            <MudIconButton Icon="@Icons.Material.Filled.Settings" 
-                          Size="Size.Small" 
-                          Class="header-button"
-                          Href="/app/settings/general" />
             <MudIconButton Icon="@Icons.Material.Filled.Minimize" 
                           Size="Size.Small" 
                           Class="header-button"
                           OnClick="MinimizeWindow" />
+            <MudIconButton Icon="@Icons.Material.Filled.ZoomInMap"
+                          Size="Size.Small" 
+                          Class="header-button"
+                          OnClick="ShowMinimalUI"
+                          Title="Minimal UI" />
             <MudIconButton Icon="@Icons.Material.Filled.Close" 
                           Size="Size.Small" 
                           Class="header-button header-button-close"
@@ -260,6 +267,10 @@
     private void StartResize(MouseEventArgs e) {
         if (e.Button != 0) return;
         PageSwitcher.Instance.StartResize();
+    }
+
+    private void ShowMinimalUI() {
+        PageSwitcher.Instance.ShowMinimalUI();
     }
 
     private void MinimizeWindow() {
