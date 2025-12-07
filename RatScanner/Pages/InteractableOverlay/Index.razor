@@ -75,6 +75,13 @@
     private ITaskObjective? _selectedObjective = null;
     private List<TaskZone?>? _selectedObjectiveZones = null;
 
+    public enum DetailAmount
+    {
+        Min,
+        Med,
+        Max,
+    }
+
     private async void ExecuteSearch(string value) {
         var sanitizedValue = _searchService.SanitizeSearch(value);
         var results = Enumerable.Empty<SearchResult>();

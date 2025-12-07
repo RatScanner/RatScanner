@@ -1,6 +1,7 @@
 @using RatScanner.TarkovDev.GraphQL
 @using TTask = RatScanner.TarkovDev.GraphQL.Task;
 @using System.Diagnostics;
+@using static RatScanner.Pages.InteractableOverlay.Index
 
 <MudPaper Class="pa-2" Elevation="3" Style="">
     <MudStack Row="true" Justify="Justify.SpaceBetween" Style="height: 6vh;">
@@ -15,23 +16,28 @@
                 <MudText Class="ellipsis" Typo="Typo.h6" Style="max-width: 16vw">
                     @Task.Name
                 </MudText>
-                <MudText Align="Align.Center">
-                    <MudIconButton Icon="@Constants.Icon.TarkovDev" Size="Size.Small" OnClick=@(() => OpenURL($"https://tarkov.dev/task/{Task.Id}")) />
-                    <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" OnClick=@(() => OpenURL(Task.WikiLink)) />
-                </MudText>
+                @if (Detail != DetailAmount.Min) {
+                    <MudText Align="Align.Center">
+                        <MudIconButton Icon="@Constants.Icon.TarkovDev" Size="Size.Small" OnClick=@(() => OpenURL($"https://tarkov.dev/task/{Task.Id}")) />
+                        <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" OnClick=@(() => OpenURL(Task.WikiLink)) />
+                    </MudText>
+                }
             </MudStack>
         </MudStack>
-        <MudStack Row="true" Justify="Justify.FlexEnd">
-            <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Spacing="0">
-                <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Center" Spacing="0">
-                    <MudAvatar Image="@Task.Trader?.ImageLink"
-                               Size="Size.Large" Style="float: left;" Square="true" Variant="Variant.Outlined" />
+        @if (Detail != DetailAmount.Min) {
+            <MudStack Row="true" Justify="Justify.FlexEnd">
+                <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Spacing="0">
+                    <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Center" Spacing="0">
+                        <MudAvatar Image="@Task.Trader?.ImageLink"
+                                   Size="Size.Large" Style="float: left;" Square="true" Variant="Variant.Outlined" />
+                    </MudStack>
                 </MudStack>
             </MudStack>
-        </MudStack>
+        }
     </MudStack>
 
-    @if (IsExpanded) {
+    @if (Detail == DetailAmount.Max)
+    {
         <MudDivider Vertical="false" DividerType="DividerType.Middle" Class="mx-0 my-2" />
 
         <MudStack Row="false" Style="max-height:200px; overflow:hidden; position:relative">
@@ -67,10 +73,10 @@
 
 @code {
     [Parameter]
-    public required TTask Task { get; set; }
+    public DetailAmount Detail { get; set; }
 
     [Parameter]
-    public bool IsExpanded { get; set; }
+    public required TTask Task { get; set; }
 
     [Parameter]
     public EventCallback<(TTask task, ITaskObjective objective)> OnMapClick { get; set; }

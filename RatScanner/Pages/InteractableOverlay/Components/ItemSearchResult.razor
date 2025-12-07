@@ -1,6 +1,7 @@
 @using RatScanner.TarkovDev.GraphQL
 @using Color = MudBlazor.Color
 @using System.Diagnostics;
+@using static RatScanner.Pages.InteractableOverlay.Index
 
 <MudPaper Class="pa-2" Elevation="3" Style="">
     <MudStack Row="true" Justify="Justify.SpaceBetween" Style="height: 6vh;">
@@ -11,57 +12,63 @@
                           Style="width: 100%; height: 100%; object-fit: contain;" />
             </MudPaper>
 
-            <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Style="width: 4vw;">
-                <MudChip OnClose="() => { }" CloseIcon="@Icons.Material.Filled.Checklist" Size="Size.Small"
-                         Variant="Variant.Outlined" Color="@(Item.GetTaskRemaining().Item1 > 0 ? Color.Success : Color.Default)">
-                    @Item.GetTaskRemaining().Item1.ToShortString()
-                </MudChip>
-                <MudChip OnClose="() => { }" CloseIcon="@Icons.Material.Filled.House" Size="Size.Small"
-                         Variant="Variant.Outlined" Color="@(Item.GetHideoutRemaining() > 0 ? Color.Success : Color.Default)">
-                    @Item.GetHideoutRemaining().ToShortString()
-                </MudChip>
-            </MudStack>
+            @if (Detail != DetailAmount.Min) {
+                <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Style="width: 4vw;">
+                    <MudChip OnClose="() => { }" CloseIcon="@Icons.Material.Filled.Checklist" Size="Size.Small"
+                             Variant="Variant.Outlined" Color="@(Item.GetTaskRemaining().Item1 > 0 ? Color.Success : Color.Default)">
+                        @Item.GetTaskRemaining().Item1.ToShortString()
+                    </MudChip>
+                    <MudChip OnClose="() => { }" CloseIcon="@Icons.Material.Filled.House" Size="Size.Small"
+                             Variant="Variant.Outlined" Color="@(Item.GetHideoutRemaining() > 0 ? Color.Success : Color.Default)">
+                        @Item.GetHideoutRemaining().ToShortString()
+                    </MudChip>
+                </MudStack>
 
-            <MudDivider Vertical="true" FlexItem="true" />
+                <MudDivider Vertical="true" FlexItem="true" />
+            }
 
             <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Start">
                 <MudText Class="ellipsis" Typo="Typo.h6" Style="max-width: 16vw">
                     @Item.Name
                 </MudText>
-                <MudText Align="Align.Center">
-                    @Item.ShortName
-                    <MudIconButton Icon="@Constants.Icon.TarkovDev" Size="Size.Small" OnClick=@(() => OpenURL($"https://tarkov.dev/item/{Item.Id}")) />
-                    <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" OnClick=@(() => OpenURL(Item.WikiLink)) />
-                </MudText>
-            </MudStack>
-        </MudStack>
-
-        <!--Right side of the search result item-->
-        <MudStack Row="true" Justify="Justify.FlexEnd">
-            <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Style="width: 8vw" Spacing="0">
-                <MudText Typo="Typo.h6">
-                    @Item.Avg24HPrice.AsRubs()
-                </MudText>
-                <MudText>
-                    @Item.GetAvg24hMarketPricePerSlot().AsRubs()
-                </MudText>
-            </MudStack>
-
-            <MudDivider Vertical="true" FlexItem="true" />
-
-            <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Center" Style="width: 3vw" Spacing="0">
-                @{
-                    var bestTrader = Item.GetBestTraderOffer();
-                    var traderImage = Item.GetBestTraderOfferVendor()?.Trader?.ImageLink;
+                @if (Detail != DetailAmount.Min) {
+                    <MudText Align="Align.Center">
+                        @Item.ShortName
+                        <MudIconButton Icon="@Constants.Icon.TarkovDev" Size="Size.Small" OnClick=@(() => OpenURL($"https://tarkov.dev/item/{Item.Id}")) />
+                        <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" OnClick=@(() => OpenURL(Item.WikiLink)) />
+                    </MudText>
                 }
-                <MudAvatar Image="@traderImage"
-                           Size="Size.Medium" Style="float: left;" Square="true" Variant="Variant.Outlined" />
-                <MudText Typo="Typo.subtitle2" Style="float: right;">@bestTrader?.PriceRub.AsRubs()</MudText>
             </MudStack>
         </MudStack>
+
+        @if (Detail != DetailAmount.Min) {
+            <!--Right side of the search result item-->
+            <MudStack Row="true" Justify="Justify.FlexEnd">
+                <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Style="width: 8vw" Spacing="0">
+                    <MudText Typo="Typo.h6">
+                        @Item.Avg24HPrice.AsRubs()
+                    </MudText>
+                    <MudText>
+                        @Item.GetAvg24hMarketPricePerSlot().AsRubs()
+                    </MudText>
+                </MudStack>
+
+                <MudDivider Vertical="true" FlexItem="true" />
+
+                <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Center" Style="width: 3vw" Spacing="0">
+                    @{
+                        var bestTrader = Item.GetBestTraderOffer();
+                        var traderImage = Item.GetBestTraderOfferVendor()?.Trader?.ImageLink;
+                    }
+                    <MudAvatar Image="@traderImage"
+                               Size="Size.Medium" Style="float: left;" Square="true" Variant="Variant.Outlined" />
+                    <MudText Typo="Typo.subtitle2" Style="float: right;">@bestTrader?.PriceRub.AsRubs()</MudText>
+                </MudStack>
+            </MudStack>
+        }
     </MudStack>
 
-    @if (IsExpanded && Item.Properties is ItemPropertiesAmmo ammoProp) {
+    @if (Detail == DetailAmount.Max && Item.Properties is ItemPropertiesAmmo ammoProp) {
         <MudDivider Vertical="false" DividerType="DividerType.Middle" Class="mx-0 my-2" />
 
         <MudStack Row="false">
@@ -114,10 +121,10 @@
 
 @code {
     [Parameter]
-    public required Item Item { get; set; }
+    public DetailAmount Detail { get; set; }
 
     [Parameter]
-    public bool IsExpanded { get; set; }
+    public required Item Item { get; set; }
 
     private void OpenURL(string? url) {
         if (string.IsNullOrEmpty(url)) return;
