@@ -11,7 +11,7 @@
 		<blazor:BlazorWebView HostPage="wwwroot/index.html" Services="{StaticResource services}" Panel.ZIndex="99"
 		                      x:Name="blazorWebView" Loaded="BlazorUI_Loaded">
 			<blazor:BlazorWebView.RootComponents>
-				<blazor:RootComponent Selector="#app" ComponentType="{x:Type local:RazorApp}" />
+				<blazor:RootComponent Selector="#app" ComponentType="{x:Type local:RazorApp}"/>
 			</blazor:BlazorWebView.RootComponents>
 		</blazor:BlazorWebView>
 	</Grid>

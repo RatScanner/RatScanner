@@ -234,6 +234,7 @@ public static class TarkovDevAPI {
 			Task.Run(() => QueuePaginatedRequest<HideoutStation>(HideoutStationsQueryKey(), HideoutStationsQueryPaginated, RatConfig.LongTTL)),
 			Task.Run(() => QueuePaginatedRequest<Map>(MapsQueryKey(), MapsQueryPaginated, RatConfig.LongTTL))
 		).ConfigureAwait(false);
+		System.Runtime.GCSettings.LargeObjectHeapCompactionMode = System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce;
 	}
 
 	public static Item[] GetItems(LanguageCode language, GameMode gameMode) => GetCachedPaginated<Item>(ItemsQueryKey(language, gameMode), (limit, offset) => ItemsQueryPaginated(limit, offset, language, gameMode), RatConfig.MediumTTL);

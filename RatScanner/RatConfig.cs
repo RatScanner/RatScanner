@@ -87,7 +87,6 @@ internal static class RatConfig {
 		internal static bool ShowKappa = false;
 		internal static bool ShowQuestHideoutTracker = true;
 		internal static bool ShowQuestHideoutTeamTracker = false;
-		internal static int Opacity = 0;
 	}
 
 	// Progress Tracking options
@@ -153,6 +152,8 @@ internal static class RatConfig {
 	internal static bool SetScreen = false;
 	internal static int LastWindowPositionX = int.MinValue;
 	internal static int LastWindowPositionY = int.MinValue;
+	internal static int LastWindowWidth = 350;
+	internal static int LastWindowHeight = 500;
 	internal static WindowMode LastWindowMode = WindowMode.Normal;
 
 	internal static float GameScale => RatScannerMain.Instance.RatEyeEngine.Config.ProcessingConfig.Scale;
@@ -208,7 +209,6 @@ internal static class RatConfig {
 		MinimalUi.ShowKappa = config.ReadBool(nameof(MinimalUi.ShowKappa), MinimalUi.ShowKappa);
 		MinimalUi.ShowQuestHideoutTracker = config.ReadBool(nameof(MinimalUi.ShowQuestHideoutTracker), MinimalUi.ShowQuestHideoutTracker);
 		MinimalUi.ShowQuestHideoutTeamTracker = config.ReadBool(nameof(MinimalUi.ShowQuestHideoutTeamTracker), MinimalUi.ShowQuestHideoutTeamTracker);
-		MinimalUi.Opacity = config.ReadInt(nameof(MinimalUi.Opacity), MinimalUi.Opacity);
 
 		config.Section = nameof(Tracking);
 		Tracking.ShowNonFIRNeeds = config.ReadBool(nameof(Tracking.ShowNonFIRNeeds), Tracking.ShowNonFIRNeeds);
@@ -244,6 +244,8 @@ internal static class RatConfig {
 
 		LastWindowPositionX = config.ReadInt(nameof(LastWindowPositionX), LastWindowPositionX);
 		LastWindowPositionY = config.ReadInt(nameof(LastWindowPositionY), LastWindowPositionY);
+		LastWindowWidth = config.ReadInt(nameof(LastWindowWidth), LastWindowWidth);
+		LastWindowHeight = config.ReadInt(nameof(LastWindowHeight), LastWindowHeight);
 		LastWindowMode = (WindowMode)config.ReadInt(nameof(LastWindowMode), (int)LastWindowMode);
 	}
 
@@ -274,7 +276,6 @@ internal static class RatConfig {
 		config.WriteBool(nameof(MinimalUi.ShowKappa), MinimalUi.ShowKappa);
 		config.WriteBool(nameof(MinimalUi.ShowQuestHideoutTracker), MinimalUi.ShowQuestHideoutTracker);
 		config.WriteBool(nameof(MinimalUi.ShowQuestHideoutTeamTracker), MinimalUi.ShowQuestHideoutTeamTracker);
-		config.WriteInt(nameof(MinimalUi.Opacity), MinimalUi.Opacity);
 
 		config.Section = nameof(Tracking);
 		config.WriteBool(nameof(Tracking.ShowNonFIRNeeds), Tracking.ShowNonFIRNeeds);
@@ -307,6 +308,8 @@ internal static class RatConfig {
 		config.WriteInt(nameof(ConfigVersion), ConfigVersion);
 		config.WriteInt(nameof(LastWindowPositionX), LastWindowPositionX);
 		config.WriteInt(nameof(LastWindowPositionY), LastWindowPositionY);
+		config.WriteInt(nameof(LastWindowWidth), LastWindowWidth);
+		config.WriteInt(nameof(LastWindowHeight), LastWindowHeight);
 		config.WriteInt(nameof(LastWindowMode), (int)LastWindowMode);
 	}
 

@@ -78,7 +78,6 @@ internal class SettingsVM : INotifyPropertyChanged {
 		ShowQuestHideoutTracker = RatConfig.MinimalUi.ShowQuestHideoutTracker;
 		ShowQuestHideoutTeamTracker = RatConfig.MinimalUi.ShowQuestHideoutTeamTracker;
 		ShowUpdated = RatConfig.MinimalUi.ShowUpdated;
-		Opacity = RatConfig.MinimalUi.Opacity;
 
 		ScreenWidth = RatConfig.ScreenWidth;
 		ScreenHeight = RatConfig.ScreenHeight;
@@ -130,7 +129,6 @@ internal class SettingsVM : INotifyPropertyChanged {
 		RatConfig.MinimalUi.ShowQuestHideoutTracker = ShowQuestHideoutTracker;
 		RatConfig.MinimalUi.ShowQuestHideoutTeamTracker = ShowQuestHideoutTeamTracker;
 		RatConfig.MinimalUi.ShowUpdated = ShowUpdated;
-		RatConfig.MinimalUi.Opacity = Opacity;
 
 		RatConfig.Tracking.ShowNonFIRNeeds = ShowNonFIRNeeds;
 		RatConfig.Tracking.ShowKappaNeeds = ShowKappaNeeds;

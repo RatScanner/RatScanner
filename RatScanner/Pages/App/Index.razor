@@ -1,212 +1,318 @@
 ﻿@page "/"
 @page "/app"
 @using RatScanner.Scan
-@using RatScanner.TarkovDev.GraphQL;
+@using RatScanner.TarkovDev.GraphQL
+@using RatScanner.Pages.App.Components
+@using RatScanner.Pages.InteractableOverlay.Services
 @using System.Diagnostics
+@using SearchResult = RatScanner.Pages.InteractableOverlay.Services.SearchResult
 @inject MenuVM MenuVM
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 @implements IDisposable
 
-<MudGrid Class="pa-0" Spacing="0">
-    <MudGrid Class="pa-0" Spacing="0">
-        <MudItem xs="12">
-            <div class="d-flex align-center justify-start mx-2 mt-2 mb-1">
-                <img src="@MenuVM.LastItem.IconLink" class="mr-2 mud-elevation-1" style="border-style: solid; border-width: 1px; border-color: #585D60; display: block; max-width: 64px; max-height: 64px; width: auto; height: auto;" />
-                <MudText Class="ellipsis" Style="display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;" Color="Color.Inherit">@MenuVM.LastItem.Name</MudText>
-            </div>
-        </MudItem>
-        <MudItem xs="6">
-            <MudPaper Class="d-flex align-center justify-center pa-1 ml-2 mr-1 my-1 mud-grey-darken4" Elevation="2" @onclick="OpenWiki" Style="cursor: pointer;" MinHeight="32px">
-                <img src="https://static.wikia.nocookie.net/escapefromtarkov_gamepedia/images/e/e6/Site-logo.png" height="24px" />
+<div class="app-container">
+    <!-- Header Bar -->
+    <div class="header-bar" @onmousedown="StartDrag" @onmousedown:stopPropagation="false">
+        <div class="header-left">
+            <img src="RatLogoMedium.png" width="20" class="header-logo" />
+            <MudText Typo="Typo.subtitle1" Class="header-title">RatScanner</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">v@(RatConfig.Version)</MudText>
+        </div>
+        <div class="header-right" @onmousedown:stopPropagation="true">
+            <MudIconButton Icon="@Icons.Material.Filled.Settings" 
+                          Size="Size.Small" 
+                          Class="header-button"
+                          Href="/app/settings/general" />
+            <MudIconButton Icon="@Icons.Material.Filled.Minimize" 
+                          Size="Size.Small" 
+                          Class="header-button"
+                          OnClick="MinimizeWindow" />
+            <MudIconButton Icon="@Icons.Material.Filled.Close" 
+                          Size="Size.Small" 
+                          Class="header-button header-button-close"
+                          OnClick="CloseWindow" />
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <MudStack Spacing="2" Class="pa-2 main-content">
+        <!-- Search Box -->
+        <MudPaper Class="pa-2" Elevation="2">
+            <MudTextField @ref="_searchTextField" T="string" 
+                          Variant="Variant.Outlined"
+                          Placeholder="Search items..."
+                          Adornment="Adornment.End" 
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          DebounceInterval="100" 
+                          OnDebounceIntervalElapsed="ExecuteSearch" 
+                          @bind-Value="@_searchText"
+                          Margin="Margin.Dense" />
+        </MudPaper>
+
+        @if (_searchResults.Any()) {
+            <!-- Search Results -->
+            @foreach (SearchResult searchResult in _searchResults.Take(3)) {
+                @if (searchResult.Data is Item item) {
+                    <CompactItemResult Item="@item" />
+                }
+            }
+
+            <!-- Clear search button -->
+            <MudButton Variant="Variant.Text" Size="Size.Small" OnClick="ClearSearch" 
+                       StartIcon="@Icons.Material.Filled.Clear">
+                Clear Search
+            </MudButton>
+        } else {
+            <!-- Last Scanned Item -->
+            @if (MenuVM.LastItem != null) {
+                <CompactItemResult Item="@MenuVM.LastItem" />
+            }
+
+            <!-- Quick Stats -->
+            <MudPaper Class="pa-2" Elevation="2">
+                <MudStack Row="true" Justify="Justify.SpaceAround">
+                    <MudStack Spacing="0" AlignItems="AlignItems.Center">
+                        <MudText Typo="Typo.h6" Color="@(MenuVM.TaskRemaining > 0 ? Color.Success : Color.Default)">
+                            @MenuVM.TaskRemaining
+                        </MudText>
+                        <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                            <MudIcon Icon="@Icons.Material.Filled.Checklist" Size="Size.Small" />
+                            <MudText Typo="Typo.caption">Quests</MudText>
+                        </MudStack>
+                    </MudStack>
+
+                    <MudDivider Vertical="true" FlexItem="true" />
+
+                    <MudStack Spacing="0" AlignItems="AlignItems.Center">
+                        <MudText Typo="Typo.h6" Color="@(MenuVM.HideoutRemaining > 0 ? Color.Success : Color.Default)">
+                            @MenuVM.HideoutRemaining
+                        </MudText>
+                        <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                            <MudIcon Icon="@Icons.Material.Filled.House" Size="Size.Small" />
+                            <MudText Typo="Typo.caption">Hideout</MudText>
+                        </MudStack>
+                    </MudStack>
+
+                    @if (MenuVM.ShowKappaNeeds == true) {
+                        <MudDivider Vertical="true" FlexItem="true" />
+
+                        <MudStack Spacing="0" AlignItems="AlignItems.Center">
+                            <MudText Typo="Typo.h6" Color="@(MenuVM.TaskRemainingKappa > 0 ? Color.Warning : Color.Default)">
+                                @MenuVM.TaskRemainingKappa
+                            </MudText>
+                            <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                                <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Size="Size.Small" />
+                                <MudText Typo="Typo.caption">Kappa</MudText>
+                            </MudStack>
+                        </MudStack>
+                    }
+                </MudStack>
             </MudPaper>
-        </MudItem>
-        <MudItem xs="6">
-            <MudPaper Class="d-flex align-center justify-center pa-1 ml-1 mr-2 my-1" Elevation="2" @onclick="OpenTarkovDev" Style="cursor: pointer;" MinHeight="32px">
-                <img src="https://api.ratscanner.com/v3/file/tarkov-dev-logo.png" height="18px" />
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Class="align-center justify-center pa-2 mx-2 my-1" Elevation="2">
-                <div class="d-flex justify-space-between align-center mt-2">
-                    <MudText Typo="Typo.subtitle2">Recent Avg. Price</MudText>
-                    <MudText Typo="Typo.subtitle2">@MenuVM.LastItem.Avg24HPrice.AsRubs()</MudText>
-                </div>
-                <div class="d-flex justify-space-between align-center my-1">
-                    <MudText Typo="Typo.subtitle2">Value per Slot</MudText>
-                    <MudText Typo="Typo.subtitle2">@MenuVM.PricePerSlot.AsRubs()</MudText>
-                </div>
-                <MudDivider DividerType="DividerType.FullWidth" />
-                <div class="d-flex justify-space-between align-center mt-2">
-                    <MudText Typo="Typo.subtitle2">Best Trader</MudText>
-                    <div class="d-flex align-center">
-                        <MudAvatar Image="@(MenuVM.BestTraderOfferVendor?.Trader?.ImageLink)" Size="Size.Small" Style="float: left;" Class="mr-1" Elevation="1" />
-                        <MudText Typo="Typo.subtitle2" Style="float: right;">@MenuVM.BestTraderOfferVendor?.Name</MudText>
-                    </div>
-                </div>
-                <div class="d-flex justify-space-between align-center my-1">
-                    <MudText Typo="Typo.subtitle2">Trader Price</MudText>
-                    <MudText Typo="Typo.subtitle2">@(MenuVM.BestTraderOffer?.PriceRub.AsRubs() ?? 0.AsRubs())</MudText>
-                </div>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">
-                <div class="d-flex align-center">
-                    @MenuVM.TaskRemaining <MudIcon Icon="@Icons.Material.Filled.Checklist" Size="Size.Small" Class="ml-1" /> Quest
-                </div>
-                <div class="d-flex align-center">
-                    @MenuVM.HideoutRemaining <MudIcon Icon="@Icons.Material.Filled.House" Size="Size.Small" Class="ml-1" /> Hideout
-                </div>
-            </MudPaper>
-        </MudItem>
-        @if (MenuVM.ShowKappaNeeds == true) {
-            <MudItem xs="12">
-                <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">
-                    <div class="d-flex align-center">
-                        @MenuVM.TaskRemainingKappa <MudIcon Icon="@Icons.Material.Filled.Checklist" Size="Size.Small" Class="ml-1" /> Kappa
-                    </div>
-                </MudPaper>
-            </MudItem>
-        }
-        @if (MenuVM.ItemTeamNeeds != null && MenuVM.ItemTeamNeeds.Any()) {
-            <MudItem xs="12">
-                <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">
-                    <MudGrid Spacing="0" Class="pa-0 ma-0">
-                        @foreach (var need in MenuVM.ItemTeamNeeds) {
-                            <MudItem xs="12" Class="pa-0 ma-0">
-                                <div class="d-flex justify-space-between">
-                                    <div class="mx-1">@need.Key</div>
-                                    <div class="d-flex align-center">
-                                        <MudIcon Icon="@Icons.Material.Filled.Checklist" Size="Size.Small" Class="mr-1" /> @need.Value.Key
-                                        <MudIcon Icon="@Icons.Material.Filled.House" Size="Size.Small" Class="ml-3 mr-1" /> @need.Value.Value
-                                    </div>
-                                </div>
-                            </MudItem>
-                        }
-                    </MudGrid>
-                </MudPaper>
-            </MudItem>
-        }
-        <MudItem xs="12">
-            <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">
-                <MudAutocomplete @ref="_searchBox" T="TarkovDev.GraphQL.Item" Placeholder="Item Search" PopoverClass="searchBoxPopover" SelectValueOnTab="true" ValueChanged="SetSearchItem" MaxItems="5" AnchorOrigin="Origin.TopCenter" TransformOrigin="Origin.BottomCenter" CoerceValue="true" AdornmentIcon="@Icons.Material.Filled.Search" SearchFunc="@SearchItem" Margin="Margin.Dense" Dense="true" Variant="Variant.Outlined">
-                    <ItemTemplate Context="item">
-                        <MudPaper Class="ma-n1" Elevation="4">
-                            <MudStack Row="true" Style="height: 48px">
-                                <MudImage Class="m-0 p-0" Src="@item.IconLink" Style="max-width:100%; max-height:100%;" />
-                                <MudStack Class="overflow-hidden">
-                                    <MudText Class="ellipsis">
-                                        @(item == null ? null : $"{item.Name}")
-                                    </MudText>
+
+            <!-- Team Needs (if any) -->
+            @if (MenuVM.ItemTeamNeeds != null && MenuVM.ItemTeamNeeds.Any()) {
+                <MudPaper Class="pa-2" Elevation="2">
+                    <MudText Typo="Typo.subtitle2" Class="mb-1">Team Needs</MudText>
+                    @foreach (var need in MenuVM.ItemTeamNeeds) {
+                        <MudStack Row="true" Justify="Justify.SpaceBetween" Class="py-1">
+                            <MudText Typo="Typo.body2">@need.Key</MudText>
+                            <MudStack Row="true" Spacing="2">
+                                <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                                    <MudIcon Icon="@Icons.Material.Filled.Checklist" Size="Size.Small" />
+                                    <MudText Typo="Typo.body2">@need.Value.Key</MudText>
+                                </MudStack>
+                                <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                                    <MudIcon Icon="@Icons.Material.Filled.House" Size="Size.Small" />
+                                    <MudText Typo="Typo.body2">@need.Value.Value</MudText>
                                 </MudStack>
                             </MudStack>
-                        </MudPaper>
-                    </ItemTemplate>
-                </MudAutocomplete>
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
-</MudGrid>
+                        </MudStack>
+                    }
+                </MudPaper>
+            }
+
+            <!-- Quick Links for current item -->
+            <MudStack Row="true" Spacing="2">
+                <MudPaper Class="flex-1 pa-2 d-flex align-center justify-center" Elevation="2" 
+                          Style="cursor: pointer;" @onclick="OpenWiki">
+                    <img src="https://static.wikia.nocookie.net/escapefromtarkov_gamepedia/images/e/e6/Site-logo.png" height="20px" />
+                </MudPaper>
+                <MudPaper Class="flex-1 pa-2 d-flex align-center justify-center" Elevation="2" 
+                          Style="cursor: pointer;" @onclick="OpenTarkovDev">
+                    <img src="https://api.ratscanner.com/v3/file/tarkov-dev-logo.png" height="16px" />
+                </MudPaper>
+            </MudStack>
+        }
+    </MudStack>
+
+    <!-- Resize Grip -->
+    <div class="resize-grip" 
+         @onmousedown="StartResize" 
+         @onmousedown:preventDefault="true"
+         @onmousedown:stopPropagation="false">
+        <svg>
+            <path d="M9 0 L11 0 L11 2 L9 2 Z M6 3 L8 3 L8 5 L6 5 Z M9 3 L11 3 L11 5 L9 5 Z M3 6 L5 6 L5 8 L3 8 Z M6 6 L8 6 L8 8 L6 8 Z M9 6 L11 6 L11 8 L9 8 Z M0 9 L2 9 L2 11 L0 11 Z M3 9 L5 9 L5 11 L3 11 Z M6 9 L8 9 L8 11 L6 11 Z M9 9 L11 9 L9 11 Z" fill="#DDDDDD" />
+        </svg>
+    </div>
+</div>
 
 <style>
+    .app-container {
+        position: relative;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        border: 2px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        overflow: hidden;
+        background: #121212;
+    }
+
+    .header-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 4px 8px;
+        background: #1e1e1e;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.12);
+        cursor: move;
+        user-select: none;
+        -webkit-app-region: drag;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .header-logo {
+        vertical-align: middle;
+    }
+
+    .header-title {
+        margin: 0;
+        line-height: 1;
+    }
+
+    .header-right {
+        display: flex;
+        gap: 2px;
+        -webkit-app-region: no-drag;
+    }
+
+    .header-button {
+        opacity: 0.7;
+        transition: opacity 0.2s;
+    }
+
+    .header-button:hover {
+        opacity: 1;
+    }
+
+    .header-button-close:hover {
+        color: #ff4444;
+    }
+
+    .main-content {
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .resize-grip {
+        position: absolute;
+        overflow: hidden;
+        bottom: 2px;
+        right: 2px;
+        width: 11px;
+        height: 11px;
+        cursor: nwse-resize;
+        z-index: 100;
+    }
+
+    .resize-grip:hover svg path {
+        fill: #aaaaaa;
+    }
+
     .ellipsis {
         overflow: hidden;
         text-overflow: ellipsis;
+        white-space: nowrap;
     }
 </style>
 
 @code {
-    private List<TarkovDev.GraphQL.Item>? _items;
-
-    private MudAutocomplete<TarkovDev.GraphQL.Item> _searchBox { get; set; } = null!;
+    private MudTextField<string> _searchTextField = null!;
+    private string _searchText = "";
+    private IEnumerable<SearchResult> _searchResults = new List<SearchResult>();
+    private readonly SearchService _searchService = new();
 
     protected override void OnInitialized() {
         MenuVM.PropertyChanged += PropertyChangeHandler;
     }
 
-    private async Task<IEnumerable<TarkovDev.GraphQL.Item>> SearchItem(string value) {
-        if (_items == null) _items = TarkovDevAPI.GetItems().ToList();
+    private void StartDrag(MouseEventArgs e) {
+        PageSwitcher.Instance.StartDrag();
+    }
 
-        if (string.IsNullOrEmpty(value)) return TarkovDevAPI.GetItems().Take(1);
+    private void StartResize(MouseEventArgs e) {
+        if (e.Button != 0) return;
+        PageSwitcher.Instance.StartResize();
+    }
 
-        value = SanitizeSearch(value);
+    private void MinimizeWindow() {
+        PageSwitcher.Instance.MinimizeWindow();
+    }
 
-        Func<TarkovDev.GraphQL.Item, (TarkovDev.GraphQL.Item item, int score)> filter = (item) => {
-            if (SanitizeSearch(item.Name) == value) return new(item, 5);
-            if (SanitizeSearch(item.ShortName) == value) return new(item, 10);
+    private void CloseWindow() {
+        PageSwitcher.Instance.Close();
+    }
 
-            if (SanitizeSearch(item.Name).StartsWith(value)) return new(item, 20);
-            if (SanitizeSearch(item.ShortName).StartsWith(value)) return new(item, 20);
-
-            // Match every individual word (expensive)
-            string[] filters = value.Split(new[] { ' ' });
-            if (filters.All(filter => SanitizeSearch(item.Name).Contains(filter))) return new(item, 40);
-            if (filters.All(filter => SanitizeSearch(item.ShortName).Contains(filter))) return new(item, 40);
-
-            if (SanitizeSearch(item.Name).Contains(value)) return new(item, 60);
-            if (SanitizeSearch(item.ShortName).Contains(value)) return new(item, 60);
-
-            if (value.Length > 3 && SanitizeSearch(item.Id).StartsWith(value)) return new(item, 80);
-            if (value.Length > 3 && SanitizeSearch(item.Id).Contains(value)) return new(item, 100);
-            return new(null, -1);
-        };
-
-        var matches = new List<(TarkovDev.GraphQL.Item item, int score)>();
-        foreach (var item in _items) {
-            var match = filter(item);
-            if (match.item == null) continue;
-            matches.Add(match);
+    private async void ExecuteSearch(string value) {
+        if (string.IsNullOrWhiteSpace(value)) {
+            _searchResults = new List<SearchResult>();
+            await InvokeAsync(StateHasChanged);
+            return;
         }
 
-        for (var i = 0; i < matches.Count; i++) {
-            // Slightly penalize items with long names
-            matches[i] = (matches[i].item, (int)(matches[i].score + matches[i].item.Name.Length * 0.002f));
-
-            // Penalize weapon mods so the weapon it self will rank higher
-            if (matches[i].item.Types.Contains(ItemType.Mods)) matches[i] = (matches[i].item, matches[i].score + 5);
-        }
-
-
-        for (var i = 0; i < matches.Count; i++) if (matches[i].item.Types.Contains(ItemType.Mods)) matches[i] = (matches[i].item, matches[i].score + 5);
-
-        var sortedMatches = matches.OrderBy(match => match.score).ThenBy(match => match.item.Name.Length);
-        return sortedMatches.Select(match => match.item);
+        var sanitizedValue = _searchService.SanitizeSearch(value);
+        var results = Enumerable.Empty<SearchResult>();
+        results = results.Concat(await _searchService.SearchItemsAsync(sanitizedValue));
+        results = results.Where(result => result != null && result.Data != null);
+        results = results.OrderBy(result => result.Score).Take(3);
+        _searchResults = results;
+        await InvokeAsync(StateHasChanged);
     }
 
-    private string SanitizeSearch(string value) {
-        value = value.ToLower().Trim();
-        value = new string(value.Where(c => char.IsLetterOrDigit(c) || c == ' ').ToArray());
-        return value;
+    private void ClearSearch() {
+        _searchText = "";
+        _searchResults = new List<SearchResult>();
     }
 
-    private async void SetSearchItem(TarkovDev.GraphQL.Item item) {
-        if (item == null) return;
-        MenuVM.ItemScans.Enqueue(new DefaultItemScan(item));
-        await _searchBox.Clear();
+    private void OpenWiki() {
+        OpenURL(MenuVM.LastItem?.WikiLink);
     }
 
-    private async void OpenWiki() {
-        OpenURL(MenuVM.LastItem.WikiLink);
+    private void OpenTarkovDev() {
+        OpenURL(MenuVM.LastItem?.Link);
     }
 
-    private async void OpenTarkovDev() {
-        OpenURL(MenuVM.LastItem.Link);
-    }
-
-    private void OpenURL(string url) {
+    private void OpenURL(string? url) {
         if (string.IsNullOrEmpty(url)) return;
         var psi = new ProcessStartInfo {
-                FileName = url,
-                UseShellExecute = true,
-            };
+            FileName = url,
+            UseShellExecute = true,
+        };
         Process.Start(psi);
     }
 
     private async void PropertyChangeHandler(object? sender, EventArgs e) {
-        await InvokeAsync(() => StateHasChanged());
+        await InvokeAsync(StateHasChanged);
     }
 
     public void Dispose() {
         MenuVM.PropertyChanged -= PropertyChangeHandler;
     }
-
 }

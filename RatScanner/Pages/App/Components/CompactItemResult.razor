@@ -1,0 +1,85 @@
+@using RatScanner.TarkovDev.GraphQL
+@using Color = MudBlazor.Color
+@using System.Diagnostics;
+
+<MudPaper Class="pa-2" Elevation="3">
+    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+        <!-- Left side: Image and name -->
+        <MudStack Row="true" Justify="Justify.FlexStart" AlignItems="AlignItems.Center" Class="flex-1" Style="min-width: 0;">
+            <MudPaper Style="width: 48px; height: 48px; min-width: 48px;" Outlined="true">
+                <MudImage Src="@Item.BaseImageLink"
+                          Style="width: 100%; height: 100%; object-fit: contain;" />
+            </MudPaper>
+
+            <MudStack Spacing="0" Style="min-width: 0; overflow: hidden;">
+                <MudText Class="ellipsis" Typo="Typo.subtitle1">@Item.Name</MudText>
+                <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">@Item.ShortName</MudText>
+                    <MudIconButton Icon="@Constants.Icon.TarkovDev" Size="Size.Small" 
+                                   OnClick=@(() => OpenURL($"https://tarkov.dev/item/{Item.Id}")) />
+                    <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" 
+                                   OnClick=@(() => OpenURL(Item.WikiLink)) />
+                </MudStack>
+            </MudStack>
+        </MudStack>
+
+        <!-- Right side: Prices and needs -->
+        <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Center">
+            <!-- Task/Hideout needs -->
+            <MudStack Spacing="0" AlignItems="AlignItems.End">
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Text" 
+                         Color="@(Item.GetTaskRemaining().Item1 > 0 ? Color.Success : Color.Default)">
+                    <MudIcon Icon="@Icons.Material.Filled.Checklist" Size="Size.Small" Class="mr-1" />
+                    @Item.GetTaskRemaining().Item1.ToShortString()
+                </MudChip>
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Text"
+                         Color="@(Item.GetHideoutRemaining() > 0 ? Color.Success : Color.Default)">
+                    <MudIcon Icon="@Icons.Material.Filled.House" Size="Size.Small" Class="mr-1" />
+                    @Item.GetHideoutRemaining().ToShortString()
+                </MudChip>
+            </MudStack>
+
+            <MudDivider Vertical="true" FlexItem="true" />
+
+            <!-- Prices -->
+            <MudStack Spacing="0" AlignItems="AlignItems.End" Style="min-width: 80px;">
+                <MudText Typo="Typo.subtitle2">@Item.Avg24HPrice.AsRubs()</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">@Item.GetAvg24hMarketPricePerSlot().AsRubs()/slot</MudText>
+            </MudStack>
+
+            <MudDivider Vertical="true" FlexItem="true" />
+
+            <!-- Best trader -->
+            <MudStack Spacing="0" AlignItems="AlignItems.Center" Style="min-width: 50px;">
+                @{
+                    var bestTrader = Item.GetBestTraderOffer();
+                    var traderImage = Item.GetBestTraderOfferVendor()?.Trader?.ImageLink;
+                }
+                <MudAvatar Image="@traderImage" Size="Size.Small" Square="true" Variant="Variant.Outlined" />
+                <MudText Typo="Typo.caption">@bestTrader?.PriceRub.AsRubs()</MudText>
+            </MudStack>
+        </MudStack>
+    </MudStack>
+</MudPaper>
+
+<style>
+    .ellipsis {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public required Item Item { get; set; }
+
+    private void OpenURL(string? url) {
+        if (string.IsNullOrEmpty(url)) return;
+        var psi = new ProcessStartInfo {
+            FileName = url,
+            UseShellExecute = true,
+        };
+        Process.Start(psi);
+    }
+}

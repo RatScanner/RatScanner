@@ -1,6 +1,60 @@
 ﻿@inherits LayoutComponentBase
 @layout MainLayout
 @using RatScanner.Pages.App.Settings
+@inject NavigationManager NavigationManager
 
-@Body
-<SettingsSave/>
+<div class="settings-container">
+    <MudPaper Class="pa-1 my-1" Elevation="1">
+        <MudStack Row="true" Justify="Justify.SpaceAround">
+            <MudIconButton Icon="@Icons.Material.Filled.Settings" Size="Size.Small" 
+                          Color="@GetNavColor("/app/settings/general")"
+                          Href="/app/settings/general" />
+            <MudIconButton Icon="@Icons.Material.Filled.CenterFocusStrong" Size="Size.Small"
+                          Color="@GetNavColor("/app/settings/scanning")"
+                          Href="/app/settings/scanning" />
+            <MudIconButton Icon="@Icons.Material.Filled.Keyboard" Size="Size.Small"
+                          Color="@GetNavColor("/app/settings/hotkeys")"
+                          Href="/app/settings/hotkeys" />
+            <MudIconButton Icon="@Icons.Material.Filled.Checklist" Size="Size.Small"
+                          Color="@GetNavColor("/app/settings/tracking")"
+                          Href="/app/settings/tracking" />
+            <MudIconButton Icon="@Icons.Material.Filled.DesktopWindows" Size="Size.Small"
+                          Color="@GetNavColor("/app/settings/minimal")"
+                          Href="/app/settings/minimal" />
+            <MudIconButton Icon="@Icons.Material.Filled.CalendarViewDay" Size="Size.Small"
+                          Color="@GetNavColor("/app/settings/interactableoverlay")"
+                          Href="/app/settings/interactableoverlay" />
+            <MudIconButton Icon="@Icons.Material.Filled.Info" Size="Size.Small"
+                          Color="@GetNavColor("/app/settings/info")"
+                          Href="/app/settings/info" />
+        </MudStack>
+    </MudPaper>
+
+    <!-- Settings Content -->
+    <div class="settings-content">
+        @Body
+    </div>
+
+    <SettingsSave/>
+</div>
+
+<style>
+    .settings-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 8px;
+    }
+
+    .settings-content {
+        flex: 1;
+        overflow-y: auto;
+        margin-bottom: 60px;
+    }
+</style>
+
+@code {
+    private Color GetNavColor(string path) {
+        return NavigationManager.Uri.Contains(path) ? Color.Primary : Color.Default;
+    }
+}

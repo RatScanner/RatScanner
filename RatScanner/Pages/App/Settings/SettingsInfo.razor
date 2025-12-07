@@ -1,0 +1,122 @@
+@page "/app/settings/info"
+@layout SettingsLayout
+@using System.Diagnostics
+@inject MenuVM MenuVM
+@implements IDisposable
+
+<div>
+    <MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
+        <MudItem xs="12">
+            <div class="d-flex align-center justify-center mx-2 mb-1">
+                <MudText Typo="Typo.subtitle1" Color="Color.Inherit">Info</MudText>
+            </div>
+        </MudItem>
+
+        <!-- App Info -->
+        <MudItem xs="12">
+            <MudPaper Class="pa-3 mx-2 mb-2" Elevation="2">
+                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
+                    <img src="RatLogoMedium.png" width="64px" />
+                    <MudStack Spacing="0">
+                        <MudText Typo="Typo.h5">RatScanner</MudText>
+                        <MudText Typo="Typo.subtitle1" Color="Color.Secondary">Version @(RatConfig.Version)</MudText>
+                    </MudStack>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+
+        <!-- Links -->
+        <MudItem xs="12">
+            <MudPaper Class="pa-2 mx-2 mb-2" Elevation="2">
+                <MudText Typo="Typo.subtitle2" Class="mb-2">Links</MudText>
+                
+                <MudStack Spacing="1">
+                    <MudButton Variant="Variant.Outlined" 
+                               StartIcon="@Icons.Custom.Brands.GitHub" 
+                               FullWidth="true"
+                               OnClick="@(() => OpenURL(MenuVM.GithubLink))">
+                        GitHub Repository
+                    </MudButton>
+                    
+                    <MudButton Variant="Variant.Outlined" 
+                               StartIcon="@Constants.Icon.Discord" 
+                               FullWidth="true"
+                               Style="color: #5865f2; border-color: #5865f2;"
+                               OnClick="@(() => OpenURL(MenuVM.DiscordLink))">
+                        Discord Community
+                    </MudButton>
+                    
+                    <MudButton Variant="Variant.Outlined" 
+                               StartIcon="@Constants.Icon.Patreon" 
+                               FullWidth="true"
+                               Style="color: #FF424D; border-color: #FF424D;"
+                               OnClick="@(() => OpenURL(MenuVM.PatreonLink))">
+                        Support on Patreon
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+
+        <!-- Credits -->
+        <MudItem xs="12">
+            <MudPaper Class="pa-2 mx-2 mb-2" Elevation="2">
+                <MudText Typo="Typo.subtitle2" Class="mb-2">Data Sources</MudText>
+                
+                <MudStack Spacing="1">
+                    <MudButton Variant="Variant.Text" 
+                               Size="Size.Small"
+                               FullWidth="true"
+                               OnClick="@(() => OpenURL("https://tarkov.dev"))">
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Class="flex-1">
+                            <img src="https://api.ratscanner.com/v3/file/tarkov-dev-logo.png" height="16px" class="mr-2" />
+                            <MudText>tarkov.dev API</MudText>
+                        </MudStack>
+                    </MudButton>
+                    
+                    <MudButton Variant="Variant.Text" 
+                               Size="Size.Small"
+                               FullWidth="true"
+                               OnClick="@(() => OpenURL("https://tarkovtracker.io"))">
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Class="flex-1">
+                            <MudIcon Icon="@Icons.Material.Filled.Checklist" Size="Size.Small" Class="mr-2" />
+                            <MudText>TarkovTracker</MudText>
+                        </MudStack>
+                    </MudButton>
+                    
+                    <MudButton Variant="Variant.Text" 
+                               Size="Size.Small"
+                               FullWidth="true"
+                               OnClick="@(() => OpenURL("https://escapefromtarkov.fandom.com"))">
+                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Class="flex-1">
+                            <img src="https://static.wikia.nocookie.net/escapefromtarkov_gamepedia/images/e/e6/Site-logo.png" height="16px" class="mr-2" />
+                            <MudText>EFT Wiki</MudText>
+                        </MudStack>
+                    </MudButton>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</div>
+
+@code {
+    protected override void OnInitialized() {
+        MenuVM.PropertyChanged += PropertyChangeHandler;
+    }
+
+    private void OpenURL(string? url) {
+        if (string.IsNullOrEmpty(url)) return;
+        var psi = new ProcessStartInfo {
+            FileName = url,
+            UseShellExecute = true,
+        };
+        Process.Start(psi);
+    }
+
+    private async void PropertyChangeHandler(object? sender, EventArgs e) {
+        await InvokeAsync(() => StateHasChanged());
+    }
+
+    public void Dispose() {
+        MenuVM.PropertyChanged -= PropertyChangeHandler;
+    }
+}

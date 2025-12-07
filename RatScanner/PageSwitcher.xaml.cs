@@ -1,9 +1,11 @@
 ﻿using RatScanner.View;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Shell;
 using ContextMenuStrip = System.Windows.Forms.ContextMenuStrip;
 using NotifyIcon = System.Windows.Forms.NotifyIcon;
@@ -14,9 +16,6 @@ namespace RatScanner;
 /// Interaction logic for PageSwitcher.xaml
 /// </summary>
 public partial class PageSwitcher : Window {
-	public const int DefaultWidth = 280;
-	public const int DefaultHeight = 450;
-
 	private NotifyIcon _notifyIcon = null!;
 	private ContextMenuStrip _contextMenuStrip = new();
 
@@ -24,6 +23,16 @@ public partial class PageSwitcher : Window {
 	public static PageSwitcher Instance => _instance ??= new PageSwitcher();
 
 	private UserControl? activeControl;
+
+	private const int WM_NCLBUTTONDOWN = 0x00A1;
+	private const int HTCAPTION = 2;
+	private const int HTBOTTOMRIGHT = 17;
+
+	[DllImport("user32.dll")]
+	private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+
+	[DllImport("user32.dll")]
+	private static extern bool ReleaseCapture();
 
 	public PageSwitcher() {
 		try {
@@ -40,6 +49,13 @@ public partial class PageSwitcher : Window {
 				Left = RatConfig.LastWindowPositionX;
 				Top = RatConfig.LastWindowPositionY;
 			}
+
+			// Restore window size if saved
+			if (RatConfig.LastWindowWidth > 0 && RatConfig.LastWindowHeight > 0) {
+				Width = RatConfig.LastWindowWidth;
+				Height = RatConfig.LastWindowHeight;
+			}
+
 			Topmost = RatConfig.AlwaysOnTop;
 			if (RatConfig.LastWindowMode == RatConfig.WindowMode.Minimal) ShowMinimalUI();
 		} catch (Exception e) {
@@ -49,13 +65,6 @@ public partial class PageSwitcher : Window {
 
 	internal void ResetWindowSize() {
 		SizeToContent = SizeToContent.Manual;
-		Width = DefaultWidth;
-		Height = DefaultHeight;
-
-		if (RatConfig.Tracking.ShowKappaNeeds) Height += 35;
-
-		// Avoid window stretching when using minimal menu
-		MaxWidth = DefaultWidth;
 	}
 
 	internal void Navigate(UserControl nextControl, object? state = null) {
@@ -73,6 +82,34 @@ public partial class PageSwitcher : Window {
 		if (state != null) nextControlSwitchable.UtilizeState(state);
 
 		nextControlSwitchable.OnOpen();
+	}
+
+	public void MinimizeWindow() {
+		WindowState = WindowState.Minimized;
+	}
+
+	public void StartDrag()
+	{
+		try
+		{
+			IntPtr hwnd = new WindowInteropHelper(this).EnsureHandle();
+			ReleaseCapture();
+			SendMessage(hwnd, WM_NCLBUTTONDOWN, (IntPtr)HTCAPTION, IntPtr.Zero);
+		}
+		catch (Exception ex)
+		{
+			Logger.LogError("Failed to start window drag", ex);
+		}
+	}
+
+	public void StartResize() {
+		try {
+			IntPtr hwnd = new WindowInteropHelper(this).EnsureHandle();
+			ReleaseCapture();
+			SendMessage(hwnd, WM_NCLBUTTONDOWN, (IntPtr)HTBOTTOMRIGHT, IntPtr.Zero);
+		} catch (Exception ex) {
+			Logger.LogError("Failed to start window resize", ex);
+		}
 	}
 
 	protected override void OnStateChanged(EventArgs e) {
@@ -162,22 +199,20 @@ public partial class PageSwitcher : Window {
 	internal void ShowUI() {
 		RatConfig.LastWindowMode = RatConfig.WindowMode.Normal;
 		ResetWindowSize();
-		SetBackgroundOpacity(1);
-		ShowTitleBar();
 		Navigate(BlazorUI.Instance);
 	}
 
 	internal void ShowMinimalUI() {
 		RatConfig.LastWindowMode = RatConfig.WindowMode.Minimal;
-		CollapseTitleBar();
 		SizeToContent = SizeToContent.WidthAndHeight;
-		SetBackgroundOpacity(RatConfig.MinimalUi.Opacity / 100f);
 		Navigate(MinimalMenu.Instance);
 	}
 
 	internal void ExitApplication() {
 		RatConfig.LastWindowPositionX = (int)Left;
 		RatConfig.LastWindowPositionY = (int)Top;
+		RatConfig.LastWindowWidth = (int)Width;
+		RatConfig.LastWindowHeight = (int)Height;
 		RatConfig.SaveConfig();
 		Application.Current.Shutdown();
 	}
@@ -195,17 +230,5 @@ public partial class PageSwitcher : Window {
 
 	private void OnTitleBarClose(object? sender, RoutedEventArgs e) {
 		Close();
-	}
-
-	internal void CollapseTitleBar() {
-		TitleBar.Visibility = Visibility.Collapsed;
-	}
-
-	internal void ShowTitleBar() {
-		TitleBar.Visibility = Visibility.Visible;
-	}
-
-	internal void SetBackgroundOpacity(float opacity) {
-		Background.Opacity = Math.Clamp(opacity, 1f / 510f, 1f);
 	}
 }
