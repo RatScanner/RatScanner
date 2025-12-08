@@ -85,22 +85,6 @@
 				</Style>
 			</StackPanel.Style>
 		</StackPanel>
-		
-		<StackPanel x:Name="PriorityDisplay">
-			<Separator />
-			<Grid>
-				<Label Grid.Column="0"
-							 Content="Priority" />
-				<Label Grid.Column="1"
-							 Content="{Binding PriorityScore}"
-							 d:Content="42" />
-
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="*" />
-					<ColumnDefinition Width="Auto" />
-				</Grid.ColumnDefinitions>
-			</Grid>
-		</StackPanel>
 
 		<StackPanel x:Name="KappaDisplay">
 			<StackPanel>
@@ -261,6 +245,22 @@
 					</Style>
 				</StackPanel.Style>
 			</StackPanel>
+		</StackPanel>
+
+		<StackPanel x:Name="PriorityDisplay">
+			<Separator />
+			<Grid>
+				<Label Grid.Column="0"
+							 Content="Priority" />
+				<Label Grid.Column="1"
+							 Content="{Binding PriorityScore}"
+							 d:Content="42" />
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
+			</Grid>
 		</StackPanel>
 
 		<StackPanel x:Name="UpdatedDisplay">
