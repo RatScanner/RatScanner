@@ -261,6 +261,15 @@
 					<ColumnDefinition Width="Auto" />
 				</Grid.ColumnDefinitions>
 			</Grid>
+			<StackPanel.Style>
+				<Style TargetType="StackPanel">
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding ShowPriority}" Value="False">
+							<Setter Property="Visibility" Value="Collapsed" />
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</StackPanel.Style>
 		</StackPanel>
 
 		<StackPanel x:Name="UpdatedDisplay">

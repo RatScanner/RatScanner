@@ -17,7 +17,7 @@ public partial class MinimalMenu : UserControl, ISwitchable {
 
 	private MinimalMenu() {
 		InitializeComponent();
-		DataContext = new MenuVM(RatScannerMain.Instance);
+		DataContext = RatScannerMain.Instance.MenuVM ?? new MenuVM(RatScannerMain.Instance);
 		UpdateElements();
 	}
 
@@ -29,7 +29,6 @@ public partial class MinimalMenu : UserControl, ISwitchable {
 		AvgDayPriceDisplay.Visibility = RCMinUi.ShowAvgDayPrice ? v : c;
 		PricePerSlotDisplay.Visibility = RCMinUi.ShowPricePerSlot ? v : c;
 		TraderPriceDisplay.Visibility = RCMinUi.ShowTraderPrice ? v : c;
-		PriorityDisplay.Visibility = RCMinUi.ShowPriority ? v : c;
 		KappaDisplay.Visibility = RCMinUi.ShowKappa ? v : c;
 		TrackingDisplay.Visibility = RCMinUi.ShowQuestHideoutTracker ? v : c;
 		TeamTrackingDisplay.Visibility = RCMinUi.ShowQuestHideoutTeamTracker ? v : c;

@@ -131,7 +131,11 @@ internal class SettingsVM : INotifyPropertyChanged {
 		RatConfig.MinimalUi.ShowKappa = ShowKappa;
 		RatConfig.MinimalUi.ShowQuestHideoutTracker = ShowQuestHideoutTracker;
 		RatConfig.MinimalUi.ShowQuestHideoutTeamTracker = ShowQuestHideoutTeamTracker;
+		RatConfig.MinimalUi.ShowPriority = ShowPriority;
 		RatConfig.MinimalUi.ShowUpdated = ShowUpdated;
+		
+		// Notify MenuVM of config changes
+		RatScannerMain.Instance.MenuVM?.RefreshProperty("ShowPriority");
 		RatConfig.MinimalUi.Opacity = Opacity;
 
 		RatConfig.Tracking.ShowNonFIRNeeds = ShowNonFIRNeeds;

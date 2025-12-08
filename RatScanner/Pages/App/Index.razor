@@ -4,7 +4,6 @@
 @using RatScanner.TarkovDev.GraphQL;
 @using System.Diagnostics
 @inject MenuVM MenuVM
-@inject SettingsVM SettingsVM
 @implements IDisposable
 
 <MudGrid Class="pa-0" Spacing="0">
@@ -59,7 +58,6 @@
                 </div>
             </MudPaper>
         </MudItem>
-        @if (SettingsVM.ShowPriority) {
         <MudItem xs="12">
             <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">
                 <div class="d-flex align-center">
@@ -83,7 +81,6 @@
                 </div>
             </MudPaper>
         </MudItem>
-    }
         @if (MenuVM.ShowKappaNeeds == true) {
             <MudItem xs="12">
                 <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">

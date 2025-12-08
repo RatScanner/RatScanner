@@ -73,6 +73,13 @@ internal class MenuVM : INotifyPropertyChanged {
 
 	public bool ShowKappaNeeds => RatConfig.Tracking.ShowKappaNeeds;
 
+	public bool ShowPriority {
+		get => RatConfig.MinimalUi.ShowPriority;
+		private set {
+			OnPropertyChanged();
+		}
+	}
+
 	public List<KeyValuePair<string, KeyValuePair<int, int>>>? ItemTeamNeeds {
 		get {
 			if (!RatConfig.Tracking.TarkovTracker.Enable) return null;
@@ -114,6 +121,10 @@ internal class MenuVM : INotifyPropertyChanged {
 
 	protected virtual void OnPropertyChanged(string propertyName = null) {
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+	}
+
+	public void RefreshProperty(string propertyName) {
+		OnPropertyChanged(propertyName);
 	}
 
 	public void ModelPropertyChanged(object? sender, PropertyChangedEventArgs e) {
