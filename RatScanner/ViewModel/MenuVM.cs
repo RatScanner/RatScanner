@@ -59,6 +59,18 @@ internal class MenuVM : INotifyPropertyChanged {
 
 	public bool ItemNeeded => TaskRemaining + HideoutRemaining > 0;
 
+	public int PriorityScore {
+		get {
+			try {
+				return LastItem?.GetPriorityScore() ?? 0;
+			}
+			catch (Exception ex) {
+				Logger.LogWarning($"Error calculating priority score: {ex.Message}");
+				return 0;
+			}
+		}
+	}
+
 	public bool ShowKappaNeeds => RatConfig.Tracking.ShowKappaNeeds;
 
 	public List<KeyValuePair<string, KeyValuePair<int, int>>>? ItemTeamNeeds {

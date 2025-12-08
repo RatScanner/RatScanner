@@ -87,6 +87,7 @@ internal static class RatConfig {
 		internal static bool ShowKappa = false;
 		internal static bool ShowQuestHideoutTracker = true;
 		internal static bool ShowQuestHideoutTeamTracker = false;
+		internal static bool ShowPriority = true;
 		internal static int Opacity = 0;
 	}
 

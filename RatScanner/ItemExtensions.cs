@@ -127,4 +127,158 @@ public static class ItemExtensions {
 		if (item.Properties is not ItemPropertiesAmmo ammo) return Enumerable.Empty<Item>();
 		return TarkovDevAPI.GetItems().Where(i => i.Properties is ItemPropertiesAmmo a && ammo.Caliber == a.Caliber);
 	}
+
+	/// <summary>
+	/// Calculates priority score based on timeline of when item will be needed
+	/// Higher score = more immediate need
+	/// </summary>
+	public static int GetPriorityScore(this Item item, UserProgress? progress = null) {
+		progress ??= GetUserProgress();
+		
+		int score = 0;
+		
+		// Get task and hideout requirements
+		var (taskRemaining, kappaCount) = item.GetTaskRemaining(progress);
+		int hideoutRemaining = item.GetHideoutRemaining(progress);
+		
+		if (taskRemaining == 0 && hideoutRemaining == 0) return 0; // Not needed
+		
+		// Calculate timeline priority
+		score += GetTaskTimelinePriority(item, progress, taskRemaining, kappaCount);
+		score += GetHideoutTimelinePriority(item, progress, hideoutRemaining);
+		
+		// Bonus for high value items that are also needed
+		if (item.Avg24HPrice > 100000) score += 1;
+		
+		return score;
+	}
+	
+	private static int GetTaskTimelinePriority(Item item, UserProgress progress, int taskRemaining, int kappaCount) {
+		int priority = 0;
+		
+		if (taskRemaining == 0) return 0;
+		
+		Task[] tasks = TarkovDevAPI.GetTasks();
+		
+		foreach (Task task in tasks) {
+			// Skip completed tasks
+			if (progress.Tasks.Any(p => p.Id == task.Id && p.Complete)) continue;
+			
+			if (task.Objectives == null) continue;
+			foreach (ITaskObjective? objective in task.Objectives) {
+				if (objective == null) continue;
+				
+				bool itemNeeded = false;
+				if (objective is TaskObjectiveItem oGiveItem && oGiveItem.Type == "giveItem") {
+					itemNeeded = oGiveItem.Items?.Any(i => i?.Id == item.Id) ?? false;
+				} else if (objective is TaskObjectiveItem oPlantItem && oPlantItem.Type == "plantItem") {
+					itemNeeded = oPlantItem.Items?.Any(i => i?.Id == item.Id) ?? false;
+				} else if (objective is TaskObjectiveMark oMark && oMark.Type == "mark") {
+					itemNeeded = oMark.MarkerItem?.Id == item.Id;
+				} else if (objective is TaskObjectiveBuildItem oBuildWeapon && oBuildWeapon.Type == "buildWeapon") {
+					itemNeeded = oBuildWeapon.Item?.Id == item.Id;
+				}
+				
+				if (!itemNeeded) continue;
+				
+				// Check if this task is currently available (prerequisites met)
+				bool prerequisitesMet = AreTaskPrerequisitesMet(task, progress);
+				
+				if (prerequisitesMet) {
+					// Immediate priority - task is available
+					priority += task.KappaRequired == true ? 50 : 30;
+				} else {
+					// Future priority - task is locked
+					int dependencyDistance = GetTaskDependencyDistance(task, progress);
+					if (dependencyDistance <= 2) {
+						priority += task.KappaRequired == true ? 20 : 10;
+					} else {
+						priority += task.KappaRequired == true ? 10 : 5;
+					}
+				}
+			}
+		}
+		
+		return priority;
+	}
+	
+	private static int GetHideoutTimelinePriority(Item item, UserProgress progress, int hideoutRemaining) {
+		int priority = 0;
+		
+		if (hideoutRemaining == 0) return 0;
+		
+		HideoutStation[] stations = TarkovDevAPI.GetHideoutStations();
+		
+		foreach (HideoutStation station in stations) {
+			if (station.Levels == null) continue;
+			
+			foreach (HideoutStationLevel? level in station.Levels) {
+				if (level == null) continue;
+				
+				// Skip completed levels
+				if (progress.HideoutModules.Any(p => p.Id == level.Id && p.Complete)) continue;
+				
+				// Check if this level needs the item
+				bool itemNeeded = level?.ItemRequirements?.Any(req => req?.Item?.Id == item.Id) ?? false;
+				if (!itemNeeded) continue;
+				
+				// Check if previous level is completed (prerequisite met)
+				bool previousLevelCompleted = IsPreviousHideoutLevelCompleted(station, level, progress);
+				
+				if (previousLevelCompleted) {
+					// Immediate priority - previous level is done
+					priority += 25;
+				} else {
+					// Future priority - need to complete previous levels first
+					priority += 10;
+				}
+			}
+		}
+		
+		return priority;
+	}
+	
+	private static bool AreTaskPrerequisitesMet(Task task, UserProgress progress) {
+		if (task.TaskRequirements == null) return true;
+		
+		foreach (TaskStatusRequirement? req in task.TaskRequirements) {
+			if (req?.Task == null) continue;
+			
+			// Check if prerequisite task is completed
+			bool prereqCompleted = progress.Tasks.Any(p => p.Id == req.Task.Id && p.Complete);
+			if (!prereqCompleted) return false;
+		}
+		
+		return true;
+	}
+	
+	private static int GetTaskDependencyDistance(Task task, UserProgress progress) {
+		// Simple implementation: count how many prerequisite tasks are incomplete
+		if (task.TaskRequirements == null) return 0;
+		
+		int distance = 0;
+		foreach (TaskStatusRequirement? req in task.TaskRequirements) {
+			if (req?.Task == null) continue;
+			
+			bool prereqCompleted = progress.Tasks.Any(p => p.Id == req.Task.Id && p.Complete);
+			if (!prereqCompleted) distance++;
+		}
+		
+		return distance;
+	}
+	
+	private static bool IsPreviousHideoutLevelCompleted(HideoutStation station, HideoutStationLevel currentLevel, UserProgress progress) {
+		if (station.Levels == null) return true;
+		
+		// Convert to List to enable IndexOf and indexing
+		var levelsList = station.Levels.ToList();
+		
+		// Find the level number of current level
+		int currentLevelNum = levelsList.IndexOf(currentLevel);
+		if (currentLevelNum <= 0) return true; // First level has no prerequisites
+		
+		// Check if previous level is completed
+		var previousLevel = levelsList[currentLevelNum - 1];
+		return progress.HideoutModules.Any(p => p.Id == previousLevel.Id && p.Complete);
+	}
 }

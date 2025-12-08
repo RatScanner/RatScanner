@@ -26,6 +26,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 	public bool ShowKappa { get; set; }
 	public bool ShowQuestHideoutTracker { get; set; }
 	public bool ShowQuestHideoutTeamTracker { get; set; }
+	public bool ShowPriority { get; set; }
 	public int Opacity { get; set; }
 
 	public int ScreenWidth { get; set; }
@@ -77,6 +78,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 		ShowKappa = RatConfig.MinimalUi.ShowKappa;
 		ShowQuestHideoutTracker = RatConfig.MinimalUi.ShowQuestHideoutTracker;
 		ShowQuestHideoutTeamTracker = RatConfig.MinimalUi.ShowQuestHideoutTeamTracker;
+		ShowPriority = RatConfig.MinimalUi.ShowPriority;
 		ShowUpdated = RatConfig.MinimalUi.ShowUpdated;
 		Opacity = RatConfig.MinimalUi.Opacity;
 

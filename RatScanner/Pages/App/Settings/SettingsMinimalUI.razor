@@ -19,6 +19,7 @@
                     <MudCheckBox @bind-Checked="SettingsVM.ShowKappa" Label="Kappa Needed" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
                     <MudCheckBox @bind-Checked="SettingsVM.ShowQuestHideoutTracker" Label="Needed Quest & Hideout" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
                     <MudCheckBox @bind-Checked="SettingsVM.ShowQuestHideoutTeamTracker" Label="Needed Quest & Hideout Team" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+                    <MudCheckBox @bind-Checked="SettingsVM.ShowPriority" Label="Priority Score" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
                     <MudCheckBox @bind-Checked="SettingsVM.ShowUpdated" Label="Updated Timestamp" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
                     <MudSlider Step="10" @bind-Value="SettingsVM.Opacity" Min="0" Max="100" Dense="true" Color="Color.Primary">
                         <MudText Typo="Typo.subtitle2" Class="mt-0">Opacity: @SettingsVM.Opacity.ToString()</MudText>
