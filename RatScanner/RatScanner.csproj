@@ -98,6 +98,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Content Include="Localization/Translations/*.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
 		<Content Update="_Imports.razor">
 			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 		</Content>
