@@ -16,6 +16,17 @@ public enum UiLanguage {
 }
 
 public class LocalizationService {
+	private const string TranslationDirectory = "Localization/Translations";
+
+	private static readonly IReadOnlyDictionary<UiLanguage, string> TranslationFileMap = new Dictionary<UiLanguage, string> {
+		[UiLanguage.Spanish] = "es.json",
+		[UiLanguage.French] = "fr.json",
+		[UiLanguage.Polish] = "pl.json",
+		[UiLanguage.Portuguese] = "pt.json",
+		[UiLanguage.Russian] = "ru.json",
+		[UiLanguage.Chinese] = "zh.json",
+	};
+
 	private static readonly IReadOnlyDictionary<UiLanguage, string> CultureMap = new Dictionary<UiLanguage, string> {
 		[UiLanguage.English] = "en",
 		[UiLanguage.Spanish] = "es",
