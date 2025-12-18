@@ -2,34 +2,46 @@
 @layout SettingsLayout
 @inject SettingsVM SettingsVM
 @inject IJSRuntime JSRuntime;
+@inject LocalizationService Localizer;
 @using RatScanner.TarkovDev.GraphQL;
+@using System.Linq;
 @implements IDisposable
 <div>
     <MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
         <MudItem xs="12">
             <div class="d-flex align-center justify-center mx-2 mb-1">
-                <MudText Typo="Typo.subtitle1" Color="Color.Inherit">General Settings</MudText>
+                <MudText Typo="Typo.subtitle1" Color="Color.Inherit">@Localizer["GeneralSettingsTitle"]</MudText>
             </div>
         </MudItem>
         <MudItem xs="12">
             <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
                 <MudSlider @bind-Value="SettingsVM.ToolTipMilli" Min="0" Max="10000" Step="100" Color="Color.Info">
-                    <MudText Typo="Typo.subtitle2">Tooltip Duration: @SettingsVM.ToolTipMilli.ToString()</MudText>
+                    <MudText Typo="Typo.subtitle2">@Localizer.Format("TooltipDuration", SettingsVM.ToolTipMilli)</MudText>
                 </MudSlider>
             </MudPaper>
         </MudItem>
         <MudItem xs="12">
             <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudText Style="margin-bottom: 4px">Screen Resolution</MudText>
+                <MudSelect @bind-Value="SettingsVM.UiLanguage" T="UiLanguage" Label="@Localizer["InterfaceLanguage"]" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+                    @foreach (var language in GetUiLanguages())
+                    {
+                        <MudSelectItem Value="@language">@Localizer.GetLanguageDisplayName(language)</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12">
+            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
+                <MudText Style="margin-bottom: 4px">@Localizer["ScreenResolution"]</MudText>
                 <MudGrid Spacing="1">
                     <MudItem xs="4">
-                        <MudNumericField @bind-Value="SettingsVM.ScreenWidth" HideSpinButtons="true" Label="Width" Variant="Variant.Outlined" Margin="Margin.Dense" Min="100" Max="99999"></MudNumericField>
+                        <MudNumericField @bind-Value="SettingsVM.ScreenWidth" HideSpinButtons="true" Label="@Localizer["WidthLabel"]" Variant="Variant.Outlined" Margin="Margin.Dense" Min="100" Max="99999"></MudNumericField>
                     </MudItem>
                     <MudItem xs="4">
-                        <MudNumericField @bind-Value="SettingsVM.ScreenHeight" HideSpinButtons="true" Label="Height" Variant="Variant.Outlined" Margin="Margin.Dense" Min="100" Max="99999"></MudNumericField>
+                        <MudNumericField @bind-Value="SettingsVM.ScreenHeight" HideSpinButtons="true" Label="@Localizer["HeightLabel"]" Variant="Variant.Outlined" Margin="Margin.Dense" Min="100" Max="99999"></MudNumericField>
                     </MudItem>
                     <MudItem xs="4">
-                        <MudNumericField @bind-Value="SettingsVM.ScreenScale" Label="Scale" Variant="Variant.Outlined" HideSpinButtons="true" Converter="@percentageConverter" Margin="Margin.Dense" Min="0.1f" Max="8"></MudNumericField>
+                        <MudNumericField @bind-Value="SettingsVM.ScreenScale" Label="@Localizer["ScaleLabel"]" Variant="Variant.Outlined" HideSpinButtons="true" Converter="@percentageConverter" Margin="Margin.Dense" Min="0.1f" Max="8"></MudNumericField>
                     </MudItem>
                 </MudGrid>
             </MudPaper>
@@ -37,10 +49,10 @@
         <MudItem xs="12">
             <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
                 <MudGrid Spacing="0" Class="pa-0 ma-0">
-                    <MudCheckBox @bind-Checked="@SettingsVM.GameMode" Label="Use PVE data" Dense="true" Size="Size.Small" Class="pa-0 ma-0" Converter="@gameModeConverter"></MudCheckBox>
+                    <MudCheckBox @bind-Checked="@SettingsVM.GameMode" Label="@Localizer["UsePveData"]" Dense="true" Size="Size.Small" Class="pa-0 ma-0" Converter="@gameModeConverter"></MudCheckBox>
                     <!--<MudCheckBox @bind-Checked="@SettingsVM.MinimizeToTray" Label="Minimize to tray" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>-->
-                    <MudCheckBox @bind-Checked="@SettingsVM.AlwaysOnTop" Label="Always on top" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    <MudCheckBox @bind-Checked="@SettingsVM.LogDebug" Label="Log debug info" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+                    <MudCheckBox @bind-Checked="@SettingsVM.AlwaysOnTop" Label="@Localizer["AlwaysOnTop"]" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+                    <MudCheckBox @bind-Checked="@SettingsVM.LogDebug" Label="@Localizer["LogDebugInfo"]" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
                 </MudGrid>
             </MudPaper>
         </MudItem>
@@ -62,6 +74,8 @@
                 return 1;
             },
         };
+
+    private IEnumerable<UiLanguage> GetUiLanguages() => Localizer.SupportedLanguages.OrderBy(language => (int)language);
 
     protected override void OnInitialized() {
         SettingsVM.PropertyChanged += PropertyChangeHandler;
