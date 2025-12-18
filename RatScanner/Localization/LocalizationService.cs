@@ -497,7 +497,9 @@ public class LocalizationService {
 
 		foreach (var pair in TranslationFileMap) {
 			string filePath = Path.Combine(AppContext.BaseDirectory, TranslationDirectory, pair.Value);
-			if (TranslationLoader.TryLoad(filePath, out var loadedTranslations)) translations[pair.Key] = loadedTranslations;
+			translations[pair.Key] = TranslationLoader.TryLoad(filePath, out var loadedTranslations)
+				? loadedTranslations
+				: translations[UiLanguage.English];
 		}
 
 		return translations;
