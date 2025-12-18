@@ -3,8 +3,16 @@
 @using System.Diagnostics;
 @using static RatScanner.Pages.InteractableOverlay.Index
 
-<MudPaper Class="pa-2" Elevation="3" Style="">
-    <MudStack Row="true" Justify="Justify.SpaceBetween" Style="height: 6vh;">
+<MudPaper Class="pa-2 overflow-hidden" Elevation="3" Style="@(Detail == DetailAmount.Max ? "" : "cursor: pointer;")" @onclick="HandleClick">
+    @{
+        string minHeight = Detail switch {
+            DetailAmount.Min => "40",
+            DetailAmount.Med => "40",
+            DetailAmount.Max => "80",
+        };
+        minHeight = $"min-height: {minHeight}px; height: 6vh;";
+    }
+    <MudStack Row="true" Justify="Justify.SpaceBetween" Style="@minHeight">
         <!--Left side of the search result item-->
         <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" Style="">
             <MudPaper Style="aspect-ratio : 1 / 1;" Outlined="true">
@@ -28,14 +36,18 @@
             }
 
             <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Start">
-                <MudText Class="ellipsis" Typo="Typo.h6" Style="max-width: 16vw">
-                    @Item.Name
-                </MudText>
                 @if (Detail != DetailAmount.Min) {
+                    <MudText Class="ellipsis" Typo="Typo.h6" Style="max-width: 16vw">
+                        @Item.Name
+                    </MudText>
                     <MudText Align="Align.Center">
                         @Item.ShortName
                         <MudIconButton Icon="@Constants.Icon.TarkovDev" Size="Size.Small" OnClick=@(() => OpenURL($"https://tarkov.dev/item/{Item.Id}")) />
                         <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" OnClick=@(() => OpenURL(Item.WikiLink)) />
+                    </MudText>
+                } else {
+                    <MudText Class="ellipsis" Typo="Typo.body1">
+                        @Item.Name
                     </MudText>
                 }
             </MudStack>
@@ -125,6 +137,13 @@
 
     [Parameter]
     public required Item Item { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    private void HandleClick() {
+        OnClick.InvokeAsync();
+    }
 
     private void OpenURL(string? url) {
         if (string.IsNullOrEmpty(url)) return;

@@ -57,16 +57,16 @@
                     </MudTextField>
                 </MudPaper>
 
-                <MudStack Spacing="2" Class="py-2 overflow-visible" Style="height:50vh">
+                <MudStack Spacing="2" Class="py-2 overflow-visible" Style="max-height:50vh; overflow-y: auto;">
                     @for (int _i = 0; _i < _searchResults.Count(); _i++) {
                         int i = _i;
                         SearchResult searchResult = _searchResults.ElementAt(i);
                         
                         @if (searchResult.Data is Item item) {
-                            <ItemSearchResult Item="@item" Detail="Pages.InteractableOverlay.Index.DetailAmount.Min" />
+                            <ItemSearchResult Item="@item" OnClick="@(() => SelectResult(i))" />
                         } 
                         else if (searchResult.Data is TTask task) {
-                            <TaskSearchResult Task="@task" Detail="Pages.InteractableOverlay.Index.DetailAmount.Min" />
+                            <TaskSearchResult Task="@task" OnClick="@(() => SelectResult(i))" />
                         } 
                         @* TODO: Re-enable map search results when MapViewer is fixed
                         else if (searchResult.Data is Map map) {
@@ -79,84 +79,10 @@
         </MudItem>
 
         <!-- Last Scanned Item -->
-        @if (MenuVM.LastItem != null) {
-            <CompactItemResult Item="@MenuVM.LastItem" />
+        @if (_searchResult?.Data is Item item)
+        {
+            <ItemSearchResult Item="@item" Detail="Pages.InteractableOverlay.Index.DetailAmount.Max" />
         }
-
-        <!-- Quick Stats -->
-        <MudPaper Class="pa-2" Elevation="2">
-            <MudStack Row="true" Justify="Justify.SpaceAround">
-                <MudStack Spacing="0" AlignItems="AlignItems.Center">
-                    <MudText Typo="Typo.h6" Color="@(MenuVM.TaskRemaining > 0 ? Color.Success : Color.Default)">
-                        @MenuVM.TaskRemaining
-                    </MudText>
-                    <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
-                        <MudIcon Icon="@Icons.Material.Filled.Checklist" Size="Size.Small" />
-                        <MudText Typo="Typo.caption">Quests</MudText>
-                    </MudStack>
-                </MudStack>
-
-                <MudDivider Vertical="true" FlexItem="true" />
-
-                <MudStack Spacing="0" AlignItems="AlignItems.Center">
-                    <MudText Typo="Typo.h6" Color="@(MenuVM.HideoutRemaining > 0 ? Color.Success : Color.Default)">
-                        @MenuVM.HideoutRemaining
-                    </MudText>
-                    <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
-                        <MudIcon Icon="@Icons.Material.Filled.House" Size="Size.Small" />
-                        <MudText Typo="Typo.caption">Hideout</MudText>
-                    </MudStack>
-                </MudStack>
-
-                @if (MenuVM.ShowKappaNeeds == true) {
-                    <MudDivider Vertical="true" FlexItem="true" />
-
-                    <MudStack Spacing="0" AlignItems="AlignItems.Center">
-                        <MudText Typo="Typo.h6" Color="@(MenuVM.TaskRemainingKappa > 0 ? Color.Warning : Color.Default)">
-                            @MenuVM.TaskRemainingKappa
-                        </MudText>
-                        <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
-                            <MudIcon Icon="@Icons.Material.Filled.EmojiEvents" Size="Size.Small" />
-                            <MudText Typo="Typo.caption">Kappa</MudText>
-                        </MudStack>
-                    </MudStack>
-                }
-            </MudStack>
-        </MudPaper>
-
-        <!-- Team Needs (if any) -->
-        @if (MenuVM.ItemTeamNeeds != null && MenuVM.ItemTeamNeeds.Any()) {
-            <MudPaper Class="pa-2" Elevation="2">
-                <MudText Typo="Typo.subtitle2" Class="mb-1">Team Needs</MudText>
-                @foreach (var need in MenuVM.ItemTeamNeeds) {
-                    <MudStack Row="true" Justify="Justify.SpaceBetween" Class="py-1">
-                        <MudText Typo="Typo.body2">@need.Key</MudText>
-                        <MudStack Row="true" Spacing="2">
-                            <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
-                                <MudIcon Icon="@Icons.Material.Filled.Checklist" Size="Size.Small" />
-                                <MudText Typo="Typo.body2">@need.Value.Key</MudText>
-                            </MudStack>
-                            <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
-                                <MudIcon Icon="@Icons.Material.Filled.House" Size="Size.Small" />
-                                <MudText Typo="Typo.body2">@need.Value.Value</MudText>
-                            </MudStack>
-                        </MudStack>
-                    </MudStack>
-                }
-            </MudPaper>
-        }
-
-        <!-- Quick Links for current item -->
-        <MudStack Row="true" Spacing="2">
-            <MudPaper Class="flex-1 pa-2 d-flex align-center justify-center" Elevation="2" 
-                        Style="cursor: pointer;" @onclick="OpenWiki">
-                <img src="https://static.wikia.nocookie.net/escapefromtarkov_gamepedia/images/e/e6/Site-logo.png" height="20px" />
-            </MudPaper>
-            <MudPaper Class="flex-1 pa-2 d-flex align-center justify-center" Elevation="2" 
-                        Style="cursor: pointer;" @onclick="OpenTarkovDev">
-                <img src="https://api.ratscanner.com/v3/file/tarkov-dev-logo.png" height="16px" />
-            </MudPaper>
-        </MudStack>
     </MudStack>
 
     <!-- Resize Grip -->
@@ -242,15 +168,21 @@
         text-overflow: ellipsis;
         white-space: nowrap;
     }
+
+    .selected-result {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
 </style>
 
 @code {
     private MudTextField<string> _searchTextField = null!;
     private List<TarkovDev.GraphQL.Item>? _items;
     private string _searchText;
-    private MudAutocomplete<TarkovDev.GraphQL.Item> _searchBox { get; set; } = null!;
     private IEnumerable<SearchResult> _searchResults = new List<SearchResult>();
     private readonly SearchService _searchService = new();
+    private int _selectedResultIndex { get; set; } = 0;
+
+    private SearchResult _searchResult;
 
     protected override void OnInitialized() {
         MenuVM.PropertyChanged += PropertyChangeHandler;
@@ -277,22 +209,6 @@
         PageSwitcher.Instance.Close();
     }
 
-    // private async void ExecuteSearch(string value) {
-    //     if (string.IsNullOrWhiteSpace(value)) {
-    //         _searchResults = new List<SearchResult>();
-    //         await InvokeAsync(StateHasChanged);
-    //         return;
-    //     }
-
-    //     var sanitizedValue = _searchService.SanitizeSearch(value);
-    //     var results = Enumerable.Empty<SearchResult>();
-    //     results = results.Concat(await _searchService.SearchItemsAsync(sanitizedValue));
-    //     results = results.Where(result => result != null && result.Data != null);
-    //     results = results.OrderBy(result => result.Score).Take(3);
-    //     _searchResults = results;
-    //     await InvokeAsync(StateHasChanged);
-    // }
-
     private async void ExecuteSearch(string value)
     {
         var sanitizedValue = _searchService.SanitizeSearch(value);
@@ -304,24 +220,15 @@
         results = results.Where(result => result != null && result.Data != null);
         results = results.OrderBy(result => result.Score).Take(4);
         _searchResults = results;
+        _selectedResultIndex = 0;
     }
 
-    private string SanitizeSearch(string value)
-    {
-        value = value.ToLower().Trim();
-        value = new string(value.Where(c => char.IsLetterOrDigit(c) || c == ' ').ToArray());
-        return value;
-    }
-
-    private void ClearSearch() {
-        _searchResults = new List<SearchResult>();
-    }
-
-    private async void SetSearchItem(TarkovDev.GraphQL.Item item)
-    {
-        if (item == null) return;
-        MenuVM.ItemScans.Enqueue(new DefaultItemScan(item));
-        await _searchBox.Clear();
+    private void SelectResult(int index) {
+        _selectedResultIndex = index;
+        _searchResult = _searchResults.ElementAt(_selectedResultIndex);
+        _searchTextField.Clear();
+        _searchResults = [];
+        StateHasChanged();
     }
 
     private void OpenWiki() {

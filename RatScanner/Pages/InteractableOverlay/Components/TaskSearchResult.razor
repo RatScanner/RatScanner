@@ -3,7 +3,7 @@
 @using System.Diagnostics;
 @using static RatScanner.Pages.InteractableOverlay.Index
 
-<MudPaper Class="pa-2" Elevation="3" Style="">
+<MudPaper Class="pa-2 overflow-hidden" Elevation="3" Style="@(Detail == DetailAmount.Max ? "" : "cursor: pointer;")" @onclick="HandleClick">
     <MudStack Row="true" Justify="Justify.SpaceBetween" Style="height: 6vh;">
         <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1;">
             <MudStack Justify="Justify.Center">
@@ -13,13 +13,17 @@
             </MudStack>
 
             <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Start">
-                <MudText Class="ellipsis" Typo="Typo.h6" Style="max-width: 16vw">
-                    @Task.Name
-                </MudText>
                 @if (Detail != DetailAmount.Min) {
+                    <MudText Class="ellipsis" Typo="Typo.h6" Style="max-width: 16vw">
+                        @Task.Name
+                    </MudText>
                     <MudText Align="Align.Center">
                         <MudIconButton Icon="@Constants.Icon.TarkovDev" Size="Size.Small" OnClick=@(() => OpenURL($"https://tarkov.dev/task/{Task.Id}")) />
                         <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" OnClick=@(() => OpenURL(Task.WikiLink)) />
+                    </MudText>
+                } else {
+                    <MudText Class="ellipsis" Typo="Typo.body1">
+                        @Task.Name
                     </MudText>
                 }
             </MudStack>
@@ -80,6 +84,13 @@
 
     [Parameter]
     public EventCallback<(TTask task, ITaskObjective objective)> OnMapClick { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    private void HandleClick() {
+        OnClick.InvokeAsync();
+    }
 
     private bool HasMapForObjective(ITaskObjective objective) {
         // Check if objective has zones with positions

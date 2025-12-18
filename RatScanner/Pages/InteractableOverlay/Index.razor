@@ -34,12 +34,15 @@
                         SearchResult searchResult = _searchResults.ElementAt(i);
                         
                         @if (searchResult.Data is Item item) {
-                            <ItemSearchResult Item="@item" IsExpanded="@(i == 0)" />
+                            <ItemSearchResult Item="@item" 
+                                            Detail="@(i == _selectedResultIndex ? DetailAmount.Max : DetailAmount.Med)" 
+                                            OnClick="@(() => SelectResult(i))" />
                         } 
                         else if (searchResult.Data is TTask task) {
                             <TaskSearchResult Task="@task" 
-                                            IsExpanded="@(i == 0)" 
-                                            OnMapClick="@((tuple) => OpenMapForObjective(tuple.task, tuple.objective))" />
+                                            Detail="@(i == _selectedResultIndex ? DetailAmount.Max : DetailAmount.Med)" 
+                                            OnMapClick="@((tuple) => OpenMapForObjective(tuple.task, tuple.objective))"
+                                            OnClick="@(() => SelectResult(i))" />
                         } 
                         @* TODO: Re-enable map search results when MapViewer is fixed
                         else if (searchResult.Data is Map map) {
@@ -68,6 +71,7 @@
     private string _searchText { get; set; } = "";
     private IEnumerable<SearchResult> _searchResults { get; set; } = new List<SearchResult>();
     private readonly SearchService _searchService = new();
+    private int _selectedResultIndex { get; set; } = 0;
 
     // Map viewer state
     private Map? _selectedMap = null;
@@ -92,6 +96,12 @@
         results = results.Where(result => result != null && result.Data != null);
         results = results.OrderBy(result => result.Score).Take(4);
         _searchResults = results;
+        _selectedResultIndex = 0;
+    }
+
+    private void SelectResult(int index) {
+        _selectedResultIndex = index;
+        StateHasChanged();
     }
 
     private void OpenMapForObjective(TTask task, ITaskObjective objective) {
