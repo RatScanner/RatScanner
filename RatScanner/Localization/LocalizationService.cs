@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 
 namespace RatScanner.Localization;
 
@@ -47,8 +48,11 @@ public class LocalizationService {
 		[UiLanguage.Chinese] = "中文",
 	};
 
-	private static readonly IReadOnlyDictionary<UiLanguage, IReadOnlyDictionary<string, string>> Translations = new Dictionary<UiLanguage, IReadOnlyDictionary<string, string>> {
-		[UiLanguage.English] = new Dictionary<string, string> {
+	private static readonly IReadOnlyDictionary<UiLanguage, IReadOnlyDictionary<string, string>> Translations = BuildTranslations();
+
+	private static IReadOnlyDictionary<UiLanguage, IReadOnlyDictionary<string, string>> BuildTranslations() {
+		Dictionary<UiLanguage, IReadOnlyDictionary<string, string>> translations = new() {
+			[UiLanguage.English] = new Dictionary<string, string> {
 			["DashboardNav"] = "Dashboard",
 			["SettingsNavGroup"] = "Settings",
 			["GeneralNav"] = "General",
@@ -489,7 +493,15 @@ public class LocalizationService {
 			["RemoveItem"] = "移除物品",
 			["NoneLabel"] = "无",
 		},
-	};
+		};
+
+		foreach (var pair in TranslationFileMap) {
+			string filePath = Path.Combine(AppContext.BaseDirectory, TranslationDirectory, pair.Value);
+			if (TranslationLoader.TryLoad(filePath, out var loadedTranslations)) translations[pair.Key] = loadedTranslations;
+		}
+
+		return translations;
+	}
 
 	private UiLanguage _currentLanguage;
 
