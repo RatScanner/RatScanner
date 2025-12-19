@@ -85,7 +85,7 @@ public class LocalizationService {
 				["BlurBehindSearch"] = "Blur Behind Search",
 				["OpenSearchOverlay"] = "Open Search Overlay",
 				["TrackingSettingsTitle"] = "Tracking Settings",
-				["ShowNonFirNeeds"] = "Show Non-FIR Needs",
+				["ShowNonFIRNeeds"] = "Show Non-FIR Needs",
 				["ShowKappaNeeds"] = "Show Kappa Needs",
 				["BackendLabel"] = "Backend",
 				["ApiToken"] = "API Token",
