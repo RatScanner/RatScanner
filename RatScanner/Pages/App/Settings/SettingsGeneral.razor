@@ -75,7 +75,7 @@
             },
         };
 
-    private IEnumerable<UiLanguage> GetUiLanguages() => Localizer.SupportedLanguages.OrderBy(language => (int)language);
+    private IEnumerable<UiLanguage> GetUiLanguages() => Localizer.SupportedLanguages.OrderBy(language => language.ToString());
 
     protected override void OnInitialized() {
         SettingsVM.PropertyChanged += PropertyChangeHandler;
