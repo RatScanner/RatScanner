@@ -60,6 +60,9 @@ public class RatScannerMain : INotifyPropertyChanged {
 		Logger.Clear();
 
 		Logger.LogInfo("----- RatScanner " + RatConfig.Version + " -----");
+		Logger.LogInfo("Checking for updates...");
+		CheckForUpdates();
+
 		Logger.LogInfo($"Screen Info: {RatConfig.ScreenWidth}x{RatConfig.ScreenHeight} at {RatConfig.ScreenScale * 100}%");
 
 		Logger.LogInfo("Initializing TarkovDev API...");
@@ -92,9 +95,6 @@ public class RatScannerMain : INotifyPropertyChanged {
 
 		new Thread(() => {
 			Thread.Sleep(1000);
-			Logger.LogInfo("Checking for updates...");
-			CheckForUpdates();
-
 			Logger.LogInfo("Loading TarkovTracker data...");
 			if (RatConfig.Tracking.TarkovTracker.Enable) {
 				TarkovTrackerDB.Token = RatConfig.Tracking.TarkovTracker.Token;
