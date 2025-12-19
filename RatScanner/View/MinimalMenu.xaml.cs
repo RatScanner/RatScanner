@@ -17,7 +17,7 @@ public partial class MinimalMenu : UserControl, ISwitchable {
 
 	private MinimalMenu() {
 		InitializeComponent();
-		DataContext = new MenuVM(RatScannerMain.Instance);
+		DataContext = RatScannerMain.Instance.MenuVM ?? new MenuVM(RatScannerMain.Instance);
 		UpdateElements();
 	}
 

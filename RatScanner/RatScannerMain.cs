@@ -47,6 +47,8 @@ public class RatScannerMain : INotifyPropertyChanged {
 
 	public TarkovTrackerDB TarkovTrackerDB;
 
+	internal ViewModel.MenuVM? MenuVM;
+
 	internal RatEyeEngine RatEyeEngine;
 
 	public event PropertyChangedEventHandler? PropertyChanged;
