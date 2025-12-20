@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
 using RatScanner.TarkovDev.GraphQL;
-using RatScanner.Localization;
 using RatStash;
 using System;
 using System.Diagnostics;
@@ -49,6 +48,8 @@ internal static class RatConfig {
 		internal static string Debug = Path.Combine(Base, "Debug");
 		internal static string Updater = Path.Combine(Base, "RatUpdater.exe");
 		internal static string LogFile = Path.Combine(Base, "Log.txt");
+
+		internal static string i18nDir => Path.Combine(Base, "i18n");
 	}
 
 	// Name Scan options

@@ -23,9 +23,8 @@
         <MudItem xs="12">
             <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
                 <MudSelect @bind-Value="SettingsVM.UiLanguage" T="UiLanguage" Label="@Localizer["InterfaceLanguage"]" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
-                    @foreach (var language in GetUiLanguages())
-                    {
-                        <MudSelectItem Value="@language">@Localizer.GetLanguageDisplayName(language)</MudSelectItem>
+                    @foreach (var language in GetUiLanguages()) {
+                        <MudSelectItem Value="@language">@language.ToCultureName()</MudSelectItem>
                     }
                 </MudSelect>
             </MudPaper>
@@ -62,20 +61,20 @@
 @code {
 
     MudBlazor.Converter<GameMode, bool?> gameModeConverter = new MudBlazor.Converter<GameMode, bool?> {
-            SetFunc = value => value == GameMode.Pve,
-            GetFunc = value => value ?? false ? GameMode.Pve : GameMode.Regular,
-        };
+        SetFunc = value => value == GameMode.Pve,
+        GetFunc = value => value ?? false ? GameMode.Pve : GameMode.Regular,
+    };
 
     Converter<float> percentageConverter = new Converter<float> {
-            SetFunc = value => (int)(value * 100) + "%",
-            GetFunc = text => {
-                text = text?.TrimEnd('%') ?? "";
-                if (int.TryParse(text, out var num)) return num / 100f;
-                return 1;
-            },
-        };
+        SetFunc = value => (int)(value * 100) + "%",
+        GetFunc = text => {
+            text = text?.TrimEnd('%') ?? "";
+            if (int.TryParse(text, out var num)) return num / 100f;
+            return 1;
+        },
+    };
 
-    private IEnumerable<UiLanguage> GetUiLanguages() => Localizer.SupportedLanguages.OrderBy(language => language.ToString());
+    private IEnumerable<UiLanguage> GetUiLanguages() => (Enum.GetValues(typeof(UiLanguage)) as IEnumerable<UiLanguage>).OrderBy(l => l.ToCultureName());
 
     protected override void OnInitialized() {
         SettingsVM.PropertyChanged += PropertyChangeHandler;

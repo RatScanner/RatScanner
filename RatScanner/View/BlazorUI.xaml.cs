@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Web.WebView2.Core;
 using MudBlazor.Services;
-using RatScanner.Localization;
 using RatScanner.ViewModel;
 using System;
 using System.Diagnostics;

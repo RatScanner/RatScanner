@@ -1,5 +1,4 @@
-﻿using RatScanner.Localization;
-using RatStash;
+﻿using RatStash;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;

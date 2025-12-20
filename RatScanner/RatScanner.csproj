@@ -88,6 +88,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Content Remove="Data\maps.json" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 
@@ -95,12 +99,6 @@
 		<Resource Include="Resources\RatLogoMedium.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Resource>
-	</ItemGroup>
-
-	<ItemGroup>
-		<Content Include="Localization/Translations/*.json">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
 	</ItemGroup>
 
 	<ItemGroup>
