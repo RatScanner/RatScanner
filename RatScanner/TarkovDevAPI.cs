@@ -27,7 +27,7 @@ public static class TarkovDevAPI {
 	}
 
 	const string ApiEndpoint = "https://api.tarkov.dev/graphql";
-	const int BatchSize = 1000;
+	const int BatchSize = 200;
 
 	private static readonly ConcurrentDictionary<string, (long expire, object response)> Cache = new();
 	private static readonly ConcurrentDictionary<string, bool> PendingRequests = new();
