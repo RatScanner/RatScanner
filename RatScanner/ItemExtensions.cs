@@ -89,6 +89,8 @@ public static class ItemExtensions {
 	public static int GetHideoutRemaining(this Item item, UserProgress? progress = null) {
 		progress ??= GetUserProgress();
 
+		bool showNonFir = RatConfig.Tracking.ShowNonFIRNeeds;
+
 		int count = 0;
 		HideoutStation[] stations = TarkovDevAPI.GetHideoutStations();
 
@@ -103,6 +105,9 @@ public static class ItemExtensions {
 				if (level?.ItemRequirements == null) continue;
 				foreach (RequirementItem? requiredItem in level.ItemRequirements) {
 					if (requiredItem?.Item?.Id != item.Id) continue;
+
+					bool FoundInRaid = bool.Parse((from x in requiredItem.Attributes where x.Type == "foundInRaid" select x.Value).FirstOrDefault("true"));
+					if (!showNonFir && !FoundInRaid) continue;                    // Skip if item is not FIR
 
 					count += requiredItem.Count;
 					List<Progress> objectiveProgress = progress.HideoutParts.Where(p => p.Id == requiredItem.Id).ToList();

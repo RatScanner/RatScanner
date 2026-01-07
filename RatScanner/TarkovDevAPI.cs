@@ -354,6 +354,7 @@ public static class TarkovDevAPI {
 		return new QueryQueryBuilder().WithHideoutStations(new HideoutStationQueryBuilder().WithAllScalarFields()
 			.WithLevels(new HideoutStationLevelQueryBuilder().WithAllScalarFields()
 				.WithItemRequirements(new RequirementItemQueryBuilder().WithAllScalarFields()
+					.WithAttributes(new ItemAttributeQueryBuilder().WithAllScalarFields())
 					.WithItem(new ItemQueryBuilder().WithAllScalarFields()))
 				.WithStationLevelRequirements(new RequirementHideoutStationLevelQueryBuilder().WithAllScalarFields()
 					.WithStation(new HideoutStationQueryBuilder().WithAllScalarFields()))
