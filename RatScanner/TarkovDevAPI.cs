@@ -341,46 +341,33 @@ public static class TarkovDevAPI {
 
 	private static string ItemsQuery() => ItemsQuery(RatConfig.NameScan.Language.ToTarkovDevType(), RatConfig.GameMode);
 	private static string ItemsQuery(LanguageCode language, GameMode gameMode) {
-		string lang = ToGraphQlEnum(language);
-		string mode = ToGraphQlEnum(gameMode);
-		return $@"query {{
-  data: items(lang: {lang}, gameMode: {mode}) {{
-    id
-    name
-    shortName
-    iconLink
-    baseImageLink
-    link
-    wikiLink
-    avg24hPrice
-    width
-    height
-    updated
-    types
-    properties {{
-      __typename
-      ... on ItemPropertiesAmmo {{
-        caliber
-        damage
-        penetrationPower
-        fragmentationChance
-      }}
-    }}
-    sellFor {{
-      priceRUB
-      vendor {{
-        __typename
-        ... on TraderOffer {{
-          name
-          trader {{
-            name
-            imageLink
-          }}
-        }}
-      }}
-    }}
-  }}
-}}";
+		return new QueryQueryBuilder().WithItems(new ItemQueryBuilder().WithAllScalarFields()
+		.WithProperties(new ItemPropertiesQueryBuilder().WithAllScalarFields()
+			.WithItemPropertiesAmmoFragment(new ItemPropertiesAmmoQueryBuilder().WithAllScalarFields())
+			.WithItemPropertiesFoodDrinkFragment(new ItemPropertiesFoodDrinkQueryBuilder().WithAllScalarFields()
+				.WithStimEffects(new StimEffectQueryBuilder().WithAllScalarFields()))
+			.WithItemPropertiesStimFragment(new ItemPropertiesStimQueryBuilder().WithAllScalarFields()
+				.WithStimEffects(new StimEffectQueryBuilder().WithAllScalarFields()))
+			.WithItemPropertiesMedicalItemFragment(new ItemPropertiesMedicalItemQueryBuilder().WithAllScalarFields())
+			.WithItemPropertiesMedKitFragment(new ItemPropertiesMedKitQueryBuilder().WithAllScalarFields()))
+		.WithSellFor(new ItemPriceQueryBuilder().WithAllScalarFields()
+			.WithVendor(new VendorQueryBuilder().WithAllScalarFields()
+				.WithTraderOfferFragment(new TraderOfferQueryBuilder().WithAllScalarFields()
+					.WithTrader(new TraderQueryBuilder().WithAllScalarFields()))))
+		.WithBuyFor(new ItemPriceQueryBuilder().WithAllScalarFields()
+			.WithVendor(new VendorQueryBuilder().WithAllScalarFields()
+				.WithTraderOfferFragment(new TraderOfferQueryBuilder().WithAllScalarFields()
+					.WithTrader(new TraderQueryBuilder().WithAllScalarFields()))))
+		.WithCategory(new ItemCategoryQueryBuilder().WithAllScalarFields())
+		.WithCategories(new ItemCategoryQueryBuilder().WithAllScalarFields())
+		.WithUsedInTasks(new TaskQueryBuilder().WithId())
+		.WithReceivedFromTasks(new TaskQueryBuilder().WithId())
+		.WithBartersFor(new BarterQueryBuilder().WithId())
+		.WithBartersUsing(new BarterQueryBuilder().WithId())
+		.WithCraftsFor(new CraftQueryBuilder().WithId())
+		.WithCraftsUsing(new CraftQueryBuilder().WithId())
+		.WithTypes()
+		, alias: "data", lang: language, gameMode: gameMode).Build();
 	}
 
 	#endregion
@@ -392,64 +379,53 @@ public static class TarkovDevAPI {
 
 	private static string TasksQuery() => TasksQuery(RatConfig.NameScan.Language.ToTarkovDevType(), RatConfig.GameMode);
 	private static string TasksQuery(LanguageCode language, GameMode gameMode) {
-		string lang = ToGraphQlEnum(language);
-		string mode = ToGraphQlEnum(gameMode);
-		return $@"query {{
-  data: tasks(lang: {lang}, gameMode: {mode}) {{
-    id
-    name
-    taskImageLink
-    wikiLink
-    kappaRequired
-    trader {{
-      name
-      imageLink
-    }}
-    objectives {{
-      __typename
-      id
-      type
-      description
-      ... on TaskObjectiveItem {{
-        count
-        foundInRaid
-        items {{ id }}
-        zones {{
-          map {{ id }}
-          position {{ x y z }}
-        }}
-      }}
-      ... on TaskObjectiveMark {{
-        markerItem {{ id }}
-        zones {{
-          map {{ id }}
-          position {{ x y z }}
-        }}
-      }}
-      ... on TaskObjectiveBuildItem {{
-        item {{ id }}
-      }}
-      ... on TaskObjectiveBasic {{
-        zones {{
-          map {{ id }}
-          position {{ x y z }}
-        }}
-      }}
-      ... on TaskObjectiveQuestItem {{
-        zones {{
-          map {{ id }}
-          position {{ x y z }}
-        }}
-      }}
-      ... on TaskObjectiveUseItem {{
-        zones {{
-          map {{ id }}
-          position {{ x y z }}
-        }}
-      }}
-    }}
-  }}
-}}";
+		return new QueryQueryBuilder().WithTasks(new TaskQueryBuilder().WithAllScalarFields()
+			.WithKappaRequired()
+			.WithMap(new MapQueryBuilder().WithAllScalarFields())
+			.WithTrader(new TraderQueryBuilder().WithAllScalarFields())
+			.WithObjectives(new TaskObjectiveQueryBuilder().WithAllScalarFields()
+				.WithTaskObjectiveBasicFragment(new TaskObjectiveBasicQueryBuilder().WithAllScalarFields()
+					.WithZones(new TaskZoneQueryBuilder().WithMap(new MapQueryBuilder().WithId()).WithPosition(new MapPositionQueryBuilder().WithAllScalarFields())))
+
+				.WithTaskObjectiveBuildItemFragment(new TaskObjectiveBuildItemQueryBuilder().WithAllScalarFields()
+					.WithItem(new ItemQueryBuilder().WithAllScalarFields()))
+
+				.WithTaskObjectiveExperienceFragment(new TaskObjectiveExperienceQueryBuilder().WithAllScalarFields())
+
+				.WithTaskObjectiveExtractFragment(new TaskObjectiveExtractQueryBuilder().WithAllScalarFields())
+
+				.WithTaskObjectiveItemFragment(new TaskObjectiveItemQueryBuilder().WithAllScalarFields()
+					.WithZones(new TaskZoneQueryBuilder().WithMap(new MapQueryBuilder().WithId()).WithPosition(new MapPositionQueryBuilder().WithAllScalarFields()))
+					.WithItems(new ItemQueryBuilder().WithAllScalarFields()))
+
+				.WithTaskObjectiveMarkFragment(new TaskObjectiveMarkQueryBuilder().WithAllScalarFields()
+					.WithZones(new TaskZoneQueryBuilder().WithMap(new MapQueryBuilder().WithId()).WithPosition(new MapPositionQueryBuilder().WithAllScalarFields()))
+					.WithMarkerItem(new ItemQueryBuilder().WithAllScalarFields()))
+
+				.WithTaskObjectivePlayerLevelFragment(new TaskObjectivePlayerLevelQueryBuilder().WithAllScalarFields())
+
+				.WithTaskObjectiveQuestItemFragment(new TaskObjectiveQuestItemQueryBuilder().WithAllScalarFields()
+					.WithZones(new TaskZoneQueryBuilder().WithMap(new MapQueryBuilder().WithId()).WithPosition(new MapPositionQueryBuilder().WithAllScalarFields()))
+					.WithQuestItem(new QuestItemQueryBuilder().WithAllScalarFields()))
+
+				.WithTaskObjectiveShootFragment(new TaskObjectiveShootQueryBuilder().WithAllScalarFields())
+
+				.WithTaskObjectiveSkillFragment(new TaskObjectiveSkillQueryBuilder().WithAllScalarFields())
+
+				.WithTaskObjectiveTaskStatusFragment(new TaskObjectiveTaskStatusQueryBuilder().WithAllScalarFields())
+
+				.WithTaskObjectiveTraderLevelFragment(new TaskObjectiveTraderLevelQueryBuilder().WithAllScalarFields()
+					.WithTrader(new TraderQueryBuilder().WithAllScalarFields()))
+
+				.WithTaskObjectiveTraderStandingFragment(new TaskObjectiveTraderStandingQueryBuilder().WithAllScalarFields()
+					.WithTrader(new TraderQueryBuilder().WithAllScalarFields()))
+
+				.WithTaskObjectiveUseItemFragment(new TaskObjectiveUseItemQueryBuilder().WithAllScalarFields()
+					.WithZones(new TaskZoneQueryBuilder().WithMap(new MapQueryBuilder().WithId()).WithPosition(new MapPositionQueryBuilder().WithAllScalarFields()))
+					.WithUseAny(new ItemQueryBuilder().WithAllScalarFields())))
+			.WithTaskRequirements(new TaskStatusRequirementQueryBuilder().WithAllScalarFields()
+				.WithTask(new TaskQueryBuilder().WithAllScalarFields()))
+		, alias: "data", lang: language, gameMode: gameMode).Build();
 	}
 
 	#endregion
@@ -461,20 +437,18 @@ public static class TarkovDevAPI {
 
 	private static string HideoutStationsQuery() => HideoutStationsQuery(RatConfig.NameScan.Language.ToTarkovDevType(), RatConfig.GameMode);
 	private static string HideoutStationsQuery(LanguageCode language, GameMode gameMode) {
-		string lang = ToGraphQlEnum(language);
-		string mode = ToGraphQlEnum(gameMode);
-		return $@"query {{
-  data: hideoutStations(lang: {lang}, gameMode: {mode}) {{
-    levels {{
-      id
-      itemRequirements {{
-        id
-        count
-        item {{ id }}
-      }}
-    }}
-  }}
-}}";
+		return new QueryQueryBuilder().WithHideoutStations(new HideoutStationQueryBuilder().WithAllScalarFields()
+			.WithLevels(new HideoutStationLevelQueryBuilder().WithAllScalarFields()
+				.WithItemRequirements(new RequirementItemQueryBuilder().WithAllScalarFields()
+					.WithItem(new ItemQueryBuilder().WithAllScalarFields()))
+				.WithStationLevelRequirements(new RequirementHideoutStationLevelQueryBuilder().WithAllScalarFields()
+					.WithStation(new HideoutStationQueryBuilder().WithAllScalarFields()))
+				.WithCrafts(new CraftQueryBuilder().WithAllScalarFields()
+					.WithRequiredItems(new ContainedItemQueryBuilder().WithAllScalarFields()
+						.WithItem(new ItemQueryBuilder().WithAllScalarFields()))
+					.WithRewardItems(new ContainedItemQueryBuilder().WithAllScalarFields()
+						.WithItem(new ItemQueryBuilder().WithAllScalarFields()))))
+		, alias: "data", lang: language, gameMode: gameMode).Build();
 	}
 
 	#endregion
@@ -486,18 +460,15 @@ public static class TarkovDevAPI {
 
 	private static string MapsQuery() => MapsQuery(RatConfig.NameScan.Language.ToTarkovDevType(), RatConfig.GameMode);
 	private static string MapsQuery(LanguageCode language, GameMode gameMode) {
-		string lang = ToGraphQlEnum(language);
-		string mode = ToGraphQlEnum(gameMode);
-		return $@"query {{
-  data: maps(lang: {lang}, gameMode: {mode}) {{
-    id
-    name
-    normalizedName
-  }}
-}}";
+		return new QueryQueryBuilder().WithMaps(new MapQueryBuilder().WithAllScalarFields()
+			.WithExtracts(new MapExtractQueryBuilder().WithAllScalarFields()
+				.WithPosition(new MapPositionQueryBuilder().WithAllScalarFields())
+				.WithTransferItem(new ContainedItemQueryBuilder().WithAllScalarFields()
+					.WithItem(new ItemQueryBuilder().WithId())))
+			.WithTransits(new MapTransitQueryBuilder().WithAllScalarFields()
+				.WithPosition(new MapPositionQueryBuilder().WithAllScalarFields()))
+		, alias: "data", lang: language, gameMode: gameMode).Build();
 	}
 
 	#endregion
-
-	private static string ToGraphQlEnum(Enum value) => value.ToString().ToLowerInvariant();
 }
