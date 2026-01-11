@@ -311,19 +311,24 @@ internal static class RatConfig {
 	}
 
 	internal static bool ReadFromCache(string key, out string value) {
-		byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(key));
-		string hash = string.Concat(Array.ConvertAll(hashBytes, b => b.ToString("X2")));
+		return ReadFromCache(key, out value, out _);
+	}
 
-		string path = Path.Combine(Paths.CacheDir, hash + ".data");
+	internal static bool ReadFromCache(string key, out string value, out DateTimeOffset lastWriteUtc) {
+		string path = GetCachePath(key);
 		value = File.Exists(path) ? File.ReadAllText(path) : string.Empty;
+		lastWriteUtc = File.Exists(path) ? File.GetLastWriteTimeUtc(path) : DateTimeOffset.MinValue;
 		return value != string.Empty;
 	}
 
-	internal static void WriteToCache(string key, string value) {
+	internal static string GetCachePath(string key) {
 		byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(key));
 		string hash = string.Concat(Array.ConvertAll(hashBytes, b => b.ToString("X2")));
+		return Path.Combine(Paths.CacheDir, hash + ".data");
+	}
 
-		string path = Path.Combine(Paths.CacheDir, hash + ".data");
+	internal static void WriteToCache(string key, string value) {
+		string path = GetCachePath(key);
 		Directory.CreateDirectory(Paths.CacheDir);
 		File.WriteAllText(path, value);
 	}
