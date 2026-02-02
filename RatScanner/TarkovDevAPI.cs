@@ -27,7 +27,7 @@ public static class TarkovDevAPI {
 	}
 
 	const string ApiEndpoint = "https://api.tarkov.dev/graphql";
-	const int BatchSize = 200;
+	const int BatchSize = 1000;
 
 	private static readonly ConcurrentDictionary<string, (long expire, object response)> Cache = new();
 	private static readonly ConcurrentDictionary<string, bool> PendingRequests = new();
@@ -267,11 +267,11 @@ public static class TarkovDevAPI {
 		.WithSellFor(new ItemPriceQueryBuilder().WithAllScalarFields()
 			.WithVendor(new VendorQueryBuilder().WithAllScalarFields()
 				.WithTraderOfferFragment(new TraderOfferQueryBuilder().WithAllScalarFields()
-					.WithTrader(new TraderQueryBuilder().WithAllScalarFields()))))
+					.WithTrader(new TraderQueryBuilder().WithId()))))
 		.WithBuyFor(new ItemPriceQueryBuilder().WithAllScalarFields()
 			.WithVendor(new VendorQueryBuilder().WithAllScalarFields()
 				.WithTraderOfferFragment(new TraderOfferQueryBuilder().WithAllScalarFields()
-					.WithTrader(new TraderQueryBuilder().WithAllScalarFields()))))
+					.WithTrader(new TraderQueryBuilder().WithId()))))
 		.WithCategory(new ItemCategoryQueryBuilder().WithAllScalarFields())
 		.WithCategories(new ItemCategoryQueryBuilder().WithAllScalarFields())
 		.WithUsedInTasks(new TaskQueryBuilder().WithId())
@@ -295,14 +295,14 @@ public static class TarkovDevAPI {
 	private static string TasksQueryPaginated(int limit, int offset, LanguageCode language, GameMode gameMode) {
 		return new QueryQueryBuilder().WithTasks(new TaskQueryBuilder().WithAllScalarFields()
 			.WithKappaRequired()
-			.WithMap(new MapQueryBuilder().WithAllScalarFields())
-			.WithTrader(new TraderQueryBuilder().WithAllScalarFields())
+			.WithMap(new MapQueryBuilder().WithId())
+			.WithTrader(new TraderQueryBuilder().WithId())
 			.WithObjectives(new TaskObjectiveQueryBuilder().WithAllScalarFields()
 				.WithTaskObjectiveBasicFragment(new TaskObjectiveBasicQueryBuilder().WithAllScalarFields()
 					.WithZones(new TaskZoneQueryBuilder().WithMap(new MapQueryBuilder().WithId()).WithPosition(new MapPositionQueryBuilder().WithAllScalarFields())))
 
 				.WithTaskObjectiveBuildItemFragment(new TaskObjectiveBuildItemQueryBuilder().WithAllScalarFields()
-					.WithItem(new ItemQueryBuilder().WithAllScalarFields()))
+					.WithItem(new ItemQueryBuilder().WithId()))
 
 				.WithTaskObjectiveExperienceFragment(new TaskObjectiveExperienceQueryBuilder().WithAllScalarFields())
 
@@ -310,11 +310,11 @@ public static class TarkovDevAPI {
 
 				.WithTaskObjectiveItemFragment(new TaskObjectiveItemQueryBuilder().WithAllScalarFields()
 					.WithZones(new TaskZoneQueryBuilder().WithMap(new MapQueryBuilder().WithId()).WithPosition(new MapPositionQueryBuilder().WithAllScalarFields()))
-					.WithItems(new ItemQueryBuilder().WithAllScalarFields()))
+					.WithItems(new ItemQueryBuilder().WithId()))
 
 				.WithTaskObjectiveMarkFragment(new TaskObjectiveMarkQueryBuilder().WithAllScalarFields()
 					.WithZones(new TaskZoneQueryBuilder().WithMap(new MapQueryBuilder().WithId()).WithPosition(new MapPositionQueryBuilder().WithAllScalarFields()))
-					.WithMarkerItem(new ItemQueryBuilder().WithAllScalarFields()))
+					.WithMarkerItem(new ItemQueryBuilder().WithId()))
 
 				.WithTaskObjectivePlayerLevelFragment(new TaskObjectivePlayerLevelQueryBuilder().WithAllScalarFields())
 
@@ -329,16 +329,16 @@ public static class TarkovDevAPI {
 				.WithTaskObjectiveTaskStatusFragment(new TaskObjectiveTaskStatusQueryBuilder().WithAllScalarFields())
 
 				.WithTaskObjectiveTraderLevelFragment(new TaskObjectiveTraderLevelQueryBuilder().WithAllScalarFields()
-					.WithTrader(new TraderQueryBuilder().WithAllScalarFields()))
+					.WithTrader(new TraderQueryBuilder().WithId()))
 
 				.WithTaskObjectiveTraderStandingFragment(new TaskObjectiveTraderStandingQueryBuilder().WithAllScalarFields()
-					.WithTrader(new TraderQueryBuilder().WithAllScalarFields()))
+					.WithTrader(new TraderQueryBuilder().WithId()))
 
 				.WithTaskObjectiveUseItemFragment(new TaskObjectiveUseItemQueryBuilder().WithAllScalarFields()
 					.WithZones(new TaskZoneQueryBuilder().WithMap(new MapQueryBuilder().WithId()).WithPosition(new MapPositionQueryBuilder().WithAllScalarFields()))
-					.WithUseAny(new ItemQueryBuilder().WithAllScalarFields())))
+					.WithUseAny(new ItemQueryBuilder().WithId())))
 			.WithTaskRequirements(new TaskStatusRequirementQueryBuilder().WithAllScalarFields()
-				.WithTask(new TaskQueryBuilder().WithAllScalarFields()))
+				.WithTask(new TaskQueryBuilder().WithId()))
 		, alias: "data", lang: language, gameMode: gameMode, limit: limit, offset: offset).Build();
 	}
 
@@ -354,14 +354,14 @@ public static class TarkovDevAPI {
 		return new QueryQueryBuilder().WithHideoutStations(new HideoutStationQueryBuilder().WithAllScalarFields()
 			.WithLevels(new HideoutStationLevelQueryBuilder().WithAllScalarFields()
 				.WithItemRequirements(new RequirementItemQueryBuilder().WithAllScalarFields()
-					.WithItem(new ItemQueryBuilder().WithAllScalarFields()))
+					.WithItem(new ItemQueryBuilder().WithId()))
 				.WithStationLevelRequirements(new RequirementHideoutStationLevelQueryBuilder().WithAllScalarFields()
 					.WithStation(new HideoutStationQueryBuilder().WithAllScalarFields()))
 				.WithCrafts(new CraftQueryBuilder().WithAllScalarFields()
 					.WithRequiredItems(new ContainedItemQueryBuilder().WithAllScalarFields()
-						.WithItem(new ItemQueryBuilder().WithAllScalarFields()))
+						.WithItem(new ItemQueryBuilder().WithId()))
 					.WithRewardItems(new ContainedItemQueryBuilder().WithAllScalarFields()
-						.WithItem(new ItemQueryBuilder().WithAllScalarFields()))))
+						.WithItem(new ItemQueryBuilder().WithId()))))
 		, alias: "data", lang: language, gameMode: gameMode, limit: limit, offset: offset).Build();
 	}
 
