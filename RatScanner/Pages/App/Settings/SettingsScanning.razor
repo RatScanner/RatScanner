@@ -2,6 +2,7 @@
 @using RatScanner.Components;
 @inject SettingsVM SettingsVM
 @inject IJSRuntime JSRuntime
+@inject LocalizationService Localizer
 @implements IDisposable
 @using System.Linq
 
@@ -9,13 +10,13 @@
     <MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
         <MudItem xs="12">
             <div class="d-flex align-center justify-center mx-2 mb-1">
-                <MudText Typo="Typo.subtitle1" Color="Color.Inherit">Scanning Settings</MudText>
+                <MudText Typo="Typo.subtitle1" Color="Color.Inherit">@Localizer["ScanningSettingsTitle"]</MudText>
             </div>
         </MudItem>
         <MudItem xs="12">
             <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
                 <MudGrid Spacing="0" Class="pa-0 ma-0">
-                    <MudSelect @bind-Value="@SettingsVM.NameScanLanguage" T="int" Label="Name Scan Language" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Text" Margin="Margin.Dense" Dense="true" Class="mx-1">
+                    <MudSelect @bind-Value="@SettingsVM.NameScanLanguage" T="int" Label="@Localizer["NameScanLanguage"]" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Text" Margin="Margin.Dense" Dense="true" Class="mx-1">
                         @foreach (var language in GetLanguages())
                         {
                             <MudSelectItem T="int" Value="@language.ordinal">
@@ -23,17 +24,17 @@
                             </MudSelectItem>
                         }
                     </MudSelect>
-                    <MudCheckBox @bind-Checked="@SettingsVM.EnableNameScan" Label="Enable Name Scan" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    <MudCheckBox @bind-Checked="@SettingsVM.EnableAutoNameScan" Label="Automatic Scanning" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+                    <MudCheckBox @bind-Checked="@SettingsVM.EnableNameScan" Label="@Localizer["EnableNameScan"]" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+                    <MudCheckBox @bind-Checked="@SettingsVM.EnableAutoNameScan" Label="@Localizer["AutomaticScanning"]" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
                 </MudGrid>
             </MudPaper>
         </MudItem>
         <MudItem xs="12">
             <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
                 <MudStack Spacing="0" Class="pa-0 ma-0">
-                    <MudCheckBox @bind-Checked="@SettingsVM.EnableIconScan" Label="Enable Icon Scan" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    <MudCheckBox @bind-Checked="@SettingsVM.ScanRotatedIcons" Label="Scan Rotated Icons" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    <MudCheckBox @bind-Checked="@SettingsVM.UseCachedIcons" Label="Use Cached Icons" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+                    <MudCheckBox @bind-Checked="@SettingsVM.EnableIconScan" Label="@Localizer["EnableIconScan"]" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+                    <MudCheckBox @bind-Checked="@SettingsVM.ScanRotatedIcons" Label="@Localizer["ScanRotatedIcons"]" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+                    <MudCheckBox @bind-Checked="@SettingsVM.UseCachedIcons" Label="@Localizer["UseCachedIcons"]" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
                 </MudStack>
             </MudPaper>
         </MudItem>
@@ -42,7 +43,7 @@
                 <MudStack Spacing="0" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Row="true">
                     <MudItem>
                         <MudText>
-                            Icon Scan Hotkey
+                            @Localizer["IconScanHotkey"]
                         </MudText>
                     </MudItem>
                     <MudItem>
