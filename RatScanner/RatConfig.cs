@@ -87,6 +87,7 @@ internal static class RatConfig {
 		internal static bool ShowKappa = false;
 		internal static bool ShowQuestHideoutTracker = true;
 		internal static bool ShowQuestHideoutTeamTracker = false;
+		internal static bool ShowPriority = true;
 		internal static int Opacity = 0;
 	}
 
@@ -208,6 +209,7 @@ internal static class RatConfig {
 		MinimalUi.ShowKappa = config.ReadBool(nameof(MinimalUi.ShowKappa), MinimalUi.ShowKappa);
 		MinimalUi.ShowQuestHideoutTracker = config.ReadBool(nameof(MinimalUi.ShowQuestHideoutTracker), MinimalUi.ShowQuestHideoutTracker);
 		MinimalUi.ShowQuestHideoutTeamTracker = config.ReadBool(nameof(MinimalUi.ShowQuestHideoutTeamTracker), MinimalUi.ShowQuestHideoutTeamTracker);
+		MinimalUi.ShowPriority = config.ReadBool(nameof(MinimalUi.ShowPriority), MinimalUi.ShowPriority);
 		MinimalUi.Opacity = config.ReadInt(nameof(MinimalUi.Opacity), MinimalUi.Opacity);
 
 		config.Section = nameof(Tracking);
@@ -274,6 +276,7 @@ internal static class RatConfig {
 		config.WriteBool(nameof(MinimalUi.ShowKappa), MinimalUi.ShowKappa);
 		config.WriteBool(nameof(MinimalUi.ShowQuestHideoutTracker), MinimalUi.ShowQuestHideoutTracker);
 		config.WriteBool(nameof(MinimalUi.ShowQuestHideoutTeamTracker), MinimalUi.ShowQuestHideoutTeamTracker);
+		config.WriteBool(nameof(MinimalUi.ShowPriority), MinimalUi.ShowPriority);
 		config.WriteInt(nameof(MinimalUi.Opacity), MinimalUi.Opacity);
 
 		config.Section = nameof(Tracking);

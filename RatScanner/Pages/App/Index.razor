@@ -58,6 +58,29 @@
                 </div>
             </MudPaper>
         </MudItem>
+        <MudItem xs="12">
+            <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">
+                <div class="d-flex align-center">
+                    @{
+                        int priorityScore = MenuVM.LastItem?.GetPriorityScore() ?? 0;
+                        string priorityIcon = priorityScore >= 50 ? @Icons.Material.Filled.PriorityHigh : 
+                                             priorityScore >= 25 ? @Icons.Material.Filled.TrendingUp : 
+                                             @Icons.Material.Filled.Schedule;
+                        string priorityColor = priorityScore >= 50 ? "color: #ff4444;" : 
+                                              priorityScore >= 25 ? "color: #ffaa00;" : 
+                                              "color: #44aaff;";
+                    }
+                    @if (priorityScore > 0) {
+                        <MudIcon Icon="@priorityIcon" Size="Size.Small" Class="mr-1" Style="@priorityColor" />
+                        <span style="@priorityColor">@priorityScore</span>
+                        <span class="ml-1">Priority</span>
+                    } else {
+                        <MudIcon Icon="@Icons.Material.Filled.Schedule" Size="Size.Small" Class="mr-1" Style="color: #888;" />
+                        <span style="color: #888;">No Priority</span>
+                    }
+                </div>
+            </MudPaper>
+        </MudItem>
         @if (MenuVM.ShowKappaNeeds == true) {
             <MudItem xs="12">
                 <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">

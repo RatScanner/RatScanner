@@ -247,6 +247,31 @@
 			</StackPanel>
 		</StackPanel>
 
+		<StackPanel x:Name="PriorityDisplay">
+			<Separator />
+			<Grid>
+				<Label Grid.Column="0"
+							 Content="Priority" />
+				<Label Grid.Column="1"
+							 Content="{Binding PriorityScore}"
+							 d:Content="42" />
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
+				</Grid.ColumnDefinitions>
+			</Grid>
+			<StackPanel.Style>
+				<Style TargetType="StackPanel">
+					<Style.Triggers>
+						<DataTrigger Binding="{Binding ShowPriority}" Value="False">
+							<Setter Property="Visibility" Value="Collapsed" />
+						</DataTrigger>
+					</Style.Triggers>
+				</Style>
+			</StackPanel.Style>
+		</StackPanel>
+
 		<StackPanel x:Name="UpdatedDisplay">
 			<Separator />
 			<Grid Margin="0,5,0,0">

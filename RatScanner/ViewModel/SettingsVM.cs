@@ -26,6 +26,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 	public bool ShowKappa { get; set; }
 	public bool ShowQuestHideoutTracker { get; set; }
 	public bool ShowQuestHideoutTeamTracker { get; set; }
+	public bool ShowPriority { get; set; }
 	public int Opacity { get; set; }
 
 	public int ScreenWidth { get; set; }
@@ -77,6 +78,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 		ShowKappa = RatConfig.MinimalUi.ShowKappa;
 		ShowQuestHideoutTracker = RatConfig.MinimalUi.ShowQuestHideoutTracker;
 		ShowQuestHideoutTeamTracker = RatConfig.MinimalUi.ShowQuestHideoutTeamTracker;
+		ShowPriority = RatConfig.MinimalUi.ShowPriority;
 		ShowUpdated = RatConfig.MinimalUi.ShowUpdated;
 		Opacity = RatConfig.MinimalUi.Opacity;
 
@@ -129,7 +131,11 @@ internal class SettingsVM : INotifyPropertyChanged {
 		RatConfig.MinimalUi.ShowKappa = ShowKappa;
 		RatConfig.MinimalUi.ShowQuestHideoutTracker = ShowQuestHideoutTracker;
 		RatConfig.MinimalUi.ShowQuestHideoutTeamTracker = ShowQuestHideoutTeamTracker;
+		RatConfig.MinimalUi.ShowPriority = ShowPriority;
 		RatConfig.MinimalUi.ShowUpdated = ShowUpdated;
+		
+		// Notify MenuVM of config changes
+		RatScannerMain.Instance.MenuVM?.RefreshProperty("ShowPriority");
 		RatConfig.MinimalUi.Opacity = Opacity;
 
 		RatConfig.Tracking.ShowNonFIRNeeds = ShowNonFIRNeeds;

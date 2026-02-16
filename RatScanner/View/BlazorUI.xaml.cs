@@ -27,7 +27,9 @@ public partial class BlazorUI : UserControl, ISwitchable {
 		serviceCollection.AddWpfBlazorWebView();
 		serviceCollection.AddMudServices();
 
-		serviceCollection.AddSingleton<MenuVM>(s => new MenuVM(RatScannerMain.Instance));
+		var menuVM = new MenuVM(RatScannerMain.Instance);
+		RatScannerMain.Instance.MenuVM = menuVM;
+		serviceCollection.AddSingleton<MenuVM>(s => menuVM);
 
 		SettingsVM settingsVM = new();
 		serviceCollection.AddSingleton<SettingsVM>(s => settingsVM);
