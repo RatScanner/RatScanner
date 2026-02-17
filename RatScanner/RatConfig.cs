@@ -48,6 +48,8 @@ internal static class RatConfig {
 		internal static string Debug = Path.Combine(Base, "Debug");
 		internal static string Updater = Path.Combine(Base, "RatUpdater.exe");
 		internal static string LogFile = Path.Combine(Base, "Log.txt");
+
+		internal static string i18nDir => Path.Combine(Base, "i18n");
 	}
 
 	// Name Scan options
@@ -75,6 +77,11 @@ internal static class RatConfig {
 	internal static class ToolTip {
 		internal static string DigitGroupingSymbol = ".";
 		internal static int Duration = 1500;
+	}
+
+	// UI options
+	internal static class UserInterface {
+		internal static UiLanguage Language = UiLanguage.English;
 	}
 
 	// Minimal UI
@@ -199,6 +206,9 @@ internal static class RatConfig {
 		ToolTip.Duration = config.ReadInt(nameof(ToolTip.Duration), ToolTip.Duration);
 		ToolTip.DigitGroupingSymbol = config.ReadString(nameof(ToolTip.DigitGroupingSymbol), ToolTip.DigitGroupingSymbol);
 
+		config.Section = nameof(UserInterface);
+		UserInterface.Language = (UiLanguage)config.ReadInt(nameof(UserInterface.Language), (int)UserInterface.Language);
+
 		config.Section = nameof(MinimalUi);
 		MinimalUi.ShowName = config.ReadBool(nameof(MinimalUi.ShowName), MinimalUi.ShowName);
 		MinimalUi.ShowAvgDayPrice = config.ReadBool(nameof(MinimalUi.ShowAvgDayPrice), MinimalUi.ShowAvgDayPrice);
@@ -264,6 +274,9 @@ internal static class RatConfig {
 		config.Section = nameof(ToolTip);
 		config.WriteInt(nameof(ToolTip.Duration), ToolTip.Duration);
 		config.WriteString(nameof(ToolTip.DigitGroupingSymbol), ToolTip.DigitGroupingSymbol);
+
+		config.Section = nameof(UserInterface);
+		config.WriteInt(nameof(UserInterface.Language), (int)UserInterface.Language);
 
 		config.Section = nameof(MinimalUi);
 		config.WriteBool(nameof(MinimalUi.ShowName), MinimalUi.ShowName);

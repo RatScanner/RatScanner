@@ -2,6 +2,7 @@
 @using RatScanner.Components;
 @inject SettingsVM SettingsVM
 @inject IJSRuntime JSRuntime
+@inject LocalizationService Localizer
 @implements IDisposable
 
 <div>
@@ -11,7 +12,7 @@
                 <MudStack Spacing="0" Justify="Justify.SpaceBetween" Row="true">
                     <MudItem>
                         <MudText>
-                            Open Wiki
+                            @Localizer["OpenWiki"]
                         </MudText>
                     </MudItem>
                     <MudItem>
@@ -25,7 +26,7 @@
                 <MudStack Spacing="0" Justify="Justify.SpaceBetween" Row="true">
                     <MudItem>
                         <MudText>
-                            Open Tarkov.dev
+                            @Localizer["OpenTarkovDev"]
                         </MudText>
                     </MudItem>
                     <MudItem>
@@ -39,7 +40,7 @@
                 <MudStack Spacing="0" Justify="Justify.SpaceBetween" Row="true">
                     <MudItem>
                         <MudText>
-                            Favorite item
+                            @Localizer["FavoriteItem"]
                         </MudText>
                     </MudItem>
                     <MudItem>
@@ -50,7 +51,7 @@
         </MudItem>
         <MudItem xs="12">
             <div class="d-flex align-center justify-center mx-2 mb-1">
-                <MudText Typo="Typo.subtitle1" Color="Color.Inherit">Tarkov Tracker</MudText>
+                <MudText Typo="Typo.subtitle1" Color="Color.Inherit">@Localizer["TarkovTrackerTitle"]</MudText>
             </div>
         </MudItem>
         <MudItem xs="12">
@@ -58,7 +59,7 @@
                 <MudStack Spacing="0" Justify="Justify.SpaceBetween" Row="true">
                     <MudItem>
                         <MudText>
-                            Add item
+                            @Localizer["AddItem"]
                         </MudText>
                     </MudItem>
                     <MudItem>
@@ -72,7 +73,7 @@
                 <MudStack Spacing="0" Justify="Justify.SpaceBetween" Row="true">
                     <MudItem>
                         <MudText>
-                            Remove item
+                            @Localizer["RemoveItem"]
                         </MudText>
                     </MudItem>
                     <MudItem>
