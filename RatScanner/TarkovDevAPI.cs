@@ -27,10 +27,13 @@ public static class TarkovDevAPI {
 	}
 
 	const string ApiEndpoint = "https://api.tarkov.dev/graphql";
-	const int BatchSize = 200;
+	const int DefaultBatchSize = 200;
+	const int TaskBatchSize = 100;
+	const int MaxBatchAttempts = 3;
+	const int RetryDelayMilliseconds = 1500;
 
 	private static readonly ConcurrentDictionary<string, (long expire, object response)> Cache = new();
-	private static readonly ConcurrentDictionary<string, bool> PendingRequests = new();
+	private static readonly ConcurrentDictionary<string, Task> PendingRequests = new();
 
 	private static readonly HttpClient HttpClient = new(new HttpClientHandler {
 		AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
@@ -43,12 +46,20 @@ public static class TarkovDevAPI {
 		TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
 	};
 
-	private static async Task<Stream> Get(string query) {
+	private static async Task<string> Get(string query) {
 		Dictionary<string, string> body = new() { { "query", query } };
-		HttpResponseMessage responseTask = await HttpClient.PostAsJsonAsync(ApiEndpoint, body);
+		using HttpRequestMessage request = new(HttpMethod.Post, ApiEndpoint) {
+			Content = JsonContent.Create(body),
+		};
+		request.Headers.TryAddWithoutValidation("User-Agent", $"RatScanner-Client/{RatConfig.Version}");
 
-		if (responseTask.StatusCode != HttpStatusCode.OK) throw new Exception($"Tarkov.dev API request failed. {responseTask.ReasonPhrase}");
-		return await responseTask.Content.ReadAsStreamAsync();
+		using HttpResponseMessage response = await HttpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+		string responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+		if (response.StatusCode != HttpStatusCode.OK)
+			throw new HttpRequestException($"Tarkov.dev API request failed. {(int)response.StatusCode} {response.ReasonPhrase}", null, response.StatusCode);
+
+		return responseBody;
 	}
 
 	/// <summary>
@@ -78,13 +89,11 @@ public static class TarkovDevAPI {
 	/// <summary>
 	/// Fetches paginated data in batches and combines results
 	/// </summary>
-	private static async Task QueuePaginatedRequest<T>(string baseQueryKey, Func<int, int, string> queryBuilder, long ttl) where T : class {
-		// Check if request is already pending
-		if (!PendingRequests.TryAdd(baseQueryKey, true)) {
-			Logger.LogInfo($"Request already pending for: \"{baseQueryKey}\", skipping");
-			return;
-		}
+	private static Task QueuePaginatedRequest<T>(string baseQueryKey, Func<int, int, string> queryBuilder, long ttl, int batchSize) where T : class {
+		return PendingRequests.GetOrAdd(baseQueryKey, _ => QueuePaginatedRequestInner<T>(baseQueryKey, queryBuilder, ttl, batchSize));
+	}
 
+	private static async Task QueuePaginatedRequestInner<T>(string baseQueryKey, Func<int, int, string> queryBuilder, long ttl, int batchSize) where T : class {
 		try {
 			List<T> allResults = new();
 			List<string> rawBatchResponses = new();
@@ -94,28 +103,17 @@ public static class TarkovDevAPI {
 			Stopwatch sw = Stopwatch.StartNew();
 
 			while (hasMore) {
-				string query = queryBuilder(BatchSize, offset);
 				Logger.LogInfo($"Fetching batch at offset {offset} for: \"{baseQueryKey}\"");
 
-				using Stream stream = await Get(query);
-				using StreamReader streamReader = new(stream);
-				
-				// Read raw response for caching
-				string rawResponse = await streamReader.ReadToEndAsync();
+				(T[] batchResults, string rawResponse) = await GetPaginatedBatch<T>(baseQueryKey, queryBuilder, batchSize, offset).ConfigureAwait(false);
 				rawBatchResponses.Add(rawResponse);
-				
-				// Parse the response
-				ResponseData<T[]>? neededResponse = JsonConvert.DeserializeObject<ResponseData<T[]>>(rawResponse, JsonSettings);
-				if (neededResponse?.Data?.Data == null) throw new Exception("Failed to deserialize paginated response");
-
-				T[] batchResults = neededResponse.Data.Data;
 				allResults.AddRange(batchResults);
 
 				Logger.LogInfo($"Fetched {batchResults.Length} items at offset {offset} for: \"{baseQueryKey}\"");
 
-				// If we got less than BatchSize, we've reached the end
-				hasMore = batchResults.Length >= BatchSize;
-				offset += BatchSize;
+				// If we got less than the batch size, we've reached the end
+				hasMore = batchResults.Length >= batchSize;
+				offset += batchSize;
 			}
 
 			// Store combined results in cache
@@ -154,9 +152,50 @@ public static class TarkovDevAPI {
 
 			if (!Cache.ContainsKey(baseQueryKey)) throw new Exception("Failed to fetch paginated query response and no cache available.");
 		} finally {
-			// Always remove from pending requests when done
 			PendingRequests.TryRemove(baseQueryKey, out _);
 		}
+	}
+
+	private static async Task<(T[] batchResults, string rawResponse)> GetPaginatedBatch<T>(string baseQueryKey, Func<int, int, string> queryBuilder, int batchSize, int offset) where T : class {
+		Exception? lastException = null;
+
+		for (int attempt = 1; attempt <= MaxBatchAttempts; attempt++) {
+			try {
+				string rawResponse = await Get(queryBuilder(batchSize, offset)).ConfigureAwait(false);
+				ResponseData<T[]>? neededResponse = JsonConvert.DeserializeObject<ResponseData<T[]>>(rawResponse, JsonSettings);
+				if (neededResponse?.Data?.Data == null) throw new Exception("Failed to deserialize paginated response");
+
+				return (neededResponse.Data.Data, rawResponse);
+			} catch (Exception e) when (attempt < MaxBatchAttempts && IsTransientPaginatedRequestFailure(e)) {
+				lastException = e;
+				int retryDelay = RetryDelayMilliseconds * attempt;
+				Logger.LogWarning($"Paginated fetch attempt {attempt} failed for: \"{baseQueryKey}\" at offset {offset}. Retrying in {retryDelay}ms.", e);
+				await Task.Delay(retryDelay).ConfigureAwait(false);
+			} catch (Exception e) {
+				lastException = e;
+				break;
+			}
+		}
+
+		throw new Exception($"Failed to fetch batch at offset {offset} for: \"{baseQueryKey}\" after {MaxBatchAttempts} attempts.", lastException);
+	}
+
+	private static bool IsTransientPaginatedRequestFailure(Exception exception) {
+		return exception switch {
+			HttpRequestException httpException => httpException.StatusCode == null || IsRetryableStatusCode(httpException.StatusCode.Value),
+			IOException => true,
+			TaskCanceledException => true,
+			_ when exception.InnerException != null => IsTransientPaginatedRequestFailure(exception.InnerException),
+			_ => false,
+		};
+	}
+
+	private static bool IsRetryableStatusCode(HttpStatusCode statusCode) {
+		int statusCodeValue = (int)statusCode;
+		return statusCode == HttpStatusCode.Forbidden
+			|| statusCode == HttpStatusCode.RequestTimeout
+			|| statusCode == HttpStatusCode.TooManyRequests
+			|| statusCodeValue >= 500;
 	}
 
 	/// <summary>
@@ -183,20 +222,18 @@ public static class TarkovDevAPI {
 		return combined.ToString(Newtonsoft.Json.Formatting.None);
 	}
 
-	private static T[] GetCachedPaginated<T>(string baseQueryKey, Func<int, int, string> queryBuilder, long ttl, bool isRetry = false) where T : class {
+	private static T[] GetCachedPaginated<T>(string baseQueryKey, Func<int, int, string> queryBuilder, long ttl, int batchSize, bool isRetry = false) where T : class {
 		if (!Cache.TryGetValue(baseQueryKey, out (long expire, object response) value)) {
 			if (isRetry) throw new Exception("Retrying to fetch paginated query response failed.");
 
 			Logger.LogInfo($"Paginated query not found in cache: \"{baseQueryKey}\"");
-			Task.Run(() => QueuePaginatedRequest<T>(baseQueryKey, queryBuilder, ttl)).Wait();
-			return GetCachedPaginated<T>(baseQueryKey, queryBuilder, ttl, true);
+			QueuePaginatedRequest<T>(baseQueryKey, queryBuilder, ttl, batchSize).GetAwaiter().GetResult();
+			return GetCachedPaginated<T>(baseQueryKey, queryBuilder, ttl, batchSize, true);
 		}
 
-		// Queue request if cache is expired and no request is already pending
+		// Queue request if cache is expired.
 		long time = DateTimeOffset.Now.ToUnixTimeSeconds();
-		if (time > value.expire && !PendingRequests.ContainsKey(baseQueryKey)) {
-			Task.Run(() => QueuePaginatedRequest<T>(baseQueryKey, queryBuilder, ttl));
-		}
+		if (time > value.expire) _ = QueuePaginatedRequest<T>(baseQueryKey, queryBuilder, ttl, batchSize);
 
 		return (T[])value.response;
 	}
@@ -228,25 +265,23 @@ public static class TarkovDevAPI {
 	/// Full cache initialization - waits for all requests to complete
 	/// </summary>
 	public static async Task InitializeCache() {
-		await Task.WhenAll(
-			Task.Run(() => QueuePaginatedRequest<Item>(ItemsQueryKey(), ItemsQueryPaginated, RatConfig.MediumTTL)),
-			Task.Run(() => QueuePaginatedRequest<TTask>(TasksQueryKey(), TasksQueryPaginated, RatConfig.LongTTL)),
-			Task.Run(() => QueuePaginatedRequest<HideoutStation>(HideoutStationsQueryKey(), HideoutStationsQueryPaginated, RatConfig.LongTTL)),
-			Task.Run(() => QueuePaginatedRequest<Map>(MapsQueryKey(), MapsQueryPaginated, RatConfig.LongTTL))
-		).ConfigureAwait(false);
+		await QueuePaginatedRequest<Item>(ItemsQueryKey(), ItemsQueryPaginated, RatConfig.MediumTTL, DefaultBatchSize).ConfigureAwait(false);
+		await QueuePaginatedRequest<TTask>(TasksQueryKey(), TasksQueryPaginated, RatConfig.LongTTL, TaskBatchSize).ConfigureAwait(false);
+		await QueuePaginatedRequest<HideoutStation>(HideoutStationsQueryKey(), HideoutStationsQueryPaginated, RatConfig.LongTTL, DefaultBatchSize).ConfigureAwait(false);
+		await QueuePaginatedRequest<Map>(MapsQueryKey(), MapsQueryPaginated, RatConfig.LongTTL, DefaultBatchSize).ConfigureAwait(false);
 	}
 
-	public static Item[] GetItems(LanguageCode language, GameMode gameMode) => GetCachedPaginated<Item>(ItemsQueryKey(language, gameMode), (limit, offset) => ItemsQueryPaginated(limit, offset, language, gameMode), RatConfig.MediumTTL);
-	public static Item[] GetItems() => GetCachedPaginated<Item>(ItemsQueryKey(), ItemsQueryPaginated, RatConfig.MediumTTL);
+	public static Item[] GetItems(LanguageCode language, GameMode gameMode) => GetCachedPaginated<Item>(ItemsQueryKey(language, gameMode), (limit, offset) => ItemsQueryPaginated(limit, offset, language, gameMode), RatConfig.MediumTTL, DefaultBatchSize);
+	public static Item[] GetItems() => GetCachedPaginated<Item>(ItemsQueryKey(), ItemsQueryPaginated, RatConfig.MediumTTL, DefaultBatchSize);
 
-	public static TTask[] GetTasks(LanguageCode language, GameMode gameMode) => GetCachedPaginated<TTask>(TasksQueryKey(language, gameMode), (limit, offset) => TasksQueryPaginated(limit, offset, language, gameMode), RatConfig.LongTTL);
-	public static TTask[] GetTasks() => GetCachedPaginated<TTask>(TasksQueryKey(), TasksQueryPaginated, RatConfig.LongTTL);
+	public static TTask[] GetTasks(LanguageCode language, GameMode gameMode) => GetCachedPaginated<TTask>(TasksQueryKey(language, gameMode), (limit, offset) => TasksQueryPaginated(limit, offset, language, gameMode), RatConfig.LongTTL, TaskBatchSize);
+	public static TTask[] GetTasks() => GetCachedPaginated<TTask>(TasksQueryKey(), TasksQueryPaginated, RatConfig.LongTTL, TaskBatchSize);
 
-	public static HideoutStation[] GetHideoutStations(LanguageCode language, GameMode gameMode) => GetCachedPaginated<HideoutStation>(HideoutStationsQueryKey(language, gameMode), (limit, offset) => HideoutStationsQueryPaginated(limit, offset, language, gameMode), RatConfig.LongTTL);
-	public static HideoutStation[] GetHideoutStations() => GetCachedPaginated<HideoutStation>(HideoutStationsQueryKey(), HideoutStationsQueryPaginated, RatConfig.LongTTL);
+	public static HideoutStation[] GetHideoutStations(LanguageCode language, GameMode gameMode) => GetCachedPaginated<HideoutStation>(HideoutStationsQueryKey(language, gameMode), (limit, offset) => HideoutStationsQueryPaginated(limit, offset, language, gameMode), RatConfig.LongTTL, DefaultBatchSize);
+	public static HideoutStation[] GetHideoutStations() => GetCachedPaginated<HideoutStation>(HideoutStationsQueryKey(), HideoutStationsQueryPaginated, RatConfig.LongTTL, DefaultBatchSize);
 
-	public static Map[] GetMaps(LanguageCode language, GameMode gameMode) => GetCachedPaginated<Map>(MapsQueryKey(language, gameMode), (limit, offset) => MapsQueryPaginated(limit, offset, language, gameMode), RatConfig.LongTTL);
-	public static Map[] GetMaps() => GetCachedPaginated<Map>(MapsQueryKey(), MapsQueryPaginated, RatConfig.LongTTL);
+	public static Map[] GetMaps(LanguageCode language, GameMode gameMode) => GetCachedPaginated<Map>(MapsQueryKey(language, gameMode), (limit, offset) => MapsQueryPaginated(limit, offset, language, gameMode), RatConfig.LongTTL, DefaultBatchSize);
+	public static Map[] GetMaps() => GetCachedPaginated<Map>(MapsQueryKey(), MapsQueryPaginated, RatConfig.LongTTL, DefaultBatchSize);
 
 	#region Items Query
 
