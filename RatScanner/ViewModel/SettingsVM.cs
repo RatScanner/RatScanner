@@ -108,11 +108,12 @@ internal class SettingsVM : INotifyPropertyChanged {
 	}
 
 	public async Task SaveSettings() {
-		bool updateMarketDB = NameScanLanguage != (int)RatConfig.NameScan.Language;
 		bool updateTarkovTrackerToken = TarkovTrackerToken != RatConfig.Tracking.TarkovTracker.Token;
 		bool updateTarkovTrackerBackend = TarkovTrackerBackend != RatConfig.Tracking.TarkovTracker.Backend;
 		bool updateResolution = ScreenWidth != RatConfig.ScreenWidth || ScreenHeight != RatConfig.ScreenHeight;
 		bool updateLanguage = RatConfig.NameScan.Language != (Language)NameScanLanguage;
+		bool updateGameMode = RatConfig.GameMode != GameMode;
+		bool updateApiData = updateLanguage || updateGameMode;
 		bool updateUiLanguage = RatConfig.UserInterface.Language != UiLanguage;
 
 		// Save config
@@ -161,7 +162,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 		// Apply config
 		PageSwitcher.Instance.Topmost = RatConfig.AlwaysOnTop;
 		PageSwitcher.Instance.ResetWindowSize();
-		await TarkovDevAPI.InitializeCache();
+		if (updateApiData) await TarkovDevAPI.InitializeCache();
 		if (updateTarkovTrackerToken || updateTarkovTrackerBackend) UpdateTarkovTrackerToken();
 		if (updateUiLanguage) _localizationService.SetLanguage(UiLanguage);
 		if (updateResolution || updateLanguage) RatScannerMain.Instance.SetupRatEye();
