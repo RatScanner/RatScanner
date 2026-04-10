@@ -29,7 +29,10 @@ public partial class BlazorUI : UserControl, ISwitchable {
 
 		serviceCollection.AddSingleton<MenuVM>(s => new MenuVM(RatScannerMain.Instance));
 
-		SettingsVM settingsVM = new();
+		LocalizationService localizationService = new();
+		serviceCollection.AddSingleton(localizationService);
+
+		SettingsVM settingsVM = new(localizationService);
 		serviceCollection.AddSingleton<SettingsVM>(s => settingsVM);
 
 		System.Collections.Generic.IEnumerable<System.Drawing.Rectangle> bounds = System.Windows.Forms.Screen.AllScreens.Select(screen => screen.Bounds);
