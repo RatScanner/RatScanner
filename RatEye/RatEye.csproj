@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<LangVersion>9</LangVersion>
+		<Company>RatScanner</Company>
+		<Authors>Blightbuster</Authors>
+		<Version>4.0.1</Version>
+		<Description>Image processing library for Escape from Tarkov</Description>
+		<!-- Vendored into RatScanner; do not publish NuGet from this monorepo build. -->
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<IsPackable>false</IsPackable>
+		<PackageProjectUrl>https://ratscanner.com/</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/RatScanner/RatEye.git</RepositoryUrl>
+		<PackageIcon>RatLogo.png</PackageIcon>
+		<RepositoryType>git</RepositoryType>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<!-- Match RatScanner's RatStash major so the solution loads a single assembly. -->
+		<NoWarn>$(NoWarn);1591</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="OpenCvSharp4.Extensions" Version="4.9.0.20240103" />
+		<PackageReference Include="OpenCvSharp4.Windows" Version="4.9.0.20240103" />
+		<PackageReference Include="RatStash" Version="6.0.0" />
+		<PackageReference Include="System.Drawing.Common" Version="8.0.7" />
+		<PackageReference Include="Tesseract" Version="5.2.0" />
+		<PackageReference Include="Tesseract.Drawing" Version="5.2.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="RatLogo.png" Pack="true" PackagePath="" />
+	</ItemGroup>
+</Project>

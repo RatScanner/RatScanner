@@ -6,7 +6,7 @@ RatScanner is a Windows-only .NET WPF application for Escape from Tarkov that sc
 
 - **Framework:** .NET 10.0 WPF (`net10.0-windows10.0.22621.0`)
 - **UI:** MudBlazor via WebView, WPF host
-- **Key deps:** RatEye (image processing), RatStash (item database), Tesseract (OCR), Newtonsoft.Json
+- **Key deps:** in-repo RatEye (image processing), RatStash (item database NuGet), Tesseract (OCR), Newtonsoft.Json
 - **Platform:** Windows only — cannot be built or run in WSL/Linux
 
 ## Build Commands
@@ -21,13 +21,16 @@ There is no test project. Verify changes by building and running the app.
 
 ## Repository Layout
 
-- `RatScanner/` — main application project
+- `RatScanner/` — main application project (WPF / MudBlazor)
   - `RatScannerMain.cs` — entry point, startup flow, update check
   - `TarkovDevAPI.cs` — GraphQL API client with rate limiting, caching, dedup
   - `RatConfig.cs` — configuration, cache path logic
   - `MapDataLoader.cs` — map data loading
-  - `RatScanner.csproj` — project file, target framework, package references
-- `RatScanner.sln` — solution file
+  - `RatScanner.csproj` — project file, target framework, package + project references
+- `RatEye/` — vendored image-processing library (ProjectReference, not NuGet)
+  - Sources from upstream `RatScanner/RatEye` tag `v4.0.1` (see `RatEye/VENDOR.md`)
+  - Change scan/marker/OCR behavior here; ship with the app in one PR
+- `RatScanner.sln` — solution (RatScanner + RatEye)
 - `publish/` — publish assets
 - `publish.bat` — publish script
 - `media/` — README images
@@ -66,3 +69,4 @@ New worktrees are created under `C:/Users/Dysekt/orca/workspaces/RatScanner/` an
 - Nullable reference types are enabled — handle nulls explicitly.
 - Cache freshness is based on file modification time (see `RatConfig.cs`).
 - API calls go through `TarkovDevAPI.cs` which handles rate limiting, dedup, and exponential backoff — do not bypass it with raw HTTP calls.
+- Do **not** re-add a NuGet `PackageReference` for `RatEye`. Edit `RatEye/` in-tree and reference via `ProjectReference`.

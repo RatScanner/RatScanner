@@ -63,11 +63,15 @@
 		</PackageReference>
 		<PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.7" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="RatEye" Version="4.0.1" />
 		<PackageReference Include="RatStash" Version="6.0.0" />
 		<PackageReference Include="SingleInstanceCore" Version="2.2.2" />
 		<PackageReference Include="System.Drawing.Common" Version="8.0.7" />
 		<PackageReference Include="Tesseract" Version="5.2.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- In-repo image processing library (vendored RatEye; do not restore NuGet RatEye). -->
+		<ProjectReference Include="..\RatEye\RatEye.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
