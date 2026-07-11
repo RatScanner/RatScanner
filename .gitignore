@@ -1,6 +1,8 @@
 ## Custom ignores
-# Static icon data
+# Static icon data (downloaded from RatScannerData releases for local dev)
 RatScanner/[Dd]ata/*
+# Optional override for name-scan magnifier template (also embedded in RatEye resources)
+!RatScanner/[Dd]ata/icon_search.png
 
 # publish folder
 publish/

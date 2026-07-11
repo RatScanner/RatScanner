@@ -27,7 +27,7 @@ namespace RatEye
 				/// <summary>
 				/// The scale of the marker used by item inspection windows
 				/// </summary>
-				public float MarkerItemScale = 16f / 21f;
+				public float MarkerItemScale = 16f / 28f;
 
 				/// <summary>
 				/// The background color used for the marker if it uses a alpha channel
