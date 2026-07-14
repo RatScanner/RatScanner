@@ -198,7 +198,8 @@ public static class TarkovDevAPI {
 			Task.Run(() => QueuePaginatedRequest<T>(baseQueryKey, queryBuilder, ttl));
 		}
 
-		return (T[])value.response;
+		if (value.response == null) return Array.Empty<T>();
+		return ((T[])value.response).Where(i => i != null).ToArray();
 	}
 
 	/// <summary>
