@@ -37,6 +37,7 @@ public partial class Item {
 		Task[] tasks = TarkovDevAPI.GetTasks();
 
 		foreach (Task task in tasks) {
+			if (task == null) continue;
 			// Skip if task is already completed
 			if (progress.Tasks.Any(p => p.Id == task.Id && p.Complete)) continue;
 
@@ -88,6 +89,8 @@ public partial class Item {
 
 	public int GetHideoutRemaining(UserProgress? progress = null) {
 		progress ??= GetUserProgress();
+		progress.Tasks ??= new List<Progress>();
+		progress.TaskObjectives ??= new List<Progress>();
 
 		int count = 0;
 		HideoutStation[] stations = TarkovDevAPI.GetHideoutStations();
