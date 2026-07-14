@@ -78,6 +78,7 @@ Limitations
 - Uses / durability is always assumed at 100%
 - Items which share a icon with other items (especially keys) will result in a uncertain match
 - There will be missmatches when scanning icons in the top left of the item stash since the bright light (top center of the screen) interferes with it
+- Nvidia's driver image sharpening option interferes with this
 
 <img src="media/IconScan.gif" width=400px>
 
