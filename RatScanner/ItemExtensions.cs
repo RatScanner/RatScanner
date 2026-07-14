@@ -3,9 +3,9 @@ using RatScanner.TarkovDev.GraphQL;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RatScanner;
+namespace RatScanner.TarkovDev.GraphQL;
 
-public static class ItemExtensions {
+public partial class Item {
 	private static UserProgress GetUserProgress() {
 		UserProgress? progress = null;
 		if (RatConfig.Tracking.TarkovTracker.Enable && RatScannerMain.Instance.TarkovTrackerDB.Progress.Count >= 1) {
@@ -15,7 +15,7 @@ public static class ItemExtensions {
 		return progress ?? new UserProgress();
 	}
 
-	public static (int count, int kappaCount) GetTaskRemaining(this Item item, UserProgress? progress = null) {
+	public (int count, int kappaCount) GetTaskRemaining(UserProgress? progress = null) {
 		// Compensation for Damage Tasks
 		// These tasks are not tracked by TarkovTracker
 		string[] excludedTasks = new string[] {
@@ -47,7 +47,7 @@ public static class ItemExtensions {
 			foreach (ITaskObjective? objective in task.Objectives) {
 				if (objective == null) continue;
 				if (objective is TaskObjectiveItem oGiveItem && oGiveItem.Type == "giveItem") {
-					if ((!oGiveItem.Items?.Any(i => i?.Id == item.Id)) ?? true) continue;	// Skip if item is not the one we are looking for
+					if ((!oGiveItem.Items?.Any(i => i?.Id == Id)) ?? true) continue;	// Skip if item is not the one we are looking for
 					if (!showNonFir && !oGiveItem.FoundInRaid) continue;					// Skip if item is not FIR
 					needed = oGiveItem.Count;
 					if (task.KappaRequired == true) kappaCount += oGiveItem.Count;
@@ -57,7 +57,7 @@ public static class ItemExtensions {
 					count += needed;
 					if (task.KappaRequired == true) kappaCount += needed;
 				} else if (objective is TaskObjectiveItem oPlantItem && oPlantItem.Type == "plantItem") {
-					if ((!oPlantItem.Items?.Any(i => i?.Id == item.Id)) ?? true) continue;	// Skip if item is not the one we are looking for
+					if ((!oPlantItem.Items?.Any(i => i?.Id == Id)) ?? true) continue;	// Skip if item is not the one we are looking for
 					if (!showNonFir) continue;												// Skip if item is not FIR
 					needed = oPlantItem.Count;
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
@@ -65,7 +65,7 @@ public static class ItemExtensions {
 					count += needed;
 					if (task.KappaRequired == true) kappaCount += needed;
 				} else if (objective is TaskObjectiveMark oMark && oMark.Type == "mark") {
-					if (oMark.MarkerItem?.Id != item.Id) continue;  // Skip if item is not the one we are looking for
+					if (oMark.MarkerItem?.Id != Id) continue;  // Skip if item is not the one we are looking for
 					if (!showNonFir) continue;                      // Skip if item is not FIR
 					needed = 1;
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
@@ -73,7 +73,7 @@ public static class ItemExtensions {
 					count += needed;
 					if (task.KappaRequired == true) kappaCount += needed;
 				} else if (objective is TaskObjectiveBuildItem oBuildWeapon && oBuildWeapon.Type == "buildWeapon") {
-					if (oBuildWeapon.Item?.Id != item.Id) continue; // Skip if item is not the one we are looking for
+					if (oBuildWeapon.Item?.Id != Id) continue; // Skip if item is not the one we are looking for
 					if (!showNonFir) continue;                      // Skip if item is not FIR
 					needed = 1;
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
@@ -86,7 +86,7 @@ public static class ItemExtensions {
 		return (count, kappaCount);
 	}
 
-	public static int GetHideoutRemaining(this Item item, UserProgress? progress = null) {
+	public int GetHideoutRemaining(UserProgress? progress = null) {
 		progress ??= GetUserProgress();
 
 		int count = 0;
@@ -102,7 +102,7 @@ public static class ItemExtensions {
 
 				if (level?.ItemRequirements == null) continue;
 				foreach (RequirementItem? requiredItem in level.ItemRequirements) {
-					if (requiredItem?.Item?.Id != item.Id) continue;
+					if (requiredItem?.Item?.Id != Id) continue;
 
 					count += requiredItem.Count;
 					List<Progress> objectiveProgress = progress.HideoutParts.Where(p => p.Id == requiredItem.Id).ToList();
@@ -113,18 +113,22 @@ public static class ItemExtensions {
 		return count;
 	}
 
-	public static int GetAvg24hMarketPricePerSlot(this Item item) {
-		int price = item.Avg24HPrice ?? 0;
-		int size = item.Width * item.Height;
+	public int GetAvg24hMarketPricePerSlot() {
+		int price = Avg24HPrice ?? 0;
+		int size = Width * Height;
 		return price / size;
 	}
 
-	public static ItemPrice? GetBestTraderOffer(this Item item) => item.SellFor?.Where(i => i.Vendor is TraderOffer).MaxBy(i => i.PriceRub);
+	public ItemPrice? GetBestTraderOffer() => SellFor?.Where(i => i.Vendor is TraderOffer).MaxBy(i => i.PriceRub);
 
-	public static TraderOffer? GetBestTraderOfferVendor(this Item item) => GetBestTraderOffer(item)?.Vendor as TraderOffer;
+	public TraderOffer? GetBestTraderOfferVendor() => GetBestTraderOffer()?.Vendor as TraderOffer;
 
-	public static IEnumerable<Item> GetAmmoOfSameCaliber(this Item item) {
-		if (item.Properties is not ItemPropertiesAmmo ammo) return Enumerable.Empty<Item>();
+	public IEnumerable<Item> GetAmmoOfSameCaliber() {
+		if (Properties is not ItemPropertiesAmmo ammo) return Enumerable.Empty<Item>();
 		return TarkovDevAPI.GetItems().Where(i => i.Properties is ItemPropertiesAmmo a && ammo.Caliber == a.Caliber);
+	}
+
+	public static Item From(string id) {
+		return TarkovDevAPI.GetItems().First(i => i.Id == id);
 	}
 }
