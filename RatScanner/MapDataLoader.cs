@@ -48,19 +48,24 @@ public static class MapDataLoader
 	private static Dictionary<string, Map> BuildMapIdCache(List<InteractiveMapData> mapsData)
 	{
 		Dictionary<string, Map> cache = new();
-		
+		var tarkovDevMaps = TarkovDevAPI.GetMaps();
+
 		foreach (InteractiveMapData mapData in mapsData) {
 			if (mapData.Maps == null) continue;
-			
+
 			foreach (InteractiveMapData.Map map in mapData.Maps) {
 				if (string.IsNullOrEmpty(map.Key)) continue;
 				if (map.Projection != "interactive") continue;
 
-				var tMap = TarkovDevAPI.GetMaps().FirstOrDefault(m => m.NormalizedName == mapData.NormalizedName);
+				var tMap = tarkovDevMaps.FirstOrDefault(m => m.NormalizedName == mapData.NormalizedName);
+				if (tMap == null) {
+					Logger.LogWarning($"No TarkovDev map match for normalized name: {mapData.NormalizedName}");
+					continue;
+				}
 				cache[tMap.Id] = map;
 			}
 		}
-		
+
 		return cache;
 	}
 	
