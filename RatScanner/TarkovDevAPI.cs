@@ -45,7 +45,14 @@ public static class TarkovDevAPI {
 
 	private static async Task<Stream> Get(string query) {
 		Dictionary<string, string> body = new() { { "query", query } };
-		HttpResponseMessage responseTask = await HttpClient.PostAsJsonAsync(ApiEndpoint, body);
+
+		using HttpRequestMessage request = new(HttpMethod.Post, ApiEndpoint) {
+			Content = JsonContent.Create(body)
+		};
+
+		request.Headers.UserAgent.ParseAdd($"RatScanner-Client/{RatConfig.Version}");
+
+		HttpResponseMessage responseTask = await HttpClient.SendAsync(request);
 
 		if (responseTask.StatusCode != HttpStatusCode.OK) throw new Exception($"Tarkov.dev API request failed. {responseTask.ReasonPhrase}");
 		return await responseTask.Content.ReadAsStreamAsync();
