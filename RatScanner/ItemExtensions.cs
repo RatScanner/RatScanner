@@ -1,9 +1,9 @@
-﻿using RatScanner.FetchModels.TarkovTracker;
-using RatScanner.TarkovDev.GraphQL;
+using RatScanner.FetchModels.TarkovTracker;
+using RatScanner.TarkovDev.Json;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace RatScanner.TarkovDev.GraphQL;
+namespace RatScanner.TarkovDev.Json;
 
 public partial class Item {
 	private static UserProgress GetUserProgress() {
@@ -31,12 +31,12 @@ public partial class Item {
 		int needed = 0;
 		int count = 0;
 		int kappaCount = 0;
-		
+
 		bool showNonFir = RatConfig.Tracking.ShowNonFIRNeeds;
 
-		Task[] tasks = TarkovDevAPI.GetTasks();
+		TarkovTask[] tasks = TarkovDevAPI.GetTasks();
 
-		foreach (Task task in tasks) {
+		foreach (TarkovTask task in tasks) {
 			if (task == null) continue;
 			// Skip if task is already completed
 			if (progress.Tasks.Any(p => p.Id == task.Id && p.Complete)) continue;
@@ -45,36 +45,36 @@ public partial class Item {
 			if (excludedTasks.Contains(task.Id)) continue;
 
 			if (task.Objectives == null) continue;
-			foreach (ITaskObjective? objective in task.Objectives) {
+			foreach (TaskObjective? objective in task.Objectives) {
 				if (objective == null) continue;
-				if (objective is TaskObjectiveItem oGiveItem && oGiveItem.Type == "giveItem") {
-					if ((!oGiveItem.Items?.Any(i => i?.Id == Id)) ?? true) continue;	// Skip if item is not the one we are looking for
-					if (!showNonFir && !oGiveItem.FoundInRaid) continue;					// Skip if item is not FIR
-					needed = oGiveItem.Count;
-					if (task.KappaRequired == true) kappaCount += oGiveItem.Count;
+				if (objective.Type == "giveItem") {
+					if (!objective.Items.Contains(Id)) continue;	// Skip if item is not the one we are looking for
+					if (!showNonFir && !objective.FoundInRaid) continue;					// Skip if item is not FIR
+					needed = objective.Count;
+					if (task.KappaRequired == true) kappaCount += objective.Count;
 					// Subtract amount of already collected items
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
-					foreach (Progress p in objectiveProgress) needed -= p.Complete ? oGiveItem.Count : p.Count;
+					foreach (Progress p in objectiveProgress) needed -= p.Complete ? objective.Count : p.Count;
 					count += needed;
 					if (task.KappaRequired == true) kappaCount += needed;
-				} else if (objective is TaskObjectiveItem oPlantItem && oPlantItem.Type == "plantItem") {
-					if ((!oPlantItem.Items?.Any(i => i?.Id == Id)) ?? true) continue;	// Skip if item is not the one we are looking for
-					if (!showNonFir) continue;												// Skip if item is not FIR
-					needed = oPlantItem.Count;
+				} else if (objective.Type == "plantItem") {
+					if (!objective.Items.Contains(Id)) continue;	// Skip if item is not the one we are looking for
+					if (!showNonFir) continue;										// Skip if item is not FIR
+					needed = objective.Count;
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
-					foreach (Progress p in objectiveProgress) needed -= p.Complete ? oPlantItem.Count : p.Count;
+					foreach (Progress p in objectiveProgress) needed -= p.Complete ? objective.Count : p.Count;
 					count += needed;
 					if (task.KappaRequired == true) kappaCount += needed;
-				} else if (objective is TaskObjectiveMark oMark && oMark.Type == "mark") {
-					if (oMark.MarkerItem?.Id != Id) continue;  // Skip if item is not the one we are looking for
+				} else if (objective.Type == "mark") {
+					if (objective.MarkerItem != Id) continue;  // Skip if item is not the one we are looking for
 					if (!showNonFir) continue;                      // Skip if item is not FIR
 					needed = 1;
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
 					foreach (Progress p in objectiveProgress) needed -= 1;
 					count += needed;
 					if (task.KappaRequired == true) kappaCount += needed;
-				} else if (objective is TaskObjectiveBuildItem oBuildWeapon && oBuildWeapon.Type == "buildWeapon") {
-					if (oBuildWeapon.Item?.Id != Id) continue; // Skip if item is not the one we are looking for
+				} else if (objective.Type == "buildWeapon") {
+					if (objective.Item != Id) continue; // Skip if item is not the one we are looking for
 					if (!showNonFir) continue;                      // Skip if item is not FIR
 					needed = 1;
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
@@ -105,7 +105,7 @@ public partial class Item {
 
 				if (level?.ItemRequirements == null) continue;
 				foreach (RequirementItem? requiredItem in level.ItemRequirements) {
-					if (requiredItem?.Item?.Id != Id) continue;
+					if (requiredItem?.Item != Id) continue;
 
 					count += requiredItem.Count;
 					List<Progress> objectiveProgress = progress.HideoutParts.Where(p => p.Id == requiredItem.Id).ToList();
@@ -116,19 +116,10 @@ public partial class Item {
 		return count;
 	}
 
-	public int GetAvg24hMarketPricePerSlot() {
-		int price = Avg24HPrice ?? 0;
-		int size = Width * Height;
-		return price / size;
-	}
-
-	public ItemPrice? GetBestTraderOffer() => SellFor?.Where(i => i.Vendor is TraderOffer).MaxBy(i => i.PriceRub);
-
-	public TraderOffer? GetBestTraderOfferVendor() => GetBestTraderOffer()?.Vendor as TraderOffer;
-
 	public IEnumerable<Item> GetAmmoOfSameCaliber() {
-		if (Properties is not ItemPropertiesAmmo ammo) return Enumerable.Empty<Item>();
-		return TarkovDevAPI.GetItems().Where(i => i.Properties is ItemPropertiesAmmo a && ammo.Caliber == a.Caliber);
+		string? caliber = Properties?.Caliber;
+		if (string.IsNullOrEmpty(caliber)) return Enumerable.Empty<Item>();
+		return TarkovDevAPI.GetItems().Where(i => i.Properties?.Caliber == caliber);
 	}
 
 	public static Item From(string id) {

@@ -48,7 +48,7 @@
                             {
                                 <div class="d-flex align-center stroke">
                                     @item.GetBestTraderOffer()?.PriceRub.ToShortString().AsRubs()
-                                    <MudAvatar Image="@(item.GetBestTraderOfferVendor()?.Trader?.ImageLink)"
+                                    <MudAvatar Image="@(item.GetBestTraderImageLink())"
                                                Size="Size.Small" Style="float: right;" Class="ml-1" />
                                 </div>
                             }
@@ -85,7 +85,7 @@
                     {
                         <div class="d-flex align-center stroke">
                             @item.GetBestTraderOffer()?.PriceRub.ToShortString().AsRubs()
-                            <MudAvatar Image="@(item.GetBestTraderOfferVendor()?.Trader?.ImageLink)"
+                            <MudAvatar Image="@(item.GetBestTraderImageLink())"
                                        Size="Size.Small" Style="float: right;" Class="ml-1" />
                         </div>
                     }

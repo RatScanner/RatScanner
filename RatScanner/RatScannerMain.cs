@@ -185,7 +185,7 @@ public class RatScannerMain : INotifyPropertyChanged {
 
 	private Database RatStashDatabaseFromTarkovDev() {
 		List<Item> rsItems = new();
-		foreach (TarkovDev.GraphQL.Item i in TarkovDevAPI.GetItems()) {
+		foreach (TarkovDev.Json.Item i in TarkovDevAPI.GetItems()) {
 			rsItems.Add(new RatStash.Item() {
 				Id = i.Id,
 				Name = i.Name,

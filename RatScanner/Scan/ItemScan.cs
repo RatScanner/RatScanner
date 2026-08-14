@@ -1,4 +1,5 @@
 ﻿using RatEye;
+using RatScanner.TarkovDev.Json;
 
 namespace RatScanner.Scan;
 
@@ -6,11 +7,11 @@ public abstract class ItemScan
 
 // Base Scan Data
 {
-	public TarkovDev.GraphQL.Item Item { get; set; } = new TarkovDev.GraphQL.Item();
+	public Item Item { get; set; } = new Item();
 
 	public float Confidence { get; set; } = 0;
 
-	public string IconPath { get; set; }
+	public string IconPath { get; set; } = string.Empty;
 
 	public long DissapearAt { get; set; } = 0;
 

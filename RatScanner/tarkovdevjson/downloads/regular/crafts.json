@@ -1,0 +1,7175 @@
+{
+  "data": [
+    {
+      "id": "655b675e1f2b6843ec751fd6",
+      "requiredItems": [
+        {
+          "item": "65573fa5655447403702a816",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af4d286f7746d4159f07a",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af4a786f7746d3f3c3400",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "63a0b208f444d32d6f03ea1e",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "61bf83814088ec1a363d7097",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 8000,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "628d0618d1ba6e4fa07ce5a4",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5d8a13fc2d9612419804003c",
+      "requiredItems": [
+        {
+          "item": "5448ff904bdc2d6f028b456e",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "57347d7224597744596b4e72",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "57347d8724597744596b4e76",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fd1654e76006732bf2e",
+      "duration": 2900,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "590c5d4b86f774784e1b9c45",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "6839a4b18b47de9b76007028",
+      "requiredItems": [
+        {
+          "item": "62a0a0bb621468534a797ad5",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "590c2e1186f77425357b6124",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5beed0f50db834001c062b12",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "61bf7b6302b3924be92fa8c3",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "5d1c819a86f774771b0acd6c",
+          "count": 10,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af22086f7746d3f3c33fa",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5734795124597738002c6176",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 100800,
+      "gameEditions": [],
+      "level": 3,
+      "taskUnlock": "684009026ceedc792c09b2a7",
+      "productItem": {
+        "item": "67d0576f29f580ebc10efd08",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "67da02e9078f1947650d7bb8",
+      "requiredItems": [
+        {
+          "item": "5c052fb986f7746b2101e909",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "590c621186f774138d11ea29",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "62a0a16d0b9d3c46de5b6e97",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5c12613b86f7743bbe2c3f76",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "61bf7c024770ee6f9c6b8b53",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 39600,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "6389c8c5dbfd5e4b95197e6b",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "67caf5c5bfe0242ab1032966",
+      "requiredItems": [
+        {
+          "item": "5d1b317c86f7742523398392",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "67cad1ec19b006e9e50f44d6",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 60,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "67cad3226bf74131800752b7",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5d5c1f5ed582a543983ee82e",
+      "requiredItems": [
+        {
+          "item": "5d1b3a5d86f774252167ba22",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 1320,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5755356824597772cb798962",
+        "count": 3,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "62a112fec1cce91d2c46a06e",
+      "requiredItems": [
+        {
+          "item": "590c621186f774138d11ea29",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c651286f7741e566b6461",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c645c86f77412b01304d9",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 7200,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "62a0a124de7ac81993580542",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5d93b91286f77467310ca15d",
+      "requiredItems": [
+        {
+          "item": "577e1c9d2459773cd707c525",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 1560,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5c13cef886f774072e618e82",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5ed9fd73f6626f08ef0efec6",
+      "requiredItems": [
+        {
+          "item": "5d1b3a5d86f774252167ba22",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "544fb37f4bdc2dee738b4567",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b3f2d86f774253763b735",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 4350,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "544fb3f34bdc2d03748b456a",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "6002ed409f2c60461a2d0f5a",
+      "requiredItems": [
+        {
+          "item": "5d4042a986f7743185265463",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "590c2d8786f774245b1f03f3",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5af04b6486f774195a3ebb49",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5c052f6886f7746b1e3db148",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 8200,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5d0376a486f7747d8050965c",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "63baedefe6ebc10fe0201083",
+      "requiredItems": [
+        {
+          "item": "5ba2678ad4351e44f824b344",
+          "count": 120,
+          "attributes": {}
+        },
+        {
+          "item": "5af04b6486f774195a3ebb49",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "590a3d9c86f774385926e510",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5c06782b86f77426df5407d2",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "61bf7b6302b3924be92fa8c3",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 12400,
+      "gameEditions": [],
+      "level": 3,
+      "taskUnlock": "5c0d4e61d09282029f53920e",
+      "productItem": {
+        "item": "5ba26835d4351e0035628ff5",
+        "count": 60,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5d5c1f25d582a5479d4ec458",
+      "requiredItems": [
+        {
+          "item": "56dff3afd2720bba668b4567",
+          "count": 180,
+          "attributes": {}
+        },
+        {
+          "item": "590c5a7286f7747884343aea",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d40425986f7743185265461",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 8500,
+      "gameEditions": [],
+      "level": 2,
+      "taskUnlock": "59c512ad86f7741f0d09de9b",
+      "productItem": {
+        "item": "56dff2ced2720bb4668b4567",
+        "count": 120,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "600ab8e3e4022c380a726088",
+      "requiredItems": [
+        {
+          "item": "5448fee04bdc2dbc018b4567",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5d40407c86f774318526545a",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "57505f6224597709a92585a9",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5bc9be8fd4351e00334cae6e",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b385e86f774252167b98a",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fd1654e76006732bf2e",
+      "duration": 6400,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5d403f9186f7743cac3f229b",
+        "count": 3,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5eeca7724a8a9b668f0d89cd",
+      "requiredItems": [
+        {
+          "item": "64b7bbb74b75259c590fa897",
+          "count": 150,
+          "attributes": {}
+        },
+        {
+          "item": "590c5a7286f7747884343aea",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "590c2e1186f77425357b6124",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 7250,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5c925fa22e221601da359b7b",
+        "count": 150,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5d8a1a7d7a3dfe597c2e459e",
+      "requiredItems": [
+        {
+          "item": "590c661e86f7741e566b646a",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5e831507ea0a7c419c2f9bd9",
+          "count": 2,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 2350,
+      "gameEditions": [],
+      "level": 1,
+      "taskUnlock": "5967733e86f774602332fc84",
+      "productItem": {
+        "item": "544fb45d4bdc2dee738b4568",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5d5589c1f934db045e6c5492",
+      "requiredItems": [
+        {
+          "item": "5d1b385e86f774252167b98a",
+          "count": 0.66,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fc8654e760065037abf",
+      "duration": 19500,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5d1b33a686f7742523398398",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "67da05c8078f1947650d7bb9",
+      "requiredItems": [
+        {
+          "item": "5c052fb986f7746b2101e909",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5c94bbff86f7747ee735c08f",
+          "count": 10,
+          "attributes": {}
+        },
+        {
+          "item": "6389c8c5dbfd5e4b95197e6b",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "5c12613b86f7743bbe2c3f76",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "62a0a16d0b9d3c46de5b6e97",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "5c05308086f7746b2101e90b",
+          "count": 2,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 90000,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5c1d0dc586f7744baf2e7b79",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "61c77d465a98404dee40a77c",
+      "requiredItems": [
+        {
+          "item": "5efb0d4f4bc50b58e81710f3",
+          "count": 150,
+          "attributes": {}
+        },
+        {
+          "item": "5d6fc87386f77449db3db94e",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "544fb5454bdc2df8738b456a",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5d6fc78386f77449d825f9dc",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c31c586f774245e3141b2",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "62a0a0bb621468534a797ad5",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 12400,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5efb0cabfb3e451d70735af5",
+        "count": 100,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5d78d8a03fe9fc21602e16be",
+      "requiredItems": [
+        {
+          "item": "5d1b3a5d86f774252167ba22",
+          "count": 4,
+          "attributes": {}
+        },
+        {
+          "item": "60098af40accd37ef2175f27",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5af0454c86f7746bf20992e8",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 4500,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "590c657e86f77412b013051d",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "603cf3094bb658618458e010",
+      "requiredItems": [
+        {
+          "item": "573477e124597737dd42e191",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590a3b0486f7743954552bdb",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "6389c70ca33d8c4cdf4932c6",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 1500,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "56742c324bdc2d150f8b456d",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "629e1b3a0694b45420210cad",
+      "requiredItems": [
+        {
+          "item": "5e54f6af86f7742199090bf3",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c5a7286f7747884343aea",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fd1654e76006732bf2e",
+      "duration": 2700,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5af0484c86f7740f02001f7f",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "60048c82a7903e00382d9593",
+      "requiredItems": [
+        {
+          "item": "5d1b2ffd86f77425243e8d17",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5d0377ce86f774186372f689",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5c05308086f7746b2101e90b",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d0376a486f7747d8050965c",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "6389c70ca33d8c4cdf4932c6",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "590c2e1186f77425357b6124",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "6389c8fb46b54c634724d847",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 21000,
+      "gameEditions": [],
+      "level": 3,
+      "taskUnlock": "63966ff54c3ef01b6f3ffad8",
+      "productItem": {
+        "item": "5d1b5e94d7ad1a2b865a96b0",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5dea63e21ecdbf7668030f24",
+      "requiredItems": [
+        {
+          "item": "5d03794386f77420415576f5",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "619cbfccbedcde2f5b3f7bdd",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 10000,
+      "gameEditions": [],
+      "level": 1,
+      "taskUnlock": "596a218586f77420d232807c",
+      "productItem": {
+        "item": "5733279d245977289b77ec24",
+        "count": 5,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5dd1126571e3fd3f634b1c8b",
+      "requiredItems": [
+        {
+          "item": "59e36c6f86f774176c10a2a7",
+          "count": 2,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 7100,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5c06779c86f77426e00dd782",
+        "count": 8,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5ede0502879619077751d00a",
+      "requiredItems": [
+        {
+          "item": "5c0e531286f7747fa54205c2",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b3a5d86f774252167ba22",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "59e3606886f77417674759a5",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "62a0a043cf4a99369e2624a5",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 5100,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5c0e531d86f7747fa23f4d42",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5ed9ff023a68ec264e5233c2",
+      "requiredItems": [
+        {
+          "item": "5d0376a486f7747d8050965c",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "573477e124597737dd42e191",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5c06782b86f77426df5407d2",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "5c06779c86f77426e00dd782",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "6389c70ca33d8c4cdf4932c6",
+          "count": 2,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 82800,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5c05308086f7746b2101e90b",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "6002e55595c402039a2747f4",
+      "requiredItems": [
+        {
+          "item": "5c94bbff86f7747ee735c08f",
+          "count": 10,
+          "attributes": {}
+        },
+        {
+          "item": "5c1d0d6d86f7744bb2683e1f",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5c12613b86f7743bbe2c3f76",
+          "count": 4,
+          "attributes": {}
+        },
+        {
+          "item": "61bf7c024770ee6f9c6b8b53",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5c052fb986f7746b2101e909",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 476000,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5c1e495a86f7743109743dfb",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b505c32b0b1645e6f54c5",
+      "requiredItems": [
+        {
+          "item": "573720e02459776143012541",
+          "count": 150,
+          "attributes": {}
+        },
+        {
+          "item": "5c06779c86f77426e00dd782",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 3300,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5737218f245977612125ba51",
+        "count": 150,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5df138986c38ba26da0b3a77",
+      "requiredItems": [
+        {
+          "item": "5d1b304286f774253763a528",
+          "count": 4,
+          "attributes": {}
+        },
+        {
+          "item": "590c2d8786f774245b1f03f3",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 1320,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5d1b309586f77425227d1676",
+        "count": 4,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b6a50b71eeb7c4168c628",
+      "requiredItems": [
+        {
+          "item": "5aa7e276e5b5b000171d0647",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af4a786f7746d3f3c3400",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af4d286f7746d4159f07a",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af47786f7746d404f3aaa",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5d40407c86f774318526545a",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "63a0b208f444d32d6f03ea1e",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 3000,
+      "gameEditions": [],
+      "level": 3,
+      "taskUnlock": "60e71b62a0beca400d69efc4",
+      "productItem": {
+        "item": "5f60c74e3b85f6263c145586",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "61dc03711bdcfa2f253c9b7c",
+      "requiredItems": [
+        {
+          "item": "590a358486f77429692b2790",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "6389c70ca33d8c4cdf4932c6",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5af0561e86f7745f5f3ad6ac",
+          "count": 2,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 8640,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5e2aedd986f7746d404f3aa4",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5dde60e0e2c8f57eb6465327",
+      "requiredItems": [
+        {
+          "item": "5d6fc78386f77449d825f9dc",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af37686f774755a234b65",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 7350,
+      "gameEditions": [],
+      "level": 2,
+      "taskUnlock": "5c0bd94186f7747a727f09b2",
+      "productItem": {
+        "item": "61962d879bb3d20b0946d385",
+        "count": 100,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5dc1f7de6058e020335c9d88",
+      "requiredItems": [
+        {
+          "item": "57505f6224597709a92585a9",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5448ff904bdc2d6f028b456e",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fd1654e76006732bf2e",
+      "duration": 1290,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "544fb6cc4bdc2d34748b456e",
+        "count": 5,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5d5c205bd582a50d042a3c0e",
+      "requiredItems": [],
+      "requiredQuestItems": [],
+      "station": "5d494a445b56502f18c98a10",
+      "duration": 300000,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "59faff1d86f7746c51718c9c",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b4bbe4343a16d2e047668",
+      "requiredItems": [
+        {
+          "item": "590c5a7286f7747884343aea",
+          "count": 2,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 5900,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5e023e53d4353e3302577c4c",
+        "count": 60,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5d8a1568df9fc649e81b8b1b",
+      "requiredItems": [
+        {
+          "item": "573475fb24597737fb1379e1",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "5bc9be8fd4351e00334cae6e",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fd1654e76006732bf2e",
+      "duration": 6100,
+      "gameEditions": [],
+      "level": 1,
+      "taskUnlock": "5ac3475486f7741d6224abd3",
+      "productItem": {
+        "item": "573476f124597737e04bf328",
+        "count": 5,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5e58e0c286f7740ba7486ca3",
+      "requiredItems": [
+        {
+          "item": "62a0a16d0b9d3c46de5b6e97",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "577e1c9d2459773cd707c525",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 114000,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5c12613b86f7743bbe2c3f76",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b4de41f2b6843ec751fd5",
+      "requiredItems": [
+        {
+          "item": "64b8f7968532cf95ee0a0dbf",
+          "count": 70,
+          "attributes": {}
+        },
+        {
+          "item": "5d6fc87386f77449db3db94e",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "544fb5454bdc2df8738b456a",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 14400,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5887431f2459777e1612938f",
+        "count": 50,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "690c784a8c5857a8e80c9970",
+      "requiredItems": [
+        {
+          "item": "5857a8bc2459772bad15db29",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d63d33b86f7746ea9275524",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5734795124597738002c6176",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 1800,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "68f8e04eae031982b00e7aaf",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "690c7882b6e7d092f006dda8",
+      "requiredItems": [
+        {
+          "item": "68f8e04eae031982b00e7aaf",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af22086f7746d3f3c33fa",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 1800,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5857a8bc2459772bad15db29",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "6666d829a8298779fc40e537",
+      "requiredItems": [
+        {
+          "item": "5d1b317c86f7742523398392",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5d4042a986f7743185265463",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5af04b6486f774195a3ebb49",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "66572b88ac60f009f270d1dc",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 300,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "665732f4464c4b4ba4670fa9",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5d8f614c9ea122564c316462",
+      "requiredItems": [
+        {
+          "item": "5af0548586f7743a532b7e99",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5751a89d24597722aa0e8db0",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b3a5d86f774252167ba22",
+          "count": 2,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 6900,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5c0e530286f7747fa1419862",
+        "count": 4,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "62a115db5c6bbf22c15ac19d",
+      "requiredItems": [
+        {
+          "item": "62a0a0bb621468534a797ad5",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "590c2b4386f77425357b6123",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 900,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5d1b31ce86f7742523398394",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5de021b30f6d581e965bcde7",
+      "requiredItems": [
+        {
+          "item": "59d6088586f774275f37482f",
+          "count": 1,
+          "attributes": {
+            "functional": true
+          }
+        },
+        {
+          "item": "544fb5454bdc2df8738b456a",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 4700,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5d1c819a86f774771b0acd6c",
+        "count": 5,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "63a3359eaf870e651d58e61a",
+      "requiredItems": [
+        {
+          "item": "62a0a0bb621468534a797ad5",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "590c2b4386f77425357b6123",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5ea034f65aad6446a939737e",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5448c12b4bdc2d02308b456f",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af22086f7746d3f3c33fa",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 1200,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "55d485be4bdc2d962f8b456f",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "67f4ec521d41954d4f09a9c8",
+      "requiredItems": [
+        {
+          "item": "5448fee04bdc2dbc018b4567",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "6389c6c7dbfd5e4b95197e68",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fc8654e760065037abf",
+      "duration": 3600,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5c0fa877d174af02a012e1cf",
+        "count": 5,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "600a9b10adfcb94fee6d3e06",
+      "requiredItems": [
+        {
+          "item": "590c31c586f774245e3141b2",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "59e36c6f86f774176c10a2a7",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 3400,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "57347cd0245977445a2d6ff1",
+        "count": 3,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "677d4fdb42cdfce74006f961",
+      "requiredItems": [
+        {
+          "item": "5d1b309586f77425227d1676",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5c06782b86f77426df5407d2",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "6389c70ca33d8c4cdf4932c6",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c2e1186f77425357b6124",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 1887,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5d1b304286f774253763a528",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "600a9fb7ba91d953182d6a1c",
+      "requiredItems": [
+        {
+          "item": "5d6fc87386f77449db3db94e",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5d6fc78386f77449d825f9dc",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "60391b0fb847c71012789415",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "60391a8b3364dc22b04d0ce5",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5af04b6486f774195a3ebb49",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 39000,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5d0379a886f77420407aa271",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "63a571802116d261d2336cd1",
+      "requiredItems": [
+        {
+          "item": "6389c70ca33d8c4cdf4932c6",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5c052f6886f7746b1e3db148",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590a3efd86f77437d351a25b",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "56742c324bdc2d150f8b456d",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c2d8786f774245b1f03f3",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5af04b6486f774195a3ebb49",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 5400,
+      "gameEditions": [],
+      "level": 1,
+      "taskUnlock": "625d6ffaf7308432be1d44c5",
+      "productItem": {
+        "item": "63a0b2eabea67a6d93009e52",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5d558968f934db006d2d5b32",
+      "requiredItems": [
+        {
+          "item": "590c5a7286f7747884343aea",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 6200,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "57371aab2459775a77142f22",
+        "count": 140,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "68f111a853aec9cbde0aa22f",
+      "requiredItems": [
+        {
+          "item": "5d1b3a5d86f774252167ba22",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b3f2d86f774253763b735",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5e8488fa988a8701445df1e4",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b39a386f774252339976f",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 2820,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5ed515f6915ec335206e4152",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b56eb32b0b1645e6f54c8",
+      "requiredItems": [
+        {
+          "item": "590c5a7286f7747884343aea",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 5400,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5a26abfac4a28232980eabff",
+        "count": 150,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "68f11230b10b42c44a0a5f8f",
+      "requiredItems": [
+        {
+          "item": "5e2af37686f774755a234b65",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "619cc01e0a7c3a1a2731940c",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5755356824597772cb798962",
+          "count": 4,
+          "attributes": {}
+        },
+        {
+          "item": "5d40407c86f774318526545a",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "59e361e886f774176c10a2a5",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 5340,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5d1b3f2d86f774253763b735",
+        "count": 4,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "68f207d400ca7e22d3081a07",
+      "requiredItems": [
+        {
+          "item": "57347da92459774491567cf5",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5448ff904bdc2d6f028b456e",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "544fb6cc4bdc2d34748b456e",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fd1654e76006732bf2e",
+      "duration": 2400,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "590c5f0d86f77413997acfab",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "67c9d4b251ce173bff01eec7",
+      "requiredItems": [
+        {
+          "item": "5d1b317c86f7742523398392",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "66572b88ac60f009f270d1dc",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 60,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "665732f4464c4b4ba4670fa9",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "62a1123ac30cfa1d366aeb82",
+      "requiredItems": [
+        {
+          "item": "57d14d2524597714373db789",
+          "count": 1,
+          "attributes": {
+            "functional": true
+          }
+        },
+        {
+          "item": "62a0a0bb621468534a797ad5",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 1800,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "584149ad2459775a7726350e",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "6a50095e2a763b0f4c034024",
+      "requiredItems": [
+        {
+          "item": "6a3d38063357ef2b260d1891",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 86400,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "6a4ff1e23e95f68a650fcb13",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "619eb0eb56579138ec08fed8",
+      "requiredItems": [
+        {
+          "item": "619cc01e0a7c3a1a2731940c",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c661e86f7741e566b646a",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5af0454c86f7746bf20992e8",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 2950,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5d02778e86f774203e7dedbe",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5f245f875b664e084523a4ce",
+      "requiredItems": [
+        {
+          "item": "5d6fc87386f77449db3db94e",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5656d7c34bdc2d9d198b4587",
+          "count": 100,
+          "attributes": {}
+        },
+        {
+          "item": "590c2b4386f77425357b6123",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 8470,
+      "gameEditions": [],
+      "level": 1,
+      "taskUnlock": "5bc47dbf86f7741ee74e93b9",
+      "productItem": {
+        "item": "5f0596629e22f464da6bbdd9",
+        "count": 60,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "603ce7c5fd70f047f93bee2a",
+      "requiredItems": [
+        {
+          "item": "5e2af4d286f7746d4159f07a",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "57347c1124597737fb1379e3",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "61bf83814088ec1a363d7097",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 1200,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5aa7cfc0e5b5b00015693143",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5eda0247658fac5b8c3862a8",
+      "requiredItems": [
+        {
+          "item": "55d480c04bdc2d1d4e8b456a",
+          "count": 4,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af29386f7746d4159f077",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d4042a986f7743185265463",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 5000,
+      "gameEditions": [],
+      "level": 1,
+      "taskUnlock": "59675d6c86f7740a842fc482",
+      "productItem": {
+        "item": "55d482194bdc2d1d4e8b456b",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5d8b8ddd322e8650762f6e3a",
+      "requiredItems": [
+        {
+          "item": "5c13cd2486f774072c757944",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "59faf98186f774067b6be103",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "59e35abd86f7741778269d82",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 2310,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "59e3556c86f7741776641ac2",
+        "count": 3,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "603cf23a420e7f487e175d7f",
+      "requiredItems": [
+        {
+          "item": "57347c77245977448d35f6e2",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "57347c5b245977448d35f6e1",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af37686f774755a234b65",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c2b4386f77425357b6123",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 7000,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "590a3c0a86f774385a33c450",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "64b6b5c1c3abf20a9660daad",
+      "requiredItems": [
+        {
+          "item": "5d1b3a5d86f774252167ba22",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b3f2d86f774253763b735",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5c0e530286f7747fa1419862",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5e8f3423fd7471236e6e3b64",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 4800,
+      "gameEditions": [],
+      "taskUnlock": "66aba85403e0ee3101042877",
+      "level": 2,
+      "productItem": {
+        "item": "5c0e534186f7747fa1419867",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5de951483c52683d810b4a10",
+      "requiredItems": [
+        {
+          "item": "5734781f24597737e04bf32a",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d63d33b86f7746ea9275524",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 1980,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "590a3b0486f7743954552bdb",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "61c226d91b8c294cd411c881",
+      "requiredItems": [
+        {
+          "item": "5672cb124bdc2d1a0f8b4568",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5672cb724bdc2dc2088b456b",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590a391c86f774385a33c404",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5c06779c86f77426e00dd782",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5af04b6486f774195a3ebb49",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 6600,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "590a3efd86f77437d351a25b",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b65fc1273611d2462ab77",
+      "requiredItems": [
+        {
+          "item": "656fae5f7c2d57afe200c0d7",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af4a786f7746d3f3c3400",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5d40419286f774318526545f",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "61bf83814088ec1a363d7097",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5e2af4d286f7746d4159f07a",
+          "count": 2,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 14000,
+      "gameEditions": [],
+      "level": 3,
+      "taskUnlock": "5ae4496986f774459e77beb6",
+      "productItem": {
+        "item": "5b44cad286f77402a54ae7e5",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "615c3d27966c85458e4c49cf",
+      "requiredItems": [
+        {
+          "item": "590c678286f77426c9660122",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5751a25924597722c463c472",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "60098af40accd37ef2175f27",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 3600,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "60098ad7c2240c0fe85c570a",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "6002eec9cc73cd34ac64188a",
+      "requiredItems": [
+        {
+          "item": "5c10c8fd86f7743d7d706df3",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5755356824597772cb798962",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b3a5d86f774252167ba22",
+          "count": 2,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 4200,
+      "gameEditions": [],
+      "level": 2,
+      "taskUnlock": "597a0b2986f77426d66c0633",
+      "productItem": {
+        "item": "5fca138c2a7b221b2852a5c6",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "67bc980c3c4c5942cb0ac53f",
+      "requiredItems": [
+        {
+          "item": "67c031b79320f644db06f456",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "67bdea8667098e658f064695",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [
+        {
+          "item": "67bdf097600629c8f20322e5"
+        },
+        {
+          "item": "67c0324acc87f341720274b6"
+        }
+      ],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 84600,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "67bdf04d66ca1d79a2024637",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5e37f15386f774299f112a2e",
+      "requiredItems": [
+        {
+          "item": "5e2af51086f7746d3f3c3402",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "590c5a7286f7747884343aea",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 4670,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5a0c27731526d80618476ac4",
+        "count": 5,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "67c9d5035be7fc94c806dee9",
+      "requiredItems": [
+        {
+          "item": "5d1b317c86f7742523398392",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "66572b3f6a723f7f005a066c",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 60,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "665732e7ac60f009f270d1ef",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5d8a13564ac882218d2085b0",
+      "requiredItems": [
+        {
+          "item": "59e3577886f774176a362503",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "575146b724597720a27126d5",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fd1654e76006732bf2e",
+      "duration": 4900,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5734773724597737fd047c14",
+        "count": 3,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "63a2327c151bfb591645c104",
+      "requiredItems": [
+        {
+          "item": "5d0377ce86f774186372f689",
+          "count": 4,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b2ffd86f77425243e8d17",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "6389c7750ef44505c87f5996",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5c05308086f7746b2101e90b",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "590c2e1186f77425357b6124",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "6389c8fb46b54c634724d847",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "6389c92d52123d5dd17f8876",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 17400,
+      "gameEditions": [],
+      "level": 3,
+      "taskUnlock": "64f83bcdde58fc437700d8fa",
+      "productItem": {
+        "item": "5a1eaa87fcdbcb001865f75e",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "6012ea1a01328b2dec3c1a9d",
+      "requiredItems": [
+        {
+          "item": "56e33634d2720bd8058b456b",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5c06779c86f77426e00dd782",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af37686f774755a234b65",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 15500,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5c12688486f77426843c7d32",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "63a232f8ab6bb51044344bff",
+      "requiredItems": [
+        {
+          "item": "6389c7f115805221fb410466",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5af04b6486f774195a3ebb49",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5d4042a986f7743185265463",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "6389c8fb46b54c634724d847",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 50400,
+      "gameEditions": [],
+      "level": 3,
+      "taskUnlock": "6396700fea19ac7ed845db32",
+      "productItem": {
+        "item": "6389c7750ef44505c87f5996",
+        "count": 4,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "6399c421d65735732c6ba765",
+      "requiredItems": [
+        {
+          "item": "62e910aaf957f2915e0a5e36",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c2d8786f774245b1f03f3",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "6389c70ca33d8c4cdf4932c6",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [
+        {
+          "item": "6331bb0d1aa9f42b804997a6"
+        }
+      ],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 7200,
+      "gameEditions": [],
+      "level": 2,
+      "taskUnlock": "625d700cc48e6c62a440fab5",
+      "productItem": {
+        "item": "62e910aaf957f2915e0a5e36",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5d93ba4486f77454bd61d2a9",
+      "requiredItems": [
+        {
+          "item": "590c595c86f7747884343ad7",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b385e86f774252167b98a",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "61bf7b6302b3924be92fa8c3",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "5d40425986f7743185265461",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "590c2e1186f77425357b6124",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 9400,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5d1b2f3f86f774252167a52c",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5dcfe2582f9b3d566c7af977",
+      "requiredItems": [
+        {
+          "item": "5d1b39a386f774252339976f",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5c06779c86f77426e00dd782",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "5734795124597738002c6176",
+          "count": 3,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 12100,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "59e35cbb86f7741778269d83",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b4a73975a7f3c734661a5",
+      "requiredItems": [
+        {
+          "item": "619cbfccbedcde2f5b3f7bdd",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "59e35de086f7741778269d84",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "64b7af434b75259c590fa893",
+          "count": 90,
+          "attributes": {}
+        },
+        {
+          "item": "5d6fc78386f77449d825f9dc",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5751496424597720a27126da",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 9400,
+      "gameEditions": [],
+      "level": 3,
+      "taskUnlock": "60e71bb4e456d449cd47ca75",
+      "productItem": {
+        "item": "59e0d99486f7744a32234762",
+        "count": 60,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b68b4769de97e1d62d117",
+      "requiredItems": [
+        {
+          "item": "57347c1124597737fb1379e3",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af4d286f7746d4159f07a",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "61bf83814088ec1a363d7097",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "62a0a0bb621468534a797ad5",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5e2af4a786f7746d3f3c3400",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 4305,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5d5e9c74a4b9364855191c40",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "68f2094c00ca7e22d3081a08",
+      "requiredItems": [
+        {
+          "item": "57347d7224597744596b4e72",
+          "count": 4,
+          "attributes": {}
+        },
+        {
+          "item": "5751487e245977207e26a315",
+          "count": 2,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fd1654e76006732bf2e",
+      "duration": 9000,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "57347da92459774491567cf5",
+        "count": 3,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "686c17583cf79421d70b007e",
+      "requiredItems": [
+        {
+          "item": "6889e4cd3ff7e9cfbc0c507c",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 600,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "68666887df54e1190902df57",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5ede0053879619077751cff1",
+      "requiredItems": [
+        {
+          "item": "5d1b3a5d86f774252167ba22",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "619cc01e0a7c3a1a2731940c",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5af0454c86f7746bf20992e8",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d02778e86f774203e7dedbe",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 4600,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5d02797c86f774203f38e30a",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5dceeaf100b3815535149f5a",
+      "requiredItems": [
+        {
+          "item": "5d1b371186f774253763a656",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "57347c5b245977448d35f6e1",
+          "count": 4,
+          "attributes": {}
+        },
+        {
+          "item": "57347c77245977448d35f6e2",
+          "count": 4,
+          "attributes": {}
+        },
+        {
+          "item": "5d40419286f774318526545f",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 12000,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5c127c4486f7745625356c13",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "615c3d800d3afc358a55405e",
+      "requiredItems": [
+        {
+          "item": "574d967124597745970e7c94",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d63d33b86f7746ea9275524",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 3100,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5d1c819a86f774771b0acd6c",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5ffcaa60f3fdc212a91d552b",
+      "requiredItems": [
+        {
+          "item": "5648a7494bdc2d9d488b4583",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "544fb5454bdc2df8738b456a",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 2000,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5e2af4d286f7746d4159f07a",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5e13301cc7049d4d9738e1a7",
+      "requiredItems": [
+        {
+          "item": "5755356824597772cb798962",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "544fb25a4bdc2dfb738b4567",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c695186f7741e566b64a2",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 2880,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5d1b3a5d86f774252167ba22",
+        "count": 3,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b60774343a16d2e04766b",
+      "requiredItems": [
+        {
+          "item": "5e2af4d286f7746d4159f07a",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af4a786f7746d3f3c3400",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "59e3556c86f7741776641ac2",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "59faf98186f774067b6be103",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "656fa25e94b480b8a500c0e0",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 7000,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5ab8dced86f774646209ec87",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b4f57769de97e1d62d116",
+      "requiredItems": [
+        {
+          "item": "59e77a2386f7742ee578960a",
+          "count": 50,
+          "attributes": {}
+        },
+        {
+          "item": "60391a8b3364dc22b04d0ce5",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "62a0a0bb621468534a797ad5",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5d6fc78386f77449d825f9dc",
+          "count": 2,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 9500,
+      "gameEditions": [],
+      "level": 3,
+      "taskUnlock": "5bc480a686f7741af0342e29",
+      "productItem": {
+        "item": "5e023d34e8a400319a28ed44",
+        "count": 30,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "63bd4c3964d7e356983c4cf5",
+      "requiredItems": [
+        {
+          "item": "5cc80f79e4a949033c7343b2",
+          "count": 100,
+          "attributes": {}
+        },
+        {
+          "item": "5d6fc78386f77449d825f9dc",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5c06782b86f77426df5407d2",
+          "count": 4,
+          "attributes": {}
+        },
+        {
+          "item": "544fb5454bdc2df8738b456a",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 8700,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5cc80f38e4a949001152b560",
+        "count": 60,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b47d1769de97e1d62d115",
+      "requiredItems": [
+        {
+          "item": "5d6fc78386f77449d825f9dc",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "62a0a098de7ac8199358053b",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 4400,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "64b7af5a8532cf95ee0a0dbd",
+        "count": 200,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "677d4db74ac9193862043ee9",
+      "requiredItems": [
+        {
+          "item": "590c2b4386f77425357b6123",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c2d8786f774245b1f03f3",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c311186f77424d1667482",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5734795124597738002c6176",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c2c9c86f774245b1f03f2",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af4a786f7746d3f3c3400",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 462,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "590c2e1186f77425357b6124",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5e66408286f7747b2c2d7786",
+      "requiredItems": [
+        {
+          "item": "5e2af51086f7746d3f3c3402",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "5656eb674bdc2d35148b457c",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "544fb5454bdc2df8738b456a",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 6000,
+      "gameEditions": [],
+      "level": 2,
+      "taskUnlock": "64f5deac39e45b527a7c4232",
+      "productItem": {
+        "item": "5e340dcdcb6d5863cc5e5efb",
+        "count": 5,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "68f2073205d9d632d30e1e97",
+      "requiredItems": [
+        {
+          "item": "62a09ee4cf4a99369e262453",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "57347d7224597744596b4e72",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5c13cef886f774072e618e82",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5672cb724bdc2dc2088b456b",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fd1654e76006732bf2e",
+      "duration": 1980,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "635a758bfefc88a93f021b8a",
+        "count": 3,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "63a2abbb31772a61500d5336",
+      "requiredItems": [
+        {
+          "item": "5d1b309586f77425227d1676",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af22086f7746d3f3c33fa",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 1500,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "59e366c186f7741778269d85",
+        "count": 4,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "6666d899eb78191c502350b2",
+      "requiredItems": [
+        {
+          "item": "5d1b317c86f7742523398392",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5d4042a986f7743185265463",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5af04b6486f774195a3ebb49",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "66571bf06a723f7f005a0619",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 300,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "665730fa4de4820934746c48",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5ede0135f7db6021ee400dfe",
+      "requiredItems": [
+        {
+          "item": "5c13cd2486f774072c757944",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "5d40412b86f7743cb332ac3a",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b3a5d86f774252167ba22",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 3300,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5755383e24597772cb798966",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "67bdfb12884b40ea9d08b5c9",
+      "requiredItems": [
+        {
+          "item": "67c0345b354fca26a0008036",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "67c031b79320f644db06f456",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "67bdf04d66ca1d79a2024637",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [
+        {
+          "item": "67c0324acc87f341720274b6"
+        }
+      ],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 19800,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "67c033fd0610e91bea056998",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "67c9d54b017035dd060bff5e",
+      "requiredItems": [
+        {
+          "item": "5d1b317c86f7742523398392",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "66571bf06a723f7f005a0619",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 60,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "665730fa4de4820934746c48",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "68f0e32460d1d6ebba02de4a",
+      "requiredItems": [
+        {
+          "item": "5c06779c86f77426e00dd782",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "590c31c586f774245e3141b2",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "61bf7b6302b3924be92fa8c3",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 3600,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5d1b392c86f77425243e98fe",
+        "count": 4,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b457c9db22d43ab42b706",
+      "requiredItems": [
+        {
+          "item": "59e68f6f86f7746c9f75e846",
+          "count": 120,
+          "attributes": {}
+        },
+        {
+          "item": "590a373286f774287540368b",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af37686f774755a234b65",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 6800,
+      "gameEditions": [],
+      "level": 2,
+      "taskUnlock": "5a27bc1586f7741f6d40fa2f",
+      "productItem": {
+        "item": "619636be6db0f2477964e710",
+        "count": 100,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5eeca812c4c989140245ae0c",
+      "requiredItems": [
+        {
+          "item": "590a3b0486f7743954552bdb",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "573477e124597737dd42e191",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5734779624597737e04bf329",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5c05300686f7746dce784e5d",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "6389c92d52123d5dd17f8876",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "57347baf24597738002c6178",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "6389c70ca33d8c4cdf4932c6",
+          "count": 4,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 54000,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "57347ca924597744596b4e71",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5eeca9bad874f914d2536585",
+      "requiredItems": [
+        {
+          "item": "5c127c4486f7745625356c13",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "57347c5b245977448d35f6e1",
+          "count": 6,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af29386f7746d4159f077",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "61bf7b6302b3924be92fa8c3",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "5d40419286f774318526545f",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 18000,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5b7c710788a4506dec015957",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5df914a53ce0f648b833bb37",
+      "requiredItems": [
+        {
+          "item": "6389c70ca33d8c4cdf4932c6",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5c1265fc86f7743f896a21c2",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c392f86f77444754deb29",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 28800,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "590c621186f774138d11ea29",
+        "count": 3,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5d8f5ee9de0799001d229ed2",
+      "requiredItems": [
+        {
+          "item": "56742c2e4bdc2d95058b456d",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "56742c284bdc2d98058b456d",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b39a386f774252339976f",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5448fee04bdc2dbc018b4567",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 3720,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5d1b371186f774253763a656",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "62a116282c5e0c325b62d5ec",
+      "requiredItems": [
+        {
+          "item": "5c05308086f7746b2101e90b",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "590c621186f774138d11ea29",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "62a0a124de7ac81993580542",
+          "count": 2,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 36000,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "62a0a16d0b9d3c46de5b6e97",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5dd3c9c8449c0c31795b0f0b",
+      "requiredItems": [
+        {
+          "item": "57347b8b24597737dd42e192",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d6fc78386f77449d825f9dc",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 2150,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5d6fc87386f77449db3db94e",
+        "count": 3,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "67da000f1556838cf90d1716",
+      "requiredItems": [
+        {
+          "item": "590c2e1186f77425357b6124",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5d4042a986f7743185265463",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "590a386e86f77429692b27ab",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "590a391c86f774385a33c404",
+          "count": 2,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 10800,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "590c37d286f77443be3d7827",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b54e7065b076eb02c4b47",
+      "requiredItems": [
+        {
+          "item": "590c5a7286f7747884343aea",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d6fc87386f77449db3db94e",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "544fb5454bdc2df8738b456a",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 3400,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5cc80f53e4a949000e1ea4f8",
+        "count": 150,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "6a614e9593f5bcb59a0af69c",
+      "requiredItems": [
+        {
+          "item": "577e1c9d2459773cd707c525",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "57347ca924597744596b4e71",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [
+        {
+          "item": "6a5f9becfc12d937d50ae095"
+        }
+      ],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 600,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "6a55f339fe4be93a04090acc",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "64b6aefe25251516d768542d",
+      "requiredItems": [
+        {
+          "item": "62a0a098de7ac8199358053b",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5e2af51086f7746d3f3c3402",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "60391b0fb847c71012789415",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 4800,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5e32f56fcb6d5863cc5e5ee4",
+        "count": 8,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5eda07acb6c564225571536c",
+      "requiredItems": [
+        {
+          "item": "5e2af41e86f774755a234b67",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af4a786f7746d3f3c3400",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "62a0a098de7ac8199358053b",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "61bf83814088ec1a363d7097",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 2800,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5c0e9f2c86f77432297fe0a3",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "68fe55248312b42f5f02129a",
+      "requiredItems": [
+        {
+          "item": "590c621186f774138d11ea29",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "62a0a16d0b9d3c46de5b6e97",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5c05300686f7746dce784e5d",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 12600,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "68cc09872bdcc15c010c2668",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5ede01e062155304b6512067",
+      "requiredItems": [
+        {
+          "item": "5d1b39a386f774252339976f",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b3f2d86f774253763b735",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "619cc01e0a7c3a1a2731940c",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 1670,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5b4335ba86f7744d2837a264",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "600aa0d1090cb6338027028c",
+      "requiredItems": [
+        {
+          "item": "544fb3364bdc2d34748b456a",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af22086f7746d3f3c33fa",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 3200,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5af0454c86f7746bf20992e8",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "67c86b2828d3adac2e09a16e",
+      "requiredItems": [
+        {
+          "item": "67c04a9bd98287be7b0923d8",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "67bdf04d66ca1d79a2024637",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "67c031b79320f644db06f456",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [
+        {
+          "item": "67c0324acc87f341720274b6"
+        }
+      ],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 19800,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "67c04a6f9152fbdfa306cc66",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "67f4ec82690e0a541a021d3d",
+      "requiredItems": [
+        {
+          "item": "57513f9324597720a7128161",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b39a386f774252339976f",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fc8654e760065037abf",
+      "duration": 1800,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "60098b1705871270cd5352a1",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "68ef997d16e4ed785f0fc18e",
+      "requiredItems": [
+        {
+          "item": "5c052fb986f7746b2101e909",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5c1d0dc586f7744baf2e7b79",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "6389c8c5dbfd5e4b95197e6b",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [
+        {
+          "item": "68e7d1be6656898e78015bd9"
+        }
+      ],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 9900,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "68c14b734a7e0bada00f8fd4",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "61c77cc6fcc1673f08540e9b",
+      "requiredItems": [
+        {
+          "item": "5448fee04bdc2dbc018b4567",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af29386f7746d4159f077",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b39a386f774252339976f",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fd1654e76006732bf2e",
+      "duration": 4000,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "60098b1705871270cd5352a1",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "66575197464c4b4ba4671004",
+      "requiredItems": [
+        {
+          "item": "5d1b317c86f7742523398392",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5d4042a986f7743185265463",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5af04b6486f774195a3ebb49",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "66572b3f6a723f7f005a066c",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 300,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "665732e7ac60f009f270d1ef",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "600abc08e4022c380a7260a8",
+      "requiredItems": [
+        {
+          "item": "5af0534a86f7743b6f354284",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "590a391c86f774385a33c404",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "5c052fb986f7746b2101e909",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "5af0561e86f7745f5f3ad6ac",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "590c2e1186f77425357b6124",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "6389c7750ef44505c87f5996",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "6389c8fb46b54c634724d847",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 120000,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5c0530ee86f774697952d952",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b50e7c023e22044165de5",
+      "requiredItems": [
+        {
+          "item": "64b7bbb74b75259c590fa897",
+          "count": 180,
+          "attributes": {}
+        },
+        {
+          "item": "5d1c774f86f7746d6620f8db",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5c06779c86f77426e00dd782",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 5600,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5a3c16fe86f77452b62de32a",
+        "count": 180,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5eeca8e327ccd70521107fdc",
+      "requiredItems": [
+        {
+          "item": "590a391c86f774385a33c404",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5c06779c86f77426e00dd782",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "5c06782b86f77426df5407d2",
+          "count": 4,
+          "attributes": {}
+        },
+        {
+          "item": "5af0561e86f7745f5f3ad6ac",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c2e1186f77425357b6124",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 18900,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5c052e6986f7746b207bc3c9",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "6913722bd4c6de533e0c774a",
+      "requiredItems": [
+        {
+          "item": "591094e086f7747caa7bb2ef",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af41e86f774755a234b67",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af4a786f7746d3f3c3400",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af47786f7746d404f3aaa",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "61bf83814088ec1a363d7097",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 1500,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "591094e086f7747caa7bb2ef",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5f240f45f4a9420a8c328ee0",
+      "requiredItems": [
+        {
+          "item": "57514643245977207f2c2d09",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5af0484c86f7740f02001f7f",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5448fee04bdc2dbc018b4567",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "62a09e73af34e73a266d932a",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fd1654e76006732bf2e",
+      "duration": 6500,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5751435d24597720a27126d1",
+        "count": 4,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "600a98d076fc4b1877509ead",
+      "requiredItems": [
+        {
+          "item": "5d1c819a86f774771b0acd6c",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5648b0744bdc2d363b8b4578",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5649b1c04bdc2d16268b457c",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c2b4386f77425357b6123",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "590c2d8786f774245b1f03f3",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 4900,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5841474424597759ba49be91",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "600aa209f64dfd63ec1293d6",
+      "requiredItems": [
+        {
+          "item": "5e4abfed86f77406a2713cf7",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af4a786f7746d3f3c3400",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af41e86f774755a234b67",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "61bf83814088ec1a363d7097",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 3600,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5648a69d4bdc2ded0b8b457b",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "6558d7894626375d6735670c",
+      "requiredItems": [
+        {
+          "item": "5fc382c1016cce60e8341b20",
+          "count": 50,
+          "attributes": {}
+        },
+        {
+          "item": "5d6fc87386f77449db3db94e",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "544fb5454bdc2df8738b456a",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 15000,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5fc275cf85fd526b824a571a",
+        "count": 30,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5ffcadeff3fdc212a91d5539",
+      "requiredItems": [
+        {
+          "item": "5448fee04bdc2dbc018b4567",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5751487e245977207e26a315",
+          "count": 2,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fd1654e76006732bf2e",
+      "duration": 3800,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5e8f3423fd7471236e6e3b64",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "6002e26ac6b84d04cc62045e",
+      "requiredItems": [
+        {
+          "item": "590a386e86f77429692b27ab",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c2d8786f774245b1f03f3",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 2600,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "590a391c86f774385a33c404",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5de10c50c607752a1f1262c7",
+      "requiredItems": [
+        {
+          "item": "57505f6224597709a92585a9",
+          "count": 2,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fd1654e76006732bf2e",
+      "duration": 5000,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "59e3577886f774176a362503",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "68ef997a4fc35ae00505dcf2",
+      "requiredItems": [
+        {
+          "item": "5c052fb986f7746b2101e909",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5c1d0efb86f7744baf2e7b7b",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "6389c8c5dbfd5e4b95197e6b",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [
+        {
+          "item": "68e7d1be6656898e78015bd9"
+        }
+      ],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 9900,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "68e7d904aded99fd1a0624f2",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5e1330dca0f0f8773c069c99",
+      "requiredItems": [
+        {
+          "item": "60363c0c92ec1c31037959f5",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c2d8786f774245b1f03f3",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 120,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "590c595c86f7747884343ad7",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5ffcafd468c55773943fc71e",
+      "requiredItems": [
+        {
+          "item": "5aa2ba46e5b5b000137b758d",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "61bf83814088ec1a363d7097",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 2600,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5e2af47786f7746d404f3aaa",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "600ab99ce4022c380a726090",
+      "requiredItems": [
+        {
+          "item": "5e8488fa988a8701445df1e4",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b3a5d86f774252167ba22",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 1800,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5e8488fa988a8701445df1e4",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "6666d7ea0b734650a91d0a42",
+      "requiredItems": [
+        {
+          "item": "5d1b317c86f7742523398392",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5d4042a986f7743185265463",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5af04b6486f774195a3ebb49",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "66572bb3ac60f009f270d1df",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 300,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "66573310a1657263d816a139",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5eecaa6327ccd70521107ff5",
+      "requiredItems": [
+        {
+          "item": "572b7adb24597762ae139821",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "61bf83814088ec1a363d7097",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 2200,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5e2af4a786f7746d3f3c3400",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "600a9bd0189b226f40059751",
+      "requiredItems": [
+        {
+          "item": "5d6fc78386f77449d825f9dc",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af37686f774755a234b65",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "590c5a7286f7747884343aea",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5a0c27731526d80618476ac4",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c2e1186f77425357b6124",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "544fb5454bdc2df8738b456a",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 16500,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5e85a9f4add9fe03027d9bf1",
+        "count": 7,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5e6cfc53a3e6886b9e6c39a8",
+      "requiredItems": [
+        {
+          "item": "5d1b3a5d86f774252167ba22",
+          "count": 7,
+          "attributes": {}
+        },
+        {
+          "item": "59e3606886f77417674759a5",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5c0e530286f7747fa1419862",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "544fb3f34bdc2d03748b456a",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 4990,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5c0e531286f7747fa54205c2",
+        "count": 5,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5d78f27d115f693ad750d2c6",
+      "requiredItems": [
+        {
+          "item": "60391b0fb847c71012789415",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af51086f7746d3f3c3402",
+          "count": 3,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 18300,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5448be9a4bdc2dfd2f8b456a",
+        "count": 6,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "6002e8fb41d38607bc4198ab",
+      "requiredItems": [
+        {
+          "item": "590c621186f774138d11ea29",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "5e42c83786f7742a021fdf3c",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5c052fb986f7746b2101e909",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5c05300686f7746dce784e5d",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "61bf7c024770ee6f9c6b8b53",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 236000,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5e42c81886f7742a01529f57",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5eda072cf6626f08ef0efed4",
+      "requiredItems": [
+        {
+          "item": "5e2af4d286f7746d4159f07a",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af4a786f7746d3f3c3400",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 3250,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "59e7635f86f7742cbf2c1095",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "690a89f3f986495a06051d5b",
+      "requiredItems": [
+        {
+          "item": "577e1c9d2459773cd707c525",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590a3b0486f7743954552bdb",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "573477e124597737dd42e191",
+          "count": 2,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 19800,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "689b512b075404ce7e09ec12",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5ffcab66fd851f4b000d61ef",
+      "requiredItems": [
+        {
+          "item": "5d1b36a186f7742523398433",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "57347c77245977448d35f6e2",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "57347c5b245977448d35f6e1",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "61bf7b6302b3924be92fa8c3",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5d40419286f774318526545f",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 30000,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5e2af55f86f7746d4159f07c",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "67da0223078f1947650d7bb7",
+      "requiredItems": [
+        {
+          "item": "5c052fb986f7746b2101e909",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5c12613b86f7743bbe2c3f76",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 2400,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5c94bbff86f7747ee735c08f",
+        "count": 3,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5de95c91225b0a76ca0ea0b7",
+      "requiredItems": [
+        {
+          "item": "5c06779c86f77426e00dd782",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "590a391c86f774385a33c404",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "6389c70ca33d8c4cdf4932c6",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5c06782b86f77426df5407d2",
+          "count": 2,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 4800,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5d1b2fa286f77425227d1674",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "6941307f73dcf473e50be4b7",
+      "requiredItems": [
+        {
+          "item": "5af0484c86f7740f02001f7f",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d63d33b86f7746ea9275524",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 3600,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "693bfb50d5c25889e701d444",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5ffcacbf24fa2e741e767234",
+      "requiredItems": [
+        {
+          "item": "590a3efd86f77437d351a25b",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5c06779c86f77426e00dd782",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5c06782b86f77426df5407d2",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5672cb124bdc2d1a0f8b4568",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c2e1186f77425357b6124",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 5500,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5672cb724bdc2dc2088b456b",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b63ac9db22d43ab42b70a",
+      "requiredItems": [
+        {
+          "item": "5e2af41e86f774755a234b67",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af4d286f7746d4159f07a",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af4a786f7746d3f3c3400",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "61bf83814088ec1a363d7097",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "590c2e1186f77425357b6124",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "656f9fa0498d1b7e3e071d98",
+          "count": 2,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 9000,
+      "gameEditions": [],
+      "level": 2,
+      "taskUnlock": "5b47876e86f7744d1c353205",
+      "productItem": {
+        "item": "5d5d87f786f77427997cfaef",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5df8fe0deddb880fd56f2d7d",
+      "requiredItems": [
+        {
+          "item": "5d40407c86f774318526545a",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d40412b86f7743cb332ac3a",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b39a386f774252339976f",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 2450,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "59e358a886f7741776641ac3",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b4669b71eeb7c4168c625",
+      "requiredItems": [
+        {
+          "item": "64b8725c4b75259c590fa899",
+          "count": 90,
+          "attributes": {}
+        },
+        {
+          "item": "5d6fc78386f77449d825f9dc",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c2e1186f77425357b6124",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 13000,
+      "gameEditions": [],
+      "level": 3,
+      "taskUnlock": "63a9b229813bba58a50c9ee5",
+      "productItem": {
+        "item": "5fd20ff893a8961fc660a954",
+        "count": 50,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5d78dbfb65aebb016d20b6f3",
+      "requiredItems": [
+        {
+          "item": "5d1c819a86f774771b0acd6c",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5648b1504bdc2d9d488b4584",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5ac50c185acfc400163398d4",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c2e1186f77425357b6124",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 5000,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5acf7db286f7743a9c7092e3",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "691371a2a911df6c2f0195f1",
+      "requiredItems": [
+        {
+          "item": "5910968f86f77425cf569c32",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c2e1186f77425357b6124",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5bc9b355d4351e6d1509862a",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d1c819a86f774771b0acd6c",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "61bf7b6302b3924be92fa8c3",
+          "count": 2,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 1500,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5910968f86f77425cf569c32",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b4489065b076eb02c4b45",
+      "requiredItems": [
+        {
+          "item": "54527a984bdc2d4e668b4567",
+          "count": 180,
+          "attributes": {}
+        },
+        {
+          "item": "590c5a7286f7747884343aea",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d6fc78386f77449d825f9dc",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "544fb5454bdc2df8738b456a",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 8400,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "54527ac44bdc2d36668b4567",
+        "count": 90,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "67da04db9cbeb8d6f4011962",
+      "requiredItems": [
+        {
+          "item": "5c052fb986f7746b2101e909",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5c94bbff86f7747ee735c08f",
+          "count": 10,
+          "attributes": {}
+        },
+        {
+          "item": "6389c8c5dbfd5e4b95197e6b",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "5c12613b86f7743bbe2c3f76",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "5c05300686f7746dce784e5d",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "5c05308086f7746b2101e90b",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "61bf7c024770ee6f9c6b8b53",
+          "count": 4,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 90000,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5c1d0efb86f7744baf2e7b7b",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "68f1105b53aec9cbde0aa22e",
+      "requiredItems": [
+        {
+          "item": "5e2af37686f774755a234b65",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "619cc01e0a7c3a1a2731940c",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5d1b3a5d86f774252167ba22",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "59e361e886f774176c10a2a5",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c695186f7741e566b64a2",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 4500,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "637b6251104668754b72f8f9",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "600aa140090cb63380270290",
+      "requiredItems": [
+        {
+          "item": "5ab8f04f86f774585f4237d8",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "61bf83814088ec1a363d7097",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 2900,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5e2af41e86f774755a234b67",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "6a564745aac5d6632d0757bc",
+      "requiredItems": [
+        {
+          "item": "5733279d245977289b77ec24",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b33a686f7742523398398",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "59e358a886f7741776641ac3",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "590c2e1186f77425357b6124",
+          "count": 1,
+          "attributes": {
+            "functional": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 79200,
+      "gameEditions": [],
+      "level": 1,
+      "taskUnlock": "5d4bec3486f7743cac246665",
+      "productItem": {
+        "item": "5d03794386f77420415576f5",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b5dc8065b076eb02c4b48",
+      "requiredItems": [
+        {
+          "item": "5e2af4d286f7746d4159f07a",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af4a786f7746d3f3c3400",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "656f57dc27aed95beb08f628",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 4000,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5c0e5edb86f77461f55ed1f7",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "61c77c830f3639492721e99c",
+      "requiredItems": [
+        {
+          "item": "5448fee04bdc2dbc018b4567",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "590c595c86f7747884343ad7",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5d1b385e86f774252167b98a",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "62a0a043cf4a99369e2624a5",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fd1654e76006732bf2e",
+      "duration": 17500,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5c0fa877d174af02a012e1cf",
+        "count": 3,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "68f68abd75ecb35e20030e85",
+      "requiredItems": [
+        {
+          "item": "59faff1d86f7746c51718c9c",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "68f244ae22c8979ee308f4d8",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 600,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "68f11adfcd0babab2c0fb003",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "67da01179cbeb8d6f4011961",
+      "requiredItems": [
+        {
+          "item": "590c2e1186f77425357b6124",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5d4042a986f7743185265463",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "590a391c86f774385a33c404",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "6389c70ca33d8c4cdf4932c6",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590a3b0486f7743954552bdb",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 14400,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "61bf7c024770ee6f9c6b8b53",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5ffcac4e1285295b7441ee01",
+      "requiredItems": [
+        {
+          "item": "590a3efd86f77437d351a25b",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c2d8786f774245b1f03f3",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 2900,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "590a3b0486f7743954552bdb",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5ede07163c345121732a10e9",
+      "requiredItems": [
+        {
+          "item": "544fb25a4bdc2dfb738b4567",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "5d40407c86f774318526545a",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 1000,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5751a25924597722c463c472",
+        "count": 10,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5d5c21aed582a50066024610",
+      "requiredItems": [
+        {
+          "item": "5d1b3a5d86f774252167ba22",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5751a25924597722c463c472",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5e831507ea0a7c419c2f9bd9",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 3000,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "590c678286f77426c9660122",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b5af31273611d2462ab76",
+      "requiredItems": [
+        {
+          "item": "5d6fc78386f77449d825f9dc",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "560d5e524bdc2d25448b4571",
+          "count": 50,
+          "attributes": {}
+        },
+        {
+          "item": "590c5c9f86f77477c91c36e7",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b317c86f7742523398392",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 8400,
+      "gameEditions": [],
+      "level": 3,
+      "taskUnlock": "5d25d2c186f77443e35162e5",
+      "productItem": {
+        "item": "5d6e68a8a4b9360b6c0d54e2",
+        "count": 50,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5d8f5e1af3a8f83c8600afb2",
+      "requiredItems": [
+        {
+          "item": "5c13cd2486f774072c757944",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "62a09f32621468534a797acb",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 2100,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5d40412b86f7743cb332ac3a",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5d5c1fd4d582a500650132f0",
+      "requiredItems": [
+        {
+          "item": "59e3577886f774176a362503",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b33a686f7742523398398",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d494a3f5b56502f18c98a0e",
+      "duration": 11000,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5d1b376e86f774252519444e",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "68f110c61bc3ee7616092bde",
+      "requiredItems": [
+        {
+          "item": "60098ad7c2240c0fe85c570a",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b3f2d86f774253763b735",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "59e361e886f774176c10a2a5",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "59e3606886f77417674759a5",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 3780,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "637b6179104668754b72f8f5",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5ee4a093a297eb185236194f",
+      "requiredItems": [
+        {
+          "item": "5c94bbff86f7747ee735c08f",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5c05300686f7746dce784e5d",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "6389c92d52123d5dd17f8876",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "590c621186f774138d11ea29",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 43200,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5c052fb986f7746b2101e909",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "62a11658650cc35fa94e009a",
+      "requiredItems": [
+        {
+          "item": "57347d3d245977448f7b7f61",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "5e8f3423fd7471236e6e3b64",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b33a686f7742523398398",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fd1654e76006732bf2e",
+      "duration": 36000,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "62a09f32621468534a797acb",
+        "count": 10,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "62a11415c30cfa1d366aeb83",
+      "requiredItems": [
+        {
+          "item": "59faf98186f774067b6be103",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "62a09ee4cf4a99369e262453",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "635a758bfefc88a93f021b8a",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 3000,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5c13cd2486f774072c757944",
+        "count": 6,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5dceb6964a98801ba2075d27",
+      "requiredItems": [
+        {
+          "item": "5d6fc87386f77449db3db94e",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5d1c774f86f7746d6620f8db",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "544fb5454bdc2df8738b456a",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "58dd3ad986f77403051cba8f",
+          "count": 80,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 8256,
+      "gameEditions": [],
+      "level": 3,
+      "taskUnlock": "5a27bc3686f7741c73584026",
+      "productItem": {
+        "item": "6768c25aa7b238f14a08d3f6",
+        "count": 40,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b58a49db22d43ab42b709",
+      "requiredItems": [
+        {
+          "item": "560d5e524bdc2d25448b4571",
+          "count": 60,
+          "attributes": {}
+        },
+        {
+          "item": "5d6fc87386f77449db3db94e",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c5bbd86f774785762df04",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "544fb5454bdc2df8738b456a",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 4200,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5d6e68c4a4b9361b93413f79",
+        "count": 60,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "6012ee7e44a0465ee67a58de",
+      "requiredItems": [
+        {
+          "item": "5c0e533786f7747fa23f4d47",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "544fb3f34bdc2d03748b456a",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5751435d24597720a27126d1",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b3a5d86f774252167ba22",
+          "count": 2,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 5500,
+      "gameEditions": [],
+      "level": 2,
+      "taskUnlock": "5c0d1c4cd0928202a02a6f5c",
+      "productItem": {
+        "item": "5ed51652f6c34d2cc26336a1",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "600a9a34189b226f40059743",
+      "requiredItems": [
+        {
+          "item": "5b4391a586f7745321235ab2",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "59e366c186f7741778269d85",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c2e1186f77425357b6124",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "590c639286f774151567fa95",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 9100,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5d1b2ffd86f77425243e8d17",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "67c9d447b53b0fcf1d0bb0ab",
+      "requiredItems": [
+        {
+          "item": "5d1b317c86f7742523398392",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "66572bb3ac60f009f270d1df",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 60,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "66573310a1657263d816a139",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "67f4ebb7d0fb51b8c705e80e",
+      "requiredItems": [
+        {
+          "item": "5448fee04bdc2dbc018b4567",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fc8654e760065037abf",
+      "duration": 1200,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5448fee04bdc2dbc018b4567",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5de950a845b5d67bad6e9ef7",
+      "requiredItems": [
+        {
+          "item": "57347cd0245977445a2d6ff1",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5c06779c86f77426e00dd782",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5734795124597738002c6176",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 2100,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "59e36c6f86f774176c10a2a7",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5ffcad24f3fdc212a91d5536",
+      "requiredItems": [
+        {
+          "item": "590c31c586f774245e3141b2",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d6fc87386f77449db3db94e",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "544fb5454bdc2df8738b456a",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 5250,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "64b8ee384b75259c590fa89b",
+        "count": 120,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b5fd2975a7f3c734661a8",
+      "requiredItems": [
+        {
+          "item": "5e2af4a786f7746d3f3c3400",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af4d286f7746d4159f07a",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af41e86f774755a234b67",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5d40419286f774318526545f",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "656fb21fa0dce000a2020f7c",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 1980,
+      "gameEditions": [],
+      "level": 2,
+      "taskUnlock": "66151401efb0539ae10875ae",
+      "productItem": {
+        "item": "61bcc89aef0f505f0c6cd0fc",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5dd3c5487058311d4b267186",
+      "requiredItems": [
+        {
+          "item": "56dff216d2720bbd668b4568",
+          "count": 120,
+          "attributes": {}
+        },
+        {
+          "item": "590c2b4386f77425357b6123",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 900,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "590c5a7286f7747884343aea",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "66509e8c9398c9c9e10a31bb",
+      "requiredItems": [
+        {
+          "item": "5c10c8fd86f7743d7d706df3",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "62a0a043cf4a99369e2624a5",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "619cc01e0a7c3a1a2731940c",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "59e3606886f77417674759a5",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 4800,
+      "gameEditions": [
+        "edge_of_darkness",
+        "eod_tue_edition"
+      ],
+      "level": 2,
+      "productItem": {
+        "item": "66507eabf5ddb0818b085b68",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5de95f1c9517b140195ab717",
+      "requiredItems": [
+        {
+          "item": "5af0561e86f7745f5f3ad6ac",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d63d33b86f7746ea9275524",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 4400,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "590a358486f77429692b2790",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5d78d81757c9b8484a2bcb99",
+      "requiredItems": [
+        {
+          "item": "590c5a7286f7747884343aea",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5d6fc78386f77449d825f9dc",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5af04b6486f774195a3ebb49",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 6250,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "60194943740c5d77f6705eea",
+        "count": 90,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "68f0e37d1ddd18a6290a7e68",
+      "requiredItems": [
+        {
+          "item": "57347c77245977448d35f6e2",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "57347c5b245977448d35f6e1",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "61bf7b6302b3924be92fa8c3",
+          "count": 2,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 9000,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5d1b317c86f7742523398392",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b6b641273611d2462ab78",
+      "requiredItems": [
+        {
+          "item": "5e2af41e86f774755a234b67",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5734795124597738002c6176",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 1200,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "56e335e4d2720b6c058b456d",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "600ab813d19f85018a7489c4",
+      "requiredItems": [
+        {
+          "item": "590c595c86f7747884343ad7",
+          "count": 10,
+          "attributes": {}
+        },
+        {
+          "item": "577e1c9d2459773cd707c525",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "5d40419286f774318526545f",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5d1b371186f774253763a656",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 8000,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5d1b385e86f774252167b98a",
+        "count": 4,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5dd11303b78bb413d5133f79",
+      "requiredItems": [
+        {
+          "item": "57347c2e24597744902c94a1",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c2d8786f774245b1f03f3",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 7450,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5c06782b86f77426df5407d2",
+        "count": 6,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "62a11354b552772a0c4ba09e",
+      "requiredItems": [
+        {
+          "item": "5780cf722459777a5108b9a1",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c5a7286f7747884343aea",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "61bf7b6302b3924be92fa8c3",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "62a0a0bb621468534a797ad5",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5d40419286f774318526545f",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 10000,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "60391a8b3364dc22b04d0ce5",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "68ef997596921a3bf70d6196",
+      "requiredItems": [
+        {
+          "item": "5c052fb986f7746b2101e909",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5c1d0c5f86f7744bb2683cf0",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "6389c8c5dbfd5e4b95197e6b",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [
+        {
+          "item": "68e7d1be6656898e78015bd9"
+        }
+      ],
+      "station": "5d484fdf654e7600691aadf8",
+      "duration": 9900,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "68e7d984308332889e0b5e71",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "6002e68bca41c53bee18813b",
+      "requiredItems": [
+        {
+          "item": "57347c1124597737fb1379e3",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5734795124597738002c6176",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "59e358a886f7741776641ac3",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "56742c284bdc2d98058b456d",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 4800,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5e2af29386f7746d4159f077",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5de919ec1b25d85cf30ca39a",
+      "requiredItems": [
+        {
+          "item": "58d3db5386f77426186285a0",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "617aa4dd8166f034d57de9c5",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c2d8786f774245b1f03f3",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 5870,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5d6fc78386f77449d825f9dc",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "657fc79cfd86b9d9680c4a24",
+      "requiredItems": [
+        {
+          "item": "657b22485f444d6dff0c6c2f",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af22086f7746d3f3c33fa",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "57347c1124597737fb1379e3",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "63a0b208f444d32d6f03ea1e",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "59e35de086f7741778269d84",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 1600,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "656efd66034e8e01c407f35c",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "68f1113b58cb1bc9000d2f8b",
+      "requiredItems": [
+        {
+          "item": "5e8488fa988a8701445df1e4",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c657e86f77412b013051d",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b3a5d86f774252167ba22",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b39a386f774252339976f",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 6720,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5c0e533786f7747fa23f4d47",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5ede1e0b7690fa313b632e88",
+      "requiredItems": [
+        {
+          "item": "57347da92459774491567cf5",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "57347d8724597744596b4e76",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "57347d3d245977448f7b7f61",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fd1654e76006732bf2e",
+      "duration": 4710,
+      "gameEditions": [],
+      "level": 1,
+      "taskUnlock": "596a1e6c86f7741ddc2d3206",
+      "productItem": {
+        "item": "57347d7224597744596b4e72",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "6671d4fef3bee343f5000703",
+      "requiredItems": [
+        {
+          "item": "5c10c8fd86f7743d7d706df3",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "62a0a043cf4a99369e2624a5",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "619cc01e0a7c3a1a2731940c",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "59e3606886f77417674759a5",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fcd654e7668ec2ec322",
+      "duration": 4800,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "66507eabf5ddb0818b085b68",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5dc1f634ee5f2440a9272dc7",
+      "requiredItems": [
+        {
+          "item": "5d1b376e86f774252519444e",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5448fee04bdc2dbc018b4567",
+          "count": 5,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fd1654e76006732bf2e",
+      "duration": 5750,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5d40407c86f774318526545a",
+        "count": 10,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5df8ffcbaab5f257bd7ff3a8",
+      "requiredItems": [
+        {
+          "item": "590c5c9f86f77477c91c36e7",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d40419286f774318526545f",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 9000,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "590c5bbd86f774785762df04",
+        "count": 2,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b33429db22d43ab42b704",
+      "requiredItems": [
+        {
+          "item": "56dff3afd2720bba668b4567",
+          "count": 180,
+          "attributes": {}
+        },
+        {
+          "item": "5d6fc78386f77449d825f9dc",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c2e1186f77425357b6124",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 13000,
+      "gameEditions": [],
+      "level": 3,
+      "taskUnlock": "675c1ff1a757ddd00404f0aa",
+      "productItem": {
+        "item": "56dfef82d2720bbd668b4567",
+        "count": 60,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "619e45ea98398d3b104e8419",
+      "requiredItems": [
+        {
+          "item": "590c2e1186f77425357b6124",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c5bbd86f774785762df04",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5d40425986f7743185265461",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "5af04b6486f774195a3ebb49",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "61bf7b6302b3924be92fa8c3",
+          "count": 5,
+          "attributes": {}
+        },
+        {
+          "item": "5d4042a986f7743185265463",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 25000,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "619cbfeb6b8a1b37a54eebfa",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "600a9955ba91d953182d69f0",
+      "requiredItems": [
+        {
+          "item": "59e6152586f77473dc057aa1",
+          "count": 1,
+          "attributes": {
+            "functional": true
+          }
+        },
+        {
+          "item": "544fb5454bdc2df8738b456a",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 360,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "59e8d2ab86f77407f03fc9c2",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b598db71eeb7c4168c626",
+      "requiredItems": [
+        {
+          "item": "590c31c586f774245e3141b2",
+          "count": 3,
+          "attributes": {}
+        },
+        {
+          "item": "5d6fc78386f77449d825f9dc",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "63a0b208f444d32d6f03ea1e",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 3000,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5d6e6911a4b9361bd5780d52",
+        "count": 40,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5dc1f4d9e078d303d91b44c7",
+      "requiredItems": [
+        {
+          "item": "5d1b33a686f7742523398398",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b39a386f774252339976f",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fd1654e76006732bf2e",
+      "duration": 6650,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5448fee04bdc2dbc018b4567",
+        "count": 10,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "6a1568b4a9185da666070a24",
+      "requiredItems": [
+        {
+          "item": "5e2af02c86f7746d420957d4",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af2bc86f7746d3f3c33fc",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "57347c1124597737fb1379e3",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5c13cef886f774072e618e82",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 3600,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "5a2a57cfc4a2826c6e06d44a",
+        "count": 6,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b6bc01f2b6843ec751fd7",
+      "requiredItems": [
+        {
+          "item": "5e2af4a786f7746d3f3c3400",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af41e86f774755a234b67",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "61bf83814088ec1a363d7097",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "59e3556c86f7741776641ac2",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 2500,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5f5e467b0bc58666c37e7821",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "67bc88ec4e7dbc3aa2024321",
+      "requiredItems": [
+        {
+          "item": "590c2e1186f77425357b6124",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "68fa8e253666e2fd5b00a626",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [
+        {
+          "item": "67bdea3ecf0cc29475092196"
+        }
+      ],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 90000,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "68dfc07da7cfeed3e60204e7",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b5ebc32b0b1645e6f54c9",
+      "requiredItems": [
+        {
+          "item": "656f603f94b480b8a500c0d6",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af41e86f774755a234b67",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "59e3556c86f7741776641ac2",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5e2af4d286f7746d4159f07a",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 7000,
+      "gameEditions": [],
+      "level": 1,
+      "taskUnlock": "5ae4497b86f7744cf402ed00",
+      "productItem": {
+        "item": "5c0e57ba86f7747fa141986d",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5dd3c5a67da3785e63275437",
+      "requiredItems": [
+        {
+          "item": "5d0379a886f77420407aa271",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "590c5a7286f7747884343aea",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "60391afc25aff57af81f7085",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fda654e7600681d9315",
+      "duration": 6750,
+      "gameEditions": [],
+      "level": 2,
+      "productItem": {
+        "item": "5d6fc87386f77449db3db94e",
+        "count": 3,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5f241246232409155b66b809",
+      "requiredItems": [
+        {
+          "item": "5d1b33a686f7742523398398",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "59e3577886f774176a362503",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5af0484c86f7740f02001f7f",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5bc9be8fd4351e00334cae6e",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5d1b385e86f774252167b98a",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        },
+        {
+          "item": "62a09e73af34e73a266d932a",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fd1654e76006732bf2e",
+      "duration": 43200,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "5751496424597720a27126da",
+        "count": 20,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "655b6c381fe356507267b2f6",
+      "requiredItems": [
+        {
+          "item": "590c2c9c86f774245b1f03f2",
+          "count": 1,
+          "attributes": {}
+        },
+        {
+          "item": "5f5e45cc5021ce62144be7aa",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "5734795124597738002c6176",
+          "count": 2,
+          "attributes": {}
+        },
+        {
+          "item": "61bf83814088ec1a363d7097",
+          "count": 1,
+          "attributes": {
+            "tool": true
+          }
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 2500,
+      "gameEditions": [],
+      "level": 3,
+      "productItem": {
+        "item": "59e763f286f7742ee57895da",
+        "count": 1,
+        "attributes": {}
+      }
+    },
+    {
+      "id": "5eda04a30699b81bb9142aa2",
+      "requiredItems": [
+        {
+          "item": "5e2af47786f7746d404f3aaa",
+          "count": 1,
+          "attributes": {}
+        }
+      ],
+      "requiredQuestItems": [],
+      "station": "5d484fba654e7600691aadf7",
+      "duration": 1900,
+      "gameEditions": [],
+      "level": 1,
+      "productItem": {
+        "item": "544fb25a4bdc2dfb738b4567",
+        "count": 6,
+        "attributes": {}
+      }
+    }
+  ],
+  "translations": []
+}

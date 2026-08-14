@@ -32,7 +32,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 	public int ScreenWidth { get; set; }
 	public int ScreenHeight { get; set; }
 	public float ScreenScale { get; set; }
-	public TarkovDev.GraphQL.GameMode GameMode { get; set; }
+	public GameMode GameMode { get; set; }
 	public bool MinimizeToTray { get; set; }
 	public bool AlwaysOnTop { get; set; }
 	public bool LogDebug { get; set; }

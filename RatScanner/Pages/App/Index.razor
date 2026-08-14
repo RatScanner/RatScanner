@@ -1,7 +1,8 @@
 ﻿@page "/"
 @page "/app"
 @using RatScanner.Scan
-@using RatScanner.TarkovDev.GraphQL;
+@using RatScanner.TarkovDev.Json
+@using TJsonItem = RatScanner.TarkovDev.Json.Item
 @using System.Diagnostics
 @inject MenuVM MenuVM
 @inject LocalizationService Localizer
@@ -39,8 +40,8 @@
                 <div class="d-flex justify-space-between align-center mt-2">
                     <MudText Typo="Typo.subtitle2">@Localizer["BestTrader"]</MudText>
                     <div class="d-flex align-center">
-                        <MudAvatar Image="@(MenuVM.BestTraderOfferVendor?.Trader?.ImageLink)" Size="Size.Small" Style="float: left;" Class="mr-1" Elevation="1" />
-                        <MudText Typo="Typo.subtitle2" Style="float: right;">@MenuVM.BestTraderOfferVendor?.Name</MudText>
+                        <MudAvatar Image="@(MenuVM.LastItem.GetBestTraderImageLink())" Size="Size.Small" Style="float: left;" Class="mr-1" Elevation="1" />
+                        <MudText Typo="Typo.subtitle2" Style="float: right;">@MenuVM.LastItem.GetBestTraderName()</MudText>
                     </div>
                 </div>
                 <div class="d-flex justify-space-between align-center my-1">
@@ -89,7 +90,7 @@
         }
         <MudItem xs="12">
             <MudPaper Class="d-flex align-center justify-space-around pa-1 mx-2 my-1" Elevation="2">
-                <MudAutocomplete @ref="_searchBox" T="TarkovDev.GraphQL.Item" Placeholder="@Localizer["ItemSearch"]" PopoverClass="searchBoxPopover" SelectValueOnTab="true" ValueChanged="SetSearchItem" MaxItems="5" AnchorOrigin="Origin.TopCenter" TransformOrigin="Origin.BottomCenter" CoerceValue="true" AdornmentIcon="@Icons.Material.Filled.Search" SearchFunc="@SearchItem" Margin="Margin.Dense" Dense="true" Variant="Variant.Outlined">
+                <MudAutocomplete @ref="_searchBox" T="TJsonItem" Placeholder="@Localizer["ItemSearch"]" PopoverClass="searchBoxPopover" SelectValueOnTab="true" ValueChanged="SetSearchItem" MaxItems="5" AnchorOrigin="Origin.TopCenter" TransformOrigin="Origin.BottomCenter" CoerceValue="true" AdornmentIcon="@Icons.Material.Filled.Search" SearchFunc="@SearchItem" Margin="Margin.Dense" Dense="true" Variant="Variant.Outlined">
                     <ItemTemplate Context="item">
                         <MudPaper Class="ma-n1" Elevation="4">
                             <MudStack Row="true" Style="height: 48px">
@@ -116,22 +117,22 @@
 </style>
 
 @code {
-    private List<TarkovDev.GraphQL.Item>? _items;
+    private List<TJsonItem>? _items;
 
-    private MudAutocomplete<TarkovDev.GraphQL.Item> _searchBox { get; set; } = null!;
+    private MudAutocomplete<TJsonItem> _searchBox { get; set; } = null!;
 
     protected override void OnInitialized() {
         MenuVM.PropertyChanged += PropertyChangeHandler;
     }
 
-    private async Task<IEnumerable<TarkovDev.GraphQL.Item>> SearchItem(string value) {
+    private async Task<IEnumerable<TJsonItem>> SearchItem(string value) {
         if (_items == null) _items = TarkovDevAPI.GetItems().ToList();
 
         if (string.IsNullOrEmpty(value)) return TarkovDevAPI.GetItems().Take(1);
 
         value = SanitizeSearch(value);
 
-        Func<TarkovDev.GraphQL.Item, (TarkovDev.GraphQL.Item item, int score)> filter = (item) => {
+        Func<TJsonItem, (TJsonItem item, int score)> filter = (item) => {
             if (SanitizeSearch(item.Name) == value) return new(item, 5);
             if (SanitizeSearch(item.ShortName) == value) return new(item, 10);
 
@@ -151,7 +152,7 @@
             return new(null, -1);
         };
 
-        var matches = new List<(TarkovDev.GraphQL.Item item, int score)>();
+        var matches = new List<(TJsonItem item, int score)>();
         foreach (var item in _items) {
             var match = filter(item);
             if (match.item == null) continue;
@@ -163,11 +164,11 @@
             matches[i] = (matches[i].item, (int)(matches[i].score + matches[i].item.Name.Length * 0.002f));
 
             // Penalize weapon mods so the weapon it self will rank higher
-            if (matches[i].item.Types.Contains(ItemType.Mods)) matches[i] = (matches[i].item, matches[i].score + 5);
+            if (matches[i].item.Types.Contains("mods")) matches[i] = (matches[i].item, matches[i].score + 5);
         }
 
 
-        for (var i = 0; i < matches.Count; i++) if (matches[i].item.Types.Contains(ItemType.Mods)) matches[i] = (matches[i].item, matches[i].score + 5);
+        for (var i = 0; i < matches.Count; i++) if (matches[i].item.Types.Contains("mods")) matches[i] = (matches[i].item, matches[i].score + 5);
 
         var sortedMatches = matches.OrderBy(match => match.score).ThenBy(match => match.item.Name.Length);
         return sortedMatches.Select(match => match.item);
@@ -175,11 +176,12 @@
 
     private string SanitizeSearch(string value) {
         value = value.ToLower().Trim();
+        value = value.Replace("-", " ");
         value = new string(value.Where(c => char.IsLetterOrDigit(c) || c == ' ').ToArray());
         return value;
     }
 
-    private async void SetSearchItem(TarkovDev.GraphQL.Item item) {
+    private async void SetSearchItem(TJsonItem item) {
         if (item == null) return;
         MenuVM.ItemScans.Enqueue(new DefaultItemScan(item));
         await _searchBox.Clear();

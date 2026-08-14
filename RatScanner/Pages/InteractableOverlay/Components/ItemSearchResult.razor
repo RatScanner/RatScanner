@@ -1,4 +1,4 @@
-@using RatScanner.TarkovDev.GraphQL
+@using RatScanner.TarkovDev.Json
 @using Color = MudBlazor.Color
 @using System.Diagnostics;
 
@@ -52,7 +52,7 @@
             <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Center" Style="width: 3vw" Spacing="0">
                 @{
                     var bestTrader = Item.GetBestTraderOffer();
-                    var traderImage = Item.GetBestTraderOfferVendor()?.Trader?.ImageLink;
+                    var traderImage = Item.GetBestTraderImageLink();
                 }
                 <MudAvatar Image="@traderImage"
                            Size="Size.Medium" Style="float: left;" Square="true" Variant="Variant.Outlined" />
@@ -61,7 +61,7 @@
         </MudStack>
     </MudStack>
 
-    @if (IsExpanded && Item.Properties is ItemPropertiesAmmo ammoProp) {
+    @if (IsExpanded && Item.Properties?.PropertiesType == "ItemPropertiesAmmo") {
         <MudDivider Vertical="false" DividerType="DividerType.Middle" Class="mx-0 my-2" />
 
         <MudStack Row="false">
@@ -69,13 +69,13 @@
                 <HeaderContent>
                     <MudTh Style="">Name</MudTh>
                     <MudTh Style="text-align:right"><MudTableSortLabel SortBy="new Func<Item, object>(x=>x.Avg24HPrice)">Price</MudTableSortLabel></MudTh>
-                    <MudTh Style="text-align:right"><MudTableSortLabel SortBy="new Func<Item, object>(x=>(x.Properties as ItemPropertiesAmmo).Damage)">Damage</MudTableSortLabel></MudTh>
-                    <MudTh Style="text-align:right"><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Item, object>(x=>(x.Properties as ItemPropertiesAmmo).PenetrationPower)">Pen</MudTableSortLabel></MudTh>
+                    <MudTh Style="text-align:right"><MudTableSortLabel SortBy="new Func<Item, object>(x=>x.Properties?.Damage)">Damage</MudTableSortLabel></MudTh>
+                    <MudTh Style="text-align:right"><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<Item, object>(x=>x.Properties?.PenetrationPower)">Pen</MudTableSortLabel></MudTh>
                     <MudTh Style="text-align:right">Frag %</MudTh>
                     <MudTh Style="text-align:center">Armor Pen</MudTh>
                 </HeaderContent>
                 <RowTemplate>
-                    @if (context.Properties is not ItemPropertiesAmmo ammo) return;
+                    @if (context.Properties?.PropertiesType != "ItemPropertiesAmmo") return;
                     <MudTd Class="my-0 py-0">
                         <MudStack Row="true" AlignItems="AlignItems.Center">
                             <MudImage Src="@context.BaseImageLink" Style="width: 32px; height: 32px;" />
@@ -83,13 +83,13 @@
                         </MudStack>
                     </MudTd>
                     <MudTd Style="text-align:right">@context.Avg24HPrice.AsRubs()</MudTd>
-                    <MudTd Style="text-align:right">@ammo.Damage</MudTd>
-                    <MudTd Style="text-align:right">@ammo.PenetrationPower</MudTd>
-                    <MudTd Style="text-align:right">@((int)((ammo.FragmentationChance ?? 0m) * 100m))%</MudTd>
+                    <MudTd Style="text-align:right">@context.Properties!.Damage</MudTd>
+                    <MudTd Style="text-align:right">@context.Properties!.PenetrationPower</MudTd>
+                    <MudTd Style="text-align:right">@((int)((context.Properties!.FragmentationChance ?? 0m) * 100m))%</MudTd>
                     <MudTd Style="text-align:center">
                         @for (int _i = 0; _i < 6; _i++) {
                             int i = _i;
-                            decimal value = Math.Clamp((ammo.PenetrationPower ?? 0m) / 10m - i, 0, 1);
+                            decimal value = Math.Clamp((context.Properties!.PenetrationPower ?? 0m) / 10m - i, 0, 1);
                             int hue = (int)(value * 120m);
                             string style = $"background-color: hsl({hue},100%,40%);";
                             <MudAvatar Size="Size.Small" Square="true" Variant="Variant.Outlined" Style="@style">

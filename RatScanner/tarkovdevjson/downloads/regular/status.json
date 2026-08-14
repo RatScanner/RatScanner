@@ -1,0 +1,74 @@
+{
+  "data": {
+    "generalStatus": {
+      "name": "Global",
+      "message": "",
+      "status": 0,
+      "statusCode": "OK"
+    },
+    "currentStatuses": [
+      {
+        "_id": "617fcd4b8243911afa6099b7",
+        "name": "Website",
+        "status": 0,
+        "statusCode": "OK"
+      },
+      {
+        "_id": "617fcd550de43050e706ba86",
+        "name": "Forum",
+        "status": 0,
+        "statusCode": "OK"
+      },
+      {
+        "_id": "617fcd5f8243911afa6099b8",
+        "name": "Authentication",
+        "status": 0,
+        "statusCode": "OK"
+      },
+      {
+        "_id": "617fcd660de43050e706ba87",
+        "name": "Launcher",
+        "status": 0,
+        "statusCode": "OK"
+      },
+      {
+        "_id": "617fcd7100b3023a1167c514",
+        "name": "Group lobby",
+        "status": 0,
+        "statusCode": "OK"
+      },
+      {
+        "_id": "617fcd788243911afa6099b9",
+        "name": "Trading",
+        "status": 0,
+        "statusCode": "OK"
+      },
+      {
+        "_id": "617fcd810de43050e706ba88",
+        "name": "Matchmaking",
+        "status": 0,
+        "statusCode": "OK"
+      },
+      {
+        "_id": "61b0a12a7c89647b991439b2",
+        "name": "Friends and msg",
+        "status": 0,
+        "statusCode": "OK"
+      },
+      {
+        "_id": "61e8600a36e34d36935b0632",
+        "name": "Inventory operations",
+        "status": 0,
+        "statusCode": "OK"
+      },
+      {
+        "name": "Global",
+        "message": "",
+        "status": 0,
+        "statusCode": "OK"
+      }
+    ],
+    "messages": []
+  },
+  "translations": []
+}
