@@ -47,7 +47,7 @@ internal class MenuVM : INotifyPropertyChanged {
 	public TraderPrice? BestTraderOffer => LastItem.GetBestTraderOffer();
 	public TraderPrice? BestTraderOfferVendor => LastItem.GetBestTraderOffer();
 
-    public (int count, int kappaCount, int total, int kappaTotal) TaskRemainingResult => LastItem.GetTaskRemaining();
+    public (int count, int kappaCount, int total, int kappaTotal, int owned, int kappaOwned) TaskRemainingResult => LastItem.GetTaskRemaining();
 
     public int TaskRemaining => TaskRemainingResult.count;
 
@@ -55,7 +55,7 @@ internal class MenuVM : INotifyPropertyChanged {
 
 	public bool KappaNeeded => TaskRemainingKappa > 0;
 
-	public (int count, int total) HideoutRemainingResult => LastItem.GetHideoutRemaining();
+	public (int count, int total, int owned) HideoutRemainingResult => LastItem.GetHideoutRemaining();
 
 	public int HideoutRemaining => HideoutRemainingResult.count;
 
@@ -65,29 +65,31 @@ internal class MenuVM : INotifyPropertyChanged {
 
 	public bool ShowCurrentItemProgress => RatConfig.Tracking.ShowCurrentItemProgress;
 
-	private static string FormatProgress(bool showProgress, int remaining, int total) {
+	// "owned" is how many of the item the player holds right now, "total" is how many are
+	// still required, which excludes the requirements of already finished tasks and modules
+	private static string FormatProgress(bool showProgress, int remaining, int owned, int total) {
 		if (!showProgress) return remaining.ToString();
-		return $"{total - remaining}/{total}";
+		return $"{owned}/{total}";
 	}
 
 	public string TaskRemainingDisplay {
 		get {
 			var result = TaskRemainingResult;
-			return FormatProgress(ShowCurrentItemProgress, result.count, result.total);
+			return FormatProgress(ShowCurrentItemProgress, result.count, result.owned, result.total);
 		}
 	}
 
 	public string TaskRemainingKappaDisplay {
 		get {
 			var result = TaskRemainingResult;
-			return FormatProgress(ShowCurrentItemProgress, result.kappaCount, result.kappaTotal);
+			return FormatProgress(ShowCurrentItemProgress, result.kappaCount, result.kappaOwned, result.kappaTotal);
 		}
 	}
 
 	public string HideoutRemainingDisplay {
 		get {
 			var result = HideoutRemainingResult;
-			return FormatProgress(ShowCurrentItemProgress, result.count, result.total);
+			return FormatProgress(ShowCurrentItemProgress, result.count, result.owned, result.total);
 		}
 	}
 
