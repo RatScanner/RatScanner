@@ -96,7 +96,7 @@
 					<StackPanel Grid.Column="1"
 										Orientation="Horizontal"
 										HorizontalAlignment="Right">
-						<Label Content="{Binding TaskRemainingKappa, FallbackValue=0}" />
+						<Label Content="{Binding TaskRemainingKappaDisplay, FallbackValue=0}" />
 						<Image Source="{StaticResource kappaIcon}"
 								 VerticalAlignment="Center"
 								 Width="20"
@@ -133,7 +133,7 @@
 					<StackPanel Grid.Column="1"
 											Orientation="Horizontal"
 											HorizontalAlignment="Right">
-						<Label Content="{Binding TaskRemaining, FallbackValue=0}" />
+						<Label Content="{Binding TaskRemainingDisplay, FallbackValue=0}" />
 						<Image Source="{StaticResource questIcon}"
 									 VerticalAlignment="Center"
 									 Height="20" />
@@ -141,7 +141,7 @@
 					<StackPanel Grid.Column="2"
 											Orientation="Horizontal"
 											HorizontalAlignment="Right">
-						<Label Content="{Binding HideoutRemaining, FallbackValue=0}" />
+						<Label Content="{Binding HideoutRemainingDisplay, FallbackValue=0}" />
 						<Image Source="{StaticResource hideoutIcon}"
 									 VerticalAlignment="Center"
 									 Height="20" />

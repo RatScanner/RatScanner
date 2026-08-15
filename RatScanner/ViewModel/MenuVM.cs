@@ -47,19 +47,49 @@ internal class MenuVM : INotifyPropertyChanged {
 	public TraderPrice? BestTraderOffer => LastItem.GetBestTraderOffer();
 	public TraderPrice? BestTraderOfferVendor => LastItem.GetBestTraderOffer();
 
-    public (int count, int kappaCount) TaskRemainingResult => LastItem.GetTaskRemaining();
+    public (int count, int kappaCount, int total, int kappaTotal) TaskRemainingResult => LastItem.GetTaskRemaining();
 
     public int TaskRemaining => TaskRemainingResult.count;
 
     public int TaskRemainingKappa => TaskRemainingResult.kappaCount;
 
 	public bool KappaNeeded => TaskRemainingKappa > 0;
-	
-	public int HideoutRemaining => LastItem.GetHideoutRemaining();
+
+	public (int count, int total) HideoutRemainingResult => LastItem.GetHideoutRemaining();
+
+	public int HideoutRemaining => HideoutRemainingResult.count;
 
 	public bool ItemNeeded => TaskRemaining + HideoutRemaining > 0;
 
 	public bool ShowKappaNeeds => RatConfig.Tracking.ShowKappaNeeds;
+
+	public bool ShowCurrentItemProgress => RatConfig.Tracking.ShowCurrentItemProgress;
+
+	private static string FormatProgress(bool showProgress, int remaining, int total) {
+		if (!showProgress) return remaining.ToString();
+		return $"{total - remaining}/{total}";
+	}
+
+	public string TaskRemainingDisplay {
+		get {
+			var result = TaskRemainingResult;
+			return FormatProgress(ShowCurrentItemProgress, result.count, result.total);
+		}
+	}
+
+	public string TaskRemainingKappaDisplay {
+		get {
+			var result = TaskRemainingResult;
+			return FormatProgress(ShowCurrentItemProgress, result.kappaCount, result.kappaTotal);
+		}
+	}
+
+	public string HideoutRemainingDisplay {
+		get {
+			var result = HideoutRemainingResult;
+			return FormatProgress(ShowCurrentItemProgress, result.count, result.total);
+		}
+	}
 
 	public List<KeyValuePair<string, KeyValuePair<int, int>>>? ItemTeamNeeds {
 		get {
@@ -70,7 +100,7 @@ internal class MenuVM : INotifyPropertyChanged {
 			List<KeyValuePair<string, KeyValuePair<int, int>>> needs = new();
 			foreach (FetchModels.TarkovTracker.UserProgress? memberProgress in teamProgress) {
 				int task = LastItem.GetTaskRemaining(memberProgress).Item1;
-				int hideout = LastItem.GetHideoutRemaining(memberProgress);
+				int hideout = LastItem.GetHideoutRemaining(memberProgress).count;
 
 				if (task == 0 && hideout == 0) continue;
 
