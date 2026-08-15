@@ -1,4 +1,5 @@
 ﻿using RatEye;
+using RatScanner.Properties;
 using RatScanner.Scan;
 using RatStash;
 using System;
@@ -178,6 +179,9 @@ public class RatScannerMain : INotifyPropertyChanged {
 				},
 				InventoryConfig = new Config.Processing.Inventory() {
 					OptimizeHighlighted = highlighted,
+				},
+				InspectionConfig = new Config.Processing.Inspection() {
+					Marker = Resources.icon_search,
 				},
 			},
 		};
