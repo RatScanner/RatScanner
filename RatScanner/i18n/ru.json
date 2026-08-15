@@ -33,6 +33,7 @@
   "TrackingSettingsTitle": "Настройки отслеживания",
   "ShowNonFirNeeds": "Показывать требования не-FIR",
   "ShowKappaNeeds": "Показывать требования для Kappa",
+  "ShowCurrentItemProgress": "Показывать текущий прогресс предмета",
   "BackendLabel": "Бэкенд",
   "ApiToken": "API токен",
   "ShowTeammates": "Показывать напарников",
