@@ -14,7 +14,8 @@ namespace RatScanner;
 /// Interaction logic for PageSwitcher.xaml
 /// </summary>
 public partial class PageSwitcher : Window {
-	public const int DefaultWidth = 280;
+	// Wide enough for the game mode indicator next to the title
+	public const int DefaultWidth = 320;
 	public const int DefaultHeight = 450;
 
 	private NotifyIcon _notifyIcon = null!;
