@@ -1,4 +1,6 @@
 ﻿using RatStash;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -43,7 +45,13 @@ internal class SettingsVM : INotifyPropertyChanged {
 	public bool ShowKappaNeeds { get; set; }
 
 	// TarkovTracker Specific Tracking Settings
-	public string TarkovTrackerToken { get; set; }
+	private readonly Dictionary<GameMode, string> _tarkovTrackerTokens = new();
+
+	/// <summary>Token belonging to the currently selected <see cref="GameMode"/></summary>
+	public string TarkovTrackerToken {
+		get => _tarkovTrackerTokens.TryGetValue(GameMode, out string? token) ? token : "";
+		set => _tarkovTrackerTokens[GameMode] = value;
+	}
 
 	public bool ShowTarkovTrackerTeam { get; set; }
 
@@ -96,7 +104,9 @@ internal class SettingsVM : INotifyPropertyChanged {
 		ShowNonFIRNeeds = RatConfig.Tracking.ShowNonFIRNeeds;
 		ShowKappaNeeds = RatConfig.Tracking.ShowKappaNeeds;
 
-		TarkovTrackerToken = RatConfig.Tracking.TarkovTracker.Token;
+		foreach (GameMode gameMode in Enum.GetValues<GameMode>()) {
+			_tarkovTrackerTokens[gameMode] = RatConfig.Tracking.TarkovTracker.GetToken(gameMode);
+		}
 		ShowTarkovTrackerTeam = RatConfig.Tracking.TarkovTracker.ShowTeam;
 		TarkovTrackerBackend = RatConfig.Tracking.TarkovTracker.Backend;
 
@@ -107,9 +117,12 @@ internal class SettingsVM : INotifyPropertyChanged {
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
 	}
 
-	public async Task SaveSettings() {
+	/// <returns>False if the settings were saved but the TarkovTracker token was rejected</returns>
+	public async Task<bool> SaveSettings() {
 		bool updateMarketDB = NameScanLanguage != (int)RatConfig.NameScan.Language;
-		bool updateTarkovTrackerToken = TarkovTrackerToken != RatConfig.Tracking.TarkovTracker.Token;
+		// The active token follows the game mode, so switching mode swaps tokens too
+		bool updateTarkovTrackerToken = GameMode != RatConfig.GameMode
+			|| _tarkovTrackerTokens.Any(token => token.Value.Trim() != RatConfig.Tracking.TarkovTracker.GetToken(token.Key));
 		bool updateTarkovTrackerBackend = TarkovTrackerBackend != RatConfig.Tracking.TarkovTracker.Backend;
 		bool updateResolution = ScreenWidth != RatConfig.ScreenWidth || ScreenHeight != RatConfig.ScreenHeight;
 		bool updateLanguage = RatConfig.NameScan.Language != (Language)NameScanLanguage;
@@ -142,7 +155,11 @@ internal class SettingsVM : INotifyPropertyChanged {
 		RatConfig.Tracking.ShowNonFIRNeeds = ShowNonFIRNeeds;
 		RatConfig.Tracking.ShowKappaNeeds = ShowKappaNeeds;
 
-		RatConfig.Tracking.TarkovTracker.Token = TarkovTrackerToken.Trim();
+		// Written per mode instead of through the mode aware Token property, which
+		// would otherwise depend on RatConfig.GameMode being updated first
+		foreach (KeyValuePair<GameMode, string> token in _tarkovTrackerTokens) {
+			RatConfig.Tracking.TarkovTracker.SetToken(token.Key, token.Value.Trim());
+		}
 		RatConfig.Tracking.TarkovTracker.ShowTeam = ShowTarkovTrackerTeam;
 		RatConfig.Tracking.TarkovTracker.Backend = TarkovTrackerBackend;
 
@@ -162,7 +179,8 @@ internal class SettingsVM : INotifyPropertyChanged {
 		PageSwitcher.Instance.Topmost = RatConfig.AlwaysOnTop;
 		PageSwitcher.Instance.ResetWindowSize();
 		await TarkovDevAPI.InitializeCache();
-		if (updateTarkovTrackerToken || updateTarkovTrackerBackend) UpdateTarkovTrackerToken();
+		bool tokenAccepted = true;
+		if (updateTarkovTrackerToken || updateTarkovTrackerBackend) tokenAccepted = UpdateTarkovTrackerToken();
 		if (updateUiLanguage) _localizationService.SetLanguage(UiLanguage);
 		if (updateResolution || updateLanguage) RatScannerMain.Instance.SetupRatEye();
 
@@ -174,16 +192,18 @@ internal class SettingsVM : INotifyPropertyChanged {
 		RatConfig.SaveConfig();
 		Logger.LogInfo("Config saved!");
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
+		return tokenAccepted;
 	}
 
-	private void UpdateTarkovTrackerToken() {
+	/// <returns>False if the token was rejected and therefore removed</returns>
+	private bool UpdateTarkovTrackerToken() {
 		string token = RatConfig.Tracking.TarkovTracker.Token;
-		if (token == "") return;
+		if (token == "") return true;
 		RatScannerMain.Instance.TarkovTrackerDB.Token = RatConfig.Tracking.TarkovTracker.Token;
 		var db = RatScannerMain.Instance.TarkovTrackerDB;
 		if (db.TestToken(token)) {
 			db.UpdateToken();
-			return;
+			return true;
 		}
 
 		int visibleLength = (int)(token.Length * 0.25);
@@ -191,6 +211,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 		Logger.ShowWarning($"The TarkovTracker API Token does not seem to work.\n\n{token}");
 
 		RatConfig.Tracking.TarkovTracker.Token = "";
+		return false;
 	}
 
 	public event PropertyChangedEventHandler? PropertyChanged;

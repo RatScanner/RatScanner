@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using RatStash;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -109,7 +110,22 @@ internal static class RatConfig {
 				: "https://tarkovtracker.org/api/v2";
 			internal static bool Enable => Token.Length > 0;
 
-			internal static string Token = "";
+			// TarkovTracker keeps progress separate per game mode and its API tokens
+			// carry the mode they belong to, so one token is stored for each mode.
+			private static readonly Dictionary<GameMode, string> Tokens = new();
+
+			/// <summary>Token belonging to the currently selected <see cref="RatConfig.GameMode"/></summary>
+			internal static string Token {
+				get => GetToken(RatConfig.GameMode);
+				set => SetToken(RatConfig.GameMode, value);
+			}
+
+			internal static string GetToken(GameMode gameMode) => Tokens.TryGetValue(gameMode, out string? token) ? token : "";
+
+			internal static void SetToken(GameMode gameMode, string token) => Tokens[gameMode] = token;
+
+			internal static string TokenKey(GameMode gameMode) => $"{nameof(Token)}_{gameMode}";
+
 			internal static bool ShowTeam = true;
 			internal static int RefreshTime = 5 * 60 * 1000; // 5 minutes
 		}
@@ -225,7 +241,15 @@ internal static class RatConfig {
 
 		config.Section = nameof(Tracking.TarkovTracker);
 		Tracking.TarkovTracker.Backend = (TarkovTrackerBackend)config.ReadInt(nameof(Tracking.TarkovTracker.Backend), (int)Tracking.TarkovTracker.Backend);
-		Tracking.TarkovTracker.Token = config.ReadSecureString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);
+		foreach (GameMode gameMode in Enum.GetValues<GameMode>()) {
+			Tracking.TarkovTracker.SetToken(gameMode, config.ReadSecureString(Tracking.TarkovTracker.TokenKey(gameMode), ""));
+		}
+
+		// Read the single token used before per mode tokens existed. The mode it was
+		// created for was never stored, so it is migrated further below, once the
+		// configured game mode is known.
+		string legacyToken = config.ReadSecureString(nameof(Tracking.TarkovTracker.Token), "");
+
 		Tracking.TarkovTracker.ShowTeam = config.ReadBool(nameof(Tracking.TarkovTracker.ShowTeam), Tracking.TarkovTracker.ShowTeam);
 
 		config.Section = nameof(Overlay);
@@ -247,6 +271,12 @@ internal static class RatConfig {
 		}
 
 		GameMode = (GameMode)config.ReadInt(nameof(GameMode), (int)GameMode);
+
+		// Now that the game mode is known, the pre per mode token belongs to it
+		if (legacyToken.Length > 0 && Tracking.TarkovTracker.GetToken(GameMode).Length == 0) {
+			Tracking.TarkovTracker.SetToken(GameMode, legacyToken);
+		}
+
 		MinimizeToTray = config.ReadBool(nameof(MinimizeToTray), MinimizeToTray);
 		AlwaysOnTop = config.ReadBool(nameof(AlwaysOnTop), AlwaysOnTop);
 		LogDebug = config.ReadBool(nameof(LogDebug), LogDebug);
@@ -294,7 +324,12 @@ internal static class RatConfig {
 
 		config.Section = nameof(Tracking.TarkovTracker);
 		config.WriteInt(nameof(Tracking.TarkovTracker.Backend), (int)Tracking.TarkovTracker.Backend);
-		config.WriteSecureString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);
+		foreach (GameMode gameMode in Enum.GetValues<GameMode>()) {
+			config.WriteSecureString(Tracking.TarkovTracker.TokenKey(gameMode), Tracking.TarkovTracker.GetToken(gameMode));
+		}
+
+		// Clear the migrated legacy token so it can not resurrect a removed token
+		config.WriteSecureString(nameof(Tracking.TarkovTracker.Token), "");
 		config.WriteBool(nameof(Tracking.TarkovTracker.ShowTeam), Tracking.TarkovTracker.ShowTeam);
 
 		config.Section = nameof(Overlay);

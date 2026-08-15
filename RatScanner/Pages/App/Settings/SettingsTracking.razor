@@ -36,7 +36,14 @@
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="SettingsVM.TarkovTrackerToken" Validation="@(new Func<string, IEnumerable<string>>(CheckToken))" Label="@Localizer["ApiToken"]" InputType="@PasswordInput" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TokenShowClick"></MudTextField>
+                        <MudSelect @bind-Value="SettingsVM.GameMode" T="RatScanner.GameMode" Label="@Localizer["GameMode"]" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+                            @foreach (var gameMode in GetGameModes()) {
+                                <MudSelectItem Value="@gameMode">@Localizer[gameMode.ToTranslationKey()]</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField @bind-Value="SettingsVM.TarkovTrackerToken" Validation="@(new Func<string, IEnumerable<string>>(CheckToken))" Label="@Localizer["ApiToken"]" HelperText="@TokenHelperText" InputType="@PasswordInput" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TokenShowClick"></MudTextField>
                     </MudItem>
                     <MudItem xs="12">
                         <MudCheckBox @bind-Checked="SettingsVM.ShowTarkovTrackerTeam" Label="@Localizer["ShowTeammates"]" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
@@ -68,10 +75,33 @@
     InputType PasswordInput = InputType.Password;
     string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
 
+    private IEnumerable<RatScanner.GameMode> GetGameModes() => Enum.GetValues(typeof(RatScanner.GameMode)) as IEnumerable<RatScanner.GameMode>;
+
+    // TarkovTracker.io predates game modes, so its single token applies to all of them
+    private bool ModeAwareBackend => SettingsVM.TarkovTrackerBackend == TarkovTrackerBackend.TarkovTrackerORG;
+
+    private string ExpectedTokenPrefix => SettingsVM.GameMode switch {
+        RatScanner.GameMode.Pve => "PVE_",
+        RatScanner.GameMode.PvpSeason => "SZN_",
+        _ => "PVP_",
+    };
+
+    private string TokenHelperText => ModeAwareBackend
+        ? Localizer.Format("ApiTokenForMode", Localizer[SettingsVM.GameMode.ToTranslationKey()])
+        : Localizer["ApiTokenSingleMode"];
+
     private IEnumerable<string> CheckToken(string token)
     {
-        if (!string.IsNullOrEmpty(token) && !TarkovTrackerDB.TestToken(token))
-            yield return Localizer["InvalidToken"];
+        if (string.IsNullOrEmpty(token)) yield break;
+
+        // A token of the wrong mode is accepted by the API but serves the progress of
+        // the mode it was created for, so it has to be caught before it is tested
+        if (ModeAwareBackend && !token.StartsWith(ExpectedTokenPrefix)) {
+            yield return Localizer.Format("TokenModeMismatch", ExpectedTokenPrefix);
+            yield break;
+        }
+
+        if (!TarkovTrackerDB.TestToken(token)) yield return Localizer["InvalidToken"];
     }
 
     void TokenShowClick()
