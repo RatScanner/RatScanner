@@ -13,17 +13,15 @@
         </MudItem>
         <MudItem xs="12">
             <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudCheckBox @bind-Checked="SettingsVM.ShowNonFIRNeeds" Label="@Localizer["ShowNonFirNeeds"]" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+                <MudGrid Spacing="0" Class="pa-0 ma-0">
+                    <MudCheckBox @bind-Checked="SettingsVM.ShowNonFIRNeeds" Label="@Localizer["ShowNonFirNeeds"]" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+                    <MudCheckBox @bind-Checked="SettingsVM.ShowKappaNeeds" Label="@Localizer["ShowKappaNeeds"]" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+                </MudGrid>
             </MudPaper>
         </MudItem>
         <MudItem xs="12">
             <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudCheckBox @bind-Checked="SettingsVM.ShowKappaNeeds" Label="@Localizer["ShowKappaNeeds"]" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudGrid Spacing="1">
+                <MudGrid Spacing="0">
                     <MudItem xs="12">
                         <div class="d-flex justify-center">
                             @Localizer["TarkovTrackerTitle"]
@@ -38,9 +36,8 @@
                     <MudItem xs="12">
                         <MudTextField @bind-Value="SettingsVM.TarkovTrackerToken" Validation="@(new Func<string, IEnumerable<string>>(CheckToken))" Label="@Localizer["ApiToken"]" InputType="@PasswordInput" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TokenShowClick"></MudTextField>
                     </MudItem>
-                    <MudItem xs="12">
-                        <MudCheckBox @bind-Checked="SettingsVM.ShowTarkovTrackerTeam" Label="@Localizer["ShowTeammates"]" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    </MudItem>
+                    <MudCheckBox @bind-Checked="SettingsVM.ShowTarkovTrackerTeam" Label="@Localizer["ShowTeammates"]" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+                    <MudCheckBox @bind-Checked="SettingsVM.ShowCurrentItemProgress" Label="@Localizer["ShowCurrentItemProgress"]" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
                 </MudGrid>
             </MudPaper>
         </MudItem>

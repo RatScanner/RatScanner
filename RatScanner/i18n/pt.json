@@ -33,6 +33,7 @@
   "TrackingSettingsTitle": "Configurações de rastreamento",
   "ShowNonFirNeeds": "Mostrar necessidades não-FIR",
   "ShowKappaNeeds": "Mostrar necessidades de Kappa",
+  "ShowCurrentItemProgress": "Mostrar progresso atual do item",
   "BackendLabel": "Backend",
   "ApiToken": "Token da API",
   "ShowTeammates": "Mostrar companheiros",

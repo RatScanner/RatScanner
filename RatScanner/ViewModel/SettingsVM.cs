@@ -42,6 +42,8 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 	public bool ShowKappaNeeds { get; set; }
 
+	public bool ShowCurrentItemProgress { get; set; }
+
 	// TarkovTracker Specific Tracking Settings
 	public string TarkovTrackerToken { get; set; }
 
@@ -95,6 +97,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 		ShowNonFIRNeeds = RatConfig.Tracking.ShowNonFIRNeeds;
 		ShowKappaNeeds = RatConfig.Tracking.ShowKappaNeeds;
+		ShowCurrentItemProgress = RatConfig.Tracking.ShowCurrentItemProgress;
 
 		TarkovTrackerToken = RatConfig.Tracking.TarkovTracker.Token;
 		ShowTarkovTrackerTeam = RatConfig.Tracking.TarkovTracker.ShowTeam;
@@ -141,6 +144,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 		RatConfig.Tracking.ShowNonFIRNeeds = ShowNonFIRNeeds;
 		RatConfig.Tracking.ShowKappaNeeds = ShowKappaNeeds;
+		RatConfig.Tracking.ShowCurrentItemProgress = ShowCurrentItemProgress;
 
 		RatConfig.Tracking.TarkovTracker.Token = TarkovTrackerToken.Trim();
 		RatConfig.Tracking.TarkovTracker.ShowTeam = ShowTarkovTrackerTeam;

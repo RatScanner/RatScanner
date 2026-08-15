@@ -33,6 +33,7 @@
   "TrackingSettingsTitle": "追踪设置",
   "ShowNonFirNeeds": "显示非FIR需求",
   "ShowKappaNeeds": "显示 Kappa 需求",
+  "ShowCurrentItemProgress": "显示当前物品进度",
   "BackendLabel": "后端",
   "ApiToken": "API 令牌",
   "ShowTeammates": "显示队友",
