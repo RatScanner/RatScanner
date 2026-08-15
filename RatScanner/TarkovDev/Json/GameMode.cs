@@ -14,6 +14,8 @@ public enum GameMode {
 }
 
 internal static class GameModeExtensions {
+	internal static string ToTranslationKey(this GameMode gameMode) => $"GameMode{gameMode}";
+
 	internal static string ToApiString(this GameMode gameMode) {
 		System.Type type = typeof(GameMode);
 		System.Reflection.MemberInfo[] member = type.GetMember(gameMode.ToString());
