@@ -14,6 +14,15 @@ public enum GameMode {
 }
 
 internal static class GameModeExtensions {
+	internal static string ToTranslationKey(this GameMode gameMode) => $"GameMode{gameMode}";
+
+	/// <summary>Abbreviation for places which have no room for the full name</summary>
+	internal static string ToShortString(this GameMode gameMode) => gameMode switch {
+		GameMode.Pve => "PvE",
+		GameMode.PvpSeason => "PvPs",
+		_ => "PvP",
+	};
+
 	internal static string ToApiString(this GameMode gameMode) {
 		System.Type type = typeof(GameMode);
 		System.Reflection.MemberInfo[] member = type.GetMember(gameMode.ToString());

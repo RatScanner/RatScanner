@@ -47,8 +47,16 @@
         </MudItem>
         <MudItem xs="12">
             <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
+                <MudSelect @bind-Value="SettingsVM.GameMode" T="GameMode" Label="@Localizer["GameMode"]" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true">
+                    @foreach (var gameMode in GetGameModes()) {
+                        <MudSelectItem Value="@gameMode">@Localizer[gameMode.ToTranslationKey()]</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12">
+            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
                 <MudGrid Spacing="0" Class="pa-0 ma-0">
-                    <MudCheckBox @bind-Checked="@SettingsVM.GameMode" Label="@Localizer["UsePveData"]" Dense="true" Size="Size.Small" Class="pa-0 ma-0" Converter="@gameModeConverter"></MudCheckBox>
                     <!--<MudCheckBox @bind-Checked="@SettingsVM.MinimizeToTray" Label="Minimize to tray" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>-->
                     <MudCheckBox @bind-Checked="@SettingsVM.AlwaysOnTop" Label="@Localizer["AlwaysOnTop"]" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
                     <MudCheckBox @bind-Checked="@SettingsVM.LogDebug" Label="@Localizer["LogDebugInfo"]" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
@@ -60,11 +68,6 @@
 
 @code {
 
-    MudBlazor.Converter<GameMode, bool?> gameModeConverter = new MudBlazor.Converter<GameMode, bool?> {
-        SetFunc = value => value == GameMode.Pve,
-        GetFunc = value => value ?? false ? GameMode.Pve : GameMode.Regular,
-    };
-
     Converter<float> percentageConverter = new Converter<float> {
         SetFunc = value => (int)(value * 100) + "%",
         GetFunc = text => {
@@ -75,6 +78,8 @@
     };
 
     private IEnumerable<UiLanguage> GetUiLanguages() => (Enum.GetValues(typeof(UiLanguage)) as IEnumerable<UiLanguage>).OrderBy(l => l.ToCultureName());
+
+    private IEnumerable<GameMode> GetGameModes() => Enum.GetValues(typeof(GameMode)) as IEnumerable<GameMode>;
 
     protected override void OnInitialized() {
         SettingsVM.PropertyChanged += PropertyChangeHandler;

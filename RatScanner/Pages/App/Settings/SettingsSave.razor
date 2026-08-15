@@ -23,9 +23,12 @@
 
     private async void SaveSettings() {
         _showSpinner = true;
-        await SettingsVM.SaveSettings();
+        bool tokenAccepted = await SettingsVM.SaveSettings();
+        _showSpinner = false;
         StateHasChanged();
-        NavigationManager.NavigateTo("/app");
+
+        // Stay on the settings so a rejected TarkovTracker token can be corrected
+        if (tokenAccepted) NavigationManager.NavigateTo("/app");
     }
 
     private void DiscardSettings() {
