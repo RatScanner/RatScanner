@@ -132,7 +132,9 @@ public class RatScannerMain : INotifyPropertyChanged {
 		string message = "Version " + mostRecentVersion + " is available!\n";
 		message += "You are using: " + RatConfig.Version + "\n\n";
 		message += "Do you want to install it now?";
-		MessageBoxResult result = MessageBox.Show(message, "Rat Scanner Updater", MessageBoxButton.YesNo);
+		Window temp = new Window() { Visibility = Visibility.Hidden };
+		temp.Show();
+		MessageBoxResult result = MessageBox.Show(temp, message, "Rat Scanner Updater", MessageBoxButton.YesNo);
 		if (result == MessageBoxResult.Yes) UpdateRatScanner();
 	}
 
