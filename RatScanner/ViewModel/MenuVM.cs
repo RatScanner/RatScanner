@@ -1,5 +1,5 @@
 ﻿using RatScanner.Scan;
-using RatScanner.TarkovDev.GraphQL;
+using RatScanner.TarkovDev.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -32,7 +32,7 @@ internal class MenuVM : INotifyPropertyChanged {
 
 	public string PatreonLink => ApiManager.GetResource(ApiManager.ResourceType.PatreonLink);
 
-	public string Updated => DateTime.Parse(LastItem.Updated).ToLocalTime().ToString(CultureInfo.CurrentCulture);
+	public string Updated => LastItem.Updated.ToString(CultureInfo.CurrentCulture);
 
 	public string WikiLink {
 		get {
@@ -44,8 +44,8 @@ internal class MenuVM : INotifyPropertyChanged {
 
 	public int PricePerSlot => LastItem.GetAvg24hMarketPricePerSlot();
 
-	public ItemPrice? BestTraderOffer => LastItem.GetBestTraderOffer();
-	public TraderOffer? BestTraderOfferVendor => LastItem.GetBestTraderOfferVendor();
+	public TraderPrice? BestTraderOffer => LastItem.GetBestTraderOffer();
+	public TraderPrice? BestTraderOfferVendor => LastItem.GetBestTraderOffer();
 
     public (int count, int kappaCount) TaskRemainingResult => LastItem.GetTaskRemaining();
 

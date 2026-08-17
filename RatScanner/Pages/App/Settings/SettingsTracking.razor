@@ -2,22 +2,23 @@
 @using static RatScanner.RatConfig
 @inject SettingsVM SettingsVM
 @inject RatScanner.TarkovTrackerDB TarkovTrackerDB
+@inject LocalizationService Localizer
 @implements IDisposable
 <div>
     <MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
         <MudItem xs="12">
             <div class="d-flex align-center justify-center mx-2 mb-1">
-                <MudText Typo="Typo.subtitle1" Color="Color.Inherit">Tracking Settings</MudText>
+                <MudText Typo="Typo.subtitle1" Color="Color.Inherit">@Localizer["TrackingSettingsTitle"]</MudText>
             </div>
         </MudItem>
         <MudItem xs="12">
             <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudCheckBox @bind-Checked="SettingsVM.ShowNonFIRNeeds" Label="Show Non-FIR Needs" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+                <MudCheckBox @bind-Checked="SettingsVM.ShowNonFIRNeeds" Label="@Localizer["ShowNonFirNeeds"]" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
             </MudPaper>
         </MudItem>
         <MudItem xs="12">
             <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudCheckBox @bind-Checked="SettingsVM.ShowKappaNeeds" Label="Show Kappa Needs" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+                <MudCheckBox @bind-Checked="SettingsVM.ShowKappaNeeds" Label="@Localizer["ShowKappaNeeds"]" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
             </MudPaper>
         </MudItem>
         <MudItem xs="12">
@@ -25,20 +26,20 @@
                 <MudGrid Spacing="1">
                     <MudItem xs="12">
                         <div class="d-flex justify-center">
-                            TarkovTracker
+                            @Localizer["TarkovTrackerTitle"]
                         </div>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudSelect @bind-Value="SettingsVM.TarkovTrackerBackend" T="TarkovTrackerBackend" Label="Backend" Variant="Variant.Outlined" Margin="Margin.Dense">
+                        <MudSelect @bind-Value="SettingsVM.TarkovTrackerBackend" T="TarkovTrackerBackend" Label="@Localizer["BackendLabel"]" Variant="Variant.Outlined" Margin="Margin.Dense">
                             <MudSelectItem T="TarkovTrackerBackend" Value="@TarkovTrackerBackend.TarkovTrackerIO">TarkovTracker.io</MudSelectItem>
                             <MudSelectItem T="TarkovTrackerBackend" Value="@TarkovTrackerBackend.TarkovTrackerORG">TarkovTracker.org</MudSelectItem>
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudTextField @bind-Value="SettingsVM.TarkovTrackerToken" Validation="@(new Func<string, IEnumerable<string>>(CheckToken))" Label="API Token" InputType="@PasswordInput" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TokenShowClick"></MudTextField>
+                        <MudTextField @bind-Value="SettingsVM.TarkovTrackerToken" Validation="@(new Func<string, IEnumerable<string>>(CheckToken))" Label="@Localizer["ApiToken"]" InputType="@PasswordInput" Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="TokenShowClick"></MudTextField>
                     </MudItem>
                     <MudItem xs="12">
-                        <MudCheckBox @bind-Checked="SettingsVM.ShowTarkovTrackerTeam" Label="Show Teammates" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+                        <MudCheckBox @bind-Checked="SettingsVM.ShowTarkovTrackerTeam" Label="@Localizer["ShowTeammates"]" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
                     </MudItem>
                 </MudGrid>
             </MudPaper>
@@ -70,7 +71,7 @@
     private IEnumerable<string> CheckToken(string token)
     {
         if (!string.IsNullOrEmpty(token) && !TarkovTrackerDB.TestToken(token))
-            yield return "Invalid token";
+            yield return Localizer["InvalidToken"];
     }
 
     void TokenShowClick()

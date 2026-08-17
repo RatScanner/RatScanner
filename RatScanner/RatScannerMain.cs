@@ -1,4 +1,5 @@
 ﻿using RatEye;
+using RatScanner.Properties;
 using RatScanner.Scan;
 using RatStash;
 using System;
@@ -60,6 +61,9 @@ public class RatScannerMain : INotifyPropertyChanged {
 		Logger.Clear();
 
 		Logger.LogInfo("----- RatScanner " + RatConfig.Version + " -----");
+		Logger.LogInfo("Checking for updates...");
+		CheckForUpdates();
+
 		Logger.LogInfo($"Screen Info: {RatConfig.ScreenWidth}x{RatConfig.ScreenHeight} at {RatConfig.ScreenScale * 100}%");
 
 		Logger.LogInfo("Initializing TarkovDev API...");
@@ -92,9 +96,6 @@ public class RatScannerMain : INotifyPropertyChanged {
 
 		new Thread(() => {
 			Thread.Sleep(1000);
-			Logger.LogInfo("Checking for updates...");
-			CheckForUpdates();
-
 			Logger.LogInfo("Loading TarkovTracker data...");
 			if (RatConfig.Tracking.TarkovTracker.Enable) {
 				TarkovTrackerDB.Token = RatConfig.Tracking.TarkovTracker.Token;
@@ -131,7 +132,9 @@ public class RatScannerMain : INotifyPropertyChanged {
 		string message = "Version " + mostRecentVersion + " is available!\n";
 		message += "You are using: " + RatConfig.Version + "\n\n";
 		message += "Do you want to install it now?";
-		MessageBoxResult result = MessageBox.Show(message, "Rat Scanner Updater", MessageBoxButton.YesNo);
+		Window temp = new Window() { Visibility = Visibility.Hidden };
+		temp.Show();
+		MessageBoxResult result = MessageBox.Show(temp, message, "Rat Scanner Updater", MessageBoxButton.YesNo);
 		if (result == MessageBoxResult.Yes) UpdateRatScanner();
 	}
 
@@ -179,13 +182,16 @@ public class RatScannerMain : INotifyPropertyChanged {
 				InventoryConfig = new Config.Processing.Inventory() {
 					OptimizeHighlighted = highlighted,
 				},
+				InspectionConfig = new Config.Processing.Inspection() {
+					Marker = Resources.icon_search,
+				},
 			},
 		};
 	}
 
 	private Database RatStashDatabaseFromTarkovDev() {
 		List<Item> rsItems = new();
-		foreach (TarkovDev.GraphQL.Item i in TarkovDevAPI.GetItems()) {
+		foreach (TarkovDev.Json.Item i in TarkovDevAPI.GetItems()) {
 			rsItems.Add(new RatStash.Item() {
 				Id = i.Id,
 				Name = i.Name,
@@ -323,6 +329,7 @@ public class RatScannerMain : INotifyPropertyChanged {
 		TarkovTrackerDB.Init();
 		_tarkovTrackerDBRefreshTimer.Change(RatConfig.Tracking.TarkovTracker.RefreshTime, Timeout.Infinite);
 	}
+
 	private void RefreshOverlay(object? o = null) {
 		OnPropertyChanged();
 	}

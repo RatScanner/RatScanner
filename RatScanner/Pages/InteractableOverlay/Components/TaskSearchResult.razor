@@ -1,5 +1,4 @@
-@using RatScanner.TarkovDev.GraphQL
-@using TTask = RatScanner.TarkovDev.GraphQL.Task;
+@using RatScanner.TarkovDev.Json
 @using System.Diagnostics;
 @using static RatScanner.Pages.InteractableOverlay.Index
 
@@ -46,7 +45,7 @@
 
         <MudStack Row="false" Style="max-height:200px; overflow:hidden; position:relative">
             <div class="fadeOut" style="top: 200px;"></div>
-            @foreach (ITaskObjective? objective in Task.Objectives ?? Enumerable.Empty<ITaskObjective?>()) {
+            @foreach (TaskObjective? objective in Task.Objectives ?? Enumerable.Empty<TaskObjective?>()) {
                 if (objective == null) continue;
                 <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
                     <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" AlignItems="AlignItems.Center">
@@ -80,10 +79,10 @@
     public DetailAmount Detail { get; set; }
 
     [Parameter]
-    public required TTask Task { get; set; }
+    public required TarkovTask Task { get; set; }
 
     [Parameter]
-    public EventCallback<(TTask task, ITaskObjective objective)> OnMapClick { get; set; }
+    public EventCallback<(TarkovTask task, TaskObjective objective)> OnMapClick { get; set; }
 
     [Parameter]
     public EventCallback OnClick { get; set; }
@@ -92,15 +91,9 @@
         OnClick.InvokeAsync();
     }
 
-    private bool HasMapForObjective(ITaskObjective objective) {
+    private bool HasMapForObjective(TaskObjective objective) {
         // Check if objective has zones with positions
-        if (objective is TaskObjectiveBasic basicObj && basicObj.Zones != null && basicObj.Zones.Any(z => z?.Position != null)) return true;
-        if (objective is TaskObjectiveItem itemObj && itemObj.Zones != null && itemObj.Zones.Any(z => z?.Position != null)) return true;
-        if (objective is TaskObjectiveMark markObj && markObj.Zones != null && markObj.Zones.Any(z => z?.Position != null)) return true;
-        if (objective is TaskObjectiveQuestItem questItemObj && questItemObj.Zones != null && questItemObj.Zones.Any(z => z?.Position != null)) return true;
-        if (objective is TaskObjectiveUseItem useItemObj && useItemObj.Zones != null && useItemObj.Zones.Any(z => z?.Position != null)) return true;
-        
-        return false;
+        return objective.Zones != null && objective.Zones.Any(z => z?.Position != null);
     }
 
     private void OpenURL(string? url) {

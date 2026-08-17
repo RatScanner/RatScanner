@@ -47,8 +47,11 @@
                             else
                             {
                                 <div class="d-flex align-center stroke">
-                                    @item.GetBestTraderOffer()?.PriceRub.ToShortString().AsRubs()
-                                    <MudAvatar Image="@(item.GetBestTraderOfferVendor()?.Trader?.ImageLink)"
+									@{
+										var bestTraderOffer = item.GetBestTraderOffer();
+									}
+                                    @bestTraderOffer?.PriceRub.ToShortString().AsRubs()
+                                    <MudAvatar Image="@(bestTraderOffer?.Trader?.ImageLink)"
                                                Size="Size.Small" Style="float: right;" Class="ml-1" />
                                 </div>
                             }
@@ -84,8 +87,11 @@
                     else
                     {
                         <div class="d-flex align-center stroke">
-                            @item.GetBestTraderOffer()?.PriceRub.ToShortString().AsRubs()
-                            <MudAvatar Image="@(item.GetBestTraderOfferVendor()?.Trader?.ImageLink)"
+							@{
+								var bestTraderOffer = item.GetBestTraderOffer();
+							}
+                            @bestTraderOffer?.PriceRub.ToShortString().AsRubs()
+                            <MudAvatar Image="@(bestTraderOffer?.Trader?.ImageLink)"
                                        Size="Size.Small" Style="float: right;" Class="ml-1" />
                         </div>
                     }

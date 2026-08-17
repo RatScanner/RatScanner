@@ -2,16 +2,19 @@
 @page "/app"
 @using RatScanner.Pages.InteractableOverlay.Components
 @using RatScanner.Scan
-@using RatScanner.TarkovDev.GraphQL
+@using RatScanner.TarkovDev.Json
 @using RatScanner.Pages.App.Components
 @using RatScanner.Pages.InteractableOverlay.Services
+@using RatScanner.TarkovDev.Json
+@using TJsonItem = RatScanner.TarkovDev.Json.Item
 @using System.Diagnostics
 @using Task = System.Threading.Tasks.Task;
-@using TTask = RatScanner.TarkovDev.GraphQL.Task;
+@using RatScanner.TarkovDev.Json;
 @using SearchResult = RatScanner.Pages.InteractableOverlay.Services.SearchResult
 @inject MenuVM MenuVM
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
+@inject LocalizationService Localizer
 @implements IDisposable
 
 <div>
@@ -65,7 +68,7 @@
                         @if (searchResult.Data is Item item) {
                             <ItemSearchResult Item="@item" OnClick="@(() => SelectResult(i))" />
                         } 
-                        else if (searchResult.Data is TTask task) {
+                        else if (searchResult.Data is TarkovTask task) {
                             <TaskSearchResult Task="@task" OnClick="@(() => SelectResult(i))" />
                         } 
                         @* TODO: Re-enable map search results when MapViewer is fixed
@@ -176,7 +179,7 @@
 
 @code {
     private MudTextField<string> _searchTextField = null!;
-    private List<TarkovDev.GraphQL.Item>? _items;
+    private List<TarkovDev.Json.Item>? _items;
     private string _searchText;
     private IEnumerable<SearchResult> _searchResults = new List<SearchResult>();
     private readonly SearchService _searchService = new();

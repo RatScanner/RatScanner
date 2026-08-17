@@ -1,11 +1,12 @@
 ﻿using RatEye;
+using RatScanner.TarkovDev.Json;
 
 namespace RatScanner.Scan;
 
 public class DefaultItemScan : ItemScan {
 	public DefaultItemScan() { }
 
-	public DefaultItemScan(TarkovDev.GraphQL.Item item) {
+	public DefaultItemScan(Item item) {
 		Item = item;
 
 		string pathEnding = "unknown-item-grid-image.jpg";

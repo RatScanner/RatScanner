@@ -61,7 +61,7 @@
 			<Separator />
 			<Grid>
 				<Label Grid.Column="0"
-							 Content="{Binding BestTraderOfferVendor.Name}"
+							 Content="{Binding BestTraderOfferVendor.Trader.NormalizedName}"
 							 d:Content="Mechanic" />
 				<Label Grid.Column="1"
 							 Content="{Binding BestTraderOffer.PriceRub, Converter={StaticResource IntToLongPriceConverter}}"
@@ -76,7 +76,7 @@
 			<StackPanel.Style>
 				<Style TargetType="StackPanel">
 					<Style.Triggers>
-						<DataTrigger Binding="{Binding BestTraderOfferVendor.Name}"
+						<DataTrigger Binding="{Binding BestTraderOfferVendor.Trader.NormalizedName}"
 												 Value="">
 							<Setter Property="Visibility"
 											Value="Collapsed" />

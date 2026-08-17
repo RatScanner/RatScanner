@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         Title="Rat Scanner"
         AllowsTransparency="True"
-        Opacity="0.002"
+				Background="#01000000"
         WindowStyle="None"
         MinWidth="300"
         MinHeight="400"

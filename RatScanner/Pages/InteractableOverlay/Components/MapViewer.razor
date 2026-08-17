@@ -1,5 +1,4 @@
-@using RatScanner.TarkovDev.GraphQL
-@using TTask = RatScanner.TarkovDev.GraphQL.Task;
+@using RatScanner.TarkovDev.Json
 
 <div class="map-viewer-overlay" @onclick="OnClose">
     <div class="map-viewer-header" @onclick:stopPropagation="true">
@@ -165,10 +164,10 @@
     public required Map Map { get; set; }
 
     [Parameter]
-    public TTask? Task { get; set; }
+    public TarkovTask? Task { get; set; }
 
     [Parameter]
-    public ITaskObjective? Objective { get; set; }
+    public TaskObjective? Objective { get; set; }
 
     [Parameter]
     public List<TaskZone?>? ObjectiveZones { get; set; }

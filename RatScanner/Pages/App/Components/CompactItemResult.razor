@@ -1,4 +1,4 @@
-@using RatScanner.TarkovDev.GraphQL
+@using RatScanner.TarkovDev.Json
 @using Color = MudBlazor.Color
 @using System.Diagnostics;
 
@@ -53,7 +53,7 @@
             <MudStack Spacing="0" AlignItems="AlignItems.Center" Style="min-width: 50px;">
                 @{
                     var bestTrader = Item.GetBestTraderOffer();
-                    var traderImage = Item.GetBestTraderOfferVendor()?.Trader?.ImageLink;
+                    var traderImage = bestTrader?.Trader?.ImageLink;
                 }
                 <MudAvatar Image="@traderImage" Size="Size.Small" Square="true" Variant="Variant.Outlined" />
                 <MudText Typo="Typo.caption">@bestTrader?.PriceRub.AsRubs()</MudText>

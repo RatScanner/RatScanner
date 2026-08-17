@@ -17,6 +17,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 	public string ToolTipDuration { get; set; }
 	public int ToolTipMilli { get; set; }
+	public UiLanguage UiLanguage { get; set; }
 
 	public bool ShowName { get; set; }
 	public bool ShowAvgDayPrice { get; set; }
@@ -31,7 +32,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 	public int ScreenWidth { get; set; }
 	public int ScreenHeight { get; set; }
 	public float ScreenScale { get; set; }
-	public TarkovDev.GraphQL.GameMode GameMode { get; set; }
+	public GameMode GameMode { get; set; }
 	public bool MinimizeToTray { get; set; }
 	public bool AlwaysOnTop { get; set; }
 	public bool LogDebug { get; set; }
@@ -53,7 +54,10 @@ internal class SettingsVM : INotifyPropertyChanged {
 	public bool BlurBehindSearch { get; set; }
 	public Hotkey InteractableOverlayHotkey { get; set; }
 
-	internal SettingsVM() {
+	private readonly LocalizationService _localizationService;
+
+	internal SettingsVM(LocalizationService localizationService) {
+		_localizationService = localizationService;
 		LoadSettings();
 	}
 
@@ -69,6 +73,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 		ToolTipDuration = RatConfig.ToolTip.Duration.ToString();
 		ToolTipMilli = RatConfig.ToolTip.Duration;
+		UiLanguage = RatConfig.UserInterface.Language;
 
 		ShowName = RatConfig.MinimalUi.ShowName;
 		ShowAvgDayPrice = RatConfig.MinimalUi.ShowAvgDayPrice;
@@ -107,6 +112,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 		bool updateTarkovTrackerBackend = TarkovTrackerBackend != RatConfig.Tracking.TarkovTracker.Backend;
 		bool updateResolution = ScreenWidth != RatConfig.ScreenWidth || ScreenHeight != RatConfig.ScreenHeight;
 		bool updateLanguage = RatConfig.NameScan.Language != (Language)NameScanLanguage;
+		bool updateUiLanguage = RatConfig.UserInterface.Language != UiLanguage;
 
 		// Save config
 		RatConfig.NameScan.Enable = EnableNameScan;
@@ -120,6 +126,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 		RatConfig.ToolTip.Duration = int.TryParse(ToolTipDuration, out int i) ? i : 0;
 		RatConfig.ToolTip.Duration = ToolTipMilli;
+		RatConfig.UserInterface.Language = UiLanguage;
 
 		RatConfig.MinimalUi.ShowName = ShowName;
 		RatConfig.MinimalUi.ShowAvgDayPrice = ShowAvgDayPrice;
@@ -154,6 +161,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 		PageSwitcher.Instance.ResetWindowSize();
 		await TarkovDevAPI.InitializeCache();
 		if (updateTarkovTrackerToken || updateTarkovTrackerBackend) UpdateTarkovTrackerToken();
+		if (updateUiLanguage) _localizationService.SetLanguage(UiLanguage);
 		if (updateResolution || updateLanguage) RatScannerMain.Instance.SetupRatEye();
 
 		RatEye.Config.LogDebug = RatConfig.LogDebug;

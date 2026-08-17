@@ -1,13 +1,13 @@
-using RatScanner.TarkovDev.GraphQL;
+using RatScanner.TarkovDev.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TTask = RatScanner.TarkovDev.GraphQL.Task;
+using System.Threading.Tasks;
 
 namespace RatScanner.Pages.InteractableOverlay.Services;
 
 public class SearchService {
-	public async System.Threading.Tasks.Task<IEnumerable<SearchResult>> SearchMapsAsync(string value) {
+	public async Task<IEnumerable<SearchResult>> SearchMapsAsync(string value) {
 		if (string.IsNullOrEmpty(value)) return Enumerable.Empty<SearchResult>();
 
 		Func<Map, SearchResult?> filter = (map) => {
@@ -18,7 +18,7 @@ public class SearchService {
 		};
 
 		List<SearchResult> matches = new();
-		await System.Threading.Tasks.Task.Run(() => {
+		await Task.Run(() => {
 			foreach (var map in TarkovDevAPI.GetMaps()) {
 				var match = filter(map);
 				if (match?.Data == null) continue;
@@ -28,10 +28,10 @@ public class SearchService {
 		return matches;
 	}
 
-	public async System.Threading.Tasks.Task<IEnumerable<SearchResult>> SearchTasksAsync(string value) {
+	public async Task<IEnumerable<SearchResult>> SearchTasksAsync(string value) {
 		if (string.IsNullOrEmpty(value)) return Enumerable.Empty<SearchResult>();
 
-		Func<TTask, SearchResult?> filter = (task) => {
+		Func<TarkovTask, SearchResult?> filter = (task) => {
 			if (SanitizeSearch(task.Name) == value) return new(task, 4);
 			if (SanitizeSearch(task.Name).StartsWith(value)) return new(task, 10);
 			string[] filters = value.Split(new[] { ' ' });
@@ -43,7 +43,7 @@ public class SearchService {
 		};
 
 		List<SearchResult> matches = new();
-		await System.Threading.Tasks.Task.Run(() => {
+		await Task.Run(() => {
 			foreach (var task in TarkovDevAPI.GetTasks()) {
 				var match = filter(task);
 				if (match?.Data == null) continue;
@@ -53,7 +53,7 @@ public class SearchService {
 		return matches;
 	}
 
-	public async System.Threading.Tasks.Task<IEnumerable<SearchResult>> SearchItemsAsync(string value) {
+	public async Task<IEnumerable<SearchResult>> SearchItemsAsync(string value) {
 		if (string.IsNullOrEmpty(value)) return Enumerable.Empty<SearchResult>();
 
 		Func<Item, SearchResult?> filter = (item) => {
@@ -72,7 +72,7 @@ public class SearchService {
 		};
 
 		List<SearchResult> matches = new();
-		await System.Threading.Tasks.Task.Run(() => {
+		await Task.Run(() => {
 			foreach (var item in TarkovDevAPI.GetItems()) {
 				var match = filter(item);
 				if (match?.Data == null) continue;
@@ -83,7 +83,7 @@ public class SearchService {
 		for (int i = 0; i < matches.Count; i++) {
 			if (!(matches[i].Data is Item item)) continue;
 			matches[i].Score += (item.Name?.Length ?? 0) * 0.002;
-			if (item.Types != null && item.Types.Contains(ItemType.Mods))
+			if (item.Types != null && item.Types.Contains("mods"))
 				matches[i].Score += 5;
 		}
 		return matches;

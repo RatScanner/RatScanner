@@ -2,20 +2,21 @@
 @using RatScanner.Components;
 @inject SettingsVM SettingsVM
 @inject IJSRuntime JSRuntime
+@inject LocalizationService Localizer
 @implements IDisposable
 
 <div>
     <MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
         <MudItem xs="12">
             <div class="d-flex align-center justify-center mx-2 mb-1">
-                <MudText Typo="Typo.subtitle1" Color="Color.Inherit">Overlay Settings</MudText>
+                <MudText Typo="Typo.subtitle1" Color="Color.Inherit">@Localizer["OverlaySettingsTitle"]</MudText>
             </div>
         </MudItem>
         <MudItem xs="12">
             <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
                 <MudStack Spacing="0" Class="pa-0 ma-0">
-                    <MudCheckBox @bind-Checked="@SettingsVM.EnableIneractableOverlay" Label="Enable Search Overlay" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    <MudCheckBox @bind-Checked="@SettingsVM.BlurBehindSearch" Label="Blur Behind Search" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+                    <MudCheckBox @bind-Checked="@SettingsVM.EnableIneractableOverlay" Label="@Localizer["EnableSearchOverlay"]" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
+                    <MudCheckBox @bind-Checked="@SettingsVM.BlurBehindSearch" Label="@Localizer["BlurBehindSearch"]" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
                 </MudStack>
             </MudPaper>
         </MudItem>
@@ -24,7 +25,7 @@
                 <MudStack Spacing="0" Justify="Justify.SpaceBetween" Row="true">
                     <MudItem>
                         <MudText>
-                            Open Search Overlay
+                            @Localizer["OpenSearchOverlay"]
                         </MudText>
                     </MudItem>
                     <MudItem>
