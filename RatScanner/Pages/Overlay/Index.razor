@@ -38,7 +38,7 @@
                         </div>
 
                         <div style="overflow: hidden;">
-                            @if (item.Avg24HPrice >= item.GetBestTraderOffer()?.PriceRub)
+                            @if (item.Avg24HPrice >= item.GetBestSellToTraderOffer()?.PriceRub)
                             {
                                 <div class="stroke">
                                     @item.Avg24HPrice.ToShortString().AsRubs()
@@ -48,7 +48,7 @@
                             {
                                 <div class="d-flex align-center stroke">
 									@{
-										var bestTraderOffer = item.GetBestTraderOffer();
+										var bestTraderOffer = item.GetBestSellToTraderOffer();
 									}
                                     @bestTraderOffer?.PriceRub.ToShortString().AsRubs()
                                     <MudAvatar Image="@(bestTraderOffer?.Trader?.ImageLink)"
@@ -79,7 +79,7 @@
 	                                                   top: @(itemScan.GetToolTipPosition().Y - VirtualScreenOffset.YOffset)px;
 	                                                   background: #121212; padding: 4px;">
 
-                    @if (item.Avg24HPrice >= item.GetBestTraderOffer()?.PriceRub) {
+                    @if (item.Avg24HPrice >= item.GetBestSellToTraderOffer()?.PriceRub) {
                         <div class="stroke">
                             @item.Avg24HPrice.ToShortString().AsRubs()
                         </div>
@@ -88,7 +88,7 @@
                     {
                         <div class="d-flex align-center stroke">
 							@{
-								var bestTraderOffer = item.GetBestTraderOffer();
+								var bestTraderOffer = item.GetBestSellToTraderOffer();
 							}
                             @bestTraderOffer?.PriceRub.ToShortString().AsRubs()
                             <MudAvatar Image="@(bestTraderOffer?.Trader?.ImageLink)"

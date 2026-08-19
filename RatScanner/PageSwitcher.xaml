@@ -7,8 +7,8 @@
         AllowsTransparency="True"
 				Background="#01000000"
         WindowStyle="None"
-        MinWidth="300"
-        MinHeight="400"
+        MinWidth="800"
+        MinHeight="500"
         mc:Ignorable="d">
 	<Grid>
 		<ContentControl x:Name="ContentControl" />

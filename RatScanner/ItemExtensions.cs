@@ -129,7 +129,12 @@ public partial class Item {
 		return price / size;
 	}
 
-	public TraderPrice? GetBestTraderOffer() => SellToTrader?.MaxBy(i => i.PriceRub);
+	public int GetAvg24hMarketSellProfit() {
+		return 0;
+	}
+
+	public TraderPrice? GetBestSellToTraderOffer() => SellToTrader?.MaxBy(i => i.PriceRub);
+	public TraderPrice? GetBestBuyFromTraderOffer() => BuyFromTrader?.MinBy(i => i.PriceRub);
 
 	public static Item From(string id) {
 		return TarkovDevAPI.GetItems().First(i => i.Id == id);

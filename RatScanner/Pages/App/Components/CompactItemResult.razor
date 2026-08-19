@@ -52,7 +52,7 @@
             <!-- Best trader -->
             <MudStack Spacing="0" AlignItems="AlignItems.Center" Style="min-width: 50px;">
                 @{
-                    var bestTrader = Item.GetBestTraderOffer();
+                    var bestTrader = Item.GetBestSellToTraderOffer();
                     var traderImage = bestTrader?.Trader?.ImageLink;
                 }
                 <MudAvatar Image="@traderImage" Size="Size.Small" Square="true" Variant="Variant.Outlined" />

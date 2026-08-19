@@ -44,8 +44,8 @@ internal class MenuVM : INotifyPropertyChanged {
 
 	public int PricePerSlot => LastItem.GetAvg24hMarketPricePerSlot();
 
-	public TraderPrice? BestTraderOffer => LastItem.GetBestTraderOffer();
-	public TraderPrice? BestTraderOfferVendor => LastItem.GetBestTraderOffer();
+	public TraderPrice? BestTraderOffer => LastItem.GetBestSellToTraderOffer();
+	public TraderPrice? BestTraderOfferVendor => LastItem.GetBestSellToTraderOffer();
 
     public (int count, int kappaCount) TaskRemainingResult => LastItem.GetTaskRemaining();
 
