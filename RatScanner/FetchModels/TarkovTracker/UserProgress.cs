@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace RatScanner.FetchModels.TarkovTracker;
 
@@ -11,15 +11,23 @@ public class UserProgress {
 	[JsonProperty("displayName")]
 	public string DisplayName { get; set; } = "Tarkov Citizen";
 
-	[JsonProperty("tasksProgress")]
+	/// <summary>PMC level as tracked by TarkovTracker. Null when the API omits the field.</summary>
+	[JsonProperty("playerLevel")]
+	public int? PlayerLevel { get; set; }
+
+	/// <summary>PMC faction ("USEC" / "BEAR") as tracked by TarkovTracker.</summary>
+	[JsonProperty("pmcFaction")]
+	public string? PmcFaction { get; set; }
+
+	[JsonProperty("tasksProgress", NullValueHandling = NullValueHandling.Ignore)]
 	public List<Progress> Tasks { get; set; } = new();
 
-	[JsonProperty("taskObjectivesProgress")]
+	[JsonProperty("taskObjectivesProgress", NullValueHandling = NullValueHandling.Ignore)]
 	public List<Progress> TaskObjectives { get; set; } = new();
 
-	[JsonProperty("hideoutModulesProgress")]
+	[JsonProperty("hideoutModulesProgress", NullValueHandling = NullValueHandling.Ignore)]
 	public List<Progress> HideoutModules { get; set; } = new();
 
-	[JsonProperty("hideoutPartsProgress")]
+	[JsonProperty("hideoutPartsProgress", NullValueHandling = NullValueHandling.Ignore)]
 	public List<Progress> HideoutParts { get; set; } = new();
 }

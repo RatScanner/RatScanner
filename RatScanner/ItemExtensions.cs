@@ -16,105 +16,213 @@ public partial class Item {
 		return progress ?? new UserProgress();
 	}
 
-	public (int count, int kappaCount) GetTaskRemaining(UserProgress? progress = null) {
-		// Compensation for Damage Tasks
-		// These tasks are not tracked by TarkovTracker
-		string[] excludedTasks = new string[] {
-			"61e6e5e0f5b9633f6719ed95",
-			"61e6e60223374d168a4576a6",
-			"61e6e621bfeab00251576265",
-			"61e6e615eea2935bc018a2c5",
-			"61e6e60c5ca3b3783662be27",
-		};
-
-		progress ??= GetUserProgress();
-
-		int needed = 0;
-		int count = 0;
-		int kappaCount = 0;
-
-		bool showNonFir = RatConfig.Tracking.ShowNonFIRNeeds;
-
-		TarkovTask[] tasks = TarkovDevAPI.GetTasks();
-
-		foreach (TarkovTask task in tasks) {
-			if (task == null) continue;
-			// Skip if task is already completed
-			if (progress.Tasks.Any(p => p.Id == task.Id && p.Complete)) continue;
-
-			// Skip if task is to be excluded
-			if (excludedTasks.Contains(task.Id)) continue;
-
-			if (task.Objectives == null) continue;
-			foreach (TaskObjective? objective in task.Objectives) {
-				if (objective == null) continue;
-				if (objective.Type == "giveItem") {
-					if (!objective.Items.Contains(Id)) continue;	// Skip if item is not the one we are looking for
-					if (!showNonFir && !objective.FoundInRaid) continue;					// Skip if item is not FIR
-					needed = objective.Count;
-					if (task.KappaRequired == true) kappaCount += objective.Count;
-					// Subtract amount of already collected items
-					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
-					foreach (Progress p in objectiveProgress) needed -= p.Complete ? objective.Count : p.Count;
-					count += needed;
-					if (task.KappaRequired == true) kappaCount += needed;
-				} else if (objective.Type == "plantItem") {
-					if (!objective.Items.Contains(Id)) continue;	// Skip if item is not the one we are looking for
-					if (!showNonFir) continue;										// Skip if item is not FIR
-					needed = objective.Count;
-					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
-					foreach (Progress p in objectiveProgress) needed -= p.Complete ? objective.Count : p.Count;
-					count += needed;
-					if (task.KappaRequired == true) kappaCount += needed;
-				} else if (objective.Type == "mark") {
-					if (objective.MarkerItem != Id) continue;  // Skip if item is not the one we are looking for
-					if (!showNonFir) continue;                      // Skip if item is not FIR
-					needed = 1;
-					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
-					foreach (Progress p in objectiveProgress) needed -= 1;
-					count += needed;
-					if (task.KappaRequired == true) kappaCount += needed;
-				} else if (objective.Type == "buildWeapon") {
-					if (objective.Item != Id) continue; // Skip if item is not the one we are looking for
-					if (!showNonFir) continue;                      // Skip if item is not FIR
-					needed = 1;
-					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
-					foreach (Progress p in objectiveProgress) needed -= 1;
-					count += needed;
-					if (task.KappaRequired == true) kappaCount += needed;
-				}
-			}
-		}
-		return (count, kappaCount);
+	public (int count, int kappaCount) GetTaskRemaining() => GetTaskRemaining(GetUserProgress());
+	public (int count, int kappaCount) GetTaskRemaining(UserProgress progress) {
+		QuestNeedReport report = GetQuestNeedReport(progress);
+		return (report.CurrentTotal, report.KappaTotal);
 	}
 
-	public int GetHideoutRemaining(UserProgress? progress = null) {
-		progress ??= GetUserProgress();
-		progress.Tasks ??= new List<Progress>();
-		progress.TaskObjectives ??= new List<Progress>();
+	/// <summary>
+	/// Full applicability-aware quest need classification for the item.
+	/// Does not inspect the scanned item's FIR state (no vision yet).
+	/// </summary>
+	internal QuestNeedReport GetQuestNeedReport(UserProgress progress) =>
+		QuestNeedClassifier.Classify(this, TarkovDevAPI.GetTasks(), progress, RatConfig.Tracking.ShowNonFIRNeeds);
 
-		int count = 0;
+	/// <summary>
+	/// Quest / hideout remaining counts broken down by found-in-raid requirement.
+	/// Visual FIR detection on the scanned icon is intentionally not implemented yet.
+	/// </summary>
+	public readonly record struct RequirementBreakdown(int Total, int FoundInRaid, int NonFoundInRaid) {
+		public bool Any => Total > 0;
+		public bool HasFirNeed => FoundInRaid > 0;
+		public bool HasNonFirNeed => NonFoundInRaid > 0;
+	}
+
+	/// <summary>How the player can obtain this item besides looting.</summary>
+	public readonly record struct AcquisitionInfo(bool CanCraft, int CraftRecipeCount, bool CanBarter, int BarterOfferCount) {
+		public bool Any => CanCraft || CanBarter;
+	}
+
+	private int RemainingForObjective(
+		TaskObjective objective,
+		UserProgress progress,
+		bool showNonFir,
+		out bool requiresFir
+	) {
+		requiresFir = false;
+		int needed = 0;
+
+		// Optional objectives are nice-to-have, never a requirement.
+		if (objective.Optional)
+			return 0;
+
+		if (objective.Type is "giveItem" or "findItem" or "plantItem") {
+			if (objective.ItemIds == null || !objective.ItemIds.Contains(Id))
+				return 0;
+
+			requiresFir = (objective.Type is "giveItem" or "findItem") && objective.FoundInRaid;
+			// plantItem is treated as non-FIR requirement (same as legacy).
+			if (!showNonFir && !requiresFir)
+				return 0;
+			if (!showNonFir && objective.Type == "plantItem")
+				return 0;
+
+			needed = objective.Count;
+			foreach (Progress p in progress.TaskObjectives.Where(p => p.Id == objective.Id))
+				needed -= p.Complete ? objective.Count : p.Count;
+			return Math.Max(0, needed);
+		}
+
+		if (objective.Type is "mark" or "buildWeapon") {
+			if (objective.MarkerItemId != Id && objective.BuildItemId != Id)
+				return 0;
+			if (!showNonFir)
+				return 0;
+			requiresFir = false;
+			needed = Math.Max(1, objective.Count);
+			foreach (Progress p in progress.TaskObjectives.Where(p => p.Id == objective.Id))
+				needed -= 1;
+			return Math.Max(0, needed);
+		}
+
+		return 0;
+	}
+
+	public int GetHideoutRemaining() => GetHideoutRequirementBreakdown(GetUserProgress()).Total;
+	public int GetHideoutRemaining(UserProgress progress) => GetHideoutRequirementBreakdown(progress).Total;
+
+	/// <summary>
+	/// Remaining hideout upgrade needs, split by FIR attribute on the station item requirement.
+	/// </summary>
+	public RequirementBreakdown GetHideoutRequirementBreakdown(UserProgress progress) {
+		int fir = 0;
+		int nonFir = 0;
 		HideoutStation[] stations = TarkovDevAPI.GetHideoutStations();
 
 		foreach (HideoutStation station in stations) {
-			if (station.Levels == null) continue;
+			if (station.Levels == null)
+				continue;
 			foreach (HideoutStationLevel? level in station.Levels) {
-				if (level == null) continue;
+				if (level == null)
+					continue;
 
-				// Skip if level is already built
-				if (progress.HideoutModules.Any(p => p.Id == level.Id && p.Complete)) continue;
+				if (progress.HideoutModules.Any(p => p.Id == level.Id && p.Complete))
+					continue;
 
-				if (level?.ItemRequirements == null) continue;
-				foreach (RequirementItem? requiredItem in level.ItemRequirements) {
-					if (requiredItem?.Item != Id) continue;
+				if (level.ItemRequirements == null)
+					continue;
+				foreach (RequirementItem requiredItem in level.ItemRequirements) {
+					if (requiredItem.ItemId != Id)
+						continue;
 
-					count += requiredItem.Count;
-					List<Progress> objectiveProgress = progress.HideoutParts.Where(p => p.Id == requiredItem.Id).ToList();
-					foreach (Progress p in objectiveProgress) count -= p.Complete ? requiredItem.Count : p.Count;
+					int remaining = requiredItem.Count;
+					foreach (Progress p in progress.HideoutParts.Where(p => p.Id == requiredItem.Id))
+						remaining -= p.Complete ? requiredItem.Count : p.Count;
+					remaining = Math.Max(0, remaining);
+					if (remaining <= 0)
+						continue;
+
+					if (requiredItem.FoundInRaid)
+						fir += remaining;
+					else
+						nonFir += remaining;
 				}
 			}
 		}
-		return count;
+
+		return new RequirementBreakdown(fir + nonFir, fir, nonFir);
+	}
+
+	internal static ObjectiveNeedBreakdown GetObjectiveNeedBreakdown(
+	Item item,
+	IReadOnlyList<TaskObjective>? objectives,
+	UserProgress progress,
+	bool showNonFir
+) {
+		RequirementBreakdown breakdown = GetTaskRequirementBreakdown(
+			item,
+			objectives,
+			progress,
+			showNonFir,
+			out int weaponHandIn
+		);
+		return new ObjectiveNeedBreakdown(
+			breakdown.Total,
+			breakdown.FoundInRaid,
+			breakdown.NonFoundInRaid,
+			weaponHandIn
+		);
+	}
+	internal static RequirementBreakdown GetTaskRequirementBreakdown(
+		Item item,
+		IReadOnlyList<TaskObjective>? objectives,
+		UserProgress progress,
+		bool showNonFir
+	) => GetTaskRequirementBreakdown(item, objectives, progress, showNonFir, out _);
+
+	private static RequirementBreakdown GetTaskRequirementBreakdown(
+		Item item,
+		IReadOnlyList<TaskObjective>? objectives,
+		UserProgress progress,
+		bool showNonFir,
+		out int weaponHandIn
+	) {
+		weaponHandIn = 0;
+		if (objectives == null)
+			return new RequirementBreakdown(0, 0, 0);
+
+		int fir = 0;
+		int nonFir = 0;
+		bool isWeapon = item.Types?.Contains("gun", StringComparer.OrdinalIgnoreCase) == true;
+		Dictionary<TaskObjective, TaskObjective> pairedFindByGive = [];
+		HashSet<TaskObjective> pairedFindObjectives = [];
+
+		foreach (
+			TaskObjective giveObjective in objectives.Where(objective =>
+				!objective.Optional && objective.Type == "giveItem" && objective.ItemIds?.Contains(item.Id) == true
+			)
+		) {
+			// Current tarkov.dev find/give pairs share count and FIR flags;
+			// loosen this match only if the upstream data starts emitting asymmetric pairs.
+			TaskObjective? pairedFind = objectives.FirstOrDefault(candidate =>
+				!candidate.Optional
+				&& candidate.Type == "findItem"
+				&& candidate.Count == giveObjective.Count
+				&& candidate.FoundInRaid == giveObjective.FoundInRaid
+				&& candidate.ItemIds?.Contains(item.Id) == true
+				&& !pairedFindObjectives.Contains(candidate)
+			);
+			if (pairedFind == null)
+				continue;
+			pairedFindByGive[giveObjective] = pairedFind;
+			pairedFindObjectives.Add(pairedFind);
+		}
+
+		foreach (TaskObjective objective in objectives) {
+			// Tarkov exposes "find" and "hand over" as separate objectives for the same
+			// physical items. Count the pair once using whichever objective is further along.
+			if (pairedFindObjectives.Contains(objective))
+				continue;
+
+			int needed = item.RemainingForObjective(objective, progress, showNonFir, out bool requiresFir);
+			if (pairedFindByGive.TryGetValue(objective, out TaskObjective? pairedFind)) {
+				int findRemaining = item.RemainingForObjective(pairedFind, progress, showNonFir, out _);
+				needed = Math.Min(needed, findRemaining);
+			}
+			if (needed <= 0)
+				continue;
+
+			if (requiresFir)
+				fir += needed;
+			else
+				nonFir += needed;
+
+			if (isWeapon && objective.Type is "giveItem" or "buildWeapon")
+				weaponHandIn += needed;
+		}
+
+		return new RequirementBreakdown(fir + nonFir, fir, nonFir);
 	}
 
 	public IEnumerable<Item> GetAmmoOfSameCaliber() {
