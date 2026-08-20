@@ -10,7 +10,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using RatScanner.TarkovDev.Json;
 
 namespace RatScanner;
 
@@ -126,7 +125,10 @@ public static class TarkovDevAPI {
 			T[] finalResults = transform(data);
 			long time = DateTimeOffset.Now.ToUnixTimeSeconds();
 			Cache[baseQueryKey] = (time + ttl, finalResults);
-			RatConfig.WriteToCache(baseQueryKey, finalResults.ToString());
+			var options = new System.Text.Json.JsonSerializerOptions {
+				IgnoreReadOnlyProperties = true
+			};
+			RatConfig.WriteToCache(baseQueryKey, System.Text.Json.JsonSerializer.Serialize(finalResults, options));
 
 			Logger.LogInfo($"Completed fetch in {sw.ElapsedMilliseconds}ms: {finalResults.Length} total items for \"{baseQueryKey}\"");
 		} catch (Exception e) {
@@ -204,9 +206,9 @@ public static class TarkovDevAPI {
 				return response;
 			}
 			case EndpointTraders: {
-					TradersResponse? response = data.ToObject<TradersResponse>(serializer);
+					Dictionary<string, T>? response = data.ToObject<Dictionary<string, T>>(serializer);
 					if (response == null) throw new Exception("Failed to deserialize traders response");
-					return response.Traders.ToDictionary(p => p.Key, p => p.Value as T)!;
+					return response;
 				}
 
 			default:
@@ -255,6 +257,10 @@ public static class TarkovDevAPI {
 					break;
 				case HideoutStation station:
 					if (translations.TryGetValue(station.Name, out string? stationName)) station.Name = stationName;
+					break;
+				case Trader trader:
+					if (translations.TryGetValue($"{trader.Id} Nickname", out string? traderName)) trader.Name = traderName;
+					if (translations.TryGetValue($"{trader.Id} Description", out string? traderDescription)) trader.Description = traderDescription;
 					break;
 			}
 		}
