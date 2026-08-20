@@ -22,6 +22,8 @@ public partial class Item {
 		return (report.CurrentTotal, report.KappaTotal);
 	}
 
+	internal QuestNeedReport GetQuestNeedReport() => GetQuestNeedReport(GetUserProgress());
+
 	/// <summary>
 	/// Full applicability-aware quest need classification for the item.
 	/// Does not inspect the scanned item's FIR state (no vision yet).
@@ -91,6 +93,8 @@ public partial class Item {
 
 	public int GetHideoutRemaining() => GetHideoutRequirementBreakdown(GetUserProgress()).Total;
 	public int GetHideoutRemaining(UserProgress progress) => GetHideoutRequirementBreakdown(progress).Total;
+
+	public RequirementBreakdown GetHideoutRequirementBreakdown() => GetHideoutRequirementBreakdown(GetUserProgress());
 
 	/// <summary>
 	/// Remaining hideout upgrade needs, split by FIR attribute on the station item requirement.
@@ -238,7 +242,19 @@ public partial class Item {
 	}
 
 	public int GetAvg24hMarketSellProfit() {
-		return 0;
+		double Ti = 0.03f;
+		double Tr = 0.03f;
+		double VO = BasePrice ?? 0;
+		double VR = Avg24HPrice ?? 0;
+
+		double PO = Math.Log10(VO / VR);
+		if (VR < VO) PO = Math.Pow(PO, 1.08);
+
+		double PR = Math.Log10(VR / VO);
+		if (VO <= VR) PR = Math.Pow(PR, 1.08);
+
+		var tax = (int)((VO * Ti * Math.Pow(4, PO)) + (VR * Tr * Math.Pow(4, PR)));
+		return (Avg24HPrice ?? 0) - tax;
 	}
 
 	public TraderPrice? GetBestSellToTraderOffer() => SellToTrader?.MaxBy(i => i.PriceRub);
