@@ -1,4 +1,4 @@
-using RatScanner.FetchModels.TarkovTracker;
+﻿using RatScanner.FetchModels.TarkovTracker;
 using RatScanner.TarkovDev.Json;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +15,7 @@ public partial class Item {
 		return progress ?? new UserProgress();
 	}
 
-	public (int count, int kappaCount) GetTaskRemaining(UserProgress? progress = null) {
+	public (int count, int kappaCount, int total, int kappaTotal, int owned, int kappaOwned) GetTaskRemaining(UserProgress? progress = null) {
 		// Compensation for Damage Tasks
 		// These tasks are not tracked by TarkovTracker
 		string[] excludedTasks = new string[] {
@@ -31,6 +31,10 @@ public partial class Item {
 		int needed = 0;
 		int count = 0;
 		int kappaCount = 0;
+		int total = 0;
+		int kappaTotal = 0;
+		int owned = 0;
+		int kappaOwned = 0;
 
 		bool showNonFir = RatConfig.Tracking.ShowNonFIRNeeds;
 
@@ -51,24 +55,37 @@ public partial class Item {
 					if (!objective.Items.Contains(Id)) continue;	// Skip if item is not the one we are looking for
 					if (!showNonFir && !objective.FoundInRaid) continue;					// Skip if item is not FIR
 					needed = objective.Count;
-					if (task.KappaRequired == true) kappaCount += objective.Count;
+					total += objective.Count;
+					if (task.KappaRequired == true) kappaTotal += objective.Count;
 					// Subtract amount of already collected items
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
 					foreach (Progress p in objectiveProgress) needed -= p.Complete ? objective.Count : p.Count;
+					// Items of completed objectives are already handed in, so they are not owned anymore
+					int objectiveOwned = objectiveProgress.Where(p => !p.Complete).Sum(p => p.Count);
+					owned += objectiveOwned;
+					if (task.KappaRequired == true) kappaOwned += objectiveOwned;
 					count += needed;
 					if (task.KappaRequired == true) kappaCount += needed;
 				} else if (objective.Type == "plantItem") {
 					if (!objective.Items.Contains(Id)) continue;	// Skip if item is not the one we are looking for
 					if (!showNonFir) continue;										// Skip if item is not FIR
 					needed = objective.Count;
+					total += objective.Count;
+					if (task.KappaRequired == true) kappaTotal += objective.Count;
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
 					foreach (Progress p in objectiveProgress) needed -= p.Complete ? objective.Count : p.Count;
+					// Items of completed objectives are already planted, so they are not owned anymore
+					int objectiveOwned = objectiveProgress.Where(p => !p.Complete).Sum(p => p.Count);
+					owned += objectiveOwned;
+					if (task.KappaRequired == true) kappaOwned += objectiveOwned;
 					count += needed;
 					if (task.KappaRequired == true) kappaCount += needed;
 				} else if (objective.Type == "mark") {
 					if (objective.MarkerItem != Id) continue;  // Skip if item is not the one we are looking for
 					if (!showNonFir) continue;                      // Skip if item is not FIR
 					needed = 1;
+					total += 1;
+					if (task.KappaRequired == true) kappaTotal += 1;
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
 					foreach (Progress p in objectiveProgress) needed -= 1;
 					count += needed;
@@ -77,6 +94,8 @@ public partial class Item {
 					if (objective.Item != Id) continue; // Skip if item is not the one we are looking for
 					if (!showNonFir) continue;                      // Skip if item is not FIR
 					needed = 1;
+					total += 1;
+					if (task.KappaRequired == true) kappaTotal += 1;
 					List<Progress> objectiveProgress = progress.TaskObjectives.Where(p => p.Id == objective.Id).ToList();
 					foreach (Progress p in objectiveProgress) needed -= 1;
 					count += needed;
@@ -84,15 +103,17 @@ public partial class Item {
 				}
 			}
 		}
-		return (count, kappaCount);
+		return (count, kappaCount, total, kappaTotal, owned, kappaOwned);
 	}
 
-	public int GetHideoutRemaining(UserProgress? progress = null) {
+	public (int count, int total, int owned) GetHideoutRemaining(UserProgress? progress = null) {
 		progress ??= GetUserProgress();
 		progress.Tasks ??= new List<Progress>();
 		progress.TaskObjectives ??= new List<Progress>();
 
 		int count = 0;
+		int total = 0;
+		int owned = 0;
 		HideoutStation[] stations = TarkovDevAPI.GetHideoutStations();
 
 		foreach (HideoutStation station in stations) {
@@ -108,12 +129,18 @@ public partial class Item {
 					if (requiredItem?.Item != Id) continue;
 
 					count += requiredItem.Count;
+					total += requiredItem.Count;
 					List<Progress> objectiveProgress = progress.HideoutParts.Where(p => p.Id == requiredItem.Id).ToList();
-					foreach (Progress p in objectiveProgress) count -= p.Complete ? requiredItem.Count : p.Count;
+					// Parts are still owned until the module is built, which is filtered out above
+					foreach (Progress p in objectiveProgress) {
+						int partOwned = p.Complete ? requiredItem.Count : p.Count;
+						count -= partOwned;
+						owned += partOwned;
+					}
 				}
 			}
 		}
-		return count;
+		return (count, total, owned);
 	}
 
 	public IEnumerable<Item> GetAmmoOfSameCaliber() {

@@ -56,13 +56,13 @@
                             @if (MenuVM.TaskRemaining > 0)
                             {
                                 <div class="d-flex align-center stroke">
-                                    @MenuVM.TaskRemaining <MudIcon Icon="@Icons.Material.Filled.Checklist" Size="Size.Small" Class="ml-1" />
+                                    @MenuVM.TaskRemainingDisplay <MudIcon Icon="@Icons.Material.Filled.Checklist" Size="Size.Small" Class="ml-1" />
                                 </div>
                             }
                             @if (MenuVM.HideoutRemaining > 0)
                             {
                                 <div class="d-flex align-center stroke">
-                                    @MenuVM.HideoutRemaining <MudIcon Icon="@Icons.Material.Filled.House" Size="Size.Small" Class="ml-1" />
+                                    @MenuVM.HideoutRemainingDisplay <MudIcon Icon="@Icons.Material.Filled.House" Size="Size.Small" Class="ml-1" />
                                 </div>
                             }
                         </div>

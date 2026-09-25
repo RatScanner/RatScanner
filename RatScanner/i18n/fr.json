@@ -33,6 +33,7 @@
   "TrackingSettingsTitle": "Paramètres de suivi",
   "ShowNonFirNeeds": "Afficher les besoins non-FIR",
   "ShowKappaNeeds": "Afficher les besoins pour Kappa",
+  "ShowCurrentItemProgress": "Afficher la progression actuelle de l'objet",
   "BackendLabel": "Backend",
   "ApiToken": "Jeton API",
   "ShowTeammates": "Afficher les coéquipiers",
