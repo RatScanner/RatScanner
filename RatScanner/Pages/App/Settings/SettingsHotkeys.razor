@@ -1,98 +1,61 @@
-﻿@page "/app/settings/hotkeys"
-@using RatScanner.Components;
+@page "/app/settings/hotkeys"
+@layout SettingsLayout
+@using RatScanner
+@using RatScanner.Components
 @inject SettingsVM SettingsVM
-@inject IJSRuntime JSRuntime
 @inject LocalizationService Localizer
 @implements IDisposable
 
-<div>
-    <MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
-        <MudItem xs="12">
-            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudStack Spacing="0" Justify="Justify.SpaceBetween" Row="true">
-                    <MudItem>
-                        <MudText>
-                            @Localizer["OpenWiki"]
-                        </MudText>
-                    </MudItem>
-                    <MudItem>
-                        <HotkeySelector></HotkeySelector>
-                    </MudItem>
-                </MudStack>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudStack Spacing="0" Justify="Justify.SpaceBetween" Row="true">
-                    <MudItem>
-                        <MudText>
-                            @Localizer["OpenTarkovDev"]
-                        </MudText>
-                    </MudItem>
-                    <MudItem>
-                        <HotkeySelector></HotkeySelector>
-                    </MudItem>
-                </MudStack>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudStack Spacing="0" Justify="Justify.SpaceBetween" Row="true">
-                    <MudItem>
-                        <MudText>
-                            @Localizer["FavoriteItem"]
-                        </MudText>
-                    </MudItem>
-                    <MudItem>
-                        <HotkeySelector></HotkeySelector>
-                    </MudItem>
-                </MudStack>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12">
-            <div class="d-flex align-center justify-center mx-2 mb-1">
-                <MudText Typo="Typo.subtitle1" Color="Color.Inherit">@Localizer["TarkovTrackerTitle"]</MudText>
-            </div>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudStack Spacing="0" Justify="Justify.SpaceBetween" Row="true">
-                    <MudItem>
-                        <MudText>
-                            @Localizer["AddItem"]
-                        </MudText>
-                    </MudItem>
-                    <MudItem>
-                        <HotkeySelector></HotkeySelector>
-                    </MudItem>
-                </MudStack>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudStack Spacing="0" Justify="Justify.SpaceBetween" Row="true">
-                    <MudItem>
-                        <MudText>
-                            @Localizer["RemoveItem"]
-                        </MudText>
-                    </MudItem>
-                    <MudItem>
-                        <HotkeySelector></HotkeySelector>
-                    </MudItem>
-                </MudStack>
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
+<div class="settings-stack">
+    <SettingsCard Title="@Localizer["ScanHotkeysGroup"]" Subtitle="@Localizer["ScanHotkeysGroupDesc"]"
+                  Footer="@Localizer["HotkeysFooter"]">
+        <SettingsRow Label="@Localizer["NameScanHotkey"]" SubLabel="@Localizer["NameScanHotkeyHint"]"
+                     Disabled="@(!SettingsVM.EnableNameScan)">
+            <HotkeySelector Hotkey="@SettingsVM.NameScanHotkey" @key="SettingsVM.NameScanHotkey"
+                            OnHotkeyChanged="@(() => SettingsVM.MarkDirty())" />
+        </SettingsRow>
+
+        <SettingsRow Label="@Localizer["IconScanHotkey"]" SubLabel="@Localizer["IconScanHotkeyHint"]"
+                     Disabled="@(!SettingsVM.EnableIconScan)">
+            <HotkeySelector Hotkey="@SettingsVM.IconScanHotkey" @key="SettingsVM.IconScanHotkey"
+                            OnHotkeyChanged="@(() => SettingsVM.MarkDirty())" />
+        </SettingsRow>
+    </SettingsCard>
+
+    <SettingsCard Title="@Localizer["OverlayHotkeysGroup"]" Subtitle="@Localizer["OverlayHotkeysGroupDesc"]">
+        <SettingsRow Label="@Localizer["OpenSearchOverlay"]" SubLabel="@Localizer["OpenSearchOverlayHint"]"
+                     Disabled="@(!SettingsVM.EnableIneractableOverlay)">
+            <HotkeySelector Hotkey="@SettingsVM.InteractableOverlayHotkey" @key="SettingsVM.InteractableOverlayHotkey"
+                            OnHotkeyChanged="@(() => SettingsVM.MarkDirty())" />
+        </SettingsRow>
+
+        <SettingsRow Label="@Localizer["CloseSearchOverlay"]" SubLabel="@Localizer["CloseSearchOverlayHint"]"
+                     Disabled="@(!SettingsVM.EnableIneractableOverlay)">
+            <HotkeySelector Hotkey="@SettingsVM.CloseOverlayHotkey" @key="SettingsVM.CloseOverlayHotkey"
+                            OnHotkeyChanged="@(() => SettingsVM.MarkDirty())" />
+        </SettingsRow>
+    </SettingsCard>
+
+    <SettingsCard Title="@Localizer["AppHotkeysGroup"]" Subtitle="@Localizer["AppHotkeysGroupDesc"]">
+        <SettingsRow Label="@Localizer["OpenWiki"]" SubLabel="@Localizer["OpenWikiHint"]">
+            <HotkeySelector Hotkey="@SettingsVM.OpenWikiHotkey" @key="SettingsVM.OpenWikiHotkey"
+                            OnHotkeyChanged="@(() => SettingsVM.MarkDirty())" />
+        </SettingsRow>
+
+        <SettingsRow Label="@Localizer["OpenTarkovDev"]" SubLabel="@Localizer["OpenTarkovDevHint"]">
+            <HotkeySelector Hotkey="@SettingsVM.OpenTarkovDevHotkey" @key="SettingsVM.OpenTarkovDevHotkey"
+                            OnHotkeyChanged="@(() => SettingsVM.MarkDirty())" />
+        </SettingsRow>
+    </SettingsCard>
 </div>
 
 @code {
-
     protected override void OnInitialized()
     {
         SettingsVM.PropertyChanged += PropertyChangeHandler;
     }
 
-    private async void PropertyChangeHandler(object? sender, EventArgs e)
+    private async void PropertyChangeHandler(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         await InvokeAsync(() => StateHasChanged());
     }

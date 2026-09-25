@@ -1,0 +1,89 @@
+@*
+	A single settings row: label (+ optional sub-label) on the left, control on the right.
+	When Disabled is set the row stays visible but is dimmed, so users can still see
+	(and understand) the relationship between a master toggle and its dependent options.
+*@
+
+<div class="settings-row @(Disabled ? "settings-row-disabled" : null)">
+    <div class="settings-row-text">
+        <div class="settings-row-label">@Label</div>
+        @if (!string.IsNullOrEmpty(SubLabel))
+        {
+            <div class="settings-row-sublabel">@SubLabel</div>
+        }
+    </div>
+    <div class="settings-row-control">
+        @ChildContent
+    </div>
+</div>
+
+<style>
+    .settings-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        min-height: 48px;
+        padding: 6px 16px;
+        transition: background-color 0.15s ease;
+    }
+
+    .settings-row:hover {
+        background-color: var(--mud-palette-action-default-hover, rgba(255, 255, 255, 0.04));
+    }
+
+    .settings-row-disabled {
+        opacity: 0.4;
+        pointer-events: none;
+    }
+
+    .settings-row-text {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .settings-row-label {
+        font-size: 14px;
+        line-height: 1.35;
+    }
+
+    .settings-row-sublabel {
+        font-size: 12px;
+        line-height: 1.35;
+        color: var(--mud-palette-text-secondary, rgba(255, 255, 255, 0.5));
+        margin-top: 2px;
+    }
+
+    .settings-row-control {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    @@media (max-width: 700px) {
+        .settings-row {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+        }
+
+        .settings-row-control {
+            justify-content: flex-start;
+        }
+    }
+</style>
+
+@code {
+    [Parameter]
+    public string? Label { get; set; }
+
+    [Parameter]
+    public string? SubLabel { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

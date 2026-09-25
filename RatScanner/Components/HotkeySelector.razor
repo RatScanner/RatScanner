@@ -2,27 +2,26 @@
 @inject LocalizationService Localizer;
 @implements IDisposable;
 
-<MudButton @ref="Button" @onclick="() => StartListening()"
-           Color="Color.Primary" Size="Size.Small"
-           Variant="Variant.Filled" DisableElevation="true"
-           Class="px-1 py-1" @attributes="InputAttributes"
+<MudButton @ref="Button" @onclick="() => StartListening()" Color="Color.Primary" Size="Size.Small"
+           Variant="Variant.Filled" DisableElevation="true" Class="px-1 py-1" @attributes="InputAttributes"
            Disabled="@_listening">
     <MudStack Spacing="0" AlignItems="AlignItems.Stretch" Justify="Justify.Center">
-        @if (string.IsNullOrEmpty(_tmpHotkey.HotkeyString)) {
+        @if (string.IsNullOrEmpty(_tmpHotkey.HotkeyString))
+        {
             <div>@Localizer["NoneLabel"]</div>
-        } else {
+        }
+        else
+        {
             <MudStack Spacing="1" Row="true" Justify="Justify.SpaceBetween">
-                @foreach (var key in _tmpHotkey.KeyboardKeys) {
-                    <MudChip Variant="Variant.Outlined" Label="true"
-                             Size="Size.Small" Color="Color.Default"
-                             Class="px-2 ma-0">
+                @foreach (var key in _tmpHotkey.KeyboardKeys)
+                {
+                    <MudChip Variant="Variant.Outlined" Label="true" Size="Size.Small" Color="Color.Default" Class="px-2 ma-0">
                         @key.ToString().ToLower().Replace("left", "l-").Replace("right", "r-")
                     </MudChip>
                 }
-                @foreach (var button in _tmpHotkey.MouseButtons) {
-                    <MudChip Variant="Variant.Outlined" Label="true"
-                             Size="Size.Small" Color="Color.Default"
-                             Class="px-2 ma-0">
+                @foreach (var button in _tmpHotkey.MouseButtons)
+                {
+                    <MudChip Variant="Variant.Outlined" Label="true" Size="Size.Small" Color="Color.Default" Class="px-2 ma-0">
                         @((button.ToString().ToLower().Replace("left", "l-").Replace("right", "r-") + "-mouse")
                             .Replace("--", "-").Replace("button", ""))
                     </MudChip>
@@ -30,7 +29,8 @@
             </MudStack>
         }
 
-        @if (_listening) {
+        @if (_listening)
+        {
             <MudProgressLinear Class="mb-n1" Style="Width: 100%;" Indeterminate="true" />
         }
     </MudStack>
@@ -43,30 +43,44 @@
     [Parameter]
     public Hotkey Hotkey { get; set; } = new Hotkey();
 
+    /// <summary>
+    /// Raised whenever the user records a new hotkey, so the settings page can
+    /// mark the configuration as dirty.
+    /// </summary>
+    [Parameter]
+    public EventCallback<Hotkey> OnHotkeyChanged { get; set; }
+
     private MudButton Button = null!;
 
     private Hotkey _tmpHotkey = new Hotkey();
 
     private bool _listening = false;
 
-    private async void StartListening() {
+    private async void StartListening()
+    {
         if (_listening) return;
         _listening = true;
         _tmpHotkey = new Hotkey();
         await InvokeAsync(() => StateHasChanged());
     }
 
-    private async void StopListening(bool discard = false) {
+    private async void StopListening(bool discard = false)
+    {
         if (!_listening) return;
 
         if (discard) _tmpHotkey = Hotkey;
-        else Hotkey.Set(_tmpHotkey);
+        else
+        {
+            Hotkey.Set(_tmpHotkey);
+            await OnHotkeyChanged.InvokeAsync(Hotkey);
+        }
 
         _listening = false;
         await InvokeAsync(() => StateHasChanged());
     }
 
-    protected override void OnInitialized() {
+    protected override void OnInitialized()
+    {
         _tmpHotkey = new Hotkey(Hotkey);
         UserActivityHelper.OnKeyboardKeyUp += OnKeyUp;
         UserActivityHelper.OnMouseButtonUp += OnKeyUp;
@@ -74,14 +88,17 @@
         UserActivityHelper.OnMouseButtonDown += OnKeyDown;
     }
 
-    private void OnKeyUp(object? sender, KeyUpEventArgs e) {
+    private void OnKeyUp(object? sender, KeyUpEventArgs e)
+    {
         StopListening();
     }
 
-    private async void OnKeyDown(object? sender, KeyDownEventArgs e) {
+    private async void OnKeyDown(object? sender, KeyDownEventArgs e)
+    {
         if (!_listening) return;
 
-        if (e.Device == Device.Keyboard && e.Key == Key.Escape) {
+        if (e.Device == Device.Keyboard && e.Key == Key.Escape)
+        {
             StopListening(true);
             return;
         }
@@ -91,7 +108,8 @@
         await InvokeAsync(() => StateHasChanged());
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
         UserActivityHelper.OnKeyboardKeyUp -= OnKeyUp;
         UserActivityHelper.OnMouseButtonUp -= OnKeyUp;
         UserActivityHelper.OnKeyboardKeyDown -= OnKeyDown;

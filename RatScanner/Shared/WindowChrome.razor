@@ -1,0 +1,157 @@
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+@*
+	Shared window chrome for the frameless PageSwitcher window.
+	Provides the draggable title bar (with min / minimal-UI / close buttons) and the
+	corner resize grip, so every page gets a consistent, grabbable header.
+*@
+
+<div class="window-chrome">
+    <div class="header-bar" @onmousedown="StartDrag" @onmousedown:preventDefault="false">
+        <div class="header-left">
+            @if (!IsInSettings)
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.Settings"
+                               Size="Size.Small"
+                               Class="header-button"
+                               Href="/app/settings/general"
+                               @onmousedown:stopPropagation="true"
+                               Title="Settings" />
+                <MudDivider Vertical="true" FlexItem="true" Class="mx-1" />
+            }
+            <img src="RatLogoMedium.png" width="20" class="header-logo" alt="RatScanner" />
+            <MudText Typo="Typo.subtitle1" Class="header-title">RatScanner</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">v@(RatConfig.Version)</MudText>
+        </div>
+        <div class="header-right" @onmousedown:stopPropagation="true">
+            <MudIconButton Icon="@Icons.Material.Filled.Minimize"
+                           Size="Size.Small"
+                           Class="header-button"
+                           OnClick="MinimizeWindow"
+                           Title="Minimize" />
+            <MudIconButton Icon="@Icons.Material.Filled.ZoomInMap"
+                           Size="Size.Small"
+                           Class="header-button"
+                           OnClick="ShowMinimalUI"
+                           Title="Minimal UI" />
+            <MudIconButton Icon="@Icons.Material.Filled.Close"
+                           Size="Size.Small"
+                           Class="header-button header-button-close"
+                           OnClick="CloseWindow"
+                           Title="Close" />
+        </div>
+    </div>
+</div>
+
+<div class="resize-grip"
+     @onmousedown="StartResize"
+     @onmousedown:preventDefault="true"
+     @onmousedown:stopPropagation="false">
+    <svg>
+        <path d="M9 0 L11 0 L11 2 L9 2 Z M6 3 L8 3 L8 5 L6 5 Z M9 3 L11 3 L11 5 L9 5 Z M3 6 L5 6 L5 8 L3 8 Z M6 6 L8 6 L8 8 L6 8 Z M9 6 L11 6 L11 8 L9 8 Z M0 9 L2 9 L2 11 L0 11 Z M3 9 L5 9 L5 11 L3 11 Z M6 9 L8 9 L8 11 L6 11 Z M9 9 L11 9 L9 11 Z" fill="#DDDDDD" />
+    </svg>
+</div>
+
+<style>
+    .window-chrome {
+        flex: 0 0 auto;
+    }
+
+    .header-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 4px 8px;
+        background: #1e1e1e;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        cursor: move;
+        user-select: none;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 0;
+    }
+
+    .header-logo {
+        vertical-align: middle;
+    }
+
+    .header-title {
+        margin: 0;
+        line-height: 1;
+    }
+
+    .header-right {
+        display: flex;
+        gap: 2px;
+    }
+
+    .header-button {
+        opacity: 0.7;
+        transition: opacity 0.2s;
+    }
+
+    .header-button:hover {
+        opacity: 1;
+    }
+
+    .header-button-close:hover {
+        color: #ff4444;
+    }
+
+    .resize-grip {
+        position: absolute;
+        overflow: hidden;
+        bottom: 2px;
+        right: 2px;
+        width: 11px;
+        height: 11px;
+        cursor: nwse-resize;
+        z-index: 100;
+    }
+
+    .resize-grip:hover svg path {
+        fill: #aaaaaa;
+    }
+</style>
+
+@code {
+    /// <summary>
+    /// The settings area provides its own back / save navigation in the footer,
+    /// so the chrome hides the settings shortcut while it is open.
+    /// </summary>
+    private bool IsInSettings =>
+        NavigationManager.ToBaseRelativePath(NavigationManager.Uri)
+            .StartsWith("app/settings", StringComparison.OrdinalIgnoreCase);
+
+    protected override void OnInitialized() {
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e) {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose() {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+
+    private void StartDrag(MouseEventArgs e) {
+        PageSwitcher.Instance.StartDrag();
+    }
+
+    private void StartResize(MouseEventArgs e) {
+        if (e.Button != 0) return;
+        PageSwitcher.Instance.StartResize();
+    }
+
+    private void ShowMinimalUI() => PageSwitcher.Instance.ShowMinimalUI();
+
+    private void MinimizeWindow() => PageSwitcher.Instance.MinimizeWindow();
+
+    private void CloseWindow() => PageSwitcher.Instance.Close();
+}

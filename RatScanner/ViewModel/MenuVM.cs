@@ -9,12 +9,15 @@ using System.Web;
 
 namespace RatScanner.ViewModel;
 
-internal class MenuVM : INotifyPropertyChanged {
+internal class MenuVM : INotifyPropertyChanged
+{
 	private RatScannerMain _dataSource;
 
-	public RatScannerMain DataSource {
+	public RatScannerMain DataSource
+	{
 		get => _dataSource;
-		set {
+		set
+		{
 			_dataSource = value;
 			OnPropertyChanged();
 		}
@@ -34,8 +37,10 @@ internal class MenuVM : INotifyPropertyChanged {
 
 	public string Updated => LastItem.Updated.ToString(CultureInfo.CurrentCulture);
 
-	public string WikiLink {
-		get {
+	public string WikiLink
+	{
+		get
+		{
 			string? link = LastItem.WikiLink;
 			if (link?.Length > 3) return link;
 			return $"https://escapefromtarkov.gamepedia.com/{HttpUtility.UrlEncode(LastItem.Name.Replace(" ", "_"))}";
@@ -47,28 +52,31 @@ internal class MenuVM : INotifyPropertyChanged {
 	public TraderPrice? BestTraderOffer => LastItem.GetBestSellToTraderOffer();
 	public TraderPrice? BestTraderOfferVendor => LastItem.GetBestSellToTraderOffer();
 
-    public (int count, int kappaCount) TaskRemainingResult => LastItem.GetTaskRemaining();
+	public (int count, int kappaCount) TaskRemainingResult => LastItem.GetTaskRemaining();
 
-    public int TaskRemaining => TaskRemainingResult.count;
+	public int TaskRemaining => TaskRemainingResult.count;
 
-    public int TaskRemainingKappa => TaskRemainingResult.kappaCount;
+	public int TaskRemainingKappa => TaskRemainingResult.kappaCount;
 
 	public bool KappaNeeded => TaskRemainingKappa > 0;
-	
+
 	public int HideoutRemaining => LastItem.GetHideoutRemaining();
 
 	public bool ItemNeeded => TaskRemaining + HideoutRemaining > 0;
 
 	public bool ShowKappaNeeds => RatConfig.Tracking.ShowKappaNeeds;
 
-	public List<KeyValuePair<string, KeyValuePair<int, int>>>? ItemTeamNeeds {
-		get {
+	public List<KeyValuePair<string, KeyValuePair<int, int>>>? ItemTeamNeeds
+	{
+		get
+		{
 			if (!RatConfig.Tracking.TarkovTracker.Enable) return null;
 			List<FetchModels.TarkovTracker.UserProgress> progress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
 			IEnumerable<FetchModels.TarkovTracker.UserProgress> teamProgress = progress.Where(x => x.UserId != RatScannerMain.Instance.TarkovTrackerDB.Self);
 
 			List<KeyValuePair<string, KeyValuePair<int, int>>> needs = new();
-			foreach (FetchModels.TarkovTracker.UserProgress? memberProgress in teamProgress) {
+			foreach (FetchModels.TarkovTracker.UserProgress? memberProgress in teamProgress)
+			{
 				int task = LastItem.GetTaskRemaining(memberProgress).Item1;
 				int hideout = LastItem.GetHideoutRemaining(memberProgress);
 
@@ -77,7 +85,8 @@ internal class MenuVM : INotifyPropertyChanged {
 				KeyValuePair<int, int> need = new(task, hideout);
 
 				string name = memberProgress.DisplayName ?? "Unknown";
-				for (int i = 2; i < 99; i++) {
+				for (int i = 2; i < 99; i++)
+				{
 					if (needs.All(n => n.Key != name)) break;
 					name = $"{memberProgress.DisplayName} #{i}";
 				}
@@ -95,21 +104,25 @@ internal class MenuVM : INotifyPropertyChanged {
 
 	public event PropertyChangedEventHandler PropertyChanged;
 
-	public MenuVM(RatScannerMain ratScanner) {
+	public MenuVM(RatScannerMain ratScanner)
+	{
 		DataSource = ratScanner;
 		DataSource.PropertyChanged += ModelPropertyChanged;
 	}
 
-	protected virtual void OnPropertyChanged(string propertyName = null) {
+	protected virtual void OnPropertyChanged(string propertyName = null)
+	{
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 
-	public void ModelPropertyChanged(object? sender, PropertyChangedEventArgs e) {
+	public void ModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+	{
 		OnPropertyChanged();
 	}
 
 	// Still used in minimal menu
-	public string IntToLongPrice(int? value) {
+	public string IntToLongPrice(int? value)
+	{
 		if (value == null) return "0 ₽";
 
 		string text = $"{value:n0}";

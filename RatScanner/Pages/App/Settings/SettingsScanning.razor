@@ -1,87 +1,116 @@
-﻿@page "/app/settings/scanning"
-@using RatScanner.Components;
+@page "/app/settings/scanning"
+@layout SettingsLayout
+@using RatScanner
+@using RatScanner.Components
+@using System.Linq
 @inject SettingsVM SettingsVM
-@inject IJSRuntime JSRuntime
 @inject LocalizationService Localizer
 @implements IDisposable
-@using System.Linq
 
-<div>
-    <MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
-        <MudItem xs="12">
-            <div class="d-flex align-center justify-center mx-2 mb-1">
-                <MudText Typo="Typo.subtitle1" Color="Color.Inherit">@Localizer["ScanningSettingsTitle"]</MudText>
-            </div>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudGrid Spacing="0" Class="pa-0 ma-0">
-                    <MudSelect @bind-Value="@SettingsVM.NameScanLanguage" T="int" Label="@Localizer["NameScanLanguage"]" AnchorOrigin="Origin.BottomCenter" Variant="Variant.Text" Margin="Margin.Dense" Dense="true" Class="mx-1">
-                        @foreach (var language in GetLanguages())
-                        {
-                            <MudSelectItem T="int" Value="@language.ordinal">
-                                @language.name
-                            </MudSelectItem>
-                        }
-                    </MudSelect>
-                    <MudCheckBox @bind-Checked="@SettingsVM.EnableNameScan" Label="@Localizer["EnableNameScan"]" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    <MudCheckBox @bind-Checked="@SettingsVM.EnableAutoNameScan" Label="@Localizer["AutomaticScanning"]" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                </MudGrid>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudStack Spacing="0" Class="pa-0 ma-0">
-                    <MudCheckBox @bind-Checked="@SettingsVM.EnableIconScan" Label="@Localizer["EnableIconScan"]" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    <MudCheckBox @bind-Checked="@SettingsVM.ScanRotatedIcons" Label="@Localizer["ScanRotatedIcons"]" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                    <MudCheckBox @bind-Checked="@SettingsVM.UseCachedIcons" Label="@Localizer["UseCachedIcons"]" Dense="true" Size="Size.Small" Class="pa-0 ma-0"></MudCheckBox>
-                </MudStack>
-            </MudPaper>
-        </MudItem>
-        <MudItem xs="12">
-            <MudPaper Class="align-center justify-center pa-2 mx-2 mb-2" Elevation="2">
-                <MudStack Spacing="0" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Row="true">
-                    <MudItem>
-                        <MudText>
-                            @Localizer["IconScanHotkey"]
-                        </MudText>
-                    </MudItem>
-                    <MudItem>
-                        <HotkeySelector Hotkey="@SettingsVM.IconScanHotkey"></HotkeySelector>
-                    </MudItem>
-                </MudStack>
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
+<div class="settings-stack">
+    <SettingsCard Title="@Localizer["NameScanGroup"]"
+                  Subtitle="@Localizer["NameScanGroupDesc"]">
+        <SettingsRow Label="@Localizer["EnableNameScan"]"
+                     SubLabel="@Localizer["EnableNameScanHint"]">
+            <MudSwitch T="bool"
+                       Checked="@SettingsVM.EnableNameScan"
+                       CheckedChanged="@((bool v) => { SettingsVM.EnableNameScan = v; SettingsVM.MarkDirty(); })"
+                       Color="Color.Primary" Dense="true" />
+        </SettingsRow>
+
+        <SettingsRow Label="@Localizer["NameScanHotkey"]"
+                     SubLabel="@Localizer["NameScanHotkeyHint"]"
+                     Disabled="@(!SettingsVM.EnableNameScan)">
+            <HotkeySelector Hotkey="@SettingsVM.NameScanHotkey"
+                            @key="SettingsVM.NameScanHotkey"
+                            OnHotkeyChanged="@(() => SettingsVM.MarkDirty())" />
+        </SettingsRow>
+
+        <SettingsRow Label="@Localizer["AutomaticScanning"]"
+                     SubLabel="@Localizer["AutomaticScanningHint"]"
+                     Disabled="@(!SettingsVM.EnableNameScan)">
+            <MudSwitch T="bool"
+                       Checked="@SettingsVM.EnableAutoNameScan"
+                       CheckedChanged="@((bool v) => { SettingsVM.EnableAutoNameScan = v; SettingsVM.MarkDirty(); })"
+                       Color="Color.Primary" Dense="true" />
+        </SettingsRow>
+
+        <SettingsRow Label="@Localizer["NameScanLanguage"]"
+                     SubLabel="@Localizer["NameScanLanguageHint"]"
+                     Disabled="@(!SettingsVM.EnableNameScan)">
+            <MudSelect T="int"
+                       Value="@SettingsVM.NameScanLanguage"
+                       ValueChanged="@((int v) => { SettingsVM.NameScanLanguage = v; SettingsVM.MarkDirty(); })"
+                       Variant="Variant.Outlined"
+                       Margin="Margin.Dense"
+                       Dense="true"
+                       Style="min-width: 220px;">
+                @foreach (var language in GetLanguages()) {
+                    <MudSelectItem T="int" Value="@language.ordinal">@language.name</MudSelectItem>
+                }
+            </MudSelect>
+        </SettingsRow>
+    </SettingsCard>
+
+    <SettingsCard Title="@Localizer["IconScanGroup"]"
+                  Subtitle="@Localizer["IconScanGroupDesc"]">
+        <SettingsRow Label="@Localizer["EnableIconScan"]"
+                     SubLabel="@Localizer["EnableIconScanHint"]">
+            <MudSwitch T="bool"
+                       Checked="@SettingsVM.EnableIconScan"
+                       CheckedChanged="@((bool v) => { SettingsVM.EnableIconScan = v; SettingsVM.MarkDirty(); })"
+                       Color="Color.Primary" Dense="true" />
+        </SettingsRow>
+
+        <SettingsRow Label="@Localizer["IconScanHotkey"]"
+                     SubLabel="@Localizer["IconScanHotkeyHint"]"
+                     Disabled="@(!SettingsVM.EnableIconScan)">
+            <HotkeySelector Hotkey="@SettingsVM.IconScanHotkey"
+                            @key="SettingsVM.IconScanHotkey"
+                            OnHotkeyChanged="@(() => SettingsVM.MarkDirty())" />
+        </SettingsRow>
+
+        <SettingsRow Label="@Localizer["ScanRotatedIcons"]"
+                     SubLabel="@Localizer["ScanRotatedIconsHint"]"
+                     Disabled="@(!SettingsVM.EnableIconScan)">
+            <MudSwitch T="bool"
+                       Checked="@SettingsVM.ScanRotatedIcons"
+                       CheckedChanged="@((bool v) => { SettingsVM.ScanRotatedIcons = v; SettingsVM.MarkDirty(); })"
+                       Color="Color.Primary" Dense="true" />
+        </SettingsRow>
+
+        <SettingsRow Label="@Localizer["UseCachedIcons"]"
+                     SubLabel="@Localizer["UseCachedIconsHint"]"
+                     Disabled="@(!SettingsVM.EnableIconScan)">
+            <MudSwitch T="bool"
+                       Checked="@SettingsVM.UseCachedIcons"
+                       CheckedChanged="@((bool v) => { SettingsVM.UseCachedIcons = v; SettingsVM.MarkDirty(); })"
+                       Color="Color.Primary" Dense="true" />
+        </SettingsRow>
+    </SettingsCard>
 </div>
 
 @code {
+    private static readonly (string name, int ordinal)[] Languages = BuildLanguages();
 
-    private (string name, int ordinal)[] GetLanguages()
-    {
-        // Sort all elements of the enum RatStash.Language
+    private static (string name, int ordinal)[] BuildLanguages() {
         var values = Enum.GetValues(typeof(RatStash.Language)).Cast<RatStash.Language>();
-        var languages = values.Select(language => (name: language.ToString(), ordinal: (int)language));
-        return languages.OrderBy(language => language.name).ToArray();
+        return values.Select(language => (name: language.ToString(), ordinal: (int)language))
+                     .OrderBy(language => language.name)
+                     .ToArray();
     }
 
-    protected override void OnInitialized()
-    {
+    private IEnumerable<(string name, int ordinal)> GetLanguages() => Languages;
+
+    protected override void OnInitialized() {
         SettingsVM.PropertyChanged += PropertyChangeHandler;
     }
 
-    private async void PropertyChangeHandler(object? sender, EventArgs e)
-    {
+    private async void PropertyChangeHandler(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
         await InvokeAsync(() => StateHasChanged());
     }
 
-    public void Dispose()
-    {
+    public void Dispose() {
         SettingsVM.PropertyChanged -= PropertyChangeHandler;
-    }
-
-    public async Task LogAsync(string message)
-    {
-        await JSRuntime.InvokeVoidAsync("console.log", message);
     }
 }

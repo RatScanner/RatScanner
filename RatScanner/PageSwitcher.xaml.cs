@@ -65,7 +65,15 @@ public partial class PageSwitcher : Window {
 
 	internal void ResetWindowSize() {
 		SizeToContent = SizeToContent.Manual;
+		MinWidth = MinNormalWindowWidth;
+		MinHeight = MinNormalWindowHeight;
 	}
+
+	// The minimal UI sizes itself to its content, so the window minimums have to
+	// be cleared for it. They are re-applied for the full UI, which is fixed-size
+	// and would otherwise collapse to nothing.
+	private const double MinNormalWindowWidth = 800;
+	private const double MinNormalWindowHeight = 500;
 
 	internal void Navigate(UserControl nextControl, object? state = null) {
 		if (!(nextControl is ISwitchable)) throw new ArgumentException("NextPage is not ISwitchable! " + nextControl.Name);
@@ -199,11 +207,25 @@ public partial class PageSwitcher : Window {
 	internal void ShowUI() {
 		RatConfig.LastWindowMode = RatConfig.WindowMode.Normal;
 		ResetWindowSize();
+
+		// Switching back from the content-sized minimal UI leaves the window at the
+		// minimal UI's dimensions, so restore the full UI's size.
+		if (RatConfig.LastWindowWidth > 0 && RatConfig.LastWindowHeight > 0) {
+			Width = RatConfig.LastWindowWidth;
+			Height = RatConfig.LastWindowHeight;
+		}
+		else {
+			Width = MinNormalWindowWidth;
+			Height = MinNormalWindowHeight;
+		}
+
 		Navigate(BlazorUI.Instance);
 	}
 
 	internal void ShowMinimalUI() {
 		RatConfig.LastWindowMode = RatConfig.WindowMode.Minimal;
+		MinWidth = 0;
+		MinHeight = 0;
 		SizeToContent = SizeToContent.WidthAndHeight;
 		Navigate(MinimalMenu.Instance);
 	}
@@ -211,8 +233,15 @@ public partial class PageSwitcher : Window {
 	internal void ExitApplication() {
 		RatConfig.LastWindowPositionX = (int)Left;
 		RatConfig.LastWindowPositionY = (int)Top;
-		RatConfig.LastWindowWidth = (int)Width;
-		RatConfig.LastWindowHeight = (int)Height;
+
+		// Only the full UI has a meaningful size. While the minimal UI is showing the
+		// window tracks its content, so persisting Width/Height here would shrink the
+		// restored main window on the next launch.
+		if (RatConfig.LastWindowMode == RatConfig.WindowMode.Normal) {
+			RatConfig.LastWindowWidth = (int)Width;
+			RatConfig.LastWindowHeight = (int)Height;
+		}
+
 		RatConfig.SaveConfig();
 		Application.Current.Shutdown();
 	}

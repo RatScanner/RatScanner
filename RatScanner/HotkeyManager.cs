@@ -1,6 +1,10 @@
 ﻿using RatScanner.View;
+using RatScanner.Scan;
+using RatScanner.TarkovDev.Json;
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
@@ -16,6 +20,8 @@ internal class HotkeyManager {
 	internal ActiveHotkey IconScanHotkey;
 	internal ActiveHotkey OpenInteractableOverlayHotkey;
 	internal ActiveHotkey CloseInteractableOverlayHotkey;
+	internal ActiveHotkey OpenWikiHotkey;
+	internal ActiveHotkey OpenTarkovDevHotkey;
 
 	internal HotkeyManager() {
 		UserActivityHelper.Start(true, true);
@@ -37,17 +43,20 @@ internal class HotkeyManager {
 		nameof(NameScanHotkey),
 		nameof(IconScanHotkey),
 		nameof(OpenInteractableOverlayHotkey),
-		nameof(CloseInteractableOverlayHotkey))
+		nameof(CloseInteractableOverlayHotkey),
+		nameof(OpenWikiHotkey),
+		nameof(OpenTarkovDevHotkey))
 	]
 	internal void RegisterHotkeys() {
 		// Unregister hotkeys to prevent multiple listeners for the same hotkey
 		UnregisterHotkeys();
 
-		Hotkey nameScanHotkey = new(null, new[] { MouseButton.Left });
-		NameScanHotkey = new ActiveHotkey(nameScanHotkey, OnNameScanHotkey, ref NameScan.Enable);
+		NameScanHotkey = new ActiveHotkey(NameScan.Hotkey, OnNameScanHotkey, ref NameScan.Enable);
 		IconScanHotkey = new ActiveHotkey(IconScan.Hotkey, OnIconScanHotkey, ref IconScan.Enable);
 		OpenInteractableOverlayHotkey = new ActiveHotkey(OverlayC.Search.Hotkey, OnOpenInteractableOverlayHotkey, ref OverlayC.Search.Enable);
-		CloseInteractableOverlayHotkey = new ActiveHotkey(new Hotkey(new[] { Key.Escape }), OnCloseInteractableOverlayHotkey);
+		CloseInteractableOverlayHotkey = new ActiveHotkey(OverlayC.Search.CloseHotkey, OnCloseInteractableOverlayHotkey);
+		OpenWikiHotkey = new ActiveHotkey(Hotkeys.OpenWiki, OnOpenWikiHotkey);
+		OpenTarkovDevHotkey = new ActiveHotkey(Hotkeys.OpenTarkovDev, OnOpenTarkovDevHotkey);
 	}
 
 	/// <summary>
@@ -57,6 +66,9 @@ internal class HotkeyManager {
 		NameScanHotkey?.Dispose();
 		IconScanHotkey?.Dispose();
 		OpenInteractableOverlayHotkey?.Dispose();
+		CloseInteractableOverlayHotkey?.Dispose();
+		OpenWikiHotkey?.Dispose();
+		OpenTarkovDevHotkey?.Dispose();
 	}
 
 	private static void Wrap<T>(Func<T> func) {
@@ -96,5 +108,41 @@ internal class HotkeyManager {
 
 	private void OnCloseInteractableOverlayHotkey(object? sender, KeyUpEventArgs e) {
 		Wrap(() => Application.Current.Dispatcher.Invoke(() => Wrap(() => BlazorUI.BlazorInteractableOverlay.HideOverlay())));
+	}
+
+	private void OnOpenWikiHotkey(object? sender, KeyUpEventArgs e) {
+		Wrap(() => {
+			Item? item = LastScannedItem();
+			if (item is null) return;
+			string link = item.WikiLink;
+			if (string.IsNullOrEmpty(link) || link.Length <= 3) {
+				link = $"https://escapefromtarkov.gamepedia.com/{Uri.EscapeDataString(item.Name.Replace(" ", "_"))}";
+			}
+			OpenURL(link);
+		});
+	}
+
+	private void OnOpenTarkovDevHotkey(object? sender, KeyUpEventArgs e) {
+		Wrap(() => {
+			Item? item = LastScannedItem();
+			OpenURL(item?.Link);
+		});
+	}
+
+	/// <summary>
+	/// The most recently scanned item, or null when nothing has been scanned yet.
+	/// </summary>
+	private static Item? LastScannedItem() {
+		ItemQueue scans = RatScannerMain.Instance.ItemScans;
+		for (int i = scans.Count - 1; i >= 0; i--) {
+			Item? item = scans.ElementAtOrDefault(i)?.Item;
+			if (item is not null) return item;
+		}
+		return null;
+	}
+
+	private static void OpenURL(string? url) {
+		if (string.IsNullOrEmpty(url)) return;
+		Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
 	}
 }

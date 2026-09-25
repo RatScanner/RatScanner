@@ -2,39 +2,77 @@
 @layout AppLayout
 @using RatScanner.Pages.App.Settings
 @inject NavigationManager NavigationManager
+@inject SettingsVM SettingsVM
+@inject LocalizationService Localizer
 
 <div class="settings-container">
-    <MudPaper Class="pa-1 my-1" Elevation="1">
-        <MudStack Row="true" Justify="Justify.SpaceAround">
-            <MudIconButton Icon="@Icons.Material.Filled.Settings" Size="Size.Small" 
-                          Color="@GetNavColor("/app/settings/general")"
-                          Href="/app/settings/general" />
-            <MudIconButton Icon="@Icons.Material.Filled.CenterFocusStrong" Size="Size.Small"
-                          Color="@GetNavColor("/app/settings/scanning")"
-                          Href="/app/settings/scanning" />
-            <MudIconButton Icon="@Icons.Material.Filled.Keyboard" Size="Size.Small"
-                          Color="@GetNavColor("/app/settings/hotkeys")"
-                          Href="/app/settings/hotkeys" />
-            <MudIconButton Icon="@Icons.Material.Filled.Checklist" Size="Size.Small"
-                          Color="@GetNavColor("/app/settings/tracking")"
-                          Href="/app/settings/tracking" />
-            <MudIconButton Icon="@Icons.Material.Filled.DesktopWindows" Size="Size.Small"
-                          Color="@GetNavColor("/app/settings/minimal")"
-                          Href="/app/settings/minimal" />
-            <MudIconButton Icon="@Icons.Material.Filled.CalendarViewDay" Size="Size.Small"
-                          Color="@GetNavColor("/app/settings/interactableoverlay")"
-                          Href="/app/settings/interactableoverlay" />
-            <MudIconButton Icon="@Icons.Material.Filled.Info" Size="Size.Small"
-                          Color="@GetNavColor("/app/settings/info")"
-                          Href="/app/settings/info" />
-        </MudStack>
-    </MudPaper>
+    <div class="settings-body">
+        @* ── Left navigation rail ── *@
+        <nav class="settings-rail">
+            <div class="settings-rail-scroll">
+                @foreach (var section in Sections)
+                {
+                    <a class="settings-rail-item @(IsActive(section.Path) ? "settings-rail-item-active" : null)"
+                       href="@section.Path">
+                        <MudIcon Icon="@section.Icon" Size="Size.Small" />
+                        <span class="settings-rail-label">@Localizer[section.LabelKey]</span>
+                    </a>
+                }
+            </div>
+        </nav>
 
-    <!-- Settings Content -->
-    <div class="settings-content">
-        @Body
+        @* ── Content column ── *@
+        <div class="settings-main">
+            <header class="settings-appbar">
+                <MudText Typo="Typo.h6" Color="Color.Inherit">@Localizer[ActiveSection?.LabelKey ?? "SettingsTitle"]
+                </MudText>
+                @if (!string.IsNullOrEmpty(ActiveSection?.DescriptionKey))
+                {
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">@Localizer[ActiveSection.DescriptionKey]</MudText>
+                }
+            </header>
 
-        <SettingsSave/>
+            <div class="settings-content">
+                @Body
+            </div>
+
+            @* ── Sticky footer ── *@
+            <footer class="settings-footer">
+                <div class="settings-footer-status">
+                    @if (_saving)
+                    {
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" Color="Color.Primary" />
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">@Localizer["SavingLabel"]</MudText>
+                    }
+                    else if (SettingsVM.IsDirty)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.Edit" Size="Size.Small" Color="Color.Warning" />
+                        <MudText Typo="Typo.caption" Color="Color.Warning">@Localizer["UnsavedChangesLabel"]</MudText>
+                    }
+                    else
+                    {
+                        @* Nothing to save, so leaving is the only action. It reads as a
+                           button, but an outlined one so it never competes with Save. *@
+                        <MudButton Variant="Variant.Outlined" Color="Color.Default" Class="settings-back"
+                                   StartIcon="@Icons.Material.Filled.ArrowBack" Disabled="@_saving" OnClick="GoBack">
+                            @Localizer["BackButton"]
+                        </MudButton>
+                    }
+                </div>
+                @if (SettingsVM.IsDirty && !_saving)
+                {
+                    <div class="settings-footer-actions">
+                        <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="DiscardSettings">
+                            @Localizer["DiscardButton"]
+                        </MudButton>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Save"
+                                   OnClick="SaveSettings">
+                            @Localizer["SaveButton"]
+                        </MudButton>
+                    </div>
+                }
+            </footer>
+        </div>
     </div>
 </div>
 
@@ -43,18 +81,254 @@
         display: flex;
         flex-direction: column;
         height: 100%;
+        min-height: 0;
+    }
+
+    .settings-body {
+        display: flex;
+        flex: 1;
+        min-height: 0;
+    }
+
+    /* ── Rail ── */
+    .settings-rail {
+        flex: 0 0 200px;
+        width: 200px;
+        border-right: 1px solid var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
+        background: rgba(0, 0, 0, 0.18);
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .settings-rail-scroll {
+        display: flex;
+        flex-direction: column;
         padding: 8px;
+        gap: 2px;
+    }
+
+    .settings-rail-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 12px;
+        border-radius: 6px;
+        border-left: 3px solid transparent;
+        color: var(--mud-palette-text-secondary, rgba(255, 255, 255, 0.6));
+        text-decoration: none;
+        font-size: 14px;
+        white-space: nowrap;
+        transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .settings-rail-item:hover {
+        background-color: rgba(255, 255, 255, 0.06);
+        color: var(--mud-palette-text-primary, #fff);
+        text-decoration: none;
+    }
+
+    .settings-rail-item-active {
+        background-color: rgba(255, 255, 255, 0.08);
+        border-left-color: var(--mud-palette-primary, #594ae2);
+        color: var(--mud-palette-text-primary, #fff);
+        font-weight: 600;
+    }
+
+    .settings-rail-label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* ── Main column ── */
+    .settings-main {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .settings-appbar {
+        flex: 0 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: 14px 20px 12px;
+        border-bottom: 1px solid var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
+        background: #1e1e1e;
     }
 
     .settings-content {
         flex: 1;
+        min-height: 0;
         overflow-y: auto;
-        margin-bottom: 60px;
+        padding: 20px;
+    }
+
+    .settings-content .settings-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        max-width: 760px;
+    }
+
+    .settings-content .settings-split {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+        align-items: start;
+    }
+
+    .settings-content .settings-split .settings-card {
+        height: 100%;
+    }
+
+    @@media (min-width: 1000px) {
+        .settings-content .settings-split {
+            grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+        }
+    }
+
+    /* ── Footer ── */
+    .settings-footer {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 10px 20px;
+        border-top: 1px solid var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
+        background: #1e1e1e;
+    }
+
+    .settings-footer-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    /* Outlined so it reads as a button, but without the fill or uppercase
+       treatment that would make it compete with Save. */
+    .settings-back {
+        text-transform: none;
+        letter-spacing: normal;
+        font-weight: 500;
+        opacity: 0.85;
+        transition: opacity 0.15s ease;
+    }
+
+    .settings-back:hover {
+        opacity: 1;
+    }
+
+    .settings-footer-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    @@media (max-width: 820px) {
+        .settings-rail {
+            flex: 0 0 56px;
+            width: 56px;
+        }
+
+        .settings-rail-label {
+            display: none;
+        }
+
+        .settings-rail-item {
+            justify-content: center;
+            padding: 10px 0;
+        }
     }
 </style>
 
 @code {
-    private Color GetNavColor(string path) {
-        return NavigationManager.Uri.Contains(path) ? Color.Primary : Color.Default;
+    private record Section(string Path, string Icon, string LabelKey, string? DescriptionKey = null);
+
+    private static readonly Section[] Sections = [
+        new("/app/settings/general", Icons.Material.Filled.Tune, "NavGeneral", "NavGeneralDesc"),
+        new("/app/settings/scanning", Icons.Material.Filled.CenterFocusStrong, "NavScanning", "NavScanningDesc"),
+        new("/app/settings/overlay", Icons.Material.Filled.OpenInFull, "NavOverlay", "NavOverlayDesc"),
+        new("/app/settings/appearance", Icons.Material.Filled.Palette, "NavAppearance", "NavAppearanceDesc"),
+        new("/app/settings/tracking", Icons.Material.Filled.Checklist, "NavTracking", "NavTrackingDesc"),
+        new("/app/settings/hotkeys", Icons.Material.Filled.Keyboard, "NavHotkeys", "NavHotkeysDesc"),
+        new("/app/settings/advanced", Icons.Material.Filled.Code, "NavAdvanced", "NavAdvancedDesc"),
+        new("/app/settings/info", Icons.Material.Filled.Info, "NavAbout", "NavAboutDesc"),
+    ];
+
+    private bool _saving;
+
+    private Section? ActiveSection => Sections.FirstOrDefault(s => IsActive(s.Path));
+
+    private bool IsActive(string path)
+    {
+        string uri = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        return uri.StartsWith(path.TrimStart('/'), StringComparison.OrdinalIgnoreCase);
+    }
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += OnLocationChanged;
+        SettingsVM.PropertyChanged += OnSettingsChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnSettingsChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async Task SaveSettings()
+    {
+        _saving = true;
+        StateHasChanged();
+        try
+        {
+            await SettingsVM.SaveSettings();
+            // Saving applies and persists the configuration, so return to the main
+            // screen rather than leaving the user on a now-clean settings page.
+            NavigationManager.NavigateTo("/app");
+        }
+        finally
+        {
+            _saving = false;
+            StateHasChanged();
+        }
+    }
+
+    private void DiscardSettings()
+    {
+        SettingsVM.LoadSettings();
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Releases the view model's load-time suppression once the render caused by
+    /// a reset has finished.
+    /// </summary>
+    /// <remarks>
+    /// Child controls echo the values they were just handed back through their
+    /// change events while the new parameters are being applied, which happens
+    /// during the render - after LoadSettings has already returned. The echo must
+    /// therefore be ignored, but only for that render, so a genuine edit made
+    /// afterwards still marks the settings dirty.
+    /// </remarks>
+    protected override void OnAfterRender(bool firstRender)
+    {
+        SettingsVM.EndLoadSuppression();
+    }
+
+    private void GoBack() => NavigationManager.NavigateTo("/app");
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+        SettingsVM.PropertyChanged -= OnSettingsChanged;
     }
 }

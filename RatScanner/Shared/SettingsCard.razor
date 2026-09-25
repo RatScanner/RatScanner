@@ -1,0 +1,69 @@
+@*
+	Reusable building blocks for the settings pages.
+	SettingsCard      - a titled group of settings rows
+	SettingsRow       - label on the left, control on the right
+	SettingsSwitchRow - convenience wrapper around SettingsRow + MudSwitch
+*@
+
+<div class="settings-card">
+    @if (!string.IsNullOrEmpty(Title)) {
+        <div class="settings-card-title">@Title</div>
+        @if (!string.IsNullOrEmpty(Subtitle)) {
+            <div class="settings-card-subtitle">@Subtitle</div>
+        }
+    }
+    <div class="settings-card-body">
+        @ChildContent
+    </div>
+    @if (!string.IsNullOrEmpty(Footer)) {
+        <div class="settings-card-footer">@Footer</div>
+    }
+</div>
+
+<style>
+    .settings-card {
+        background: var(--mud-palette-surface, #1e1e1e);
+        border: 1px solid var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .settings-card-title {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--mud-palette-text-secondary, rgba(255, 255, 255, 0.5));
+        padding: 12px 16px 0;
+    }
+
+    .settings-card-subtitle {
+        font-size: 12px;
+        color: var(--mud-palette-text-secondary, rgba(255, 255, 255, 0.5));
+        padding: 4px 16px 0;
+    }
+
+    .settings-card-body {
+        padding: 8px 0;
+    }
+
+    .settings-card-footer {
+        font-size: 12px;
+        color: var(--mud-palette-text-secondary, rgba(255, 255, 255, 0.5));
+        padding: 0 16px 12px;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public string? Subtitle { get; set; }
+
+    [Parameter]
+    public string? Footer { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

@@ -1,0 +1,222 @@
+@page "/app/settings/appearance"
+@layout SettingsLayout
+@using System.Globalization
+@using RatScanner
+@inject SettingsVM SettingsVM
+@inject LocalizationService Localizer
+@implements IDisposable
+
+<div class="settings-split">
+    <div class="settings-stack">
+        <SettingsCard Title="@Localizer["TooltipGroup"]" Subtitle="@Localizer["TooltipGroupDesc"]">
+            <SettingsRow Label="@Localizer.Format("TooltipDuration", SettingsVM.ToolTipMilli)"
+                         SubLabel="@Localizer["TooltipDurationHint"]">
+                <div class="slider-control">
+                    <MudSlider T="int" Value="@SettingsVM.ToolTipMilli"
+                               ValueChanged="@((int v) => { SettingsVM.ToolTipMilli = v; SettingsVM.MarkDirty(); })" Min="0"
+                               Max="10000" Step="100" Color="Color.Primary" />
+                </div>
+            </SettingsRow>
+        </SettingsCard>
+
+        <SettingsCard Title="@Localizer["MinimalUiGroup"]" Subtitle="@Localizer["MinimalUiGroupDesc"]"
+                      Footer="@Localizer["MinimalUiGroupFooter"]">
+            <SettingsSwitchRow Label="@Localizer["NameLabel"]" Value="@SettingsVM.ShowName"
+                               ValueChanged="@((bool v) => { SettingsVM.ShowName = v; SettingsVM.MarkDirty(); })" />
+
+            <SettingsSwitchRow Label="@Localizer["AvgDailyPrice"]" Value="@SettingsVM.ShowAvgDayPrice"
+                               ValueChanged="@((bool v) => { SettingsVM.ShowAvgDayPrice = v; SettingsVM.MarkDirty(); })" />
+
+            <SettingsSwitchRow Label="@Localizer["PricePerSlot"]" Value="@SettingsVM.ShowPricePerSlot"
+                               ValueChanged="@((bool v) => { SettingsVM.ShowPricePerSlot = v; SettingsVM.MarkDirty(); })" />
+
+            <SettingsSwitchRow Label="@Localizer["TraderPrice"]" Value="@SettingsVM.ShowTraderPrice"
+                               ValueChanged="@((bool v) => { SettingsVM.ShowTraderPrice = v; SettingsVM.MarkDirty(); })" />
+
+            <SettingsSwitchRow Label="@Localizer["KappaNeeded"]" Value="@SettingsVM.ShowKappa"
+                               ValueChanged="@((bool v) => { SettingsVM.ShowKappa = v; SettingsVM.MarkDirty(); })" />
+
+            <SettingsSwitchRow Label="@Localizer["NeededQuestHideout"]" Value="@SettingsVM.ShowQuestHideoutTracker"
+                               ValueChanged="@((bool v) => { SettingsVM.ShowQuestHideoutTracker = v; SettingsVM.MarkDirty(); })" />
+
+            <SettingsSwitchRow Label="@Localizer["NeededQuestHideoutTeam"]"
+                               Value="@SettingsVM.ShowQuestHideoutTeamTracker"
+                               ValueChanged="@((bool v) => { SettingsVM.ShowQuestHideoutTeamTracker = v; SettingsVM.MarkDirty(); })" />
+
+            <SettingsSwitchRow Label="@Localizer["UpdatedTimestamp"]" Value="@SettingsVM.ShowUpdated"
+                               ValueChanged="@((bool v) => { SettingsVM.ShowUpdated = v; SettingsVM.MarkDirty(); })" />
+        </SettingsCard>
+
+        <SettingsCard Title="@Localizer["OpacityGroup"]" Subtitle="@Localizer["OpacityGroupDesc"]">
+            <SettingsRow Label="@Localizer.Format("OpacityLabel", SettingsVM.Opacity)">
+                <div class="slider-control">
+                    <MudSlider T="int" Value="@SettingsVM.Opacity"
+                               ValueChanged="@((int v) => { SettingsVM.Opacity = v; SettingsVM.MarkDirty(); })" Min="0"
+                               Max="100" Step="5" Color="Color.Primary" />
+                </div>
+            </SettingsRow>
+        </SettingsCard>
+    </div>
+
+    @* Live preview *@
+    <div class="settings-stack">
+        <SettingsCard Title="@Localizer["PreviewGroup"]" Subtitle="@Localizer["PreviewGroupDesc"]">
+            <div class="preview-surface">
+                <div class="preview-card" style="background-color: @PreviewBackdrop">
+                    @if (SettingsVM.ShowName)
+                    {
+                        <div class="preview-name">Salewa FIRST AID KIT</div>
+                    }
+                    @if (SettingsVM.ShowUpdated)
+                    {
+                        <div class="preview-updated">updated 4m ago</div>
+                    }
+                    <div class="preview-divider"></div>
+                    @if (SettingsVM.ShowAvgDayPrice)
+                    {
+                        <div class="preview-line">
+                            <span>Avg 24h price</span><span class="preview-value">24 118 ₽</span>
+                        </div>
+                    }
+                    @if (SettingsVM.ShowPricePerSlot)
+                    {
+                        <div class="preview-line">
+                            <span>Per slot</span><span class="preview-value">1 582 ₽</span>
+                        </div>
+                    }
+                    @if (SettingsVM.ShowTraderPrice)
+                    {
+                        <div class="preview-line">
+                            <span>Best trader</span><span class="preview-value">21 500 ₽</span>
+                        </div>
+                    }
+                    @if (SettingsVM.ShowKappa)
+                    {
+                        <div class="preview-line">
+                            <span>Kappa needed</span><span class="preview-value preview-warn">2 400</span>
+                        </div>
+                    }
+                    @if (SettingsVM.ShowQuestHideoutTracker)
+                    {
+                        <div class="preview-line">
+                            <span>Quest / hideout</span><span class="preview-value">3</span>
+                        </div>
+                    }
+                    @if (SettingsVM.ShowQuestHideoutTeamTracker)
+                    {
+                        <div class="preview-line">
+                            <span>Team needs</span><span class="preview-value">1</span>
+                        </div>
+                    }
+                </div>
+            </div>
+            @if (!AnyFieldEnabled())
+            {
+                <MudText Typo="Typo.caption" Color="Color.Warning" Class="d-block mt-2">
+                    @Localizer["PreviewEmptyLabel"]
+                </MudText>
+            }
+        </SettingsCard>
+    </div>
+</div>
+
+@code {
+    // Mirrors RatConfig.MinimalUi.OpacityToAlpha so the preview matches the real
+    // minimal UI, which fades the backdrop rather than the whole card.
+    private string PreviewBackdrop
+    {
+        get
+        {
+            return $"rgba(30, 30, 30, {(SettingsVM.Opacity / 100.0).ToString(CultureInfo.InvariantCulture)})";
+        }
+    }
+
+    private bool AnyFieldEnabled() =>
+        SettingsVM.ShowName || SettingsVM.ShowAvgDayPrice || SettingsVM.ShowPricePerSlot ||
+        SettingsVM.ShowTraderPrice || SettingsVM.ShowKappa || SettingsVM.ShowQuestHideoutTracker ||
+        SettingsVM.ShowQuestHideoutTeamTracker || SettingsVM.ShowUpdated;
+
+    protected override void OnInitialized()
+    {
+        SettingsVM.PropertyChanged += PropertyChangeHandler;
+    }
+
+    private async void PropertyChangeHandler(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        await InvokeAsync(() => StateHasChanged());
+    }
+
+    public void Dispose()
+    {
+        SettingsVM.PropertyChanged -= PropertyChangeHandler;
+    }
+}
+
+<style>
+    .slider-control {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 2px;
+        width: 220px;
+    }
+
+    .slider-value {
+        white-space: nowrap;
+    }
+
+    .preview-surface {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px 12px;
+        border-radius: 6px;
+        background:
+            repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.02) 0 10px, transparent 10px 20px),
+            #101010;
+        transition: opacity 0.15s ease;
+    }
+
+    .preview-card {
+        width: 100%;
+        max-width: 300px;
+        padding: 12px 14px;
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        font-size: 13px;
+        line-height: 1.5;
+        transition: background-color 0.15s ease;
+    }
+
+    .preview-name {
+        font-weight: 600;
+        color: #fff;
+    }
+
+    .preview-updated {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.45);
+    }
+
+    .preview-divider {
+        height: 1px;
+        margin: 8px 0;
+        background: rgba(255, 255, 255, 0.12);
+    }
+
+    .preview-line {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .preview-value {
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .preview-warn {
+        color: #ffb74d;
+    }
+</style>

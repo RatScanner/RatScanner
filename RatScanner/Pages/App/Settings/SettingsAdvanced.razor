@@ -1,0 +1,199 @@
+@page "/app/settings/advanced"
+@layout SettingsLayout
+@using System.Diagnostics
+@using System.IO
+@using RatScanner
+@inject SettingsVM SettingsVM
+@inject LocalizationService Localizer
+@implements IDisposable
+
+<div class="settings-stack">
+    <SettingsCard Title="@Localizer["ScreenConfigGroup"]" Subtitle="@Localizer["ScreenConfigGroupDesc"]"
+                  Footer="@Localizer["ScreenConfigGroupFooter"]">
+        <SettingsRow Label="@Localizer["DetectedResolution"]" SubLabel="@Localizer["DetectedResolutionHint"]">
+            <MudText Typo="Typo.body1" Color="Color.Secondary">@DetectedResolution</MudText>
+        </SettingsRow>
+
+        <SettingsSwitchRow Label="@Localizer["OverrideScreenConfig"]" SubLabel="@Localizer["OverrideScreenConfigHint"]"
+                           Value="@SettingsVM.OverrideScreenConfig"
+                           ValueChanged="@((bool v) => { SettingsVM.OverrideScreenConfig = v; SettingsVM.MarkDirty(); })" />
+
+        <SettingsRow Label="@Localizer["ScreenResolution"]" SubLabel="@Localizer["ScreenResolutionHint"]"
+                     Disabled="@(!SettingsVM.OverrideScreenConfig)">
+            <div class="resolution-grid">
+                <div class="resolution-field">
+                    <MudText Typo="Typo.caption" Color="Color.Secondary" Class="resolution-label">
+                        @Localizer["WidthLabel"]
+                    </MudText>
+                    <MudNumericField T="int" Value="@SettingsVM.ScreenWidth"
+                                     ValueChanged="@((int v) => { SettingsVM.ScreenWidth = v; SettingsVM.MarkDirty(); })"
+                                     Variant="Variant.Outlined" Margin="Margin.Dense"
+                                     HideSpinButtons="true" Min="100" Max="99999" />
+                </div>
+                <div class="resolution-field">
+                    <MudText Typo="Typo.caption" Color="Color.Secondary" Class="resolution-label">
+                        @Localizer["HeightLabel"]
+                    </MudText>
+                    <MudNumericField T="int" Value="@SettingsVM.ScreenHeight"
+                                     ValueChanged="@((int v) => { SettingsVM.ScreenHeight = v; SettingsVM.MarkDirty(); })"
+                                     Variant="Variant.Outlined" Margin="Margin.Dense"
+                                     HideSpinButtons="true" Min="100" Max="99999" />
+                </div>
+                <div class="resolution-field">
+                    <MudText Typo="Typo.caption" Color="Color.Secondary" Class="resolution-label">
+                        @Localizer["ScaleLabel"]
+                    </MudText>
+                    <MudNumericField T="float" Value="@SettingsVM.ScreenScale"
+                                     ValueChanged="@((float v) => { SettingsVM.ScreenScale = v; SettingsVM.MarkDirty(); })"
+                                     Variant="Variant.Outlined" Margin="Margin.Dense"
+                                     HideSpinButtons="true" Converter="@_percentageConverter" Min="0.1f" Max="8f" />
+                </div>
+            </div>
+        </SettingsRow>
+    </SettingsCard>
+
+    <SettingsCard Title="@Localizer["DiagnosticsGroup"]" Subtitle="@Localizer["DiagnosticsGroupDesc"]">
+        <SettingsRow Label="@Localizer["ConfigFile"]" SubLabel="@Localizer["ConfigFileHint"]">
+            <MudButton Variant="Variant.Text" Size="Size.Small" Color="Color.Secondary"
+                       Class="path-button" EndIcon="@Icons.Material.Filled.FolderOpen"
+                       OnClick="@(() => RevealInExplorer(ConfigPath))"
+                       Title="@($"{Localizer["RevealInExplorerHint"]} - {ConfigPath}")">
+                <span class="path-text">@DisplayPath(ConfigPath)</span>
+            </MudButton>
+        </SettingsRow>
+
+        <SettingsRow Label="@Localizer["LogFile"]" SubLabel="@Localizer["LogFileHint"]">
+            <MudButton Variant="Variant.Text" Size="Size.Small" Color="Color.Secondary"
+                       Class="path-button" EndIcon="@Icons.Material.Filled.FolderOpen"
+                       OnClick="@(() => RevealInExplorer(LogPath))"
+                       Title="@($"{Localizer["RevealInExplorerHint"]} - {LogPath}")">
+                <span class="path-text">@DisplayPath(LogPath)</span>
+            </MudButton>
+        </SettingsRow>
+
+        <SettingsRow Label="@Localizer["DataFolder"]" SubLabel="@Localizer["DataFolderHint"]">
+            <MudButton Variant="Variant.Text" Size="Size.Small" Color="Color.Secondary"
+                       Class="path-button" EndIcon="@Icons.Material.Filled.FolderOpen"
+                       OnClick="@(() => RevealInExplorer(DataPath))"
+                       Title="@($"{Localizer["RevealInExplorerHint"]} - {DataPath}")">
+                <span class="path-text">@DisplayPath(DataPath)</span>
+            </MudButton>
+        </SettingsRow>
+    </SettingsCard>
+</div>
+
+@code {
+    private static readonly Converter<float> _percentageConverter = new()
+    {
+        SetFunc = value => (int)(value * 100) + "%",
+        GetFunc = text =>
+        {
+            text = text?.TrimEnd('%') ?? "";
+            return int.TryParse(text, out var num) ? num / 100f : 1f;
+        },
+    };
+
+    private string DetectedResolution => string.Join("  ·  ",
+        new[] { $"{SettingsVM.ScreenWidth}×{SettingsVM.ScreenHeight}", $"{SettingsVM.ScreenScale * 100:0.#}%" });
+
+    private string ConfigPath => RatConfig.Paths.ConfigFile;
+
+    private string LogPath => RatConfig.Paths.LogFile;
+
+    private string DataPath => RatConfig.Paths.Data;
+
+    /// <summary>
+    /// Paths under the application folder share a long, identical prefix, so display
+    /// them relative to that folder instead. The full path stays in the tooltip and
+    /// is what gets revealed in Explorer.
+    /// </summary>
+    private static string DisplayPath(string path) {
+        string baseDir = RatConfig.Paths.Base;
+        if (!string.IsNullOrEmpty(baseDir) &&
+            path.StartsWith(baseDir, StringComparison.OrdinalIgnoreCase)) {
+            string relative = path[baseDir.Length..].TrimStart(Path.DirectorySeparatorChar);
+            return string.IsNullOrEmpty(relative) ? path : relative;
+        }
+        return path;
+    }
+
+    /// <summary>
+    /// Opens the containing folder in Explorer with the given file selected.
+    /// Falls back to opening the folder itself when the file does not exist yet.
+    /// </summary>
+    private void RevealInExplorer(string path) {
+        try {
+            if (File.Exists(path)) {
+                // explorer.exe selects the file when given /select,<path>
+                string args = "/select,\"" + path + "\"";
+                Process.Start(new ProcessStartInfo("explorer.exe", args) { UseShellExecute = true });
+            } else if (Directory.Exists(path)) {
+                Process.Start(new ProcessStartInfo("explorer.exe", "\"" + path + "\"") { UseShellExecute = true });
+            } else {
+                Logger.ShowMessage(Localizer["PathNotFound"]);
+            }
+        } catch (Exception e) {
+            Logger.LogError("Failed to reveal path in explorer", e);
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        SettingsVM.PropertyChanged += PropertyChangeHandler;
+    }
+
+    private async void PropertyChangeHandler(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        await InvokeAsync(() => StateHasChanged());
+    }
+
+    public void Dispose()
+    {
+        SettingsVM.PropertyChanged -= PropertyChangeHandler;
+    }
+}
+
+<style>
+    .resolution-grid {
+        display: grid;
+        /* Fixed tracks rather than 1fr: the fields have a natural minimum width and
+           would otherwise overflow the row and starve the label into wrapping. */
+        grid-template-columns: repeat(3, 110px);
+        gap: 10px;
+        flex: 0 0 auto;
+    }
+
+    /* Stacked labels give each field room to breathe; MudNumericField's floating
+       label sits too close to the neighbouring controls when crammed together. */
+    .resolution-field {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 0;
+    }
+
+    .resolution-label {
+        line-height: 1.2;
+    }
+
+    .path-button {
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    .path-button .path-text {
+        display: block;
+        max-width: 360px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-align: right;
+        direction: ltr;
+        font-family: Consolas, "Cascadia Mono", monospace;
+        font-size: 12px;
+    }
+
+    .path-button:hover .path-text {
+        text-decoration: underline;
+    }
+</style>

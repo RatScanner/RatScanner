@@ -12,9 +12,43 @@ public class TarkovTrackerDB {
 	private TokenResponse? _token;
 	private bool _badToken;
 
+	// Last token validation result, kept across page instances so revisiting the
+	// settings does not re-issue a network request for a token we already checked.
+	// Both outcomes are cached; only a changed token or backend invalidates it.
+	private static string _lastValidatedToken = "";
+	private static RatConfig.TarkovTrackerBackend _lastValidatedBackend;
+	private static bool _lastValidationResult;
+
 	public List<UserProgress> Progress = new();
 	public string Self = "";
 	public string? Token;
+
+	/// <summary>
+	/// Returns the cached validation result for the given token and backend,
+	/// or null when that pair has not been checked yet.
+	/// </summary>
+	internal static bool? GetCachedValidation(string token, RatConfig.TarkovTrackerBackend backend) {
+		if (string.IsNullOrEmpty(token)) return false;
+		if (token != _lastValidatedToken || backend != _lastValidatedBackend) return null;
+		return _lastValidationResult;
+	}
+
+	/// <summary>
+	/// Records the outcome of a token validation for later reuse.
+	/// </summary>
+	internal static void CacheValidation(string token, RatConfig.TarkovTrackerBackend backend, bool result) {
+		_lastValidatedToken = token;
+		_lastValidatedBackend = backend;
+		_lastValidationResult = result;
+	}
+
+	/// <summary>
+	/// Discards the cached validation, forcing the next check to hit the network.
+	/// </summary>
+	internal static void InvalidateCachedValidation() {
+		_lastValidatedToken = "";
+		_lastValidationResult = false;
+	}
 
 	// Set up the TarkovTracker DB
 	public bool Init() {

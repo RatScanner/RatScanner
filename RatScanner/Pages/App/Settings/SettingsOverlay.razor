@@ -1,0 +1,55 @@
+@page "/app/settings/overlay"
+@layout SettingsLayout
+@using RatScanner
+@using RatScanner.Components
+@inject SettingsVM SettingsVM
+@inject LocalizationService Localizer
+@implements IDisposable
+
+<div class="settings-stack">
+    <SettingsCard Title="@Localizer["OverlayGroup"]" Subtitle="@Localizer["OverlayGroupDesc"]">
+        <SettingsRow Label="@Localizer["EnableSearchOverlay"]" SubLabel="@Localizer["EnableSearchOverlayHint"]">
+            <MudSwitch T="bool" Checked="@SettingsVM.EnableIneractableOverlay"
+                       CheckedChanged="@((bool v) => { SettingsVM.EnableIneractableOverlay = v; SettingsVM.MarkDirty(); })"
+                       Color="Color.Primary" Dense="true" />
+        </SettingsRow>
+
+        <SettingsRow Label="@Localizer["BlurBehindSearch"]" SubLabel="@Localizer["BlurBehindSearchHint"]"
+                     Disabled="@(!SettingsVM.EnableIneractableOverlay)">
+            <MudSwitch T="bool" Checked="@SettingsVM.BlurBehindSearch"
+                       CheckedChanged="@((bool v) => { SettingsVM.BlurBehindSearch = v; SettingsVM.MarkDirty(); })"
+                       Color="Color.Primary" Dense="true" />
+        </SettingsRow>
+    </SettingsCard>
+
+    <SettingsCard Title="@Localizer["OverlayHotkeysGroup"]" Subtitle="@Localizer["OverlayHotkeysGroupDesc"]">
+        <SettingsRow Label="@Localizer["OpenSearchOverlay"]" SubLabel="@Localizer["OpenSearchOverlayHint"]"
+                     Disabled="@(!SettingsVM.EnableIneractableOverlay)">
+            <HotkeySelector Hotkey="@SettingsVM.InteractableOverlayHotkey" @key="SettingsVM.InteractableOverlayHotkey"
+                            OnHotkeyChanged="@(() => SettingsVM.MarkDirty())" />
+        </SettingsRow>
+
+        <SettingsRow Label="@Localizer["CloseSearchOverlay"]" SubLabel="@Localizer["CloseSearchOverlayHint"]"
+                     Disabled="@(!SettingsVM.EnableIneractableOverlay)">
+            <HotkeySelector Hotkey="@SettingsVM.CloseOverlayHotkey" @key="SettingsVM.CloseOverlayHotkey"
+                            OnHotkeyChanged="@(() => SettingsVM.MarkDirty())" />
+        </SettingsRow>
+    </SettingsCard>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        SettingsVM.PropertyChanged += PropertyChangeHandler;
+    }
+
+    private async void PropertyChangeHandler(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        await InvokeAsync(() => StateHasChanged());
+    }
+
+    public void Dispose()
+    {
+        SettingsVM.PropertyChanged -= PropertyChangeHandler;
+    }
+}

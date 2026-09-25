@@ -1,21 +1,22 @@
-﻿using RatStash;
+using RatStash;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace RatScanner.ViewModel;
 
-internal class SettingsVM : INotifyPropertyChanged {
+internal class SettingsVM : INotifyPropertyChanged
+{
 	public bool EnableNameScan { get; set; }
 	public bool EnableAutoNameScan { get; set; }
 	public int NameScanLanguage { get; set; }
+	public Hotkey NameScanHotkey { get; set; }
 
 	public bool EnableIconScan { get; set; }
 	public bool ScanRotatedIcons { get; set; }
 	public bool UseCachedIcons { get; set; }
 	public Hotkey IconScanHotkey { get; set; }
 
-	public string ToolTipDuration { get; set; }
 	public int ToolTipMilli { get; set; }
 	public UiLanguage UiLanguage { get; set; }
 
@@ -32,6 +33,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 	public int ScreenWidth { get; set; }
 	public int ScreenHeight { get; set; }
 	public float ScreenScale { get; set; }
+	public bool OverrideScreenConfig { get; set; }
 	public GameMode GameMode { get; set; }
 	public bool MinimizeToTray { get; set; }
 	public bool AlwaysOnTop { get; set; }
@@ -53,25 +55,32 @@ internal class SettingsVM : INotifyPropertyChanged {
 	public bool EnableIneractableOverlay { get; set; }
 	public bool BlurBehindSearch { get; set; }
 	public Hotkey InteractableOverlayHotkey { get; set; }
+	public Hotkey CloseOverlayHotkey { get; set; }
+
+	// Application hotkeys
+	public Hotkey OpenWikiHotkey { get; set; }
+	public Hotkey OpenTarkovDevHotkey { get; set; }
 
 	private readonly LocalizationService _localizationService;
 
-	internal SettingsVM(LocalizationService localizationService) {
+	internal SettingsVM(LocalizationService localizationService)
+	{
 		_localizationService = localizationService;
 		LoadSettings();
 	}
 
-	public void LoadSettings() {
+	public void LoadSettings()
+	{
 		EnableNameScan = RatConfig.NameScan.Enable;
 		EnableAutoNameScan = RatConfig.NameScan.EnableAuto;
 		NameScanLanguage = (int)RatConfig.NameScan.Language;
+		NameScanHotkey = new Hotkey(RatConfig.NameScan.Hotkey);
 
 		EnableIconScan = RatConfig.IconScan.Enable;
 		ScanRotatedIcons = RatConfig.IconScan.ScanRotatedIcons;
 		UseCachedIcons = RatConfig.IconScan.UseCachedIcons;
-		IconScanHotkey = RatConfig.IconScan.Hotkey;
+		IconScanHotkey = new Hotkey(RatConfig.IconScan.Hotkey);
 
-		ToolTipDuration = RatConfig.ToolTip.Duration.ToString();
 		ToolTipMilli = RatConfig.ToolTip.Duration;
 		UiLanguage = RatConfig.UserInterface.Language;
 
@@ -83,10 +92,12 @@ internal class SettingsVM : INotifyPropertyChanged {
 		ShowQuestHideoutTracker = RatConfig.MinimalUi.ShowQuestHideoutTracker;
 		ShowQuestHideoutTeamTracker = RatConfig.MinimalUi.ShowQuestHideoutTeamTracker;
 		ShowUpdated = RatConfig.MinimalUi.ShowUpdated;
+		Opacity = RatConfig.MinimalUi.Opacity;
 
 		ScreenWidth = RatConfig.ScreenWidth;
 		ScreenHeight = RatConfig.ScreenHeight;
 		ScreenScale = RatConfig.ScreenScale;
+		OverrideScreenConfig = RatConfig.OverrideScreenConfig;
 		GameMode = RatConfig.GameMode;
 		MinimizeToTray = RatConfig.MinimizeToTray;
 		AlwaysOnTop = RatConfig.AlwaysOnTop;
@@ -101,16 +112,66 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 		EnableIneractableOverlay = RatConfig.Overlay.Search.Enable;
 		BlurBehindSearch = RatConfig.Overlay.Search.BlurBehind;
-		InteractableOverlayHotkey = RatConfig.Overlay.Search.Hotkey;
+		InteractableOverlayHotkey = new Hotkey(RatConfig.Overlay.Search.Hotkey);
+		CloseOverlayHotkey = new Hotkey(RatConfig.Overlay.Search.CloseHotkey);
 
-		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
+		OpenWikiHotkey = new Hotkey(RatConfig.Hotkeys.OpenWiki);
+		OpenTarkovDevHotkey = new Hotkey(RatConfig.Hotkeys.OpenTarkovDev);
+
+		IsDirty = false;
+		_suppressDirty = true;
+		Notify();
 	}
 
-	public async Task SaveSettings() {
+	/// <summary>
+	/// True when the in-memory settings differ from the persisted config, so the
+	/// UI can show a dirty state and enable the Save / Discard buttons.
+	/// </summary>
+	public bool IsDirty { get; private set; }
+
+	private bool _suppressDirty;
+
+	/// <summary>
+	/// Clears the load-time suppression. Called once the re-render triggered by a
+	/// reset has been processed, so a genuine edit after a load is never ignored.
+	/// </summary>
+	internal void EndLoadSuppression()
+	{
+		_suppressDirty = false;
+	}
+
+	private void Notify() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
+
+	/// <summary>
+	/// Marks the settings as having unsaved changes. Called by the settings pages
+	/// whenever a control is edited.
+	/// </summary>
+	/// <remarks>
+	/// The notification is raised on every call, not just the first, because pages
+	/// use it as their signal to re-render (live previews, dependent rows, the
+	/// footer status) whenever a control changes.
+	/// </remarks>
+	public void MarkDirty()
+	{
+		// Swallow the first callback after a load: that is a control re-applying
+		// the value we just handed it, not a user edit.
+		if (_suppressDirty)
+		{
+			_suppressDirty = false;
+			return;
+		}
+
+		IsDirty = true;
+		Notify();
+	}
+
+	public async Task SaveSettings()
+	{
 		bool updateMarketDB = NameScanLanguage != (int)RatConfig.NameScan.Language;
 		bool updateTarkovTrackerToken = TarkovTrackerToken != RatConfig.Tracking.TarkovTracker.Token;
 		bool updateTarkovTrackerBackend = TarkovTrackerBackend != RatConfig.Tracking.TarkovTracker.Backend;
 		bool updateResolution = ScreenWidth != RatConfig.ScreenWidth || ScreenHeight != RatConfig.ScreenHeight;
+		bool updateScreenOverride = OverrideScreenConfig != RatConfig.OverrideScreenConfig || ScreenScale != RatConfig.ScreenScale;
 		bool updateLanguage = RatConfig.NameScan.Language != (Language)NameScanLanguage;
 		bool updateUiLanguage = RatConfig.UserInterface.Language != UiLanguage;
 
@@ -118,13 +179,13 @@ internal class SettingsVM : INotifyPropertyChanged {
 		RatConfig.NameScan.Enable = EnableNameScan;
 		RatConfig.NameScan.EnableAuto = EnableAutoNameScan;
 		RatConfig.NameScan.Language = (Language)NameScanLanguage;
+		RatConfig.NameScan.Hotkey = NameScanHotkey;
 
 		RatConfig.IconScan.Enable = EnableIconScan;
 		RatConfig.IconScan.ScanRotatedIcons = ScanRotatedIcons;
 		RatConfig.IconScan.UseCachedIcons = UseCachedIcons;
 		RatConfig.IconScan.Hotkey = IconScanHotkey;
 
-		RatConfig.ToolTip.Duration = int.TryParse(ToolTipDuration, out int i) ? i : 0;
 		RatConfig.ToolTip.Duration = ToolTipMilli;
 		RatConfig.UserInterface.Language = UiLanguage;
 
@@ -136,6 +197,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 		RatConfig.MinimalUi.ShowQuestHideoutTracker = ShowQuestHideoutTracker;
 		RatConfig.MinimalUi.ShowQuestHideoutTeamTracker = ShowQuestHideoutTeamTracker;
 		RatConfig.MinimalUi.ShowUpdated = ShowUpdated;
+		RatConfig.MinimalUi.Opacity = Opacity;
 
 		RatConfig.Tracking.ShowNonFIRNeeds = ShowNonFIRNeeds;
 		RatConfig.Tracking.ShowKappaNeeds = ShowKappaNeeds;
@@ -147,10 +209,18 @@ internal class SettingsVM : INotifyPropertyChanged {
 		RatConfig.Overlay.Search.Enable = EnableIneractableOverlay;
 		RatConfig.Overlay.Search.BlurBehind = BlurBehindSearch;
 		RatConfig.Overlay.Search.Hotkey = InteractableOverlayHotkey;
+		RatConfig.Overlay.Search.CloseHotkey = CloseOverlayHotkey;
 
-		RatConfig.ScreenWidth = ScreenWidth;
-		RatConfig.ScreenHeight = ScreenHeight;
-		RatConfig.ScreenScale = ScreenScale;
+		RatConfig.Hotkeys.OpenWiki = OpenWikiHotkey;
+		RatConfig.Hotkeys.OpenTarkovDev = OpenTarkovDevHotkey;
+
+		if (OverrideScreenConfig)
+		{
+			RatConfig.ScreenWidth = ScreenWidth;
+			RatConfig.ScreenHeight = ScreenHeight;
+			RatConfig.ScreenScale = ScreenScale;
+			RatConfig.OverrideScreenConfig = true;
+		}
 		RatConfig.GameMode = GameMode;
 		RatConfig.MinimizeToTray = MinimizeToTray;
 		RatConfig.AlwaysOnTop = AlwaysOnTop;
@@ -162,7 +232,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 		await TarkovDevAPI.InitializeCache();
 		if (updateTarkovTrackerToken || updateTarkovTrackerBackend) UpdateTarkovTrackerToken();
 		if (updateUiLanguage) _localizationService.SetLanguage(UiLanguage);
-		if (updateResolution || updateLanguage) RatScannerMain.Instance.SetupRatEye();
+		if (updateResolution || updateLanguage || updateScreenOverride) RatScannerMain.Instance.SetupRatEye();
 
 		RatEye.Config.LogDebug = RatConfig.LogDebug;
 		RatScannerMain.Instance.HotkeyManager.RegisterHotkeys();
@@ -171,15 +241,19 @@ internal class SettingsVM : INotifyPropertyChanged {
 		Logger.LogInfo("Saving config...");
 		RatConfig.SaveConfig();
 		Logger.LogInfo("Config saved!");
-		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
+		IsDirty = false;
+		_suppressDirty = true;
+		Notify();
 	}
 
-	private void UpdateTarkovTrackerToken() {
+	private void UpdateTarkovTrackerToken()
+	{
 		string token = RatConfig.Tracking.TarkovTracker.Token;
 		if (token == "") return;
 		RatScannerMain.Instance.TarkovTrackerDB.Token = RatConfig.Tracking.TarkovTracker.Token;
 		var db = RatScannerMain.Instance.TarkovTrackerDB;
-		if (db.TestToken(token)) {
+		if (db.TestToken(token))
+		{
 			db.UpdateToken();
 			return;
 		}
@@ -193,7 +267,8 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 
-	internal virtual void OnPropertyChanged(string? propertyName = null) {
+	internal virtual void OnPropertyChanged(string? propertyName = null)
+	{
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 }

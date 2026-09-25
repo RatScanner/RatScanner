@@ -2,121 +2,240 @@
 @layout SettingsLayout
 @using System.Diagnostics
 @inject MenuVM MenuVM
+@inject LocalizationService Localizer
 @implements IDisposable
 
-<div>
-    <MudGrid Class="pa-0 ma-0" Spacing="0" Style="height: 100%;">
-        <MudItem xs="12">
-            <div class="d-flex align-center justify-center mx-2 mb-1">
-                <MudText Typo="Typo.subtitle1" Color="Color.Inherit">Info</MudText>
+<div class="settings-stack">
+    <SettingsCard>
+        <div class="about-header">
+            <img src="RatLogoMedium.png" width="52" height="52" alt="RatScanner" />
+            <div class="about-header-text">
+                <MudText Typo="Typo.h5">RatScanner</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">@Localizer["AboutTagline"]</MudText>
             </div>
-        </MudItem>
+            <div class="about-header-version">
+                <span class="about-badge">@($"v{RatConfig.Version}")</span>
+            </div>
+        </div>
+    </SettingsCard>
 
-        <!-- App Info -->
-        <MudItem xs="12">
-            <MudPaper Class="pa-3 mx-2 mb-2" Elevation="2">
-                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="3">
-                    <img src="RatLogoMedium.png" width="64px" />
-                    <MudStack Spacing="0">
-                        <MudText Typo="Typo.h5">RatScanner</MudText>
-                        <MudText Typo="Typo.subtitle1" Color="Color.Secondary">Version @(RatConfig.Version)</MudText>
-                    </MudStack>
-                </MudStack>
-            </MudPaper>
-        </MudItem>
+    <SettingsCard Title="@Localizer["AboutCommunityGroup"]" Subtitle="@Localizer["AboutCommunitySub"]">
+        <div class="about-links">
+            <button type="button" class="about-link" @onclick="@(() => OpenURL(MenuVM.GithubLink))">
+                <span class="about-link-icon">
+                    <img src="https://www.google.com/s2/favicons?domain=github.com&sz=64" alt="" />
+                </span>
+                <span class="about-link-text">
+                    <span class="about-link-title">GitHub</span>
+                    <span class="about-link-sub">@Localizer["AboutGithubSub"]</span>
+                </span>
+                <MudIcon Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" Class="about-link-arrow" />
+            </button>
 
-        <!-- Links -->
-        <MudItem xs="12">
-            <MudPaper Class="pa-2 mx-2 mb-2" Elevation="2">
-                <MudText Typo="Typo.subtitle2" Class="mb-2">Links</MudText>
-                
-                <MudStack Spacing="1">
-                    <MudButton Variant="Variant.Outlined" 
-                               StartIcon="@Icons.Custom.Brands.GitHub" 
-                               FullWidth="true"
-                               OnClick="@(() => OpenURL(MenuVM.GithubLink))">
-                        GitHub Repository
-                    </MudButton>
-                    
-                    <MudButton Variant="Variant.Outlined" 
-                               StartIcon="@Constants.Icon.Discord" 
-                               FullWidth="true"
-                               Style="color: #5865f2; border-color: #5865f2;"
-                               OnClick="@(() => OpenURL(MenuVM.DiscordLink))">
-                        Discord Community
-                    </MudButton>
-                    
-                    <MudButton Variant="Variant.Outlined" 
-                               StartIcon="@Constants.Icon.Patreon" 
-                               FullWidth="true"
-                               Style="color: #FF424D; border-color: #FF424D;"
-                               OnClick="@(() => OpenURL(MenuVM.PatreonLink))">
-                        Support on Patreon
-                    </MudButton>
-                </MudStack>
-            </MudPaper>
-        </MudItem>
+            <button type="button" class="about-link" @onclick="@(() => OpenURL(MenuVM.DiscordLink))">
+                <span class="about-link-icon">
+                    <img src="https://www.google.com/s2/favicons?domain=discord.com&sz=64" alt="" />
+                </span>
+                <span class="about-link-text">
+                    <span class="about-link-title">Discord</span>
+                    <span class="about-link-sub">@Localizer["AboutDiscordSub"]</span>
+                </span>
+                <MudIcon Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" Class="about-link-arrow" />
+            </button>
 
-        <!-- Credits -->
-        <MudItem xs="12">
-            <MudPaper Class="pa-2 mx-2 mb-2" Elevation="2">
-                <MudText Typo="Typo.subtitle2" Class="mb-2">Data Sources</MudText>
-                
-                <MudStack Spacing="1">
-                    <MudButton Variant="Variant.Text" 
-                               Size="Size.Small"
-                               FullWidth="true"
-                               OnClick="@(() => OpenURL("https://tarkov.dev"))">
-                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Class="flex-1">
-                            <img src="https://api.ratscanner.com/v3/file/tarkov-dev-logo.png" height="16px" class="mr-2" />
-                            <MudText>tarkov.dev API</MudText>
-                        </MudStack>
-                    </MudButton>
-                    
-                    <MudButton Variant="Variant.Text" 
-                               Size="Size.Small"
-                               FullWidth="true"
-                               OnClick="@(() => OpenURL("https://tarkovtracker.io"))">
-                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Class="flex-1">
-                            <MudIcon Icon="@Icons.Material.Filled.Checklist" Size="Size.Small" Class="mr-2" />
-                            <MudText>TarkovTracker</MudText>
-                        </MudStack>
-                    </MudButton>
-                    
-                    <MudButton Variant="Variant.Text" 
-                               Size="Size.Small"
-                               FullWidth="true"
-                               OnClick="@(() => OpenURL("https://escapefromtarkov.fandom.com"))">
-                        <MudStack Row="true" AlignItems="AlignItems.Center" Justify="Justify.FlexStart" Class="flex-1">
-                            <img src="https://static.wikia.nocookie.net/escapefromtarkov_gamepedia/images/e/e6/Site-logo.png" height="16px" class="mr-2" />
-                            <MudText>EFT Wiki</MudText>
-                        </MudStack>
-                    </MudButton>
-                </MudStack>
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
+            <button type="button" class="about-link" @onclick="@(() => OpenURL(MenuVM.PatreonLink))">
+                <span class="about-link-icon">
+                    <img src="https://www.google.com/s2/favicons?domain=patreon.com&sz=64" alt="" />
+                </span>
+                <span class="about-link-text">
+                    <span class="about-link-title">Patreon</span>
+                    <span class="about-link-sub">@Localizer["AboutPatreonSub"]</span>
+                </span>
+                <MudIcon Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" Class="about-link-arrow" />
+            </button>
+        </div>
+    </SettingsCard>
+
+    <SettingsCard Title="@Localizer["AboutSourcesGroup"]" Subtitle="@Localizer["AboutSourcesSub"]"
+                  Footer="@Localizer["AboutSourcesFooter"]">
+        <div class="about-links">
+            <button type="button" class="about-link" @onclick="@(() => OpenURL("https://tarkov.dev"))">
+                <span class="about-link-icon">
+                    <img src="https://www.google.com/s2/favicons?domain=tarkov.dev&sz=64" alt="" />
+                </span>
+                <span class="about-link-text">
+                    <span class="about-link-title">tarkov.dev</span>
+                    <span class="about-link-sub">@Localizer["AboutTarkovDevSub"]</span>
+                </span>
+                <MudIcon Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" Class="about-link-arrow" />
+            </button>
+
+            <button type="button" class="about-link" @onclick="@(() => OpenURL("https://tarkovtracker.io"))">
+                <span class="about-link-icon">
+                    <img src="https://www.google.com/s2/favicons?domain=tarkovtracker.io&sz=64" alt="" />
+                </span>
+                <span class="about-link-text">
+                    <span class="about-link-title">TarkovTracker</span>
+                    <span class="about-link-sub">@Localizer["AboutTarkovTrackerSub"]</span>
+                </span>
+                <MudIcon Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" Class="about-link-arrow" />
+            </button>
+
+            <button type="button" class="about-link" @onclick="@(() => OpenURL("https://escapefromtarkov.fandom.com"))">
+                <span class="about-link-icon">
+                    <img src="https://www.google.com/s2/favicons?domain=escapefromtarkov.fandom.com&sz=64" alt="" />
+                </span>
+                <span class="about-link-text">
+                    <span class="about-link-title">EFT Wiki</span>
+                    <span class="about-link-sub">@Localizer["AboutWikiSub"]</span>
+                </span>
+                <MudIcon Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" Class="about-link-arrow" />
+            </button>
+        </div>
+    </SettingsCard>
 </div>
 
 @code {
-    protected override void OnInitialized() {
+    private void OpenURL(string? url)
+    {
+        if (string.IsNullOrEmpty(url)) return;
+        Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
+    }
+
+    protected override void OnInitialized()
+    {
         MenuVM.PropertyChanged += PropertyChangeHandler;
     }
 
-    private void OpenURL(string? url) {
-        if (string.IsNullOrEmpty(url)) return;
-        var psi = new ProcessStartInfo {
-            FileName = url,
-            UseShellExecute = true,
-        };
-        Process.Start(psi);
-    }
-
-    private async void PropertyChangeHandler(object? sender, EventArgs e) {
+    private async void PropertyChangeHandler(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
         await InvokeAsync(() => StateHasChanged());
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
         MenuVM.PropertyChanged -= PropertyChangeHandler;
     }
 }
+
+<style>
+    /* Header: logo, name/tagline, version badge on one baseline. */
+    .about-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 8px 16px;
+    }
+
+    .about-header-text {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+    }
+
+    .about-header-version {
+        margin-left: auto;
+        flex-shrink: 0;
+    }
+
+    .about-badge {
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
+        background: var(--mud-palette-background-grey, rgba(255, 255, 255, 0.05));
+        color: var(--mud-palette-text-secondary, rgba(255, 255, 255, 0.6));
+        white-space: nowrap;
+    }
+
+    /* Link rows: uniform height, dividers and hover across the card. */
+    .about-links {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .about-link {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        width: 100%;
+        min-height: 56px;
+        padding: 8px 16px;
+        border: 0;
+        border-top: 1px solid var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+        transition: background-color 120ms ease-in-out;
+    }
+
+    .about-link:first-child {
+        border-top: 0;
+    }
+
+    .about-link:hover {
+        background: var(--mud-palette-action-default-hover, rgba(255, 255, 255, 0.06));
+    }
+
+    .about-link:focus-visible {
+        outline: 2px solid var(--mud-palette-primary, #594AE2);
+        outline-offset: -2px;
+    }
+
+    /* Icon slot: a fixed-size square keeps the text column aligned across
+       every row. The slot is exactly the icon size, so the row's own left
+       padding is the only inset - giving even spacing either side of the
+       icon instead of a dead gap on the right. */
+    .about-link-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        flex-shrink: 0;
+    }
+
+    .about-link-icon img {
+        display: block;
+        width: 24px;
+        height: 24px;
+        object-fit: contain;
+        object-position: center;
+        border-radius: 4px;
+    }
+
+    .about-link-text {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        min-width: 0;
+    }
+
+    .about-link-title {
+        font-size: 13px;
+        font-weight: 500;
+        line-height: 1.3;
+    }
+
+    .about-link-sub {
+        font-size: 12px;
+        line-height: 1.3;
+        color: var(--mud-palette-text-secondary, rgba(255, 255, 255, 0.55));
+    }
+
+    .about-link-arrow {
+        margin-left: auto;
+        flex-shrink: 0;
+        opacity: 0.4;
+    }
+
+    .about-link:hover .about-link-arrow {
+        opacity: 0.8;
+    }
+</style>
+

@@ -1,8 +1,10 @@
 ﻿using RatEye;
 using RatScanner.ViewModel;
+using System;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Media;
 using RCMinUi = RatScanner.RatConfig.MinimalUi;
 using UserControl = System.Windows.Controls.UserControl;
 
@@ -11,17 +13,20 @@ namespace RatScanner.View;
 /// <summary>
 /// Interaction logic for MinimalMenu.xaml
 /// </summary>
-public partial class MinimalMenu : UserControl, ISwitchable {
+public partial class MinimalMenu : UserControl, ISwitchable
+{
 	private static MinimalMenu _instance = null!;
 	public static MinimalMenu Instance => _instance ??= new MinimalMenu();
 
-	private MinimalMenu() {
+	private MinimalMenu()
+	{
 		InitializeComponent();
 		DataContext = new MenuVM(RatScannerMain.Instance);
 		UpdateElements();
 	}
 
-	private void UpdateElements() {
+	private void UpdateElements()
+	{
 		const Visibility v = Visibility.Visible;
 		const Visibility c = Visibility.Collapsed;
 
@@ -33,25 +38,37 @@ public partial class MinimalMenu : UserControl, ISwitchable {
 		TrackingDisplay.Visibility = RCMinUi.ShowQuestHideoutTracker ? v : c;
 		TeamTrackingDisplay.Visibility = RCMinUi.ShowQuestHideoutTeamTracker ? v : c;
 		UpdatedDisplay.Visibility = RCMinUi.ShowUpdated ? v : c;
+
+		// Fade the backdrop rather than the whole panel, so the text stays fully
+		// legible at low opacity values. 0 maps to a faint but non-zero alpha.
+		RootPanel.Background = new SolidColorBrush(Color.FromArgb(RCMinUi.OpacityToAlpha(RCMinUi.Opacity), 30, 30, 30));
 	}
 
-	private void OnMouseDown(object? sender, MouseButtonEventArgs e) {
+	private void OnMouseDown(object? sender, MouseButtonEventArgs e)
+	{
 		if (e.ChangedButton == MouseButton.Left) PageSwitcher.Instance.DragMove();
 	}
 
-	private void OnMouseDoubleClick(object? sender, MouseButtonEventArgs e) {
+	private void OnMouseDoubleClick(object? sender, MouseButtonEventArgs e)
+	{
 		PageSwitcher.Instance.ShowUI();
 	}
 
-	public void UtilizeState(object state) {
+	public void UtilizeState(object state)
+	{
 		throw new System.NotImplementedException();
 	}
 
-	public void OnOpen() { }
+	public void OnOpen()
+	{
+		// Re-apply visibility / opacity so settings changes take effect immediately
+		UpdateElements();
+	}
 
 	public void OnClose() { }
 
-	private void OnSizeChanged(object? sender, SizeChangedEventArgs e) {
+	private void OnSizeChanged(object? sender, SizeChangedEventArgs e)
+	{
 		PageSwitcher win = PageSwitcher.Instance;
 		Vector2 center = new((int)(win.Left + win.Width / 2), (int)(win.Top + win.Height / 2));
 		Screen screen = Screen.FromPoint(center);
