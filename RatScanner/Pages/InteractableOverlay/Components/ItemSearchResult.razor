@@ -94,13 +94,12 @@
         </MudStack>
     }
 
-    @if (Detail == DetailAmount.Max)
-    {
+@if (Detail == DetailAmount.Max)
+{
     // Calculate Best Sell: Higher of Flea Market Sell Profit or Trader Buyback
     var fleaProfit = Item.GetAvg24hMarketSellProfit();
     var bestTraderSellOffer = Item.GetBestSellToTraderOffer();
     int bestTraderSellPrice = bestTraderSellOffer?.PriceRub ?? 0;
-    
     bool isFleaBestSell = fleaProfit >= bestTraderSellPrice;
     int bestSellValue = Math.Max(fleaProfit, bestTraderSellPrice);
 
@@ -108,35 +107,38 @@
     var bestTraderBuyOffer = Item.GetBestBuyFromTraderOffer();
     int traderBuyPrice = bestTraderBuyOffer?.PriceRub ?? int.MaxValue;
     int fleaBuyPrice = Item.Avg24HPrice > 0 ? Item.Avg24HPrice.Value : int.MaxValue;
-
     bool isTraderBestBuy = traderBuyPrice < fleaBuyPrice;
     int bestBuyValue = Math.Min(fleaBuyPrice, traderBuyPrice);
-    if (bestBuyValue == int.MaxValue) bestBuyValue = 0; // Fallback if no buy offers exist
+    if (bestBuyValue == int.MaxValue) bestBuyValue = 0;
 
-        <MudStack Row="true" Spacing="6" Class="h-100" AlignItems="AlignItems.Stretch">
+    // Fetch quest and hideout data
+    var questReport = Item.GetQuestNeedReport();
+    var hideoutBreakdown = Item.GetHideoutRequirementBreakdown();
+    var acquisition = new Item.AcquisitionInfo(true, 4, false, 0
+        @* Item.CraftsFor?.Count > 0, Item.CraftsFor?.Count ?? 0, *@
+        @* Item.BartersFor?.Count > 0, Item.BartersFor?.Count ?? 0 *@
+    );
 
-            <!-- Left Side: Fixed Width (280px) -->
-            <MudStack AlignItems="AlignItems.Center"
-                      Justify="Justify.Center"
-                      Class="pr-6 border-solid border-r-2 mud-border-lines-default"
-                      Style="width: 280px; min-width: 280px; flex-shrink: 0;">
+    <MudGrid Spacing="3" Class="pa-2">
+        <!-- Left Item Overview Card -->
+        <MudItem xs="12" md="4" lg="3">
+            <MudPaper Outlined="true" Class="pa-4 d-flex flex-column align-center justify-space-between h-100">
+                <MudStack AlignItems="AlignItems.Center" Spacing="2">
+                    <div class="d-flex align-center justify-center pa-2 rounded" Style="width: 160px; height: 160px; background-color: var(--mud-palette-background-grey);">
+                        <MudImage Src="@Item.Image512PxLink"
+                                  Alt="@Item.Name"
+                                  Style="max-width: 100%; max-height: 100%; object-fit: contain;" />
+                    </div>
 
-                <MudPaper Elevation="0" Class="d-flex align-center justify-center pa-4 mb-3" Style="width: 200px; height: 200px; background: var(--mud-palette-surface); border-radius: 8px;">
-                    <MudImage Src="@Item.Image512PxLink"
-                              Alt="@Item.Name"
-                              Style="max-width: 100%; max-height: 100%; object-fit: contain;" />
-                </MudPaper>
+                    <MudText Typo="Typo.h6" Align="Align.Center" Class="mt-2 font-weight-bold">
+                        @Item.ShortName
+                    </MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary" Align="Align.Center">
+                        @Item.Name
+                    </MudText>
+                </MudStack>
 
-                <MudText Typo="Typo.h5" Align="Align.Center" Style="font-weight: 600;">
-                    @Item.ShortName
-                </MudText>
-
-                <MudText Typo="Typo.subtitle1" Color="Color.Secondary" Align="Align.Center">
-                    @Item.Name
-                </MudText>
-
-                <!-- Action Links -->
-                <MudStack Row="true" Spacing="2">
+                <MudStack Row="true" Spacing="2" Class="mt-4 w-100 justify-center">
                     <MudButton Variant="Variant.Outlined"
                                Color="Color.Primary"
                                StartIcon="@Constants.Icon.TarkovDev"
@@ -145,151 +147,172 @@
                         Tarkov.dev
                     </MudButton>
                     <MudButton Variant="Variant.Outlined"
-                               Color="Color.Info"
+                               Color="Color.Secondary"
                                StartIcon="@Icons.Material.Filled.OpenInNew"
                                Size="Size.Small"
                                OnClick="@(() => OpenURL(Item.WikiLink))">
                         Wiki
                     </MudButton>
                 </MudStack>
-            </MudStack>
+            </MudPaper>
+        </MudItem>
 
-            <!-- Right Side: Fills Remaining Space -->
-            <MudStack Justify="Justify.SpaceBetween" Class="flex-grow-1" Spacing="4">
-                <!-- Best Overall Deals (Buy & Sell) -->
-                <div>
-                    <MudText Typo="Typo.overline" Color="Color.Secondary" Style="letter-spacing: 1px;">
-                        Optimal Deals
+        <!-- Right Content Area -->
+        <MudItem xs="12" md="8" lg="9">
+            <MudStack Spacing="3">
+                <!-- Market & Trader Pricing -->
+                <MudPaper Outlined="true" Class="pa-3">
+                    <MudText Typo="Typo.subtitle2" Class="mb-2 font-weight-bold" Color="Color.Primary">
+                        OPTIMAL PRICING
                     </MudText>
-                    <MudDivider Class="mb-3" />
-
                     <MudGrid Spacing="2">
-                        <!-- Best Sell Option -->
-                        <MudItem xs="6">
-                            <MudPaper Class="pa-3 d-flex align-center justify-space-between" Elevation="0" Style="background: var(--mud-palette-surface);">
+                        <!-- Best Sell -->
+                        <MudItem xs="12" sm="6">
+                            <MudPaper Class="pa-3 d-flex align-center justify-space-between" Elevation="0" Style="background-color: var(--mud-palette-background-grey);">
                                 <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
-                                    @if (isFleaBestSell) {
-                                        <MudAvatar Color="Color.Info" Size="Size.Medium" Square="true" Variant="Variant.Outlined">
+                                    @if (isFleaBestSell)
+                                    {
+                                        <MudAvatar Color="Color.Info" Size="Size.Small" Square="true">
                                             <MudIcon Icon="@Icons.Material.Filled.Storefront" />
                                         </MudAvatar>
-                                        <MudStack Spacing="0">
-                                            <MudText Typo="Typo.body2" Style="font-weight: 600;">Flea Market</MudText>
+                                        <div>
+                                            <MudText Typo="Typo.body2" Class="font-weight-bold">Flea Market</MudText>
                                             <MudText Typo="Typo.caption" Color="Color.Secondary">Best Profit</MudText>
-                                        </MudStack>
-                                    } else {
-                                        <MudAvatar Image="@bestTraderSellOffer?.Trader?.ImageLink" Size="Size.Medium" Square="true" Variant="Variant.Outlined" />
-                                        <MudStack Spacing="0">
-                                            <MudText Typo="Typo.body2" Style="font-weight: 600;">@(bestTraderSellOffer?.Trader?.Name ?? "Trader")</MudText>
-                                            <MudText Typo="Typo.caption" Color="Color.Secondary">Best Trader Buyback</MudText>
-                                        </MudStack>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <MudAvatar Image="@bestTraderSellOffer?.Trader?.ImageLink" Size="Size.Small" Square="true" />
+                                        <div>
+                                            <MudText Typo="Typo.body2" Class="font-weight-bold">@(bestTraderSellOffer?.Trader?.Name ?? "Trader")</MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary">Trader Buyback</MudText>
+                                        </div>
                                     }
                                 </MudStack>
-
-                                <MudText Typo="Typo.h6" Color="Color.Success" Style="font-weight: bold;">
+                                <MudText Typo="Typo.subtitle1" Color="Color.Success" Class="font-weight-bold">
                                     @bestSellValue.AsRubs()
                                 </MudText>
                             </MudPaper>
                         </MudItem>
 
-                        <!-- Best Buy Option -->
-                        <MudItem xs="6">
-                            <MudPaper Class="pa-3 d-flex align-center justify-space-between" Elevation="0" Style="background: var(--mud-palette-surface);">
+                        <!-- Best Buy -->
+                        <MudItem xs="12" sm="6">
+                            <MudPaper Class="pa-3 d-flex align-center justify-space-between" Elevation="0" Style="background-color: var(--mud-palette-background-grey);">
                                 <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
-                                    @if (isTraderBestBuy) {
-                                        <MudAvatar Image="@bestTraderBuyOffer?.Trader?.ImageLink" Size="Size.Medium" Square="true" Variant="Variant.Outlined" />
-                                        <MudStack Spacing="0">
-                                            <MudText Typo="Typo.body2" Style="font-weight: 600;">@(bestTraderBuyOffer?.Trader?.Name ?? "Trader")</MudText>
+                                    @if (isTraderBestBuy)
+                                    {
+                                        <MudAvatar Image="@bestTraderBuyOffer?.Trader?.ImageLink" Size="Size.Small" Square="true" />
+                                        <div>
+                                            <MudText Typo="Typo.body2" Class="font-weight-bold">@(bestTraderBuyOffer?.Trader?.Name ?? "Trader")</MudText>
                                             <MudText Typo="Typo.caption" Color="Color.Secondary">
-                                                @(bestTraderBuyOffer?.MinTraderLevel != null ? $"LL{bestTraderBuyOffer.MinTraderLevel}" : "Best Trader Price")
+                                                @(bestTraderBuyOffer?.MinTraderLevel != null ? $"LL{bestTraderBuyOffer.MinTraderLevel}" : "Trader Buy")
                                             </MudText>
-                                        </MudStack>
-                                    } else {
-                                        <MudAvatar Color="Color.Info" Size="Size.Medium" Square="true" Variant="Variant.Outlined">
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <MudAvatar Color="Color.Info" Size="Size.Small" Square="true">
                                             <MudIcon Icon="@Icons.Material.Filled.Storefront" />
                                         </MudAvatar>
-                                        <MudStack Spacing="0">
-                                            <MudText Typo="Typo.body2" Style="font-weight: 600;">Flea Market</MudText>
+                                        <div>
+                                            <MudText Typo="Typo.body2" Class="font-weight-bold">Flea Market</MudText>
                                             <MudText Typo="Typo.caption" Color="Color.Secondary">Lowest Buy Price</MudText>
-                                        </MudStack>
+                                        </div>
                                     }
                                 </MudStack>
-
-                                <MudText Typo="Typo.h6" Color="Color.Warning" Style="font-weight: bold;">
+                                <MudText Typo="Typo.subtitle1" Color="Color.Warning" Class="font-weight-bold">
                                     @(bestBuyValue > 0 ? bestBuyValue.AsRubs() : "N/A")
                                 </MudText>
                             </MudPaper>
                         </MudItem>
                     </MudGrid>
-                </div>
+                </MudPaper>
 
                 <!-- Requirements & Usage -->
-                <div>
-                    <MudText Typo="Typo.overline" Color="Color.Secondary" Style="letter-spacing: 1px;">
-                        Requirements & Usage
+                <MudPaper Outlined="true" Class="pa-3">
+                    <MudText Typo="Typo.subtitle2" Class="mb-2 font-weight-bold" Color="Color.Primary">
+                        REQUIREMENTS & USAGE
                     </MudText>
-                    <MudDivider Class="mb-3" />
-
-                    <MudStack Row="true" Spacing="3">
+                    <MudFlexWrap Spacing="1" Class="gap-2">
+                        <!-- Quest Chips -->
                         <MudChip T="string"
                                  Icon="@Icons.Material.Filled.Checklist"
                                  Variant="Variant.Filled"
-                                 Color="@(Item.GetTaskRemaining().Item1 > 0 ? Color.Success : Color.Dark)"
-                                 Size="Size.Medium">
-                            Task Remaining: <b>@Item.GetTaskRemaining().Item1.ToShortString()</b>
+                                 Color="@(questReport.GrandTotal > 0 ? Color.Primary : Color.Default)"
+                                 Size="Size.Small">
+                            Quests: <b>@questReport.GrandTotal</b> (Active: @questReport.ActiveNow, Available: @questReport.AvailableNow)
                         </MudChip>
 
+                        @if (questReport.FutureKnown > 0)
+                        {
+                            <MudChip T="string"
+                                     Icon="@Icons.Material.Filled.Lock"
+                                     Variant="Variant.Outlined"
+                                     Color="Color.Warning"
+                                     Size="Size.Small">
+                                Locked Quests: <b>@questReport.FutureKnown</b>@(questReport.UnlockLevel.HasValue ? $" (Lvl {questReport.UnlockLevel.Value})" : "")
+                            </MudChip>
+                        }
+
+                        @if (questReport.ConditionalUnknown > 0)
+                        {
+                            <MudChip T="string"
+                                     Icon="@Icons.Material.Filled.HelpOutline"
+                                     Variant="Variant.Outlined"
+                                     Color="Color.Default"
+                                     Size="Size.Small">
+                                Conditional: <b>@questReport.ConditionalUnknown</b>
+                            </MudChip>
+                        }
+
+                        @if (questReport.FirTotal > 0)
+                        {
+                            <MudChip T="string"
+                                     Icon="@Icons.Material.Filled.Verified"
+                                     Variant="Variant.Outlined"
+                                     Color="Color.Secondary"
+                                     Size="Size.Small">
+                                FIR Needed: <b>@questReport.FirTotal</b>
+                            </MudChip>
+                        }
+
+                        <!-- Hideout Chips -->
                         <MudChip T="string"
                                  Icon="@Icons.Material.Filled.House"
                                  Variant="Variant.Filled"
-                                 Color="@(Item.GetHideoutRemaining() > 0 ? Color.Success : Color.Dark)"
-                                 Size="Size.Medium">
-                            Hideout Needed: <b>@Item.GetHideoutRemaining().ToShortString()</b>
+                                 Color="@(hideoutBreakdown.Total > 0 ? Color.Primary : Color.Default)"
+                                 Size="Size.Small">
+                            Hideout: <b>@hideoutBreakdown.Total</b>@(hideoutBreakdown.HasFirNeed ? $" ({hideoutBreakdown.FoundInRaid} FIR)" : "")
                         </MudChip>
-                    </MudStack>
-                </div>
 
-                <!-- Flea Market Data -->
-                <div>
-                    <MudText Typo="Typo.overline" Color="Color.Secondary" Style="letter-spacing: 1px;">
-                        Flea Market Data
-                    </MudText>
-                    <MudDivider Class="mb-3" />
+                        <!-- Acquisition Chips -->
+                        @if (acquisition.CanCraft)
+                        {
+                            <MudChip T="string"
+                                     Icon="@Icons.Material.Filled.Build"
+                                     Variant="Variant.Outlined"
+                                     Color="Color.Info"
+                                     Size="Size.Small">
+                                Crafts (@acquisition.CraftRecipeCount)
+                            </MudChip>
+                        }
 
-                    <MudGrid Spacing="2">
-                        <MudItem xs="6">
-                            <MudPaper Class="pa-3" Elevation="0" Style="background: var(--mud-palette-surface);">
-                                <MudText Typo="Typo.caption" Color="Color.Secondary">Avg 24h Price</MudText>
-                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
-                                    <MudText Typo="Typo.h6" Style="font-weight: bold;" Color="Color.Primary">
-                                        @Item.Avg24HPrice.AsRubs()
-                                    </MudText>
-
-                                    <!-- Inline 48h Market Trend -->
-                                    <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="0">
-                                        <MudIcon Icon="@(Item.ChangeLast48HPercent >= 0 ? Icons.Material.Filled.ArrowDropUp : Icons.Material.Filled.ArrowDropDown)"
-                                                 Color="@(Item.ChangeLast48HPercent >= 0 ? Color.Success : Color.Error)"
-                                                 Size="Size.Medium" />
-                                        <MudText Typo="Typo.body2" Style="font-weight: 600;" Color="@(Item.ChangeLast48HPercent >= 0 ? Color.Success : Color.Error)">
-                                            @(Item.ChangeLast48HPercent >= 0 ? $"+{Item.ChangeLast48HPercent:F1}%" : $"{Item.ChangeLast48HPercent:F1}%")
-                                        </MudText>
-                                    </MudStack>
-                                </MudStack>
-                            </MudPaper>
-                        </MudItem>
-
-                        <MudItem xs="6">
-                            <MudPaper Class="pa-3" Elevation="0" Style="background: var(--mud-palette-surface);">
-                                <MudText Typo="Typo.caption" Color="Color.Secondary">Price Per Slot</MudText>
-                                <MudText Typo="Typo.h6" Style="font-weight: bold;">
-                                    @Item.GetAvg24hMarketPricePerSlot().AsRubs()
-                                </MudText>
-                            </MudPaper>
-                        </MudItem>
-                    </MudGrid>
-                </div>
+                        @if (acquisition.CanBarter)
+                        {
+                            <MudChip T="string"
+                                     Icon="@Icons.Material.Filled.SyncAlt"
+                                     Variant="Variant.Outlined"
+                                     Color="Color.Info"
+                                     Size="Size.Small">
+                                Barters (@acquisition.BarterOfferCount)
+                            </MudChip>
+                        }
+                    </MudFlexWrap>
+                </MudPaper>
             </MudStack>
-        </MudStack>
-    }
+        </MudItem>
+    </MudGrid>
+}
 
     @if (Detail == DetailAmount.Max && Item.Properties?.PropertiesType == "ItemPropertiesAmmo") {
         <MudDivider Vertical="false" DividerType="DividerType.Middle" Class="mx-0 my-2" />
