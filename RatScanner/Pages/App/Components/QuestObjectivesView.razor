@@ -1,0 +1,107 @@
+@using RatScanner.FetchModels.TarkovTracker
+@using RatScanner.TarkovDev.Json
+@using Color = MudBlazor.Color
+
+@*
+    Objectives of one quest, with completion state and counters taken from
+    TarkovTracker. Extracted from ItemQuestTable so both tables share it.
+*@
+
+@if (Entry.ObjectiveList.Count == 0) {
+    <div class="objective-list">
+        <span class="objective-empty">@Localizer["QuestNoObjectives"]</span>
+    </div>
+}
+else {
+    <div class="objective-list">
+        @foreach (var objective in Entry.ObjectiveList) {
+            var isDone = Entry.IsComplete || objective.IsComplete;
+            var items = objective.AlternateItems;
+            <div class="@("objective" + (isDone ? " objective-done" : ""))">
+                <MudIcon Icon="@(isDone ? Icons.Material.Filled.CheckCircle : Icons.Material.Outlined.Circle)"
+                         Color="@(isDone ? Color.Success : Color.Default)" Size="Size.Small" />
+                <div class="objective-text">
+                    <span>@objective.Description</span>
+                    @if (objective.Required > 0) {
+                        <span class="objective-count">@($"{objective.ProgressCount}/{objective.Required}")</span>
+                    }
+                    @if (objective.Objective.FoundInRaid) {
+                        <MudTooltip Text="@Localizer["QuestFirHint"]" Placement="Placement.Top" Delay="200" Class="flag-tooltip">
+                            <ChildContent>
+                                <span class="objective-flag objective-fir">FIR</span>
+                            </ChildContent>
+                        </MudTooltip>
+                    }
+                    @if (objective.HasAlternates) {
+                        <MudTooltip Text="@Localizer["QuestAnyOfHint"]" Placement="Placement.Top" Delay="200" Class="flag-tooltip">
+                            <ChildContent>
+                                <span class="objective-flag objective-any">@Localizer["QuestAnyOf"]</span>
+                            </ChildContent>
+                        </MudTooltip>
+                    }
+                </div>
+            </div>
+            @if (items.Count > 0) {
+                <div class="alternate-items">
+                    @foreach (var item in items) {
+                        <div class="alternate-item">
+                            <MudImage Src="@item.BaseImageLink" Style="width: 100%; height: 44px; object-fit: contain;" />
+                            <span>@item.Name</span>
+                        </div>
+                    }
+                </div>
+            }
+        }
+    </div>
+}
+
+<style>
+    /* Horizontal single-row strip, below the objective it belongs to.
+       box-sizing + width:100% + min-width:0 stop the tiles' max-content
+       width propagating up the flex chain, which would otherwise make the
+       whole quest section scroll sideways instead of just this strip. */
+    .alternate-items {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 8px;
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        margin: 2px 0 4px 0;
+        padding: 2px 0 4px 24px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: thin;
+    }
+
+    .alternate-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 0 0 64px;
+        width: 64px;
+        text-align: center;
+        font-size: 0.7rem;
+        line-height: 1.2;
+    }
+
+    .alternate-item .mud-image {
+        width: 100%;
+    }
+
+    .alternate-item span {
+        margin-top: 2px;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+</style>
+
+@code {
+    [Parameter, EditorRequired]
+    public QuestItemEntry Entry { get; set; } = null!;
+
+    [Inject]
+    public LocalizationService Localizer { get; set; } = null!;
+}

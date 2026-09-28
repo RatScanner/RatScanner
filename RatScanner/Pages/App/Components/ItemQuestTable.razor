@@ -1,0 +1,311 @@
+@using RatScanner.FetchModels.TarkovTracker
+@using RatScanner.TarkovDev.Json
+@using Color = MudBlazor.Color
+
+@*
+    Two quest tables for an item, mirroring tarkov.dev: quests that require
+    handing the item in, and quests that reward it.
+
+    Each row expands to show the task objectives, with completion state and
+    counters taken from TarkovTracker.
+*@
+
+@if (Requiring.Count > 0) {
+    <div class="quest-section">
+        <MudText Typo="Typo.h6" Class="quest-title">@Localizer["QuestsRequiring"] @Item.Name</MudText>
+        <MudTable T="QuestItemEntry" Items="@Requiring" Dense="true" Hover="true" Elevation="0" Outlined="true" Breakpoint="Breakpoint.None"
+                  RowClassFunc="@RowClass" OnRowClick="@(args => Toggle(args.Item))" Class="quest-table">
+            <ColGroup>
+                <col style="width: 40px;" />
+                <col />
+                <col />
+            </ColGroup>
+            <HeaderContent>
+                <MudTh></MudTh>
+                <MudTh>@Localizer["QuestTask"]</MudTh>
+                <MudTh>@Localizer["QuestRequiredItems"]</MudTh>
+            </HeaderContent>
+            <RowTemplate Context="entry">
+                <MudTd DataLabel="">
+                    <MudIcon Icon="@ExpandIcon(entry.IsExpanded)" Size="Size.Small" />
+                </MudTd>
+                <MudTd DataLabel="@Localizer["QuestTask"]">
+                    <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                        <MudImage Src="@(entry.Task.Trader?.ImageLink ?? entry.Task.TaskImageLink)"
+                                  Style="width: 40px; height: 40px; object-fit: contain;" />
+                        <MudStack Spacing="0" Style="min-width: 0;">
+                            <MudText Typo="Typo.body2" Class="@($"quest-name{(entry.IsComplete ? " quest-done" : "")}")">@entry.Task.Name</MudText>
+                            @if (entry.IsComplete) {
+                                <MudText Typo="Typo.caption" Color="Color.Success">@Localizer["QuestCompleted"]</MudText>
+                            }
+                            else if (entry.IsFailed) {
+                                <MudText Typo="Typo.caption" Color="Color.Error">@Localizer["QuestFailed"]</MudText>
+                            }
+                        </MudStack>
+                    </MudStack>
+                </MudTd>
+                <MudTd DataLabel="@Localizer["QuestRequiredItems"]">
+                    <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                        <MudPaper Style="width: 48px; height: 48px;" Outlined="true">
+                            <MudImage Src="@Item.BaseImageLink" Style="width: 100%; height: 100%; object-fit: contain;" />
+                        </MudPaper>
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.body2">@Item.Name</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                @string.Format(Localizer["QuestAmount"], entry.Count)@(entry.HasAlternates ? $" ({Localizer["QuestHasAlternates"]})" : "")
+                            </MudText>
+                        </MudStack>
+                    </MudStack>
+                </MudTd>
+            </RowTemplate>
+            <ChildRowContent Context="entry">
+                @if (entry.IsExpanded) {
+                    <MudTr Item="@entry">
+                        <MudTd colspan="3">
+                            <div class="objective-cell" @onclick:stopPropagation="true">
+                                <QuestObjectivesView Entry="entry" />
+                            </div>
+                        </MudTd>
+                    </MudTr>
+                }
+            </ChildRowContent>
+        </MudTable>
+    </div>
+}
+
+@if (Rewarding.Count > 0) {
+    <div class="quest-section">
+        <MudText Typo="Typo.h6" Class="quest-title">@Localizer["QuestsRewarding"] @Item.Name</MudText>
+        <MudTable T="QuestItemEntry" Items="@Rewarding" Dense="true" Hover="true" Elevation="0" Outlined="true" Breakpoint="Breakpoint.None"
+                  RowClassFunc="@RowClass" OnRowClick="@(args => Toggle(args.Item))" Class="quest-table">
+            <ColGroup>
+                <col style="width: 40px;" />
+                <col />
+                <col />
+            </ColGroup>
+            <HeaderContent>
+                <MudTh></MudTh>
+                <MudTh>@Localizer["QuestTask"]</MudTh>
+                <MudTh>@Localizer["QuestRewardItems"]</MudTh>
+            </HeaderContent>
+            <RowTemplate Context="entry">
+                <MudTd DataLabel="">
+                    <MudIcon Icon="@ExpandIcon(entry.IsExpanded)" Size="Size.Small" />
+                </MudTd>
+                <MudTd DataLabel="@Localizer["QuestTask"]">
+                    <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                        <MudImage Src="@(entry.Task.Trader?.ImageLink ?? entry.Task.TaskImageLink)"
+                                  Style="width: 40px; height: 40px; object-fit: contain;" />
+                        <MudStack Spacing="0" Style="min-width: 0;">
+                            <MudText Typo="Typo.body2" Class="@($"quest-name{(entry.IsComplete ? " quest-done" : "")}")">@entry.Task.Name</MudText>
+                            @if (entry.IsComplete) {
+                                <MudText Typo="Typo.caption" Color="Color.Success">@Localizer["QuestCompleted"]</MudText>
+                            }
+                            else if (entry.IsFailed) {
+                                <MudText Typo="Typo.caption" Color="Color.Error">@Localizer["QuestFailed"]</MudText>
+                            }
+                        </MudStack>
+                    </MudStack>
+                </MudTd>
+                <MudTd DataLabel="@Localizer["QuestRewardItems"]">
+                    <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                        <MudPaper Style="width: 48px; height: 48px;" Outlined="true">
+                            <MudImage Src="@Item.BaseImageLink" Style="width: 100%; height: 100%; object-fit: contain;" />
+                        </MudPaper>
+                        <MudStack Spacing="0">
+                            <MudText Typo="Typo.body2">@Item.Name</MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                @string.Format(Localizer["QuestAmount"], entry.Count)
+                            </MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">@Localizer["QuestOnTaskCompletion"]
+                            </MudText>
+                        </MudStack>
+                    </MudStack>
+                </MudTd>
+            </RowTemplate>
+            <ChildRowContent Context="entry">
+                @if (entry.IsExpanded) {
+                    <MudTr Item="@entry">
+                        <MudTd colspan="3">
+                            <div class="objective-cell" @onclick:stopPropagation="true">
+                                <QuestObjectivesView Entry="entry" />
+                            </div>
+                        </MudTd>
+                    </MudTr>
+                }
+            </ChildRowContent>
+        </MudTable>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public Item Item { get; set; } = null!;
+
+    [Inject]
+    public LocalizationService Localizer { get; set; } = null!;
+
+    private List<QuestItemEntry> _requiring = [];
+    private List<QuestItemEntry> _rewarding = [];
+
+    private List<QuestItemEntry> Requiring => _requiring;
+    private List<QuestItemEntry> Rewarding => _rewarding;
+
+    private Item? _builtFor;
+    private UserProgress? _builtProgress;
+
+    /// <summary>
+    /// The parent re-renders on a 100 ms scan timer, so rebuilding the rows
+    /// every time would churn the whole table. Only rebuild when the item or
+    /// the tracker data actually changed; toggling expansion mutates the entry
+    /// in place instead, which is what MudTable's ChildRowContent expects.
+    /// </summary>
+    protected override void OnParametersSet() {
+        var progress = Item.SelfProgress;
+        if (ReferenceEquals(_builtFor, Item) && ReferenceEquals(_builtProgress, progress))
+            return;
+
+        _builtFor = Item;
+        _builtProgress = progress;
+        _requiring = Build(Item.GetQuestsRequiringItem(), progress);
+        _rewarding = Build(Item.GetQuestsRewardingItem(), progress);
+    }
+
+    private static List<QuestItemEntry> Build(List<QuestItemEntry> entries, UserProgress progress) {
+        return entries.Select(entry => entry with {
+            IsComplete = Item.IsTaskComplete(entry.Task, progress),
+            IsFailed = Item.IsTaskFailed(entry.Task, progress),
+            Objectives = Item.GetObjectiveProgress(entry.Task, progress),
+        }).ToList();
+    }
+
+    // The MudTr inside ChildRowContent has no Item, and MudTable hands its click
+    // through anyway, so args.Item can be null when the expanded area is clicked.
+    private void Toggle(QuestItemEntry? entry) {
+        if (entry is null) {
+            return;
+        }
+
+        entry.IsExpanded = !entry.IsExpanded;
+    }
+
+    private static string ExpandIcon(bool expanded) =>
+        expanded ? Icons.Material.Filled.ExpandLess : Icons.Material.Filled.ExpandMore;
+
+    private static string? RowClass(QuestItemEntry entry, int rowIndex) =>
+        entry.IsComplete ? "quest-row-done" : null;
+}
+
+<style>
+    .quest-section {
+        margin-top: 8px;
+    }
+
+    .quest-title {
+        margin-bottom: 4px;
+    }
+
+    .quest-row-done {
+        opacity: 0.6;
+    }
+
+    .quest-done {
+        text-decoration: line-through;
+    }
+
+    /* MudTable puts Class on the outer wrapper div, not the table element, so
+       table-layout has to target the table root directly. Without the fixed
+       layout the colspan=3 child row contributes its max-content width to the
+       table and pushes the later columns out of view. */
+    .quest-table {
+        width: 100%;
+    }
+
+    .quest-table .mud-table-root {
+        table-layout: fixed;
+    }
+
+    .quest-table .mud-table-container {
+        overflow-x: hidden;
+    }
+
+    .quest-table .mud-table-cell {
+        overflow-wrap: anywhere;
+    }
+
+    .quest-name {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .objective-list {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 4px 8px 8px 8px;
+        min-width: 0;
+    }
+
+    /* Without this the expanded item strip's max-content width propagates up
+       and the whole quest section scrolls sideways instead of just the strip. */
+    .objective-cell {
+        max-width: 100%;
+        min-width: 0;
+        overflow: hidden;
+    }
+
+    .objective {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.85rem;
+    }
+
+    .objective-done {
+        opacity: 0.6;
+    }
+
+    .objective-text {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .objective-count,
+    .objective-flag,
+    .objective-empty {
+        font-size: 0.75rem;
+        color: var(--mud-palette-text-secondary, rgba(255, 255, 255, 0.5));
+    }
+
+    .objective-flag {
+        border: 1px solid var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
+        border-radius: 4px;
+        padding: 0 4px;
+    }
+
+    /* FIR is a warning-style constraint, so give it a warm accent to set it
+       apart from the neutral flags. */
+    .objective-fir {
+        color: #f0a02a;
+        border-color: rgba(240, 160, 42, 0.45);
+    }
+
+    /* ANY means the objective has substitutes, a positive/relaxed condition. */
+    .objective-any {
+        color: #66bb6a;
+        border-color: rgba(102, 187, 106, 0.45);
+    }
+
+    /* Tooltips render through MudPopoverProvider, so this must stay global.
+       The default mud-tooltip styling is a light grey that clashes here. */
+    .flag-tooltip {
+        background: #1e1e1e;
+        color: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        font-weight: 400;
+    }
+</style>

@@ -31,17 +31,13 @@
                 </MudPaper>
 
                 <MudStack Spacing="2" Class="py-2 overflow-visible" Style="max-height:50vh; overflow-y: auto;">
-                    @for (int _i = 0; _i < _searchResults.Count(); _i++)
-                    {
+                    @for (int _i = 0; _i < _searchResults.Count(); _i++) {
                         int i = _i;
                         SearchResult searchResult = _searchResults.ElementAt(i);
                         
-                        @if (searchResult.Data is Item item)
-                        {
+                        @if (searchResult.Data is Item item) {
                             <ItemSearchResult Item="@item" OnClick="@(() => SelectResult(i))" />
-                        }
-                        else if (searchResult.Data is TarkovTask task)
-                        {
+                        } else if (searchResult.Data is TarkovTask task) {
                             <TaskSearchResult Task="@task" OnClick="@(() => SelectResult(i))" />
                         }
                         @* TODO: Re-enable map search results when MapViewer is fixed
@@ -55,17 +51,17 @@
         </MudItem>
 
         <!-- Last Scanned Item -->
-        @if (GetDisplayedItem() is Item displayed)
-        {
+        @if (GetDisplayedItem() is Item displayed) {
             <ItemSearchResult Item="@displayed" Detail="Pages.InteractableOverlay.Index.DetailAmount.Max" />
+            <ItemQuestTable Item="@displayed" />
         }
     </MudStack>
 </div>
 
 <style>
     .main-content {
-        flex: 1;
-        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
     }
 
     .ellipsis {
@@ -90,25 +86,21 @@
     private bool _showSearchResult;
     private Item? _shownScanItem;
 
-    private Item? GetLastScannedItem()
-    {
+    private Item? GetLastScannedItem() {
         var scans = MenuVM.ItemScans;
         return scans.Count > 0 ? scans.Last().Item : null;
     }
 
-    private Item? GetDisplayedItem()
-    {
+    private Item? GetDisplayedItem() {
         if (_showSearchResult && _searchResult?.Data is Item searched) return searched;
         return GetLastScannedItem();
     }
 
-    protected override void OnInitialized()
-    {
+    protected override void OnInitialized() {
         MenuVM.PropertyChanged += PropertyChangeHandler;
     }
 
-    private async void ExecuteSearch(string value)
-    {
+    private async void ExecuteSearch(string value) {
         var sanitizedValue = SearchService.SanitizeSearch(value);
         var results = Enumerable.Empty<SearchResult>();
         results = results.Concat(await SearchService.SearchItemsAsync(sanitizedValue));
@@ -121,8 +113,7 @@
         _selectedResultIndex = 0;
     }
 
-    private void SelectResult(int index)
-    {
+    private void SelectResult(int index) {
         _selectedResultIndex = index;
         _searchResult = _searchResults.ElementAt(_selectedResultIndex);
         _showSearchResult = true;
@@ -131,32 +122,26 @@
         StateHasChanged();
     }
 
-    private void OpenWiki()
-    {
+    private void OpenWiki() {
         OpenURL(MenuVM.LastItem?.WikiLink);
     }
 
-    private void OpenTarkovDev()
-    {
+    private void OpenTarkovDev() {
         OpenURL(MenuVM.LastItem?.Link);
     }
 
-    private void OpenURL(string? url)
-    {
+    private void OpenURL(string? url) {
         if (string.IsNullOrEmpty(url)) return;
-        var psi = new ProcessStartInfo
-        {
+        var psi = new ProcessStartInfo {
             FileName = url,
             UseShellExecute = true,
         };
         Process.Start(psi);
     }
 
-    private async void PropertyChangeHandler(object? sender, EventArgs e)
-    {
+    private async void PropertyChangeHandler(object? sender, EventArgs e) {
         var latest = GetLastScannedItem();
-        if (latest is not null && !ReferenceEquals(latest, _shownScanItem))
-        {
+        if (latest is not null && !ReferenceEquals(latest, _shownScanItem)) {
             _shownScanItem = latest;
             _showSearchResult = false;
         }
@@ -164,8 +149,7 @@
         await InvokeAsync(StateHasChanged);
     }
 
-    public void Dispose()
-    {
+    public void Dispose() {
         MenuVM.PropertyChanged -= PropertyChangeHandler;
     }
 }

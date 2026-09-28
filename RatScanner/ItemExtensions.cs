@@ -5,6 +5,114 @@ using System.Linq;
 
 namespace RatScanner.TarkovDev.Json;
 
+/// <summary>
+/// One quest row relating an item to a task: the amount involved, why, and the
+/// TarkovTracker state folded in.
+/// </summary>
+/// <param name="Task">The quest itself.</param>
+/// <param name="Count">Amount required or rewarded.</param>
+/// <param name="HasAlternates">Task accepts other items as well.</param>
+/// <param name="IsReward">True when the item is given by the task, not kept.</param>
+/// <param name="IsComplete">TarkovTracker reports the task as done.</param>
+/// <param name="IsFailed">TarkovTracker reports the task as failed.</param>
+/// <param name="Objectives">Objectives with their tracker state, for the expanded row.</param>
+public record QuestItemEntry(
+	TarkovTask Task,
+	int Count,
+	bool HasAlternates = false,
+	bool IsReward = false,
+	bool IsComplete = false,
+	bool IsFailed = false,
+	List<QuestObjectiveEntry>? Objectives = null
+) {
+	/// <summary>
+	/// Whether the row is expanded. Mutable on purpose: MudTable renders
+	/// ChildRowContent from the item instance, so toggling this in place avoids
+	/// rebuilding the list (which the parent re-render would otherwise trigger).
+	/// </summary>
+	public bool IsExpanded { get; set; }
+
+	/// <summary>Objectives for display, never null.</summary>
+	public List<QuestObjectiveEntry> ObjectiveList => Objectives ?? [];
+}
+
+/// <summary>
+/// One objective of a quest, with the TarkovTracker completion state folded in.
+/// </summary>
+/// <param name="Objective">The task objective from tarkov.dev.</param>
+/// <param name="IsComplete">Tracker reports the objective finished.</param>
+/// <param name="ProgressCount">Objective counter reported by the tracker, 0 when absent.</param>
+public record QuestObjectiveEntry(
+	TaskObjective Objective,
+	bool IsComplete,
+	int ProgressCount
+) {
+	/// <summary>Amount the objective wants in total.</summary>
+	public int Required => Objective.Count;
+
+	/// <summary>True when the objective accepts more than one item.</summary>
+	public bool HasAlternates => Objective.ItemIds?.Count > 1;
+
+	/// <summary>Item ids the objective accepts.</summary>
+	public IEnumerable<string> ItemIds => Objective.ItemIds ?? [];
+
+	private static Dictionary<string, Item>? _itemLookup;
+
+	/// <summary>
+	/// Every item the objective accepts, resolved against the tarkov.dev
+	/// catalogue. Cached because the id lookup would otherwise be a linear
+	/// scan over every item, and this renders once per objective per repaint.
+	/// </summary>
+	public IReadOnlyList<Item> AlternateItems {
+		get {
+			if (field is not null) {
+				return field;
+			}
+
+			_itemLookup ??= TarkovDevAPI.GetItems().ToDictionary(i => i.Id, StringComparer.Ordinal);
+			var result = new List<Item>();
+			foreach (var id in ItemIds) {
+				if (_itemLookup.TryGetValue(id, out var item)) {
+					result.Add(item);
+				}
+			}
+
+			field = result;
+			return field;
+		}
+	}
+
+	/// <summary>
+	/// Objective text. Uses the upstream description when present, otherwise a
+	/// wording derived from the objective type, matching tarkov.dev.
+	/// </summary>
+	public string Description => !string.IsNullOrWhiteSpace(Objective.Description)
+		? Objective.Description
+		: Objective.Type switch {
+			"findItem" => "Find the items",
+			"giveItem" => "Hand over the items",
+			"kill" => "Eliminate",
+			"visit" => "Visit",
+			"extract" => "Extract",
+			"survive" => "Survive",
+			"craft" => "Craft",
+			"sell" => "Sell",
+			"buy" => "Buy",
+			"repair" => "Repair",
+			"equip" => "Equip",
+			"loyaltyLevel" => "Reach trader loyalty level",
+			"traderReputation" => "Raise trader standing",
+			"skillLevel" => "Reach skill level",
+			"playerLevel" => "Reach player level",
+			"experience" => "Accumulate experience",
+			"location" => "Visit location",
+			"killstreak" => "Achieve a killstreak",
+			"notLoot" => "Avoid taking anything",
+			"collect" => "Collect",
+			_ => Objective.Type ?? "Objective",
+		};
+}
+
 public partial class Item {
 	private static UserProgress GetUserProgress() {
 		UserProgress? progress = null;
@@ -15,6 +123,72 @@ public partial class Item {
 		return progress ?? new UserProgress();
 	}
 
+	/// <summary>
+	/// The player's own TarkovTracker progress, or an empty instance when the
+	/// tracker is disabled or has not loaded yet. Use <see cref="HasTracker"/>
+	/// to tell "no progress recorded" apart from "recorded as not done".
+	/// </summary>
+	public static UserProgress SelfProgress => GetUserProgress();
+
+	/// <summary>
+	/// True when TarkovTracker is enabled and has returned progress for the
+	/// player, so completion states can be trusted.
+	/// </summary>
+	public static bool HasTracker =>
+		RatConfig.Tracking.TarkovTracker.Enable
+		&& RatScannerMain.Instance.TarkovTrackerDB.Progress.Count >= 1
+		&& RatScannerMain.Instance.TarkovTrackerDB.Self.Length > 0;
+
+	/// <summary>
+	/// TarkovTracker state for a task, or null when the tracker is off, has no
+	/// data for the player yet, or has no entry for this task.
+	/// </summary>
+	public static Progress? GetTaskProgress(TarkovTask task, UserProgress? progress = null) {
+		progress ??= GetUserProgress();
+		if (progress.Tasks is not { Count: > 0 })
+			return null;
+
+		return progress.Tasks.FirstOrDefault(t => t.Id == task.Id && !t.Invalid);
+	}
+
+	/// <summary>
+	/// Whether TarkovTracker marks the task complete. False when the tracker is
+	/// off or has no entry, so callers must not treat false as "not done".
+	/// </summary>
+	public static bool IsTaskComplete(TarkovTask task, UserProgress progress) {
+		var entry = progress.Tasks?.FirstOrDefault(t => t.Id == task.Id && !t.Invalid);
+		return entry is { Complete: true };
+	}
+
+	/// <summary>
+	/// Whether TarkovTracker marks the task failed.
+	/// </summary>
+	public static bool IsTaskFailed(TarkovTask task, UserProgress progress) {
+		var entry = progress.Tasks?.FirstOrDefault(t => t.Id == task.Id && !t.Invalid);
+		return entry is { Failed: true };
+	}
+
+	/// <summary>
+	/// Objectives of a task paired with their TarkovTracker completion state and
+	/// counter. Objectives with no tracker entry come back as incomplete with a
+	/// zero count.
+	/// </summary>
+	public static List<QuestObjectiveEntry> GetObjectiveProgress(TarkovTask task, UserProgress progress) {
+		var result = new List<QuestObjectiveEntry>();
+		if (task.Objectives is not { Count: > 0 })
+			return result;
+
+		foreach (var objective in task.Objectives) {
+			var entry = objective.Id is null
+				? null
+				: progress.TaskObjectives?.FirstOrDefault(p => p.Id == objective.Id && !p.Invalid);
+
+			result.Add(new QuestObjectiveEntry(objective, entry?.Complete == true, entry?.Count ?? 0));
+		}
+
+		return result;
+	}
+
 	public (int count, int kappaCount) GetTaskRemaining() => GetTaskRemaining(GetUserProgress());
 	public (int count, int kappaCount) GetTaskRemaining(UserProgress progress) {
 		var report = GetQuestNeedReport(progress);
@@ -22,6 +196,106 @@ public partial class Item {
 	}
 
 	internal QuestNeedReport GetQuestNeedReport() => GetQuestNeedReport(GetUserProgress());
+
+	/// <summary>
+	/// Quests that require handing this item in. Uses findItem/giveItem objectives
+	/// with a non-zero remaining count, matching how tarkov.dev builds its quest
+	/// table. Optional objectives and the find half of a find/give pair are folded
+	/// into the single give objective so a task is listed once.
+	/// </summary>
+	public List<QuestItemEntry> GetQuestsRequiringItem() {
+		var tasks = TarkovDevAPI.GetTasks();
+		var result = new List<QuestItemEntry>();
+
+		foreach (var task in tasks) {
+			if (task.Objectives is not { Count: > 0 })
+				continue;
+
+			var need = GetQuestItemCount(task, Id);
+			if (need is null)
+				continue;
+
+			result.Add(new QuestItemEntry(task, need.Value, HasAlternates(task, Id)));
+		}
+
+		return result;
+	}
+
+	/// <summary>
+	/// Quests that hand this item out as a completion reward.
+	/// </summary>
+	public List<QuestItemEntry> GetQuestsRewardingItem() {
+		var result = new List<QuestItemEntry>();
+
+		foreach (var task in TarkovDevAPI.GetTasks()) {
+			var reward = task.FinishRewards?.Items?.FirstOrDefault(i => i.Item == Id);
+			if (reward is null)
+				continue;
+
+			result.Add(new QuestItemEntry(task, reward.Count, false, true));
+		}
+
+		return result;
+	}
+
+	/// <summary>
+	/// Remaining count of this item a task still wants handed in, or null when the
+	/// task does not need it. A find/give pair for the same items is counted once,
+	/// using the give objective, which is the one that actually consumes them.
+	/// </summary>
+	private static int? GetQuestItemCount(TarkovTask task, string itemId) {
+		var objectives = task.Objectives;
+		if (objectives is null)
+			return null;
+
+		var matchedFind = new HashSet<TaskObjective>();
+
+		foreach (var give in objectives.Where(o =>
+			!o.Optional && o.Type == "giveItem" && o.ItemIds?.Contains(itemId) == true
+		)) {
+			// Tarkov.dev emits find and give as separate objectives for the same
+			// physical items; consume the matching find so it is not counted twice.
+			foreach (var find in objectives.Where(o =>
+				!o.Optional
+				&& o.Type == "findItem"
+				&& o.Count == give.Count
+				&& o.FoundInRaid == give.FoundInRaid
+				&& o.ItemIds?.Contains(itemId) == true
+			)) {
+				_ = matchedFind.Add(find);
+			}
+
+			return give.Count;
+		}
+
+		// No give objective: a standalone find requirement (e.g. survive-with style
+		// objectives) still means the item is needed.
+		foreach (var find in objectives.Where(o =>
+			!o.Optional && o.Type == "findItem" && o.ItemIds?.Contains(itemId) == true
+		)) {
+			if (matchedFind.Contains(find))
+				continue;
+			return find.Count;
+		}
+
+		return null;
+	}
+
+	/// <summary>
+	/// True when the task also asks for other items, so the UI can note that the
+	/// displayed amount is one of several accepted requirements.
+	/// </summary>
+	private static bool HasAlternates(TarkovTask task, string itemId) {
+		if (task.Objectives is not { Count: > 0 })
+			return false;
+
+		return task.Objectives.Any(o =>
+			!o.Optional
+			&& (o.Type == "giveItem" || o.Type == "findItem")
+			&& o.ItemIds?.Contains(itemId) == true
+			&& o.ItemIds.Count > 1
+		);
+	}
 
 	/// <summary>
 	/// Full applicability-aware quest need classification for the item.

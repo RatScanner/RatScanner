@@ -7,7 +7,9 @@
 
 <div class="app-container">
 	<WindowChrome />
-	@Body
+	<div class="app-body">
+		@Body
+	</div>
 </div>
 
 <style>
@@ -21,5 +23,17 @@
         border-radius: 8px;
         overflow: hidden;
         background: #121212;
+    }
+
+    /* Flex items default to min-height:auto, so a plain page root would grow to
+       its content height instead of scrolling. min-height:0 lets it shrink and
+       hands the scrolling to this container for every page in the layout. */
+    .app-body {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
     }
 </style>
