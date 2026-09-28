@@ -29,25 +29,25 @@ public partial class BlazorInteractableOverlay : Window {
 	}
 
 	private void SetPosition() {
-		System.Collections.Generic.IEnumerable<Screen> hoveredScreen = Screen.AllScreens.Where(screen => screen.Bounds.Contains(UserActivityHelper.GetMousePosition()));
-		Screen? screen = hoveredScreen.FirstOrDefault() ?? Screen.PrimaryScreen;
-		System.Drawing.Rectangle b = screen.Bounds;
-		nint handle = new WindowInteropHelper(this).Handle;
-		NativeMethods.SetWindowPos(handle, 0, b.Left, b.Top, b.Right - b.Left, b.Bottom - b.Top, 0);
+		var hoveredScreen = Screen.AllScreens.Where(screen => screen.Bounds.Contains(UserActivityHelper.GetMousePosition()));
+		var screen = hoveredScreen.FirstOrDefault() ?? Screen.PrimaryScreen;
+		var b = screen.Bounds;
+		var handle = new WindowInteropHelper(this).Handle;
+		_ = NativeMethods.SetWindowPos(handle, 0, b.Left, b.Top, b.Right - b.Left, b.Bottom - b.Top, 0);
 	}
 
 	private void ApplyBlurBehind() {
-		WindowBlurEffect.AccentState accent = WindowBlurEffect.AccentState.ACCENT_DISABLED;
+		var accent = WindowBlurEffect.AccentState.ACCENT_DISABLED;
 		if (RatConfig.Overlay.Search.BlurBehind) accent = WindowBlurEffect.AccentState.ACCENT_ENABLE_BLURBEHIND;
 		WindowBlurEffect.SetBlur(this, accent);
 	}
 
-	async internal void ShowOverlay() {
+	internal async void ShowOverlay() {
 		ApplyBlurBehind();
 		SetPosition();
 		Show();
 		await blazorInteractableOverlayWebView.WebView.EnsureCoreWebView2Async();
-		await blazorInteractableOverlayWebView.WebView.ExecuteScriptAsync("ShowOverlay()");
+		_ = await blazorInteractableOverlayWebView.WebView.ExecuteScriptAsync("ShowOverlay()");
 	}
 
 	internal void HideOverlay() {
@@ -58,8 +58,8 @@ public partial class BlazorInteractableOverlay : Window {
 		const int gwlExStyle = -20; // GWL_EXSTYLE
 		const uint wsExToolWindow = 0x00000080; // WS_EX_TOOLWINDOW
 
-		nint handle = new WindowInteropHelper(this).Handle;
-		NativeMethods.SetWindowLongPtr(handle, gwlExStyle, NativeMethods.GetWindowLongPtr(handle, gwlExStyle) | (nint)wsExToolWindow);
+		var handle = new WindowInteropHelper(this).Handle;
+		_ = NativeMethods.SetWindowLongPtr(handle, gwlExStyle, NativeMethods.GetWindowLongPtr(handle, gwlExStyle) | (nint)wsExToolWindow);
 	}
 
 	private void WebView_Loaded(object? sender, CoreWebView2NavigationCompletedEventArgs e) {
@@ -73,14 +73,15 @@ public partial class BlazorInteractableOverlay : Window {
 		blazorInteractableOverlayWebView.WebView.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;
 	}
 
-	private static class NativeMethods {
-		[DllImport("user32.dll", EntryPoint = "GetWindowLongPtr")]
-		public static extern nint GetWindowLongPtr(nint hWnd, int nIndex);
+	private static partial class NativeMethods {
+		[LibraryImport("user32.dll", EntryPoint = "GetWindowLongPtrW")]
+		public static partial nint GetWindowLongPtr(nint hWnd, int nIndex);
 
-		[DllImport("user32.dll", EntryPoint = "SetWindowLongPtr")]
-		public static extern nint SetWindowLongPtr(nint hWnd, int nIndex, nint dwNewLong);
+		[LibraryImport("user32.dll", EntryPoint = "SetWindowLongPtrW")]
+		public static partial nint SetWindowLongPtr(nint hWnd, int nIndex, nint dwNewLong);
 
-		[DllImport("user32.dll", SetLastError = true)]
-		public static extern bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+		[LibraryImport("user32.dll", EntryPoint = "SetWindowPos", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static partial bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 	}
 }

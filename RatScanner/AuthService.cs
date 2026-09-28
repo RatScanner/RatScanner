@@ -2,8 +2,9 @@
 using System.Threading.Tasks;
 
 namespace RatScanner;
+
 internal class AuthService {
-	static readonly HttpClient HttpClient = new();
+	private static readonly HttpClient HttpClient = new();
 
 	public static async void AuthDiscord() {
 		OAuth2.Client client = new() {
@@ -44,10 +45,10 @@ internal class AuthService {
 				{ "Authorization", $"Bearer {token.AccessToken}" },
 			},
 		};
-		HttpResponseMessage response = await HttpClient.SendAsync(request);
+		var response = await HttpClient.SendAsync(request);
 
 		Logger.LogInfo($"STATUS CODE: {response.StatusCode}");
-		string content = await response.Content.ReadAsStringAsync();
+		var content = await response.Content.ReadAsStringAsync();
 		Logger.LogInfo(content);
 	}
 

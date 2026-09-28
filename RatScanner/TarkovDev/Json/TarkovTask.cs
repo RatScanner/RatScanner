@@ -260,8 +260,7 @@ public class TaskOtherRequirement {
 	public List<string> Traders { get; set; }
 }
 
-public class TarkovTask
-{
+public class TarkovTask {
 	[JsonProperty("id")]
 	public string Id { get; set; }
 

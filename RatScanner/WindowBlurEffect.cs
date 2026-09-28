@@ -6,9 +6,9 @@ using System.Windows.Interop;
 
 namespace RatScanner;
 
-static class WindowBlurEffect {
-	[DllImport("user32.dll")]
-	private static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);
+internal static partial class WindowBlurEffect {
+	[LibraryImport("user32.dll", EntryPoint = "SetWindowCompositionAttribute")]
+	private static partial int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);
 
 	//private const uint _blurOpacity = 1;
 	//private const uint _blurBackgroundColor = 0x0FF000;
@@ -44,14 +44,14 @@ static class WindowBlurEffect {
 
 	private static bool IsTransparencyAvailable() {
 		// Always available if not on Windows 11
-		Version version = Environment.OSVersion.Version;
+		var version = Environment.OSVersion.Version;
 		if (!(version.Major == 10 && version.Build >= 20000)) return true;
 
-		string path = @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
-		using RegistryKey? key = Registry.CurrentUser.OpenSubKey(path);
-		object? registryValueObject = key?.GetValue("EnableTransparency");
+		var path = @"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
+		using var key = Registry.CurrentUser.OpenSubKey(path);
+		var registryValueObject = key?.GetValue("EnableTransparency");
 		if (registryValueObject == null) return false;
-		int registryValue = (int)registryValueObject;
+		var registryValue = (int)registryValueObject;
 		return registryValue == 1;
 	}
 
@@ -62,25 +62,26 @@ static class WindowBlurEffect {
 		}
 
 		WindowInteropHelper windowHelper = new(window);
-		AccentPolicy accent = new();
+		AccentPolicy accent = new() {
+			// to enable blur the image behind the window
+			AccentState = accentState,
+			AccentFlags = 0,
+			GradientColor = 0x00_00_00_00,   // A_B_G_R
+			AnimationId = 0
+		};
 
-		// to enable blur the image behind the window
-		accent.AccentState = accentState;
-		accent.AccentFlags = 0;
-		accent.GradientColor = 0x00_00_00_00;   // A_B_G_R
-		accent.AnimationId = 0;
+		var accentStructSize = Marshal.SizeOf(accent);
 
-		int accentStructSize = Marshal.SizeOf(accent);
-
-		nint accentPtr = Marshal.AllocHGlobal(accentStructSize);
+		var accentPtr = Marshal.AllocHGlobal(accentStructSize);
 		Marshal.StructureToPtr(accent, accentPtr, false);
 
-		WindowCompositionAttributeData data = new();
-		data.Attribute = WindowCompositionAttribute.WCA_ACCENT_POLICY;
-		data.SizeOfData = accentStructSize;
-		data.Data = accentPtr;
+		WindowCompositionAttributeData data = new() {
+			Attribute = WindowCompositionAttribute.WCA_ACCENT_POLICY,
+			SizeOfData = accentStructSize,
+			Data = accentPtr
+		};
 
-		SetWindowCompositionAttribute(windowHelper.Handle, ref data);
+		_ = SetWindowCompositionAttribute(windowHelper.Handle, ref data);
 
 		Marshal.FreeHGlobal(accentPtr);
 	}

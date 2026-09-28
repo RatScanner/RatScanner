@@ -88,24 +88,24 @@ internal class ActiveHotkey : Hotkey, IDisposable {
 		if (IsPressed(e) && HotkeyPressedEventHandler != null) {
 			Logger.LogDebug("Pressed: " + ToString());
 			e.Handled |= SuppressHotkey;
-			Task.Run(() => HotkeyPressedEventHandler(sender, e));
+			_ = Task.Run(() => HotkeyPressedEventHandler(sender, e));
 		}
 	}
 
 	internal bool IsPressed(KeyUpEventArgs e) {
 		if (e == null) throw new ArgumentNullException(nameof(e), "KeyUpEventArgs can not be empty!");
 
-		bool keyInHotkey = false;
+		var keyInHotkey = false;
 
 		if (RequiresKeyboard) {
-			foreach (Key keyboardKey in KeyboardKeys) {
+			foreach (var keyboardKey in KeyboardKeys) {
 				if (!UserActivityHelper.IsKeyDown(keyboardKey)) return false;
 				if (e.Device == Device.Keyboard) keyInHotkey |= e.Key == keyboardKey;
 			}
 		}
 
 		if (RequiresMouse) {
-			foreach (MouseButton mouseButton in MouseButtons) {
+			foreach (var mouseButton in MouseButtons) {
 				if (!UserActivityHelper.IsMouseButtonDown(mouseButton)) return false;
 				if (e.Device == Device.Mouse) keyInHotkey |= e.MouseButton == mouseButton;
 			}

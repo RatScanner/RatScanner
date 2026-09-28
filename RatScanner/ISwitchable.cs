@@ -3,9 +3,9 @@
 public interface ISwitchable {
 	public static ISwitchable? Instance { get; }
 
-	void UtilizeState(object state);
+	public void UtilizeState(object state);
 
-	void OnClose();
+	public void OnClose();
 
-	void OnOpen();
+	public void OnOpen();
 }

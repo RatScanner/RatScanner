@@ -1,3 +1,4 @@
+using RatScanner.TarkovDev.Json;
 using RatStash;
 using System.ComponentModel;
 using System.Linq;
@@ -5,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace RatScanner.ViewModel;
 
-internal class SettingsVM : INotifyPropertyChanged
-{
+internal class SettingsVM : INotifyPropertyChanged {
 	public bool EnableNameScan { get; set; }
 	public bool EnableAutoNameScan { get; set; }
 	public int NameScanLanguage { get; set; }
@@ -63,14 +63,12 @@ internal class SettingsVM : INotifyPropertyChanged
 
 	private readonly LocalizationService _localizationService;
 
-	internal SettingsVM(LocalizationService localizationService)
-	{
+	internal SettingsVM(LocalizationService localizationService) {
 		_localizationService = localizationService;
 		LoadSettings();
 	}
 
-	public void LoadSettings()
-	{
+	public void LoadSettings() {
 		EnableNameScan = RatConfig.NameScan.Enable;
 		EnableAutoNameScan = RatConfig.NameScan.EnableAuto;
 		NameScanLanguage = (int)RatConfig.NameScan.Language;
@@ -135,8 +133,7 @@ internal class SettingsVM : INotifyPropertyChanged
 	/// Clears the load-time suppression. Called once the re-render triggered by a
 	/// reset has been processed, so a genuine edit after a load is never ignored.
 	/// </summary>
-	internal void EndLoadSuppression()
-	{
+	internal void EndLoadSuppression() {
 		_suppressDirty = false;
 	}
 
@@ -151,12 +148,10 @@ internal class SettingsVM : INotifyPropertyChanged
 	/// use it as their signal to re-render (live previews, dependent rows, the
 	/// footer status) whenever a control changes.
 	/// </remarks>
-	public void MarkDirty()
-	{
+	public void MarkDirty() {
 		// Swallow the first callback after a load: that is a control re-applying
 		// the value we just handed it, not a user edit.
-		if (_suppressDirty)
-		{
+		if (_suppressDirty) {
 			_suppressDirty = false;
 			return;
 		}
@@ -165,15 +160,14 @@ internal class SettingsVM : INotifyPropertyChanged
 		Notify();
 	}
 
-	public async Task SaveSettings()
-	{
-		bool updateMarketDB = NameScanLanguage != (int)RatConfig.NameScan.Language;
-		bool updateTarkovTrackerToken = TarkovTrackerToken != RatConfig.Tracking.TarkovTracker.Token;
-		bool updateTarkovTrackerBackend = TarkovTrackerBackend != RatConfig.Tracking.TarkovTracker.Backend;
-		bool updateResolution = ScreenWidth != RatConfig.ScreenWidth || ScreenHeight != RatConfig.ScreenHeight;
-		bool updateScreenOverride = OverrideScreenConfig != RatConfig.OverrideScreenConfig || ScreenScale != RatConfig.ScreenScale;
-		bool updateLanguage = RatConfig.NameScan.Language != (Language)NameScanLanguage;
-		bool updateUiLanguage = RatConfig.UserInterface.Language != UiLanguage;
+	public async Task SaveSettings() {
+		_ = NameScanLanguage != (int)RatConfig.NameScan.Language;
+		var updateTarkovTrackerToken = TarkovTrackerToken != RatConfig.Tracking.TarkovTracker.Token;
+		var updateTarkovTrackerBackend = TarkovTrackerBackend != RatConfig.Tracking.TarkovTracker.Backend;
+		var updateResolution = ScreenWidth != RatConfig.ScreenWidth || ScreenHeight != RatConfig.ScreenHeight;
+		var updateScreenOverride = OverrideScreenConfig != RatConfig.OverrideScreenConfig || ScreenScale != RatConfig.ScreenScale;
+		var updateLanguage = RatConfig.NameScan.Language != (Language)NameScanLanguage;
+		var updateUiLanguage = RatConfig.UserInterface.Language != UiLanguage;
 
 		// Save config
 		RatConfig.NameScan.Enable = EnableNameScan;
@@ -214,8 +208,7 @@ internal class SettingsVM : INotifyPropertyChanged
 		RatConfig.Hotkeys.OpenWiki = OpenWikiHotkey;
 		RatConfig.Hotkeys.OpenTarkovDev = OpenTarkovDevHotkey;
 
-		if (OverrideScreenConfig)
-		{
+		if (OverrideScreenConfig) {
 			RatConfig.ScreenWidth = ScreenWidth;
 			RatConfig.ScreenHeight = ScreenHeight;
 			RatConfig.ScreenScale = ScreenScale;
@@ -231,7 +224,7 @@ internal class SettingsVM : INotifyPropertyChanged
 		PageSwitcher.Instance.ResetWindowSize();
 		await TarkovDevAPI.InitializeCache();
 		if (updateTarkovTrackerToken || updateTarkovTrackerBackend) UpdateTarkovTrackerToken();
-		if (updateUiLanguage) _localizationService.SetLanguage(UiLanguage);
+		if (updateUiLanguage) LocalizationService.SetLanguage(UiLanguage);
 		if (updateResolution || updateLanguage || updateScreenOverride) RatScannerMain.Instance.SetupRatEye();
 
 		RatEye.Config.LogDebug = RatConfig.LogDebug;
@@ -246,19 +239,17 @@ internal class SettingsVM : INotifyPropertyChanged
 		Notify();
 	}
 
-	private void UpdateTarkovTrackerToken()
-	{
-		string token = RatConfig.Tracking.TarkovTracker.Token;
+	private static void UpdateTarkovTrackerToken() {
+		var token = RatConfig.Tracking.TarkovTracker.Token;
 		if (token == "") return;
 		RatScannerMain.Instance.TarkovTrackerDB.Token = RatConfig.Tracking.TarkovTracker.Token;
 		var db = RatScannerMain.Instance.TarkovTrackerDB;
-		if (db.TestToken(token))
-		{
+		if (db.TestToken(token)) {
 			db.UpdateToken();
 			return;
 		}
 
-		int visibleLength = (int)(token.Length * 0.25);
+		var visibleLength = (int)(token.Length * 0.25);
 		token = token[..visibleLength] + string.Concat(Enumerable.Repeat(" *", token.Length - visibleLength));
 		Logger.ShowWarning($"The TarkovTracker API Token does not seem to work.\n\n{token}");
 
@@ -267,8 +258,7 @@ internal class SettingsVM : INotifyPropertyChanged
 
 	public event PropertyChangedEventHandler? PropertyChanged;
 
-	internal virtual void OnPropertyChanged(string? propertyName = null)
-	{
+	internal virtual void OnPropertyChanged(string? propertyName = null) {
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 }

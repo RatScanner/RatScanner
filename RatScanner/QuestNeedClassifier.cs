@@ -1,9 +1,7 @@
 ﻿using RatScanner.FetchModels.TarkovTracker;
-using RatScanner.TarkovDev;
 using RatScanner.TarkovDev.Json;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using static RatScanner.TarkovDev.Json.Item;
 
@@ -104,7 +102,7 @@ internal static class QuestNeedClassifier {
 		ArgumentNullException.ThrowIfNull(item);
 		ArgumentNullException.ThrowIfNull(progress);
 
-		Dictionary<string, TarkovTask> tasksById = TarkovDevAPI.GetTasks().ToDictionary(t => t.Id, t => t);
+		var tasksById = TarkovDevAPI.GetTasks().ToDictionary(t => t.Id, t => t);
 
 		int active = 0,
 			available = 0,
@@ -119,9 +117,9 @@ internal static class QuestNeedClassifier {
 			futureWeapon = 0,
 			conditionalWeapon = 0;
 		int? unlockLevel = null;
-		int kappa = 0;
+		var kappa = 0;
 
-		foreach (TarkovTask task in tasks) {
+		foreach (var task in tasks) {
 			if (ExcludedTaskIds.Contains(task.Id))
 				continue;
 
@@ -129,14 +127,14 @@ internal static class QuestNeedClassifier {
 			// started this task. Unlock gates (trader standing, delays,
 			// Lightkeeper dialogue, active-only prerequisites) have therefore
 			// already been crossed and must not demote a live need to uncertain.
-			bool taskShowsProgress = TaskShowsProgress(task, progress);
-			QuestGate gate = ClassifyGate(task, tasksById, progress, out int? taskUnlockLevel);
+			var taskShowsProgress = TaskShowsProgress(task, progress);
+			var gate = ClassifyGate(task, tasksById, progress, out var taskUnlockLevel);
 			if (gate != QuestGate.NotApplicable && taskShowsProgress)
 				gate = QuestGate.ActiveNow;
 			if (gate == QuestGate.NotApplicable)
 				continue;
 
-			ObjectiveNeedBreakdown need = GetObjectiveNeedBreakdown(
+			var need = GetObjectiveNeedBreakdown(
 				item,
 				task.Objectives,
 				progress,
@@ -174,6 +172,12 @@ internal static class QuestNeedClassifier {
 					conditionalFir += need.FoundInRaid;
 					conditionalWeapon += need.WeaponHandIn;
 					break;
+				case QuestGate.NotApplicable:
+					break;
+				case QuestGate.ApplicableNow:
+					break;
+				default:
+					break;
 			}
 		}
 
@@ -204,12 +208,12 @@ internal static class QuestNeedClassifier {
 	) {
 		unlockLevel = null;
 
-		Progress? entry = progress.Tasks.FirstOrDefault(p => p.Id == task.Id);
+		var entry = progress.Tasks.FirstOrDefault(p => p.Id == task.Id);
 		if (entry is { Complete: true } or { Failed: true } or { Invalid: true })
 			return QuestGate.NotApplicable;
 
-		bool conditional = false;
-		bool future = false;
+		var conditional = false;
+		var future = false;
 
 		// Faction gate: evaluable when the tracker profile carries a faction.
 		if (
@@ -223,7 +227,7 @@ internal static class QuestNeedClassifier {
 		}
 
 		if (task.TaskRequirements is { Count: > 0 }) {
-			foreach (TaskRequirement prerequisite in task.TaskRequirements) {
+			foreach (var prerequisite in task.TaskRequirements) {
 				switch (PrerequisiteStatus(prerequisite, tasksById, progress)) {
 					case PrerequisiteGate.Satisfied:
 						continue;
@@ -234,6 +238,8 @@ internal static class QuestNeedClassifier {
 					case PrerequisiteGate.LockedByKnownGate:
 						future = true;
 						continue;
+					case PrerequisiteGate.UnverifiableActiveState:
+						break;
 					default:
 						// "active"-only prerequisites we cannot verify keep uncertainty.
 						conditional = true;
@@ -260,11 +266,13 @@ internal static class QuestNeedClassifier {
 		if (task.HasUnmodeledRequirements)
 			conditional = true;
 
-		if (conditional)
+		if (conditional) {
 			return QuestGate.ConditionalUnknown;
-		if (future)
+		} else if (future) {
 			return QuestGate.FutureKnown;
-		return QuestGate.ApplicableNow;
+		} else {
+			return QuestGate.ApplicableNow;
+		}
 	}
 
 	private enum PrerequisiteGate {
@@ -288,12 +296,12 @@ internal static class QuestNeedClassifier {
 		IReadOnlyDictionary<string, TarkovTask> tasksById,
 		UserProgress progress
 	) {
-		Progress? entry = progress.Tasks.FirstOrDefault(p => p.Id == requirement.Task);
-		bool complete = entry?.Complete == true;
-		bool failed = entry?.Failed == true;
+		var entry = progress.Tasks.FirstOrDefault(p => p.Id == requirement.Task);
+		var complete = entry?.Complete == true;
+		var failed = entry?.Failed == true;
 
 		HashSet<string> statuses = new(requirement.Status, StringComparer.OrdinalIgnoreCase);
-		bool wantsActive = statuses.Contains(StatusActive);
+		var wantsActive = statuses.Contains(StatusActive);
 
 		if (complete) {
 			if (statuses.Contains(StatusComplete))
@@ -308,15 +316,21 @@ internal static class QuestNeedClassifier {
 		// Prereq neither complete nor failed: satisfied only when the requirement
 		// accepts an in-progress ("active") task AND the tracker shows progress on it.
 		if (wantsActive && !statuses.Contains(StatusComplete) && !statuses.Contains(StatusFailed)) {
-			if (
-				tasksById.TryGetValue(requirement.Task, out TarkovTask? prereqTask)
-				&& TaskShowsProgress(prereqTask, progress)
-			)
+			if (tasksById.TryGetValue(requirement.Task, out var prereqTask)
+				&& TaskShowsProgress(prereqTask, progress)) {
+				// Prereq neither complete nor failed: satisfied only when the requirement
+				// accepts an in-progress ("active") task AND the tracker shows progress on it.
 				return PrerequisiteGate.Satisfied;
-			return PrerequisiteGate.UnverifiableActiveState;
+			} else {
+				// Prereq neither complete nor failed: satisfied only when the requirement
+				// accepts an in-progress ("active") task AND the tracker shows progress on it.
+				return PrerequisiteGate.UnverifiableActiveState;
+			}
+		} else {
+			// Prereq neither complete nor failed: satisfied only when the requirement
+			// accepts an in-progress ("active") task AND the tracker shows progress on it.
+			return PrerequisiteGate.LockedByKnownGate;
 		}
-
-		return PrerequisiteGate.LockedByKnownGate;
 	}
 
 	/// <summary>
@@ -324,11 +338,8 @@ internal static class QuestNeedClassifier {
 	/// are observable through objective progress entries.
 	/// </summary>
 	private static bool TaskShowsProgress(TarkovTask task, UserProgress progress) {
-		Progress? taskEntry = progress.Tasks.FirstOrDefault(p => p.Id == task.Id);
-		if (taskEntry is { Complete: true } or { Failed: true } or { Invalid: true })
-			return false;
-
-		return task.Objectives is { Count: > 0 }
+		var taskEntry = progress.Tasks.FirstOrDefault(p => p.Id == task.Id);
+		return taskEntry is not { Complete: true } and not { Failed: true } and not { Invalid: true } && task.Objectives is { Count: > 0 }
 			&& task.Objectives.Any(o =>
 				o.Id is not null && progress.TaskObjectives.Any(p => p.Id == o.Id && !p.Invalid)
 			);

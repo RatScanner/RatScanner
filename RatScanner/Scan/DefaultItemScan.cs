@@ -9,8 +9,8 @@ public class DefaultItemScan : ItemScan {
 	public DefaultItemScan(Item item) {
 		Item = item;
 
-		string pathEnding = "unknown-item-grid-image.jpg";
-		string path = "https://assets.tarkov.dev/" + pathEnding;
+		var pathEnding = "unknown-item-grid-image.jpg";
+		var path = "https://assets.tarkov.dev/" + pathEnding;
 
 		Confidence = 1;
 		IconPath = path;

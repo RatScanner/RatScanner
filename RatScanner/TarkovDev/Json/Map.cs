@@ -26,7 +26,7 @@ public class Map {
 	public string? Wiki { get; set; }
 
 	[JsonProperty("enemies")]
-	public List<string> Enemies { get; set; } = new();
+	public List<string> Enemies { get; set; } = [];
 
 	[JsonProperty("raidDuration")]
 	public int RaidDuration { get; set; }
@@ -35,5 +35,5 @@ public class Map {
 	public string Players { get; set; } = string.Empty;
 
 	[JsonProperty("bosses")]
-	public List<object> Bosses { get; set; } = new();
+	public List<object> Bosses { get; set; } = [];
 }

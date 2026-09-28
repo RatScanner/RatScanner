@@ -1,11 +1,6 @@
 ﻿namespace RatScanner;
 
-public class VirtualScreenOffset {
-	public int XOffset { get; }
-	public int YOffset { get; }
-
-	public VirtualScreenOffset(int x, int y) {
-		XOffset = x;
-		YOffset = y;
-	}
+public class VirtualScreenOffset(int x, int y) {
+	public int XOffset { get; } = x;
+	public int YOffset { get; } = y;
 }

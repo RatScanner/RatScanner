@@ -69,7 +69,6 @@
     private static MudTextField<string> _searchTextField { get; set; } = null!;
     private string _searchText { get; set; } = "";
     private IEnumerable<SearchResult> _searchResults { get; set; } = new List<SearchResult>();
-    private readonly SearchService _searchService = new();
     private int _selectedResultIndex { get; set; } = 0;
 
     // Map viewer state
@@ -86,12 +85,12 @@
     }
 
     private async void ExecuteSearch(string value) {
-        var sanitizedValue = _searchService.SanitizeSearch(value);
+        var sanitizedValue = SearchService.SanitizeSearch(value);
         var results = Enumerable.Empty<SearchResult>();
-        results = results.Concat(await _searchService.SearchItemsAsync(sanitizedValue));
-        results = results.Concat(await _searchService.SearchTasksAsync(sanitizedValue));
+        results = results.Concat(await SearchService.SearchItemsAsync(sanitizedValue));
+        results = results.Concat(await SearchService.SearchTasksAsync(sanitizedValue));
         // TODO: Re-enable map search when MapViewer is fixed
-        // results = results.Concat(await _searchService.SearchMapsAsync(sanitizedValue));
+        // results = results.Concat(await SearchService.SearchMapsAsync(sanitizedValue));
         results = results.Where(result => result != null && result.Data != null);
         results = results.OrderBy(result => result.Score).Take(4);
         _searchResults = results;

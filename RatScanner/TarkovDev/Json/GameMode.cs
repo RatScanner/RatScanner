@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 
-namespace RatScanner;
+namespace RatScanner.TarkovDev.Json;
 
 public enum GameMode {
 	[EnumMember(Value = "regular")]
@@ -15,10 +15,10 @@ public enum GameMode {
 
 internal static class GameModeExtensions {
 	internal static string ToApiString(this GameMode gameMode) {
-		System.Type type = typeof(GameMode);
-		System.Reflection.MemberInfo[] member = type.GetMember(gameMode.ToString());
+		var type = typeof(GameMode);
+		var member = type.GetMember(gameMode.ToString());
 		if (member.Length > 0) {
-			object[] attributes = member[0].GetCustomAttributes(typeof(EnumMemberAttribute), false);
+			var attributes = member[0].GetCustomAttributes(typeof(EnumMemberAttribute), false);
 			if (attributes.Length > 0) {
 				return ((EnumMemberAttribute)attributes[0]).Value!;
 			}

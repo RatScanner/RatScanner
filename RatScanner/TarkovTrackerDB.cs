@@ -19,7 +19,7 @@ public class TarkovTrackerDB {
 	private static RatConfig.TarkovTrackerBackend _lastValidatedBackend;
 	private static bool _lastValidationResult;
 
-	public List<UserProgress> Progress = new();
+	public List<UserProgress> Progress = [];
 	public string Self = "";
 	public string? Token;
 
@@ -28,9 +28,13 @@ public class TarkovTrackerDB {
 	/// or null when that pair has not been checked yet.
 	/// </summary>
 	internal static bool? GetCachedValidation(string token, RatConfig.TarkovTrackerBackend backend) {
-		if (string.IsNullOrEmpty(token)) return false;
-		if (token != _lastValidatedToken || backend != _lastValidatedBackend) return null;
-		return _lastValidationResult;
+		if (string.IsNullOrEmpty(token)) {
+			return false;
+		} else if (token != _lastValidatedToken || backend != _lastValidatedBackend) {
+			return null;
+		} else {
+			return _lastValidationResult;
+		}
 	}
 
 	/// <summary>
@@ -78,7 +82,7 @@ public class TarkovTrackerDB {
 	public void UpdateToken() {
 		// Attempt to verify the token
 		try {
-			TokenResponse? newToken = GetToken();
+			var newToken = GetToken();
 			_badToken = newToken == null;
 			if (!_badToken)
 				// We have a valid token
@@ -102,13 +106,13 @@ public class TarkovTrackerDB {
 		try {
 			if (TeamProgressAvailable == true) {
 
-				TeamProgressResponse tpr = GetTeamProgress();
+				var tpr = GetTeamProgress();
 				Self = tpr.Meta.Self;
-				Progress = tpr.TeamProgress.Where(x => !tpr.Meta.HiddenTeammates.Contains(x.UserId)).ToList();
+				Progress = [.. tpr.TeamProgress.Where(x => !tpr.Meta.HiddenTeammates.Contains(x.UserId))];
 			} else if (SoloProgressAvailable == true) {
-				ProgressResponse spr = GetProgress();
+				var spr = GetProgress();
 				Self = spr.Meta.Self;
-				Progress = new List<UserProgress> { spr.UserProgress };
+				Progress = [spr.UserProgress];
 			} else {
 				// We dont have permissions
 			}
@@ -124,10 +128,10 @@ public class TarkovTrackerDB {
 	// Checks the token metadata endpoint for TarkovTracker
 	private TeamProgressResponse GetTeamProgress() {
 		try {
-			string responseStr = APIClient.Get($"{RatConfig.Tracking.TarkovTracker.Endpoint}/team/progress", _token.Id);
+			var responseStr = APIClient.Get($"{RatConfig.Tracking.TarkovTracker.Endpoint}/team/progress", _token.Id);
 			return JsonConvert.DeserializeObject<TeamProgressResponse>(responseStr) ?? new();
 		} catch (WebException e) {
-			HttpStatusCode? status = (e.Response as HttpWebResponse)?.StatusCode;
+			var status = (e.Response as HttpWebResponse)?.StatusCode;
 			if (status is HttpStatusCode.TooManyRequests)
 				throw new RateLimitExceededException("Rate Limiting reached for token", e);
 			// Unknown error, continue throwing
@@ -138,10 +142,10 @@ public class TarkovTrackerDB {
 	// Checks the token metadata endpoint for TarkovTracker
 	private ProgressResponse GetProgress() {
 		try {
-			string responseStr = APIClient.Get($"{RatConfig.Tracking.TarkovTracker.Endpoint}/progress", _token.Id);
+			var responseStr = APIClient.Get($"{RatConfig.Tracking.TarkovTracker.Endpoint}/progress", _token.Id);
 			return JsonConvert.DeserializeObject<ProgressResponse>(responseStr) ?? new();
 		} catch (WebException e) {
-			HttpStatusCode? status = (e.Response as HttpWebResponse)?.StatusCode;
+			var status = (e.Response as HttpWebResponse)?.StatusCode;
 			if (status is HttpStatusCode.TooManyRequests)
 				throw new RateLimitExceededException("Rate Limiting reached for token", e);
 			// Unknown error, continue throwing
@@ -151,7 +155,7 @@ public class TarkovTrackerDB {
 
 	public bool TestToken(string test_token) {
 		try {
-			GetToken(test_token);
+			_ = GetToken(test_token);
 		} catch (Exception) {
 			return false;
 		}
@@ -161,11 +165,11 @@ public class TarkovTrackerDB {
 
 	// Checks the token metadata endpoint for TarkovTracker
 	private TokenResponse GetToken(string? custom_token = null) {
-		string? working_token = Token;
+		var working_token = Token;
 		if (custom_token != null) working_token = custom_token;
 
-		string responseStr = APIClient.Get($"{RatConfig.Tracking.TarkovTracker.Endpoint}/token", working_token);
-		TokenResponse? result = JsonConvert.DeserializeObject<TokenResponse>(responseStr);
+		var responseStr = APIClient.Get($"{RatConfig.Tracking.TarkovTracker.Endpoint}/token", working_token);
+		var result = JsonConvert.DeserializeObject<TokenResponse>(responseStr);
 		return result ?? throw new Exception("Failed to deserialize token response");
 	}
 }

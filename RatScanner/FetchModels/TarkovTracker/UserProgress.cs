@@ -20,14 +20,14 @@ public class UserProgress {
 	public string? PmcFaction { get; set; }
 
 	[JsonProperty("tasksProgress", NullValueHandling = NullValueHandling.Ignore)]
-	public List<Progress> Tasks { get; set; } = new();
+	public List<Progress> Tasks { get; set; } = [];
 
 	[JsonProperty("taskObjectivesProgress", NullValueHandling = NullValueHandling.Ignore)]
-	public List<Progress> TaskObjectives { get; set; } = new();
+	public List<Progress> TaskObjectives { get; set; } = [];
 
 	[JsonProperty("hideoutModulesProgress", NullValueHandling = NullValueHandling.Ignore)]
-	public List<Progress> HideoutModules { get; set; } = new();
+	public List<Progress> HideoutModules { get; set; } = [];
 
 	[JsonProperty("hideoutPartsProgress", NullValueHandling = NullValueHandling.Ignore)]
-	public List<Progress> HideoutParts { get; set; } = new();
+	public List<Progress> HideoutParts { get; set; } = [];
 }

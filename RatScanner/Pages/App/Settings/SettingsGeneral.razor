@@ -3,21 +3,16 @@
 @inject SettingsVM SettingsVM
 @inject LocalizationService Localizer
 @using RatScanner
+@using RatScanner.TarkovDev.Json
 @using System.Linq
 @implements IDisposable
 
 <div class="settings-stack">
-    <SettingsCard Title="@Localizer["GameDataGroup"]"
-                  Subtitle="@Localizer["GameModeSelectionSub"]">
-        <SettingsRow Label="@Localizer["GameModeSelection"]"
-                     SubLabel="@Localizer["GameModeSelectionHint"]">
-            <MudSelect T="GameMode"
-                       Value="@SettingsVM.GameMode"
+    <SettingsCard Title="@Localizer["GameDataGroup"]" Subtitle="@Localizer["GameModeSelectionSub"]">
+        <SettingsRow Label="@Localizer["GameModeSelection"]" SubLabel="@Localizer["GameModeSelectionHint"]">
+            <MudSelect T="GameMode" Value="@SettingsVM.GameMode"
                        ValueChanged="@((GameMode v) => { SettingsVM.GameMode = v; SettingsVM.MarkDirty(); })"
-                       Variant="Variant.Outlined"
-                       Margin="Margin.Dense"
-                       Dense="true"
-                       Style="min-width: 220px;">
+                       Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Style="min-width: 220px;">
                 <MudSelectItem Value="@GameMode.Regular">@Localizer["GameModeRegular"]</MudSelectItem>
                 <MudSelectItem Value="@GameMode.Pve">@Localizer["GameModePve"]</MudSelectItem>
                 <MudSelectItem Value="@GameMode.PvpSeason">@Localizer["GameModePvpSeason"]</MudSelectItem>
@@ -26,16 +21,12 @@
     </SettingsCard>
 
     <SettingsCard Title="@Localizer["LanguageGroup"]">
-        <SettingsRow Label="@Localizer["InterfaceLanguage"]"
-                     SubLabel="@Localizer["InterfaceLanguageHint"]">
-            <MudSelect T="UiLanguage"
-                       Value="@SettingsVM.UiLanguage"
+        <SettingsRow Label="@Localizer["InterfaceLanguage"]" SubLabel="@Localizer["InterfaceLanguageHint"]">
+            <MudSelect T="UiLanguage" Value="@SettingsVM.UiLanguage"
                        ValueChanged="@((UiLanguage v) => { SettingsVM.UiLanguage = v; SettingsVM.MarkDirty(); })"
-                       Variant="Variant.Outlined"
-                       Margin="Margin.Dense"
-                       Dense="true"
-                       Style="min-width: 220px;">
-                @foreach (var language in GetUiLanguages()) {
+                       Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Style="min-width: 220px;">
+                @foreach (var language in GetUiLanguages())
+                {
                     <MudSelectItem Value="@language">@language.ToCultureName()</MudSelectItem>
                 }
             </MudSelect>
@@ -43,18 +34,15 @@
     </SettingsCard>
 
     <SettingsCard Title="@Localizer["WindowGroup"]">
-        <SettingsSwitchRow Label="@Localizer["AlwaysOnTop"]"
-                           Value="@SettingsVM.AlwaysOnTop"
+        <SettingsSwitchRow Label="@Localizer["AlwaysOnTop"]" Value="@SettingsVM.AlwaysOnTop"
                            ValueChanged="@((bool v) => { SettingsVM.AlwaysOnTop = v; SettingsVM.MarkDirty(); })" />
-        <SettingsSwitchRow Label="@Localizer["MinimizeToTray"]"
-                           SubLabel="@Localizer["MinimizeToTrayHint"]"
+        <SettingsSwitchRow Label="@Localizer["MinimizeToTray"]" SubLabel="@Localizer["MinimizeToTrayHint"]"
                            Value="@SettingsVM.MinimizeToTray"
                            ValueChanged="@((bool v) => { SettingsVM.MinimizeToTray = v; SettingsVM.MarkDirty(); })" />
     </SettingsCard>
 
     <SettingsCard Title="@Localizer["AdvancedGroup"]">
-        <SettingsSwitchRow Label="@Localizer["LogDebugInfo"]"
-                           SubLabel="@Localizer["LogDebugInfoHint"]"
+        <SettingsSwitchRow Label="@Localizer["LogDebugInfo"]" SubLabel="@Localizer["LogDebugInfoHint"]"
                            Value="@SettingsVM.LogDebug"
                            ValueChanged="@((bool v) => { SettingsVM.LogDebug = v; SettingsVM.MarkDirty(); })" />
     </SettingsCard>
@@ -64,15 +52,18 @@
     private IEnumerable<UiLanguage> GetUiLanguages() =>
         (Enum.GetValues(typeof(UiLanguage)) as IEnumerable<UiLanguage>)!.OrderBy(l => l.ToCultureName());
 
-    protected override void OnInitialized() {
+    protected override void OnInitialized()
+    {
         SettingsVM.PropertyChanged += PropertyChangeHandler;
     }
 
-    private async void PropertyChangeHandler(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
+    private async void PropertyChangeHandler(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
         await InvokeAsync(() => StateHasChanged());
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
         SettingsVM.PropertyChanged -= PropertyChangeHandler;
     }
 }

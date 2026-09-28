@@ -17,7 +17,7 @@ public class HideoutStation {
 	public int AreaType { get; set; }
 
 	[JsonProperty("levels")]
-	public List<HideoutStationLevel> Levels { get; set; } = new();
+	public List<HideoutStationLevel> Levels { get; set; } = [];
 
 	[JsonProperty("imageLink")]
 	public string? ImageLink { get; set; }

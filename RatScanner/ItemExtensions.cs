@@ -1,5 +1,4 @@
 using RatScanner.FetchModels.TarkovTracker;
-using RatScanner.TarkovDev.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +9,7 @@ public partial class Item {
 	private static UserProgress GetUserProgress() {
 		UserProgress? progress = null;
 		if (RatConfig.Tracking.TarkovTracker.Enable && RatScannerMain.Instance.TarkovTrackerDB.Progress.Count >= 1) {
-			System.Collections.Generic.List<UserProgress> teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
+			var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
 			progress = teamProgress.FirstOrDefault(x => x.UserId == RatScannerMain.Instance.TarkovTrackerDB.Self);
 		}
 		return progress ?? new UserProgress();
@@ -18,7 +17,7 @@ public partial class Item {
 
 	public (int count, int kappaCount) GetTaskRemaining() => GetTaskRemaining(GetUserProgress());
 	public (int count, int kappaCount) GetTaskRemaining(UserProgress progress) {
-		QuestNeedReport report = GetQuestNeedReport(progress);
+		var report = GetQuestNeedReport(progress);
 		return (report.CurrentTotal, report.KappaTotal);
 	}
 
@@ -53,7 +52,7 @@ public partial class Item {
 		out bool requiresFir
 	) {
 		requiresFir = false;
-		int needed = 0;
+		var needed = 0;
 
 		// Optional objectives are nice-to-have, never a requirement.
 		if (objective.Optional)
@@ -71,7 +70,7 @@ public partial class Item {
 				return 0;
 
 			needed = objective.Count;
-			foreach (Progress p in progress.TaskObjectives.Where(p => p.Id == objective.Id))
+			foreach (var p in progress.TaskObjectives.Where(p => p.Id == objective.Id))
 				needed -= p.Complete ? objective.Count : p.Count;
 			return Math.Max(0, needed);
 		}
@@ -83,7 +82,7 @@ public partial class Item {
 				return 0;
 			requiresFir = false;
 			needed = Math.Max(1, objective.Count);
-			foreach (Progress p in progress.TaskObjectives.Where(p => p.Id == objective.Id))
+			foreach (var p in progress.TaskObjectives.Where(p => p.Id == objective.Id))
 				needed -= 1;
 			return Math.Max(0, needed);
 		}
@@ -100,14 +99,14 @@ public partial class Item {
 	/// Remaining hideout upgrade needs, split by FIR attribute on the station item requirement.
 	/// </summary>
 	public RequirementBreakdown GetHideoutRequirementBreakdown(UserProgress progress) {
-		int fir = 0;
-		int nonFir = 0;
-		HideoutStation[] stations = TarkovDevAPI.GetHideoutStations();
+		var fir = 0;
+		var nonFir = 0;
+		var stations = TarkovDevAPI.GetHideoutStations();
 
-		foreach (HideoutStation station in stations) {
+		foreach (var station in stations) {
 			if (station.Levels == null)
 				continue;
-			foreach (HideoutStationLevel? level in station.Levels) {
+			foreach (var level in station.Levels) {
 				if (level == null)
 					continue;
 
@@ -116,12 +115,12 @@ public partial class Item {
 
 				if (level.ItemRequirements == null)
 					continue;
-				foreach (RequirementItem requiredItem in level.ItemRequirements) {
+				foreach (var requiredItem in level.ItemRequirements) {
 					if (requiredItem.ItemId != Id)
 						continue;
 
-					int remaining = requiredItem.Count;
-					foreach (Progress p in progress.HideoutParts.Where(p => p.Id == requiredItem.Id))
+					var remaining = requiredItem.Count;
+					foreach (var p in progress.HideoutParts.Where(p => p.Id == requiredItem.Id))
 						remaining -= p.Complete ? requiredItem.Count : p.Count;
 					remaining = Math.Max(0, remaining);
 					if (remaining <= 0)
@@ -144,12 +143,12 @@ public partial class Item {
 	UserProgress progress,
 	bool showNonFir
 ) {
-		RequirementBreakdown breakdown = GetTaskRequirementBreakdown(
+		var breakdown = GetTaskRequirementBreakdown(
 			item,
 			objectives,
 			progress,
 			showNonFir,
-			out int weaponHandIn
+			out var weaponHandIn
 		);
 		return new ObjectiveNeedBreakdown(
 			breakdown.Total,
@@ -176,20 +175,20 @@ public partial class Item {
 		if (objectives == null)
 			return new RequirementBreakdown(0, 0, 0);
 
-		int fir = 0;
-		int nonFir = 0;
-		bool isWeapon = item.Types?.Contains("gun", StringComparer.OrdinalIgnoreCase) == true;
+		var fir = 0;
+		var nonFir = 0;
+		var isWeapon = item.Types?.Contains("gun", StringComparer.OrdinalIgnoreCase) == true;
 		Dictionary<TaskObjective, TaskObjective> pairedFindByGive = [];
 		HashSet<TaskObjective> pairedFindObjectives = [];
 
 		foreach (
-			TaskObjective giveObjective in objectives.Where(objective =>
+			var giveObjective in objectives.Where(objective =>
 				!objective.Optional && objective.Type == "giveItem" && objective.ItemIds?.Contains(item.Id) == true
 			)
 		) {
 			// Current tarkov.dev find/give pairs share count and FIR flags;
 			// loosen this match only if the upstream data starts emitting asymmetric pairs.
-			TaskObjective? pairedFind = objectives.FirstOrDefault(candidate =>
+			var pairedFind = objectives.FirstOrDefault(candidate =>
 				!candidate.Optional
 				&& candidate.Type == "findItem"
 				&& candidate.Count == giveObjective.Count
@@ -200,18 +199,18 @@ public partial class Item {
 			if (pairedFind == null)
 				continue;
 			pairedFindByGive[giveObjective] = pairedFind;
-			pairedFindObjectives.Add(pairedFind);
+			_ = pairedFindObjectives.Add(pairedFind);
 		}
 
-		foreach (TaskObjective objective in objectives) {
+		foreach (var objective in objectives) {
 			// Tarkov exposes "find" and "hand over" as separate objectives for the same
 			// physical items. Count the pair once using whichever objective is further along.
 			if (pairedFindObjectives.Contains(objective))
 				continue;
 
-			int needed = item.RemainingForObjective(objective, progress, showNonFir, out bool requiresFir);
-			if (pairedFindByGive.TryGetValue(objective, out TaskObjective? pairedFind)) {
-				int findRemaining = item.RemainingForObjective(pairedFind, progress, showNonFir, out _);
+			var needed = item.RemainingForObjective(objective, progress, showNonFir, out var requiresFir);
+			if (pairedFindByGive.TryGetValue(objective, out var pairedFind)) {
+				var findRemaining = item.RemainingForObjective(pairedFind, progress, showNonFir, out _);
 				needed = Math.Min(needed, findRemaining);
 			}
 			if (needed <= 0)
@@ -230,14 +229,15 @@ public partial class Item {
 	}
 
 	public IEnumerable<Item> GetAmmoOfSameCaliber() {
-		string? caliber = Properties?.Caliber;
-		if (string.IsNullOrEmpty(caliber)) return Enumerable.Empty<Item>();
-		return TarkovDevAPI.GetItems().Where(i => i.Properties?.Caliber == caliber);
+		var caliber = Properties?.Caliber;
+		return string.IsNullOrEmpty(caliber)
+			? []
+			: TarkovDevAPI.GetItems().Where(i => i.Properties?.Caliber == caliber);
 	}
 
 	public int GetAvg24hMarketPricePerSlot() {
-		int price = Avg24HPrice ?? 0;
-		int size = Math.Max(Width * Height, 1);
+		var price = Avg24HPrice ?? 0;
+		var size = Math.Max(Width * Height, 1);
 		return price / size;
 	}
 
@@ -247,10 +247,10 @@ public partial class Item {
 		double VO = BasePrice ?? 0;
 		double VR = Avg24HPrice ?? 0;
 
-		double PO = Math.Log10(VO / VR);
+		var PO = Math.Log10(VO / VR);
 		if (VR < VO) PO = Math.Pow(PO, 1.08);
 
-		double PR = Math.Log10(VR / VO);
+		var PR = Math.Log10(VR / VO);
 		if (VO <= VR) PR = Math.Pow(PR, 1.08);
 
 		var tax = (int)((VO * Ti * Math.Pow(4, PO)) + (VR * Tr * Math.Pow(4, PR)));

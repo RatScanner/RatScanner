@@ -16,37 +16,36 @@ namespace RatScanner.View;
 /// Interaction logic for BlazorUI.xaml
 /// </summary>
 public partial class BlazorUI : UserControl, ISwitchable {
-	private static BlazorUI _instance = null;
-	public static BlazorUI Instance => _instance ??= new BlazorUI();
+	public static BlazorUI Instance { get => field ??= new BlazorUI(); } = null;
 
 	public static BlazorOverlay BlazorOverlay { get; set; }
 	public static BlazorInteractableOverlay BlazorInteractableOverlay { get; set; }
 
 	private BlazorUI() {
 		ServiceCollection serviceCollection = new();
-		serviceCollection.AddWpfBlazorWebView();
-		serviceCollection.AddMudServices();
+		_ = serviceCollection.AddWpfBlazorWebView();
+		_ = serviceCollection.AddMudServices();
 
-		serviceCollection.AddSingleton<MenuVM>(s => new MenuVM(RatScannerMain.Instance));
+		_ = serviceCollection.AddSingleton(s => new MenuVM(RatScannerMain.Instance));
 
 		LocalizationService localizationService = new();
-		serviceCollection.AddSingleton(localizationService);
+		_ = serviceCollection.AddSingleton(localizationService);
 
 		SettingsVM settingsVM = new(localizationService);
-		serviceCollection.AddSingleton<SettingsVM>(s => settingsVM);
+		_ = serviceCollection.AddSingleton(s => settingsVM);
 
-		System.Collections.Generic.IEnumerable<System.Drawing.Rectangle> bounds = System.Windows.Forms.Screen.AllScreens.Select(screen => screen.Bounds);
-		int left = 0;
-		int top = 0;
-		foreach (System.Drawing.Rectangle bound in bounds) {
+		var bounds = System.Windows.Forms.Screen.AllScreens.Select(screen => screen.Bounds);
+		var left = 0;
+		var top = 0;
+		foreach (var bound in bounds) {
 			if (bound.Left < left) left = bound.Left;
 			if (bound.Top < top) top = bound.Top;
 		}
-		serviceCollection.AddSingleton<VirtualScreenOffset>(s => new VirtualScreenOffset(left, top));
+		_ = serviceCollection.AddSingleton(s => new VirtualScreenOffset(left, top));
 
-		serviceCollection.AddSingleton<TarkovTrackerDB>(s => RatScannerMain.Instance.TarkovTrackerDB);
+		_ = serviceCollection.AddSingleton(s => RatScannerMain.Instance.TarkovTrackerDB);
 
-		ServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
+		var serviceProvider = serviceCollection.BuildServiceProvider();
 
 		Resources.Add("services", serviceProvider);
 
@@ -75,14 +74,14 @@ public partial class BlazorUI : UserControl, ISwitchable {
 		blazorWebView.WebView.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;
 	}
 
-	private void UpdateElements() { }
+	private static void UpdateElements() { }
 
 	private void HyperlinkRequestNavigate(object? sender, RequestNavigateEventArgs e) {
 		ProcessStartInfo psi = new() {
 			FileName = e.Uri.ToString(),
 			UseShellExecute = true,
 		};
-		Process.Start(psi);
+		_ = Process.Start(psi);
 		e.Handled = true;
 	}
 

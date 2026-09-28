@@ -9,7 +9,7 @@
 <div class="settings-split">
     <div class="settings-stack">
         <SettingsCard Title="@Localizer["TooltipGroup"]" Subtitle="@Localizer["TooltipGroupDesc"]">
-            <SettingsRow Label="@Localizer.Format("TooltipDuration", SettingsVM.ToolTipMilli)"
+            <SettingsRow Label="@LocalizationService.Format("TooltipDuration", SettingsVM.ToolTipMilli)"
                          SubLabel="@Localizer["TooltipDurationHint"]">
                 <div class="slider-control">
                     <MudSlider T="int" Value="@SettingsVM.ToolTipMilli"
@@ -48,7 +48,7 @@
         </SettingsCard>
 
         <SettingsCard Title="@Localizer["OpacityGroup"]" Subtitle="@Localizer["OpacityGroupDesc"]">
-            <SettingsRow Label="@Localizer.Format("OpacityLabel", SettingsVM.Opacity)">
+            <SettingsRow Label="@LocalizationService.Format("OpacityLabel", SettingsVM.Opacity)">
                 <div class="slider-control">
                     <MudSlider T="int" Value="@SettingsVM.Opacity"
                                ValueChanged="@((int v) => { SettingsVM.Opacity = v; SettingsVM.MarkDirty(); })" Min="0"

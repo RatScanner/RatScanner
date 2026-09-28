@@ -14,17 +14,17 @@ public class HideoutStationLevel {
 	public int ConstructionTime { get; set; }
 
 	[JsonProperty("traderRequirements")]
-	public List<object> TraderRequirements { get; set; } = new();
+	public List<object> TraderRequirements { get; set; } = [];
 
 	[JsonProperty("stationLevelRequirements")]
-	public List<object> StationLevelRequirements { get; set; } = new();
+	public List<object> StationLevelRequirements { get; set; } = [];
 
 	[JsonProperty("itemRequirements")]
-	public List<RequirementItem> ItemRequirements { get; set; } = new();
+	public List<RequirementItem> ItemRequirements { get; set; } = [];
 
 	[JsonProperty("skillRequirements")]
-	public List<object> SkillRequirements { get; set; } = new();
+	public List<object> SkillRequirements { get; set; } = [];
 
 	[JsonProperty("bonuses")]
-	public List<object> Bonuses { get; set; } = new();
+	public List<object> Bonuses { get; set; } = [];
 }

@@ -5,7 +5,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -16,25 +15,25 @@ namespace RatScanner;
 public static class TarkovDevAPI {
 	private class ItemsResponse {
 		[JsonProperty("items")]
-		public Dictionary<string, Item> Items { get; set; } = new();
+		public Dictionary<string, Item> Items { get; set; } = [];
 	}
 
 	private class TasksResponse {
 		[JsonProperty("tasks")]
-		public Dictionary<string, TarkovTask> Tasks { get; set; } = new();
+		public Dictionary<string, TarkovTask> Tasks { get; set; } = [];
 	}
 
 	private class MapsResponse {
 		[JsonProperty("maps")]
-		public Dictionary<string, Map> Maps { get; set; } = new();
+		public Dictionary<string, Map> Maps { get; set; } = [];
 	}
 
 	private class TradersResponse {
 		[JsonProperty("traders")]
-		public Dictionary<string, Trader> Traders { get; set; } = new();
+		public Dictionary<string, Trader> Traders { get; set; } = [];
 	}
 
-	const string ApiEndpoint = "https://json.tarkov.dev/";
+	private const string ApiEndpoint = "https://json.tarkov.dev/";
 
 	private static readonly ConcurrentDictionary<string, (long expire, object response)> Cache = new();
 	private static readonly ConcurrentDictionary<string, bool> PendingRequests = new();
@@ -68,10 +67,11 @@ public static class TarkovDevAPI {
 		using HttpRequestMessage request = new(HttpMethod.Get, url);
 		request.Headers.UserAgent.ParseAdd($"RatScanner-Client/{RatConfig.Version}");
 
-		HttpResponseMessage responseTask = await HttpClient.SendAsync(request);
+		var responseTask = await HttpClient.SendAsync(request);
 
-		if (responseTask.StatusCode != HttpStatusCode.OK) throw new Exception($"Tarkov.dev API request failed. {responseTask.ReasonPhrase}");
-		return await responseTask.Content.ReadAsStringAsync();
+		return responseTask.StatusCode != HttpStatusCode.OK
+			? throw new Exception($"Tarkov.dev API request failed. {responseTask.ReasonPhrase}")
+			: await responseTask.Content.ReadAsStringAsync();
 	}
 
 	/// <summary>
@@ -81,11 +81,11 @@ public static class TarkovDevAPI {
 	private static bool TryLoadFromOfflineCache<T>(string baseQueryKey, long ttl) where T : class {
 		if (Cache.ContainsKey(baseQueryKey)) return true;
 
-		if (RatConfig.ReadFromCache(baseQueryKey, out string cachedResponse)) {
+		if (RatConfig.ReadFromCache(baseQueryKey, out var cachedResponse)) {
 			try {
-				T[]? data = DeserializeArrayResponse<T>(cachedResponse);
+				var data = DeserializeArrayResponse<T>(cachedResponse);
 				if (data != null) {
-					long time = DateTimeOffset.Now.ToUnixTimeSeconds();
+					var time = DateTimeOffset.Now.ToUnixTimeSeconds();
 					// Use expired TTL so background refresh will be triggered
 					Cache[baseQueryKey] = (time - 1, data);
 					Logger.LogInfo($"Loaded {data.Length} items from offline cache for: \"{baseQueryKey}\"");
@@ -109,21 +109,21 @@ public static class TarkovDevAPI {
 		}
 
 		try {
-			Stopwatch sw = Stopwatch.StartNew();
+			var sw = Stopwatch.StartNew();
 			Logger.LogInfo($"Fetching endpoint for: \"{baseQueryKey}\"");
 
-			string gameMode = RatConfig.GameMode.ToApiString();
-			string baseUrl = BuildUrl(gameMode, endpoint);
-			string rawResponse = await Get(baseUrl);
-			Dictionary<string, T> data = DeserializeKeyedResponse<T>(endpoint, rawResponse);
+			var gameMode = RatConfig.GameMode.ToApiString();
+			var baseUrl = BuildUrl(gameMode, endpoint);
+			var rawResponse = await Get(baseUrl);
+			var data = DeserializeKeyedResponse<T>(endpoint, rawResponse);
 
 			// Apply translations by requesting the localized variant when available
-			if (TryFetchTranslations(endpoint, out Dictionary<string, string>? translations) && translations != null) {
+			if (TryFetchTranslations(endpoint, out var translations) && translations != null) {
 				ApplyTranslations(endpoint, data, translations);
 			}
 
-			T[] finalResults = transform(data);
-			long time = DateTimeOffset.Now.ToUnixTimeSeconds();
+			var finalResults = transform(data);
+			var time = DateTimeOffset.Now.ToUnixTimeSeconds();
 			Cache[baseQueryKey] = (time + ttl, finalResults);
 			var options = new System.Text.Json.JsonSerializerOptions {
 				IgnoreReadOnlyProperties = true
@@ -136,18 +136,18 @@ public static class TarkovDevAPI {
 
 			// If we have existing cached data, extend its TTL to prevent rapid retries
 			if (Cache.TryGetValue(baseQueryKey, out var existingCache)) {
-				long time = DateTimeOffset.Now.ToUnixTimeSeconds();
+				var time = DateTimeOffset.Now.ToUnixTimeSeconds();
 				Cache[baseQueryKey] = (time + RatConfig.SuperShortTTL, existingCache.response);
 				Logger.LogInfo($"Extended cache TTL for: \"{baseQueryKey}\" to prevent rapid retries");
 				return;
 			}
 
 			// Try to load from offline cache
-			if (RatConfig.ReadFromCache(baseQueryKey, out string cachedResponse)) {
+			if (RatConfig.ReadFromCache(baseQueryKey, out var cachedResponse)) {
 				Logger.LogInfo($"Read from offline cache for: \"{baseQueryKey}\"");
-				T[]? cachedData = DeserializeArrayResponse<T>(cachedResponse);
+				var cachedData = DeserializeArrayResponse<T>(cachedResponse);
 				if (cachedData != null) {
-					long time = DateTimeOffset.Now.ToUnixTimeSeconds();
+					var time = DateTimeOffset.Now.ToUnixTimeSeconds();
 					Cache[baseQueryKey] = (time + RatConfig.SuperShortTTL, cachedData);
 					return;
 				}
@@ -156,59 +156,58 @@ public static class TarkovDevAPI {
 			if (!Cache.ContainsKey(baseQueryKey)) throw new Exception("Failed to fetch query response and no cache available.");
 		} finally {
 			// Always remove from pending requests when done
-			PendingRequests.TryRemove(baseQueryKey, out _);
+			_ = PendingRequests.TryRemove(baseQueryKey, out _);
 		}
 	}
 
 	private static T[]? DeserializeArrayResponse<T>(string rawResponse) where T : class {
-		JObject json = JObject.Parse(rawResponse);
-		JObject? data = json["data"] as JObject;
-		if (data == null) return null;
+		var json = JObject.Parse(rawResponse);
+		if (json["data"] is not JObject data) return null;
 
-		JsonSerializer serializer = JsonSerializer.Create(JsonSettings);
-		List<T> results = new();
+		var serializer = JsonSerializer.Create(JsonSettings);
+		List<T> results = [];
 
-		foreach (JProperty property in data.Properties()) {
+		foreach (var property in data.Properties()) {
 			if (property.Value is not JObject itemObject) continue;
-			T? item = itemObject.ToObject<T>(serializer);
+			var item = itemObject.ToObject<T>(serializer);
 			if (item != null) results.Add(item);
 		}
 
-		return results.ToArray();
+		return [.. results];
 	}
 
 	private static Dictionary<string, T> DeserializeKeyedResponse<T>(string endpoint, string rawResponse) where T : class {
-		JObject json = JObject.Parse(rawResponse);
-		JObject? data = json["data"] as JObject;
-		if (data == null) throw new Exception($"Failed to deserialize {endpoint} response");
+		var json = JObject.Parse(rawResponse);
+		if (json["data"] is not JObject data) throw new Exception($"Failed to deserialize {endpoint} response");
 
-		JsonSerializer serializer = JsonSerializer.Create(JsonSettings);
+		var serializer = JsonSerializer.Create(JsonSettings);
 
 		switch (endpoint) {
 			case EndpointItems: {
-				ItemsResponse? response = data.ToObject<ItemsResponse>(serializer);
-				if (response == null) throw new Exception("Failed to deserialize items response");
-				return response.Items.ToDictionary(p => p.Key, p => p.Value as T)!;
-			}
+					var response = data.ToObject<ItemsResponse>(serializer);
+					return response == null
+						? throw new Exception("Failed to deserialize items response")
+						: response.Items.ToDictionary(p => p.Key, p => p.Value as T)!;
+				}
 			case EndpointTasks: {
-				TasksResponse? response = data.ToObject<TasksResponse>(serializer);
-				if (response == null) throw new Exception("Failed to deserialize tasks response");
-				return response.Tasks.ToDictionary(p => p.Key, p => p.Value as T)!;
-			}
+					var response = data.ToObject<TasksResponse>(serializer);
+					return response == null
+						? throw new Exception("Failed to deserialize tasks response")
+						: response.Tasks.ToDictionary(p => p.Key, p => p.Value as T)!;
+				}
 			case EndpointMaps: {
-				MapsResponse? response = data.ToObject<MapsResponse>(serializer);
-				if (response == null) throw new Exception("Failed to deserialize maps response");
-				return response.Maps.ToDictionary(p => p.Key, p => p.Value as T)!;
-			}
+					var response = data.ToObject<MapsResponse>(serializer);
+					return response == null
+						? throw new Exception("Failed to deserialize maps response")
+						: response.Maps.ToDictionary(p => p.Key, p => p.Value as T)!;
+				}
 			case EndpointHideout: {
-				Dictionary<string, T>? response = data.ToObject<Dictionary<string, T>>(serializer);
-				if (response == null) throw new Exception("Failed to deserialize hideout response");
-				return response;
-			}
+					var response = data.ToObject<Dictionary<string, T>>(serializer);
+					return response ?? throw new Exception("Failed to deserialize hideout response");
+				}
 			case EndpointTraders: {
-					Dictionary<string, T>? response = data.ToObject<Dictionary<string, T>>(serializer);
-					if (response == null) throw new Exception("Failed to deserialize traders response");
-					return response;
+					var response = data.ToObject<Dictionary<string, T>>(serializer);
+					return response ?? throw new Exception("Failed to deserialize traders response");
 				}
 
 			default:
@@ -218,17 +217,16 @@ public static class TarkovDevAPI {
 
 	private static bool TryFetchTranslations(string endpoint, out Dictionary<string, string>? translations) {
 		translations = null;
-		string lang = LanguageCode;
+		var lang = LanguageCode;
 
 		try {
-			string gameMode = RatConfig.GameMode.ToApiString();
-			string localizedUrl = BuildUrl(gameMode, $"{endpoint}_{lang}");
-			string rawResponse = Get(localizedUrl).GetAwaiter().GetResult();
-			JObject json = JObject.Parse(rawResponse, TranslationLoadSettings);
-			JObject? data = json["data"] as JObject;
-			if (data == null) return false;
+			var gameMode = RatConfig.GameMode.ToApiString();
+			var localizedUrl = BuildUrl(gameMode, $"{endpoint}_{lang}");
+			var rawResponse = Get(localizedUrl).GetAwaiter().GetResult();
+			var json = JObject.Parse(rawResponse, TranslationLoadSettings);
+			if (json["data"] is not JObject data) return false;
 
-			JsonSerializer serializer = JsonSerializer.Create(JsonSettings);
+			var serializer = JsonSerializer.Create(JsonSettings);
 			translations = data.ToObject<Dictionary<string, string>>(serializer);
 			return translations != null;
 		} catch (Exception e) {
@@ -241,48 +239,49 @@ public static class TarkovDevAPI {
 		foreach (var pair in data) {
 			switch (pair.Value) {
 				case Item item:
-					if (translations.TryGetValue($"{item.Id} Name", out string? name)) item.Name = name;
-					if (translations.TryGetValue($"{item.Id} ShortName", out string? shortName)) item.ShortName = shortName;
-					if (translations.TryGetValue($"{item.Id} Description", out string? description)) item.Description = description;
+					if (translations.TryGetValue($"{item.Id} Name", out var name)) item.Name = name;
+					if (translations.TryGetValue($"{item.Id} ShortName", out var shortName)) item.ShortName = shortName;
+					if (translations.TryGetValue($"{item.Id} Description", out var description)) item.Description = description;
 					break;
 				case TarkovTask task:
-					if (translations.TryGetValue($"{task.Id} name", out string? taskName)) task.Name = taskName;
-					foreach (TaskObjective objective in task.Objectives) {
-						if (translations.TryGetValue(objective.Id, out string? objectiveDescription)) objective.Description = objectiveDescription;
+					if (translations.TryGetValue($"{task.Id} name", out var taskName)) task.Name = taskName;
+					foreach (var objective in task.Objectives) {
+						if (translations.TryGetValue(objective.Id, out var objectiveDescription)) objective.Description = objectiveDescription;
 					}
 					break;
 				case Map map:
-					if (translations.TryGetValue($"{map.Id} Name", out string? mapName)) map.Name = mapName;
-					if (translations.TryGetValue($"{map.Id} Description", out string? mapDescription)) map.Description = mapDescription;
+					if (translations.TryGetValue($"{map.Id} Name", out var mapName)) map.Name = mapName;
+					if (translations.TryGetValue($"{map.Id} Description", out var mapDescription)) map.Description = mapDescription;
 					break;
 				case HideoutStation station:
-					if (translations.TryGetValue(station.Name, out string? stationName)) station.Name = stationName;
+					if (translations.TryGetValue(station.Name, out var stationName)) station.Name = stationName;
 					break;
 				case Trader trader:
-					if (translations.TryGetValue($"{trader.Id} Nickname", out string? traderName)) trader.Name = traderName;
-					if (translations.TryGetValue($"{trader.Id} Description", out string? traderDescription)) trader.Description = traderDescription;
+					if (translations.TryGetValue($"{trader.Id} Nickname", out var traderName)) trader.Name = traderName;
+					if (translations.TryGetValue($"{trader.Id} Description", out var traderDescription)) trader.Description = traderDescription;
+					break;
+				default:
 					break;
 			}
 		}
 	}
 
 	private static T[] GetCached<T>(string baseQueryKey, string endpoint, Func<Dictionary<string, T>, T[]> transform, long ttl, bool isRetry = false) where T : class {
-		if (!Cache.TryGetValue(baseQueryKey, out (long expire, object response) value)) {
+		if (!Cache.TryGetValue(baseQueryKey, out var value)) {
 			if (isRetry) throw new Exception("Retrying to fetch query response failed.");
 
 			Logger.LogInfo($"Query not found in cache: \"{baseQueryKey}\"");
-			Task.Run(() => QueueEndpointRequest<T>(baseQueryKey, endpoint, transform, ttl)).Wait();
-			return GetCached<T>(baseQueryKey, endpoint, transform, ttl, true);
+			Task.Run(() => QueueEndpointRequest(baseQueryKey, endpoint, transform, ttl)).Wait();
+			return GetCached(baseQueryKey, endpoint, transform, ttl, true);
 		}
 
 		// Queue request if cache is expired and no request is already pending
-		long time = DateTimeOffset.Now.ToUnixTimeSeconds();
+		var time = DateTimeOffset.Now.ToUnixTimeSeconds();
 		if (time > value.expire && !PendingRequests.ContainsKey(baseQueryKey)) {
-			Task.Run(() => QueueEndpointRequest<T>(baseQueryKey, endpoint, transform, ttl));
+			_ = Task.Run(() => QueueEndpointRequest(baseQueryKey, endpoint, transform, ttl));
 		}
 
-		if (value.response == null) return Array.Empty<T>();
-		return ((T[])value.response).Where(i => i != null).ToArray();
+		return value.response == null ? [] : [.. ((T[])value.response).Where(i => i != null)];
 	}
 
 	/// <summary>
@@ -292,13 +291,13 @@ public static class TarkovDevAPI {
 	public static bool TryInitializeCacheFromOffline() {
 		Logger.LogInfo("Attempting to load API cache from offline storage...");
 
-		bool itemsLoaded = TryLoadFromOfflineCache<Item>(ItemsQueryKey(), RatConfig.MediumTTL);
-		bool tasksLoaded = TryLoadFromOfflineCache<TarkovTask>(TasksQueryKey(), RatConfig.LongTTL);
-		bool hideoutLoaded = TryLoadFromOfflineCache<HideoutStation>(HideoutStationsQueryKey(), RatConfig.LongTTL);
-		bool mapsLoaded = TryLoadFromOfflineCache<Map>(MapsQueryKey(), RatConfig.LongTTL);
-		bool tradersLoaded = TryLoadFromOfflineCache<Trader>(TradersQueryKey(), RatConfig.LongTTL);
+		var itemsLoaded = TryLoadFromOfflineCache<Item>(ItemsQueryKey(), RatConfig.MediumTTL);
+		var tasksLoaded = TryLoadFromOfflineCache<TarkovTask>(TasksQueryKey(), RatConfig.LongTTL);
+		var hideoutLoaded = TryLoadFromOfflineCache<HideoutStation>(HideoutStationsQueryKey(), RatConfig.LongTTL);
+		var mapsLoaded = TryLoadFromOfflineCache<Map>(MapsQueryKey(), RatConfig.LongTTL);
+		var tradersLoaded = TryLoadFromOfflineCache<Trader>(TradersQueryKey(), RatConfig.LongTTL);
 
-		bool allLoaded = itemsLoaded && tasksLoaded && hideoutLoaded && mapsLoaded && tradersLoaded;
+		var allLoaded = itemsLoaded && tasksLoaded && hideoutLoaded && mapsLoaded && tradersLoaded;
 
 		if (allLoaded) {
 			Logger.LogInfo("All API caches loaded from offline storage");
@@ -314,29 +313,29 @@ public static class TarkovDevAPI {
 	/// </summary>
 	public static async Task InitializeCache() {
 		await Task.WhenAll(
-			Task.Run(() => QueueEndpointRequest<Item>(ItemsQueryKey(), EndpointItems, d => d.Values.ToArray(), RatConfig.MediumTTL)),
-			Task.Run(() => QueueEndpointRequest<TarkovTask>(TasksQueryKey(), EndpointTasks, d => d.Values.ToArray(), RatConfig.LongTTL)),
-			Task.Run(() => QueueEndpointRequest<HideoutStation>(HideoutStationsQueryKey(), EndpointHideout, d => d.Values.ToArray(), RatConfig.LongTTL)),
-			Task.Run(() => QueueEndpointRequest<Map>(MapsQueryKey(), EndpointMaps, d => d.Values.ToArray(), RatConfig.LongTTL)),
-			Task.Run(() => QueueEndpointRequest<Trader>(TradersQueryKey(), EndpointTraders, d => d.Values.ToArray(), RatConfig.LongTTL))
+			Task.Run(() => QueueEndpointRequest<Item>(ItemsQueryKey(), EndpointItems, d => [.. d.Values], RatConfig.MediumTTL)),
+			Task.Run(() => QueueEndpointRequest<TarkovTask>(TasksQueryKey(), EndpointTasks, d => [.. d.Values], RatConfig.LongTTL)),
+			Task.Run(() => QueueEndpointRequest<HideoutStation>(HideoutStationsQueryKey(), EndpointHideout, d => [.. d.Values], RatConfig.LongTTL)),
+			Task.Run(() => QueueEndpointRequest<Map>(MapsQueryKey(), EndpointMaps, d => [.. d.Values], RatConfig.LongTTL)),
+			Task.Run(() => QueueEndpointRequest<Trader>(TradersQueryKey(), EndpointTraders, d => [.. d.Values], RatConfig.LongTTL))
 		).ConfigureAwait(false);
 		System.Runtime.GCSettings.LargeObjectHeapCompactionMode = System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce;
 	}
 
-	public static Item[] GetItems(string language, GameMode gameMode) => GetCached<Item>(ItemsQueryKey(language, gameMode), EndpointItems, d => d.Values.ToArray(), RatConfig.MediumTTL);
-	public static Item[] GetItems() => GetCached<Item>(ItemsQueryKey(), EndpointItems, d => d.Values.ToArray(), RatConfig.MediumTTL);
+	public static Item[] GetItems(string language, GameMode gameMode) => GetCached<Item>(ItemsQueryKey(language, gameMode), EndpointItems, d => [.. d.Values], RatConfig.MediumTTL);
+	public static Item[] GetItems() => GetCached<Item>(ItemsQueryKey(), EndpointItems, d => [.. d.Values], RatConfig.MediumTTL);
 
-	public static TarkovTask[] GetTasks(string language, GameMode gameMode) => GetCached<TarkovTask>(TasksQueryKey(language, gameMode), EndpointTasks, d => d.Values.ToArray(), RatConfig.LongTTL);
-	public static TarkovTask[] GetTasks() => GetCached<TarkovTask>(TasksQueryKey(), EndpointTasks, d => d.Values.ToArray(), RatConfig.LongTTL);
+	public static TarkovTask[] GetTasks(string language, GameMode gameMode) => GetCached<TarkovTask>(TasksQueryKey(language, gameMode), EndpointTasks, d => [.. d.Values], RatConfig.LongTTL);
+	public static TarkovTask[] GetTasks() => GetCached<TarkovTask>(TasksQueryKey(), EndpointTasks, d => [.. d.Values], RatConfig.LongTTL);
 
-	public static HideoutStation[] GetHideoutStations(string language, GameMode gameMode) => GetCached<HideoutStation>(HideoutStationsQueryKey(language, gameMode), EndpointHideout, d => d.Values.ToArray(), RatConfig.LongTTL);
-	public static HideoutStation[] GetHideoutStations() => GetCached<HideoutStation>(HideoutStationsQueryKey(), EndpointHideout, d => d.Values.ToArray(), RatConfig.LongTTL);
+	public static HideoutStation[] GetHideoutStations(string language, GameMode gameMode) => GetCached<HideoutStation>(HideoutStationsQueryKey(language, gameMode), EndpointHideout, d => [.. d.Values], RatConfig.LongTTL);
+	public static HideoutStation[] GetHideoutStations() => GetCached<HideoutStation>(HideoutStationsQueryKey(), EndpointHideout, d => [.. d.Values], RatConfig.LongTTL);
 
-	public static Map[] GetMaps(string language, GameMode gameMode) => GetCached<Map>(MapsQueryKey(language, gameMode), EndpointMaps, d => d.Values.ToArray(), RatConfig.LongTTL);
-	public static Map[] GetMaps() => GetCached<Map>(MapsQueryKey(), EndpointMaps, d => d.Values.ToArray(), RatConfig.LongTTL);
+	public static Map[] GetMaps(string language, GameMode gameMode) => GetCached<Map>(MapsQueryKey(language, gameMode), EndpointMaps, d => [.. d.Values], RatConfig.LongTTL);
+	public static Map[] GetMaps() => GetCached<Map>(MapsQueryKey(), EndpointMaps, d => [.. d.Values], RatConfig.LongTTL);
 
-	public static Trader[] GetTraders(string language, GameMode gameMode) => GetCached<Trader>(TradersQueryKey(language, gameMode), EndpointTraders, d => d.Values.ToArray(), RatConfig.LongTTL);
-	public static Trader[] GetTraders() => GetCached<Trader>(TradersQueryKey(), EndpointTraders, d => d.Values.ToArray(), RatConfig.LongTTL);
+	public static Trader[] GetTraders(string language, GameMode gameMode) => GetCached<Trader>(TradersQueryKey(language, gameMode), EndpointTraders, d => [.. d.Values], RatConfig.LongTTL);
+	public static Trader[] GetTraders() => GetCached<Trader>(TradersQueryKey(), EndpointTraders, d => [.. d.Values], RatConfig.LongTTL);
 
 	#region Query Keys
 

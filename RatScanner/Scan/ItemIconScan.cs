@@ -11,11 +11,11 @@ public class ItemIconScan : ItemScan {
 	public ItemExtraInfo ItemExtraInfo;
 	public Icon Icon;
 
-	private Vector2 _toolTipPosition;
+	private readonly Vector2 _toolTipPosition;
 
 	public ItemIconScan(Icon icon, Vector2 toolTipPosition, int duration) {
 		Icon = icon;
-		RatStash.Item iconItem = icon.Item;
+		var iconItem = icon.Item;
 		Item = TarkovDevAPI.GetItems().FirstOrDefault(item => item.Id == iconItem.Id) ?? throw new Exception($"Unknown item: {icon.Item.Id}");
 		ItemExtraInfo = icon.ItemExtraInfo;
 		Confidence = icon.DetectionConfidence;

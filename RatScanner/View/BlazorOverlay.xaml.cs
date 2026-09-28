@@ -28,28 +28,28 @@ public partial class BlazorOverlay : Window {
 	}
 
 	private void SetSize() {
-		System.Collections.Generic.IEnumerable<System.Drawing.Rectangle> bounds = Screen.AllScreens.Select(screen => screen.Bounds);
-		int left = 0;
-		int top = 0;
-		int right = 0;
-		int bottom = 0;
-		foreach (System.Drawing.Rectangle bound in bounds) {
+		var bounds = Screen.AllScreens.Select(screen => screen.Bounds);
+		var left = 0;
+		var top = 0;
+		var right = 0;
+		var bottom = 0;
+		foreach (var bound in bounds) {
 			if (bound.Left < left) left = bound.Left;
 			if (bound.Top < top) top = bound.Top;
 			if (bound.Right > right) right = bound.Right;
 			if (bound.Bottom > bottom) bottom = bound.Bottom;
 		}
 
-		nint handle = new WindowInteropHelper(this).Handle;
-		NativeMethods.SetWindowPos(handle, 0, left, top, right - left, bottom - top, 0);
+		var handle = new WindowInteropHelper(this).Handle;
+		_ = NativeMethods.SetWindowPos(handle, 0, left, top, right - left, bottom - top, 0);
 	}
 
 	private void SetWindowStyle() {
 		const int gwlExStyle = -20; // GWL_EXSTYLE
 		const uint wsExToolWindow = 0x00000080; // WS_EX_TOOLWINDOW
 
-		nint handle = new WindowInteropHelper(this).Handle;
-		NativeMethods.SetWindowLongPtr(handle, gwlExStyle, NativeMethods.GetWindowLongPtr(handle, gwlExStyle) | (nint)wsExToolWindow);
+		var handle = new WindowInteropHelper(this).Handle;
+		_ = NativeMethods.SetWindowLongPtr(handle, gwlExStyle, NativeMethods.GetWindowLongPtr(handle, gwlExStyle) | (nint)wsExToolWindow);
 	}
 
 	private void WebView_Loaded(object? sender, CoreWebView2NavigationCompletedEventArgs e) {
@@ -63,14 +63,15 @@ public partial class BlazorOverlay : Window {
 		blazorOverlayWebView.WebView.CoreWebView2.Settings.AreBrowserAcceleratorKeysEnabled = false;
 	}
 
-	private static class NativeMethods {
-		[DllImport("user32.dll", EntryPoint = "GetWindowLongPtr")]
-		public static extern nint GetWindowLongPtr(nint hWnd, int nIndex);
+	private static partial class NativeMethods {
+		[LibraryImport("user32.dll", EntryPoint = "GetWindowLongPtrW")]
+		public static partial nint GetWindowLongPtr(nint hWnd, int nIndex);
 
-		[DllImport("user32.dll", EntryPoint = "SetWindowLongPtr")]
-		public static extern nint SetWindowLongPtr(nint hWnd, int nIndex, nint dwNewLong);
+		[LibraryImport("user32.dll", EntryPoint = "SetWindowLongPtrW")]
+		public static partial nint SetWindowLongPtr(nint hWnd, int nIndex, nint dwNewLong);
 
-		[DllImport("user32.dll", SetLastError = true)]
-		public static extern bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+		[LibraryImport("user32.dll", EntryPoint = "SetWindowPos", SetLastError = true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static partial bool SetWindowPos(nint hWnd, nint hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 	}
 }

@@ -1,5 +1,4 @@
 using RatScanner.TarkovDev.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,17 +6,17 @@ using System.Threading.Tasks;
 namespace RatScanner.Pages.InteractableOverlay.Services;
 
 public class SearchService {
-	public async Task<IEnumerable<SearchResult>> SearchMapsAsync(string value) {
-		if (string.IsNullOrEmpty(value)) return Enumerable.Empty<SearchResult>();
+	public static async Task<IEnumerable<SearchResult>> SearchMapsAsync(string value) {
+		if (string.IsNullOrEmpty(value)) return [];
 
-		Func<Map, SearchResult?> filter = (map) => {
+		SearchResult? filter(Map map) {
 			if (SanitizeSearch(map.Name) == value) return new(map, 3);
 			if (SanitizeSearch(map.Name).StartsWith(value)) return new(map, 15);
 			if (SanitizeSearch(map.Name).Contains(value)) return new(map, 45);
 			return null;
-		};
+		}
 
-		List<SearchResult> matches = new();
+		List<SearchResult> matches = [];
 		await Task.Run(() => {
 			foreach (var map in TarkovDevAPI.GetMaps()) {
 				var match = filter(map);
@@ -28,21 +27,21 @@ public class SearchService {
 		return matches;
 	}
 
-	public async Task<IEnumerable<SearchResult>> SearchTasksAsync(string value) {
-		if (string.IsNullOrEmpty(value)) return Enumerable.Empty<SearchResult>();
+	public static async Task<IEnumerable<SearchResult>> SearchTasksAsync(string value) {
+		if (string.IsNullOrEmpty(value)) return [];
 
-		Func<TarkovTask, SearchResult?> filter = (task) => {
+		SearchResult? filter(TarkovTask task) {
 			if (SanitizeSearch(task.Name) == value) return new(task, 4);
 			if (SanitizeSearch(task.Name).StartsWith(value)) return new(task, 10);
-			string[] filters = value.Split(new[] { ' ' });
+			var filters = value.Split([' ']);
 			if (filters.All(filter => SanitizeSearch(task.Name).Contains(filter))) return new(task, 30);
 			if (SanitizeSearch(task.Name).Contains(value)) return new(task, 50);
 			if (value.Length > 3 && SanitizeSearch(task.Id).StartsWith(value)) return new(task, 80);
 			if (value.Length > 3 && SanitizeSearch(task.Id).Contains(value)) return new(task, 100);
 			return null;
-		};
+		}
 
-		List<SearchResult> matches = new();
+		List<SearchResult> matches = [];
 		await Task.Run(() => {
 			foreach (var task in TarkovDevAPI.GetTasks()) {
 				var match = filter(task);
@@ -53,15 +52,15 @@ public class SearchService {
 		return matches;
 	}
 
-	public async Task<IEnumerable<SearchResult>> SearchItemsAsync(string value) {
-		if (string.IsNullOrEmpty(value)) return Enumerable.Empty<SearchResult>();
+	public static async Task<IEnumerable<SearchResult>> SearchItemsAsync(string value) {
+		if (string.IsNullOrEmpty(value)) return [];
 
-		Func<Item, SearchResult?> filter = (item) => {
+		SearchResult? filter(Item item) {
 			if (SanitizeSearch(item.Name) == value) return new(item, 5);
 			if (SanitizeSearch(item.ShortName) == value) return new(item, 10);
 			if (SanitizeSearch(item.Name).StartsWith(value)) return new(item, 20);
 			if (SanitizeSearch(item.ShortName).StartsWith(value)) return new(item, 20);
-			string[] filters = value.Split(new[] { ' ' });
+			var filters = value.Split([' ']);
 			if (filters.All(filter => SanitizeSearch(item.Name).Contains(filter))) return new(item, 40);
 			if (filters.All(filter => SanitizeSearch(item.ShortName).Contains(filter))) return new(item, 40);
 			if (SanitizeSearch(item.Name).Contains(value)) return new(item, 60);
@@ -69,9 +68,9 @@ public class SearchService {
 			if (value.Length > 3 && SanitizeSearch(item.Id).StartsWith(value)) return new(item, 80);
 			if (value.Length > 3 && SanitizeSearch(item.Id).Contains(value)) return new(item, 100);
 			return null;
-		};
+		}
 
-		List<SearchResult> matches = new();
+		List<SearchResult> matches = [];
 		await Task.Run(() => {
 			foreach (var item in TarkovDevAPI.GetItems()) {
 				var match = filter(item);
@@ -80,8 +79,8 @@ public class SearchService {
 			}
 		});
 
-		for (int i = 0; i < matches.Count; i++) {
-			if (!(matches[i].Data is Item item)) continue;
+		for (var i = 0; i < matches.Count; i++) {
+			if (matches[i].Data is not Item item) continue;
 			matches[i].Score += (item.Name?.Length ?? 0) * 0.002;
 			if (item.Types != null && item.Types.Contains("mods"))
 				matches[i].Score += 5;
@@ -89,20 +88,16 @@ public class SearchService {
 		return matches;
 	}
 
-	public string SanitizeSearch(string? value) {
+	public static string SanitizeSearch(string? value) {
 		if (string.IsNullOrEmpty(value)) return string.Empty;
 		value = value.ToLower().Trim();
 		value = value.Replace("-", " ");
-		value = new string(value.Where(c => char.IsLetterOrDigit(c) || c == ' ').ToArray());
+		value = new string([.. value.Where(c => char.IsLetterOrDigit(c) || c == ' ')]);
 		return value;
 	}
 }
 
-public class SearchResult {
-	public SearchResult(object data, float score) {
-		Score = score;
-		Data = data;
-	}
-	public object Data;
-	public double Score;
+public class SearchResult(object data, float score) {
+	public object Data = data;
+	public double Score = score;
 }

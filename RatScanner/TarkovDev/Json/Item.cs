@@ -2,7 +2,6 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 
 namespace RatScanner.TarkovDev.Json;
 
@@ -39,7 +38,7 @@ public partial class Item {
 	public int? LastOfferCount { get; set; }
 
 	[JsonProperty("types")]
-	public List<string> Types { get; set; } = new();
+	public List<string> Types { get; set; } = [];
 
 	[JsonProperty("wikiLink")]
 	public string? WikiLink { get; set; }
@@ -66,7 +65,7 @@ public partial class Item {
 	public string? Image8XLink { get; set; }
 
 	[JsonProperty("containsItems")]
-	public List<ContainedItem> ContainsItems { get; set; } = new();
+	public List<ContainedItem> ContainsItems { get; set; } = [];
 
 	[JsonProperty("discardLimit")]
 	public int? DiscardLimit { get; set; }
@@ -75,10 +74,10 @@ public partial class Item {
 	public int? BasePrice { get; set; }
 
 	[JsonProperty("categories")]
-	public List<string> Categories { get; set; } = new();
+	public List<string> Categories { get; set; } = [];
 
 	[JsonProperty("handbookCategories")]
-	public List<string> HandbookCategories { get; set; } = new();
+	public List<string> HandbookCategories { get; set; } = [];
 
 	[JsonProperty("lastLowPrice")]
 	public int? LastLowPrice { get; set; }
@@ -126,17 +125,17 @@ public partial class Item {
 	public string? BackgroundColor { get; set; }
 
 	[JsonProperty("conflictingItems")]
-	public List<string> ConflictingItems { get; set; } = new();
+	public List<string> ConflictingItems { get; set; } = [];
 
 	[JsonProperty("conflictingSlotIds")]
-	public List<string> ConflictingSlotIds { get; set; } = new();
+	public List<string> ConflictingSlotIds { get; set; } = [];
 
 	[JsonProperty("conflictingCategories")]
-	public List<string> ConflictingCategories { get; set; } = new();
+	public List<string> ConflictingCategories { get; set; } = [];
 
 	[JsonProperty("buyFromTrader")]
-	public List<TraderPrice> BuyFromTrader { get; set; } = new();
+	public List<TraderPrice> BuyFromTrader { get; set; } = [];
 
 	[JsonProperty("sellToTrader")]
-	public List<TraderPrice> SellToTrader { get; set; } = new();
+	public List<TraderPrice> SellToTrader { get; set; } = [];
 }

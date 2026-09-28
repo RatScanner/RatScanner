@@ -1,10 +1,9 @@
 ﻿using Newtonsoft.Json.Linq;
+using RatScanner.TarkovDev.Json;
 using RatStash;
 using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -14,13 +13,18 @@ using Key = System.Windows.Input.Key;
 
 namespace RatScanner;
 
-internal static class RatConfig
-{
-	[DllImport("user32.dll")]
-	private static extern IntPtr MonitorFromPoint([In] Point pt, [In] uint dwFlags);
+internal static partial class RatConfig {
+	[StructLayout(LayoutKind.Sequential)]
+	private struct NativePoint {
+		public int X;
+		public int Y;
+	}
 
-	[DllImport("Shcore.dll")]
-	private static extern IntPtr GetDpiForMonitor([In] IntPtr hmonitor, [In] DpiType dpiType, [Out] out uint dpiX, [Out] out uint dpiY);
+	[LibraryImport("user32.dll", EntryPoint = "MonitorFromPoint")]
+	private static partial IntPtr MonitorFromPoint(NativePoint pt, uint dwFlags);
+
+	[LibraryImport("Shcore.dll", EntryPoint = "GetDpiForMonitor")]
+	private static partial IntPtr GetDpiForMonitor(IntPtr hmonitor, DpiType dpiType, out uint dpiX, out uint dpiY);
 
 	// Version
 	public static string Version => Process.GetCurrentProcess().MainModule?.FileVersionInfo.ProductVersion ?? "Unknown";
@@ -28,8 +32,7 @@ internal static class RatConfig
 	public const string SINGLE_INSTANCE_GUID = "{a057bb64-c126-4ef4-a4ed-3037c2e7bc89}";
 
 	// Paths
-	internal static class Paths
-	{
+	internal static class Paths {
 		internal static string Base = AppDomain.CurrentDomain.BaseDirectory;
 		internal static string Data = Path.Combine(Base, "Data");
 		internal static string StaticIcon = Path.Combine(Data, "icons");
@@ -54,45 +57,40 @@ internal static class RatConfig
 	}
 
 	// Name Scan options
-	internal static class NameScan
-	{
+	internal static class NameScan {
 		internal static bool Enable = true;
 		internal static bool EnableAuto = false;
 		internal static Language Language = Language.English;
 		internal static float ConfWarnThreshold = 0.85f;
-		internal static Hotkey Hotkey = new(null, new[] { MouseButton.Left });
+		internal static Hotkey Hotkey = new(null, [MouseButton.Left]);
 		internal static int MarkerScanSize => (int)(50 * GameScale);
 		internal static int TextWidth => (int)(600 * GameScale);
 	}
 
 	// Icon Scan options
-	internal static class IconScan
-	{
+	internal static class IconScan {
 		internal static bool Enable = true;
 		internal static float ConfWarnThreshold = 0.8f;
 		internal static bool ScanRotatedIcons = true;
 		internal static int ScanWidth => (int)(GameScale * 896);
 		internal static int ScanHeight => (int)(GameScale * 896);
-		internal static Hotkey Hotkey = new(new[] { Key.LeftShift }.ToList(), new[] { MouseButton.Left });
+		internal static Hotkey Hotkey = new([Key.LeftShift], [MouseButton.Left]);
 		internal static bool UseCachedIcons = true;
 	}
 
 	// ToolTip options
-	internal static class ToolTip
-	{
+	internal static class ToolTip {
 		internal static string DigitGroupingSymbol = ".";
 		internal static int Duration = 1500;
 	}
 
 	// UI options
-	internal static class UserInterface
-	{
+	internal static class UserInterface {
 		internal static UiLanguage Language = UiLanguage.English;
 	}
 
 	// Minimal UI
-	internal static class MinimalUi
-	{
+	internal static class MinimalUi {
 		internal static bool ShowName = true;
 		internal static bool ShowAvgDayPrice = true;
 		internal static bool ShowPricePerSlot = true;
@@ -112,23 +110,19 @@ internal static class RatConfig
 		/// <summary>
 		/// Maps the 0-100 <see cref="Opacity"/> setting onto a 0-255 backdrop alpha.
 		/// </summary>
-		internal static byte OpacityToAlpha(int opacity)
-		{
-			int clamped = Math.Clamp(opacity, 0, 100);
-			if (clamped == 0) return MinimumAlpha;
-			return (byte)(clamped * 255 / 100);
+		internal static byte OpacityToAlpha(int opacity) {
+			var clamped = Math.Clamp(opacity, 0, 100);
+			return clamped == 0 ? MinimumAlpha : (byte)(clamped * 255 / 100);
 		}
 	}
 
 	// Progress Tracking options
-	internal static class Tracking
-	{
+	internal static class Tracking {
 		internal static bool ShowNonFIRNeeds = true;
 
 		internal static bool ShowKappaNeeds = false;
 
-		internal static class TarkovTracker
-		{
+		internal static class TarkovTracker {
 			internal static TarkovTrackerBackend Backend = TarkovTrackerBackend.TarkovTrackerIO;
 			internal static string Endpoint => Backend == TarkovTrackerBackend.TarkovTrackerIO
 				? "https://tarkovtracker.io/api/v2"
@@ -141,42 +135,36 @@ internal static class RatConfig
 		}
 	}
 
-	public enum TarkovTrackerBackend
-	{
+	public enum TarkovTrackerBackend {
 		TarkovTrackerIO,
 		TarkovTrackerORG,
 	}
 
 	// Overlay options
-	internal static class Overlay
-	{
-		internal static class Search
-		{
+	internal static class Overlay {
+		internal static class Search {
 			internal static bool Enable = true;
 			internal static bool BlurBehind = true;
-			internal static Hotkey Hotkey = new(new[] { Key.N, Key.M }.ToList());
-			internal static Hotkey CloseHotkey = new(new[] { Key.Escape }.ToList());
+			internal static Hotkey Hotkey = new([Key.N, Key.M]);
+			internal static Hotkey CloseHotkey = new([Key.Escape]);
 		}
 	}
 
 	// Application hotkeys
-	internal static class Hotkeys
-	{
-		internal static Hotkey OpenWiki = new(new[] { Key.F1 }.ToList());
-		internal static Hotkey OpenTarkovDev = new(new[] { Key.F2 }.ToList());
+	internal static class Hotkeys {
+		internal static Hotkey OpenWiki = new([Key.F1]);
+		internal static Hotkey OpenTarkovDev = new([Key.F2]);
 	}
 
 	// OAuth2 refresh tokens
-	internal static class OAuthRefreshToken
-	{
+	internal static class OAuthRefreshToken {
 		internal static string Discord = "";
 		internal static string Patreon = "";
 	}
 
 	// Other
 #if DEBUG
-	internal static bool LogDebug
-	{
+	internal static bool LogDebug {
 		get => true;
 		set { }
 	}
@@ -209,22 +197,19 @@ internal static class RatConfig
 
 	internal static float GameScale => RatScannerMain.Instance.RatEyeEngine.Config.ProcessingConfig.Scale;
 
-	private static bool IsSupportedConfigVersion()
-	{
+	private static bool IsSupportedConfigVersion() {
 		SimpleConfig config = new(Paths.ConfigFile, "Other");
-		int readConfigVersion = config.ReadInt(nameof(ConfigVersion), -1);
-		bool isSupportedConfigVersion = ConfigVersion == readConfigVersion;
+		var readConfigVersion = config.ReadInt(nameof(ConfigVersion), -1);
+		var isSupportedConfigVersion = ConfigVersion == readConfigVersion;
 		if (!isSupportedConfigVersion) Logger.LogWarning("Config version (" + readConfigVersion + ") is not supported!");
 		return isSupportedConfigVersion;
 	}
 
-	internal static void LoadConfig()
-	{
-		bool configFileExists = File.Exists(Paths.ConfigFile);
-		bool isSupportedConfigVersion = IsSupportedConfigVersion();
-		if (configFileExists && !isSupportedConfigVersion)
-		{
-			string message = "Old config version detected!\n\n";
+	internal static void LoadConfig() {
+		var configFileExists = File.Exists(Paths.ConfigFile);
+		var isSupportedConfigVersion = IsSupportedConfigVersion();
+		if (configFileExists && !isSupportedConfigVersion) {
+			var message = "Old config version detected!\n\n";
 			message += "It will be removed and replaced with a new config file.\n";
 			message += "Please make sure to reconfigure your settings after.";
 			Logger.ShowMessage(message);
@@ -232,16 +217,14 @@ internal static class RatConfig
 			File.Delete(Paths.ConfigFile);
 			TrySetScreenConfig();
 			SaveConfig();
-		}
-		else if (!configFileExists)
-		{
+		} else if (!configFileExists) {
 			TrySetScreenConfig();
 			SaveConfig();
 		}
 
-		SimpleConfig config = new(Paths.ConfigFile);
-
-		config.Section = nameof(NameScan);
+		SimpleConfig config = new(Paths.ConfigFile) {
+			Section = nameof(NameScan)
+		};
 		NameScan.Enable = config.ReadBool(nameof(NameScan.Enable), NameScan.Enable);
 		NameScan.EnableAuto = config.ReadBool(nameof(NameScan.EnableAuto), NameScan.EnableAuto);
 		NameScan.Language = (Language)config.ReadInt(nameof(NameScan.Language), (int)NameScan.Language);
@@ -298,8 +281,7 @@ internal static class RatConfig
 
 		config.Section = "Other";
 		OverrideScreenConfig = config.ReadBool(nameof(OverrideScreenConfig), OverrideScreenConfig);
-		if (!SetScreen || OverrideScreenConfig)
-		{
+		if (!SetScreen || OverrideScreenConfig) {
 			ScreenWidth = config.ReadInt(nameof(ScreenWidth), ScreenWidth);
 			ScreenHeight = config.ReadInt(nameof(ScreenHeight), ScreenHeight);
 			ScreenScale = config.ReadFloat(nameof(ScreenScale), ScreenScale);
@@ -317,11 +299,10 @@ internal static class RatConfig
 		LastWindowMode = (WindowMode)config.ReadInt(nameof(LastWindowMode), (int)LastWindowMode);
 	}
 
-	internal static void SaveConfig()
-	{
-		SimpleConfig config = new(Paths.ConfigFile);
-
-		config.Section = nameof(NameScan);
+	internal static void SaveConfig() {
+		SimpleConfig config = new(Paths.ConfigFile) {
+			Section = nameof(NameScan)
+		};
 		config.WriteBool(nameof(NameScan.Enable), NameScan.Enable);
 		config.WriteBool(nameof(NameScan.EnableAuto), NameScan.EnableAuto);
 		config.WriteInt(nameof(NameScan.Language), (int)NameScan.Language);
@@ -393,89 +374,79 @@ internal static class RatConfig
 		config.WriteInt(nameof(LastWindowMode), (int)LastWindowMode);
 	}
 
-	internal static bool ReadFromCache(string key, out string value)
-	{
-		byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(key));
-		string hash = string.Concat(Array.ConvertAll(hashBytes, b => b.ToString("X2")));
+	internal static bool ReadFromCache(string key, out string value) {
+		var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(key));
+		var hash = string.Concat(Array.ConvertAll(hashBytes, b => b.ToString("X2")));
 
-		string path = Path.Combine(Paths.CacheDir, hash + ".data");
+		var path = Path.Combine(Paths.CacheDir, hash + ".data");
 		value = File.Exists(path) ? File.ReadAllText(path) : string.Empty;
 		return value != string.Empty;
 	}
 
-	internal static void WriteToCache(string key, string value)
-	{
-		byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(key));
-		string hash = string.Concat(Array.ConvertAll(hashBytes, b => b.ToString("X2")));
+	internal static void WriteToCache(string key, string value) {
+		var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(key));
+		var hash = string.Concat(Array.ConvertAll(hashBytes, b => b.ToString("X2")));
 
-		string path = Path.Combine(Paths.CacheDir, hash + ".data");
-		Directory.CreateDirectory(Paths.CacheDir);
+		var path = Path.Combine(Paths.CacheDir, hash + ".data");
+		_ = Directory.CreateDirectory(Paths.CacheDir);
 		File.WriteAllText(path, value);
 	}
 
 	/// <summary>
 	/// Get the current screen config from tarkov's config files or default to the primary screen
 	/// </summary>
-	internal static void TrySetScreenConfig()
-	{
-		(int width, int height, double scale) = GetTarkovScreenConfig();
+	internal static void TrySetScreenConfig() {
+		(var width, var height, var scale) = GetTarkovScreenConfig();
 		ScreenWidth = width;
 		ScreenHeight = height;
 		ScreenScale = (float)scale;
 		SetScreen = true;
 	}
 
-	public enum DpiType
-	{
+	public enum DpiType {
 		Effective = 0,
 		Angular = 1,
 		Raw = 2,
 	}
 
-	public enum WindowMode
-	{
+	public enum WindowMode {
 		Normal = 0,
 		Minimal = 1,
 		Minimized = 2,
 	}
 
-	public static double GetScalingForScreen(Screen screen)
-	{
-		Point pointOnScreen = new(screen.Bounds.X + 1, screen.Bounds.Y + 1);
-		nint mon = MonitorFromPoint(pointOnScreen, 2 /*MONITOR_DEFAULTTONEAREST*/);
-		GetDpiForMonitor(mon, DpiType.Effective, out uint dpiX, out _);
+	public static double GetScalingForScreen(Screen screen) {
+		NativePoint pointOnScreen = new() { X = screen.Bounds.X + 1, Y = screen.Bounds.Y + 1 };
+		var mon = MonitorFromPoint(pointOnScreen, 2 /*MONITOR_DEFAULTTONEAREST*/);
+		_ = GetDpiForMonitor(mon, DpiType.Effective, out var dpiX, out _);
 		return dpiX / 96.0;
 	}
 
-	private static (int widht, int height, double scale) GetTarkovScreenConfig()
-	{
-		try
-		{
-			string configPath = Environment.ExpandEnvironmentVariables(@"%AppData%\Battlestate Games\Escape From Tarkov\Settings\Graphics.ini");
+	private static (int widht, int height, double scale) GetTarkovScreenConfig() {
+		try {
+			var configPath = Environment.ExpandEnvironmentVariables(@"%AppData%\Battlestate Games\Escape From Tarkov\Settings\Graphics.ini");
 			using FileStream file = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 			using StreamReader reader = new(file, Encoding.UTF8);
 
-			JObject json = JObject.Parse(reader.ReadToEnd());
+			var json = JObject.Parse(reader.ReadToEnd());
 
-			int activeDisplay = json["DisplaySettings"]["Display"].ToObject<int>();
-			JToken? windowRes = json["Stored"][activeDisplay.ToString()]["WindowResolution"];
-			int width = windowRes["Width"].ToObject<int>();
-			int height = windowRes["Height"].ToObject<int>();
+			var activeDisplay = json["DisplaySettings"]["Display"].ToObject<int>();
+			var windowRes = json["Stored"][activeDisplay.ToString()]["WindowResolution"];
+			var width = windowRes["Width"].ToObject<int>();
+			var height = windowRes["Height"].ToObject<int>();
 
-			Screen usedScreen = Screen.AllScreens[activeDisplay];
-			double scale = GetScalingForScreen(usedScreen);
+			var usedScreen = Screen.AllScreens[activeDisplay];
+			var scale = GetScalingForScreen(usedScreen);
 
 			return (width, height, scale);
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			Logger.LogWarning("Unable to query Escape From Tarkov graphic settings.", e);
 
-			int width = Screen.PrimaryScreen.Bounds.Width;
-			int height = Screen.PrimaryScreen.Bounds.Height;
-			double scale = GetScalingForScreen(Screen.PrimaryScreen);
+			var width = Screen.PrimaryScreen.Bounds.Width;
+			var height = Screen.PrimaryScreen.Bounds.Height;
+			var scale = GetScalingForScreen(Screen.PrimaryScreen);
 
-			string message = $"Detected {width}x{height} Resolution at {scale} Scale.\n\n";
+			var message = $"Detected {width}x{height} Resolution at {scale} Scale.\n\n";
 			message += "You can adjust this inside the settings.";
 			Logger.ShowMessage(message);
 

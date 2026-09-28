@@ -36,8 +36,8 @@ public class Hotkey : INotifyPropertyChanged {
 
 	[MemberNotNull(nameof(KeyboardKeys), nameof(MouseButtons))]
 	public void Set(IEnumerable<Key>? keyboardKeys, IEnumerable<MouseButton>? mouseButtons) {
-		KeyboardKeys = keyboardKeys?.ToHashSet() ?? new HashSet<Key>();
-		MouseButtons = mouseButtons?.ToHashSet() ?? new HashSet<MouseButton>();
+		KeyboardKeys = keyboardKeys?.ToHashSet() ?? [];
+		MouseButtons = mouseButtons?.ToHashSet() ?? [];
 
 		RequiresKeyboard = KeyboardKeys.Count > 0;
 		RequiresMouse = MouseButtons.Count > 0;
@@ -45,13 +45,12 @@ public class Hotkey : INotifyPropertyChanged {
 
 	public string HotkeyString {
 		get {
-			string keyboardString = string.Join('+', KeyboardKeys.ToList().OrderDescending());
-			string mouseString = string.Join('+', MouseButtons.ToList().OrderDescending());
+			var keyboardString = string.Join('+', KeyboardKeys.ToList().OrderDescending());
+			var mouseString = string.Join('+', MouseButtons.ToList().OrderDescending());
 
-			bool keyboardKeysEmpty = KeyboardKeys.Count == 0;
-			bool mouseButtonsEmpty = MouseButtons.Count == 0;
-			if (!mouseButtonsEmpty && !keyboardKeysEmpty) return keyboardString + '+' + mouseString;
-			return keyboardString + mouseString;
+			var keyboardKeysEmpty = KeyboardKeys.Count == 0;
+			var mouseButtonsEmpty = MouseButtons.Count == 0;
+			return !mouseButtonsEmpty && !keyboardKeysEmpty ? keyboardString + '+' + mouseString : keyboardString + mouseString;
 		}
 	}
 

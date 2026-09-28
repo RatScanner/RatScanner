@@ -1,5 +1,4 @@
 ﻿using RatScanner.View;
-using RatScanner.Scan;
 using RatScanner.TarkovDev.Json;
 using System;
 using System.Diagnostics;
@@ -7,7 +6,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Windows;
-using System.Windows.Input;
 using static RatScanner.RatConfig;
 using OverlayC = RatScanner.RatConfig.Overlay;
 
@@ -71,14 +69,6 @@ internal class HotkeyManager {
 		OpenTarkovDevHotkey?.Dispose();
 	}
 
-	private static void Wrap<T>(Func<T> func) {
-		try {
-			func();
-		} catch (Exception e) {
-			Logger.LogError(e.Message, e);
-		}
-	}
-
 	private static void Wrap(Action action) {
 		try {
 			action();
@@ -112,9 +102,9 @@ internal class HotkeyManager {
 
 	private void OnOpenWikiHotkey(object? sender, KeyUpEventArgs e) {
 		Wrap(() => {
-			Item? item = LastScannedItem();
+			var item = LastScannedItem();
 			if (item is null) return;
-			string link = item.WikiLink;
+			var link = item.WikiLink;
 			if (string.IsNullOrEmpty(link) || link.Length <= 3) {
 				link = $"https://escapefromtarkov.gamepedia.com/{Uri.EscapeDataString(item.Name.Replace(" ", "_"))}";
 			}
@@ -124,7 +114,7 @@ internal class HotkeyManager {
 
 	private void OnOpenTarkovDevHotkey(object? sender, KeyUpEventArgs e) {
 		Wrap(() => {
-			Item? item = LastScannedItem();
+			var item = LastScannedItem();
 			OpenURL(item?.Link);
 		});
 	}
@@ -133,9 +123,9 @@ internal class HotkeyManager {
 	/// The most recently scanned item, or null when nothing has been scanned yet.
 	/// </summary>
 	private static Item? LastScannedItem() {
-		ItemQueue scans = RatScannerMain.Instance.ItemScans;
-		for (int i = scans.Count - 1; i >= 0; i--) {
-			Item? item = scans.ElementAtOrDefault(i)?.Item;
+		var scans = RatScannerMain.Instance.ItemScans;
+		for (var i = scans.Count - 1; i >= 0; i--) {
+			var item = scans.ElementAtOrDefault(i)?.Item;
 			if (item is not null) return item;
 		}
 		return null;
@@ -143,6 +133,6 @@ internal class HotkeyManager {
 
 	private static void OpenURL(string? url) {
 		if (string.IsNullOrEmpty(url)) return;
-		Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
+		_ = Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
 	}
 }

@@ -6,10 +6,10 @@ using System.Linq;
 namespace RatScanner.Scan;
 
 public class ItemNameScan : ItemScan {
-	private Vector2 _toolTipPosition;
+	private readonly Vector2 _toolTipPosition;
 
 	public ItemNameScan(Inspection inspection, Vector2 toolTipPosition, int duration) {
-		RatStash.Item inspectionItem = inspection.Item;
+		var inspectionItem = inspection.Item;
 		Item = TarkovDevAPI.GetItems().FirstOrDefault(item => item.Id == inspectionItem.Id) ?? throw new Exception($"Unknown item: {inspection.Item.Id}");
 		Confidence = inspection.MarkerConfidence;
 		IconPath = inspection.IconPath;

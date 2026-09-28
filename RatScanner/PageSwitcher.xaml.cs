@@ -17,10 +17,9 @@ namespace RatScanner;
 /// </summary>
 public partial class PageSwitcher : Window {
 	private NotifyIcon _notifyIcon = null!;
-	private ContextMenuStrip _contextMenuStrip = new();
+	private readonly ContextMenuStrip _contextMenuStrip = new();
 
-	private static PageSwitcher _instance = null!;
-	public static PageSwitcher Instance => _instance ??= new PageSwitcher();
+	public static PageSwitcher Instance { get => field ??= new PageSwitcher(); private set; } = null!;
 
 	private UserControl? activeControl;
 
@@ -28,15 +27,16 @@ public partial class PageSwitcher : Window {
 	private const int HTCAPTION = 2;
 	private const int HTBOTTOMRIGHT = 17;
 
-	[DllImport("user32.dll")]
-	private static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+	[LibraryImport("user32.dll", EntryPoint = "SendMessageW")]
+	private static partial IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 
-	[DllImport("user32.dll")]
-	private static extern bool ReleaseCapture();
+	[LibraryImport("user32.dll", EntryPoint = "ReleaseCapture")]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	private static partial bool ReleaseCapture();
 
 	public PageSwitcher() {
 		try {
-			_instance = this;
+			Instance = this;
 			RatConfig.LoadConfig();
 
 			InitializeComponent();
@@ -76,17 +76,17 @@ public partial class PageSwitcher : Window {
 	private const double MinNormalWindowHeight = 500;
 
 	internal void Navigate(UserControl nextControl, object? state = null) {
-		if (!(nextControl is ISwitchable)) throw new ArgumentException("NextPage is not ISwitchable! " + nextControl.Name);
+		if (nextControl is not ISwitchable) throw new ArgumentException("NextPage is not ISwitchable! " + nextControl.Name);
 
 		if (activeControl != null) {
-			ISwitchable activeControlSwitchable = (ISwitchable)activeControl;
+			var activeControlSwitchable = (ISwitchable)activeControl;
 			activeControlSwitchable.OnClose();
 		}
 
 		ContentControl.Content = nextControl;
 		activeControl = nextControl;
 
-		ISwitchable nextControlSwitchable = (ISwitchable)nextControl;
+		var nextControlSwitchable = (ISwitchable)nextControl;
 		if (state != null) nextControlSwitchable.UtilizeState(state);
 
 		nextControlSwitchable.OnOpen();
@@ -96,25 +96,21 @@ public partial class PageSwitcher : Window {
 		WindowState = WindowState.Minimized;
 	}
 
-	public void StartDrag()
-	{
-		try
-		{
-			IntPtr hwnd = new WindowInteropHelper(this).EnsureHandle();
-			ReleaseCapture();
-			SendMessage(hwnd, WM_NCLBUTTONDOWN, (IntPtr)HTCAPTION, IntPtr.Zero);
-		}
-		catch (Exception ex)
-		{
+	public void StartDrag() {
+		try {
+			var hwnd = new WindowInteropHelper(this).EnsureHandle();
+			_ = ReleaseCapture();
+			_ = SendMessage(hwnd, WM_NCLBUTTONDOWN, HTCAPTION, IntPtr.Zero);
+		} catch (Exception ex) {
 			Logger.LogError("Failed to start window drag", ex);
 		}
 	}
 
 	public void StartResize() {
 		try {
-			IntPtr hwnd = new WindowInteropHelper(this).EnsureHandle();
-			ReleaseCapture();
-			SendMessage(hwnd, WM_NCLBUTTONDOWN, (IntPtr)HTBOTTOMRIGHT, IntPtr.Zero);
+			var hwnd = new WindowInteropHelper(this).EnsureHandle();
+			_ = ReleaseCapture();
+			_ = SendMessage(hwnd, WM_NCLBUTTONDOWN, HTBOTTOMRIGHT, IntPtr.Zero);
 		} catch (Exception ex) {
 			Logger.LogError("Failed to start window resize", ex);
 		}
@@ -136,7 +132,7 @@ public partial class PageSwitcher : Window {
 		ExitApplication();
 	}
 
-	private void AddJumpList() {
+	private static void AddJumpList() {
 		JumpTask showUITask = new() {
 			Title = "Show UI",
 			Arguments = "/showUI",
@@ -180,10 +176,10 @@ public partial class PageSwitcher : Window {
 			Icon = Properties.Resources.RatLogoSmall,
 		};
 
-		_contextMenuStrip.Items.Add("Show UI", null, OnContextMenuShowUI);
-		_contextMenuStrip.Items.Add("Show Minimal UI", null, OnContextMenuShowMinimalUI);
-		_contextMenuStrip.Items.Add("Show Overlay", null, OnContextMenuShowOverlay);
-		_contextMenuStrip.Items.Add("Exit", null, OnContextMenuExitApplication);
+		_ = _contextMenuStrip.Items.Add("Show UI", null, OnContextMenuShowUI);
+		_ = _contextMenuStrip.Items.Add("Show Minimal UI", null, OnContextMenuShowMinimalUI);
+		_ = _contextMenuStrip.Items.Add("Show Overlay", null, OnContextMenuShowOverlay);
+		_ = _contextMenuStrip.Items.Add("Exit", null, OnContextMenuExitApplication);
 
 		_notifyIcon.ContextMenuStrip = _contextMenuStrip;
 
@@ -200,7 +196,7 @@ public partial class PageSwitcher : Window {
 	private void OnContextMenuShowMinimalUI(object? sender, EventArgs e) => ShowMinimalUI();
 	private void OnContextMenuExitApplication(object? sender, EventArgs e) => ExitApplication();
 
-	internal void ShowOverlay() {
+	internal static void ShowOverlay() {
 		BlazorUI.BlazorInteractableOverlay.ShowOverlay();
 	}
 
@@ -213,8 +209,7 @@ public partial class PageSwitcher : Window {
 		if (RatConfig.LastWindowWidth > 0 && RatConfig.LastWindowHeight > 0) {
 			Width = RatConfig.LastWindowWidth;
 			Height = RatConfig.LastWindowHeight;
-		}
-		else {
+		} else {
 			Width = MinNormalWindowWidth;
 			Height = MinNormalWindowHeight;
 		}

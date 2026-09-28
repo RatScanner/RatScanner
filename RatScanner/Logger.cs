@@ -6,13 +6,14 @@ using System.IO;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
 namespace RatScanner;
 
 internal static class Logger {
-	private static readonly object SyncObject = new();
+	private static readonly Lock SyncObject = new();
 
 	private static readonly Queue<string> Backlog = new();
 
@@ -28,7 +29,7 @@ internal static class Logger {
 	}
 
 	internal static void LogError(Exception e) {
-		Exception message = e.GetBaseException().GetBaseException();
+		var message = e.GetBaseException().GetBaseException();
 		LogError(message.Message, e);
 	}
 
@@ -37,23 +38,23 @@ internal static class Logger {
 		Crashed = true;
 
 		// Log the error
-		string logMessage = "[Error] " + message;
+		var logMessage = "[Error] " + message;
 		string divider = new('-', 20);
 		if (e != null) logMessage += $"\n {divider} \n {e}";
 		else logMessage += $"\n {divider} \n {Environment.StackTrace}";
 		AppendToLog(logMessage);
 
 		// Setup info box
-		string title = "RatScanner " + RatConfig.Version;
+		var title = "RatScanner " + RatConfig.Version;
 
 		// Ask to open FAQ
-		string faqBoxMessage = message + "\n\nThe FAQ will probably help with that.\nDo you want to open it now?";
-		MessageBoxResult faqBoxResult = MessageBox.Show(faqBoxMessage, title, MessageBoxButton.YesNo, MessageBoxImage.Error);
+		var faqBoxMessage = message + "\n\nThe FAQ will probably help with that.\nDo you want to open it now?";
+		var faqBoxResult = MessageBox.Show(faqBoxMessage, title, MessageBoxButton.YesNo, MessageBoxImage.Error);
 		if (faqBoxResult == MessageBoxResult.Yes) OpenFAQ(message);
 
 		// Ask for git issue creation
-		string gitBoxMessage = "Would you like to create a issue on GitHub?";
-		MessageBoxResult gitBoxResult = MessageBox.Show(gitBoxMessage, title, MessageBoxButton.YesNo, MessageBoxImage.Question);
+		var gitBoxMessage = "Would you like to create a issue on GitHub?";
+		var gitBoxResult = MessageBox.Show(gitBoxMessage, title, MessageBoxButton.YesNo, MessageBoxImage.Question);
 		if (gitBoxResult == MessageBoxResult.Yes) CreateGitHubIssue(message, e);
 
 		// Exit after error is handled
@@ -72,33 +73,33 @@ internal static class Logger {
 
 	internal static void ShowMessage(string message, string? title = null) {
 		LogInfo(message);
-		MessageBox.Show(message, title ?? "Rat Scanner " + RatConfig.Version, MessageBoxButton.OK, MessageBoxImage.Information);
+		_ = MessageBox.Show(message, title ?? ("Rat Scanner " + RatConfig.Version), MessageBoxButton.OK, MessageBoxImage.Information);
 	}
 
 	internal static void ShowWarning(string message, string? title = null) {
 		LogWarning(message);
-		MessageBox.Show(message, title ?? "Rat Scanner " + RatConfig.Version, MessageBoxButton.OK, MessageBoxImage.Warning);
+		_ = MessageBox.Show(message, title ?? ("Rat Scanner " + RatConfig.Version), MessageBoxButton.OK, MessageBoxImage.Warning);
 	}
 
 	private static string GetUniquePath(string basePath, string fileName, string extension) {
 		fileName = fileName.Replace(' ', '_');
 
-		int index = 0;
-		string uniquePath = Path.Combine(basePath, fileName + index + extension);
+		var index = 0;
+		var uniquePath = Path.Combine(basePath, fileName + index + extension);
 
 		while (File.Exists(uniquePath)) {
 			index += 1;
 			uniquePath = Path.Combine(basePath, fileName + index + extension);
 		}
 
-		Directory.CreateDirectory(Path.GetDirectoryName(uniquePath) ?? throw new NullReferenceException());
+		_ = Directory.CreateDirectory(Path.GetDirectoryName(uniquePath) ?? throw new NullReferenceException());
 		return uniquePath;
 	}
 
 	private static void AppendToLog(string content) {
-		string text = "[" + DateTime.UtcNow.ToUniversalTime().TimeOfDay + "] > " + content + "\n";
+		var text = "[" + DateTime.UtcNow.ToUniversalTime().TimeOfDay + "] > " + content + "\n";
 		Backlog.Enqueue(text);
-		Task.Run(() => ProcessBacklog());
+		_ = Task.Run(() => ProcessBacklog());
 	}
 
 	private static void AppendToLogRaw(string text) {
@@ -108,7 +109,7 @@ internal static class Logger {
 
 	private static void ProcessBacklog() {
 		lock (SyncObject) {
-			for (int i = 0; i < Backlog.Count; i++) AppendToLogRaw(Backlog.Dequeue());
+			for (var i = 0; i < Backlog.Count; i++) AppendToLogRaw(Backlog.Dequeue());
 		}
 	}
 
@@ -117,15 +118,15 @@ internal static class Logger {
 	}
 
 	internal static void ClearMats(string pattern = "*.png") {
-		string[] files = Directory.GetFiles(RatConfig.Paths.Data, pattern);
-		foreach (string file in files) File.Delete(file);
+		var files = Directory.GetFiles(RatConfig.Paths.Data, pattern);
+		foreach (var file in files) File.Delete(file);
 	}
 
 	internal static void ClearDebugMats() {
 		if (!Directory.Exists(RatConfig.Paths.Debug)) return;
 
-		string[] files = Directory.GetFiles(RatConfig.Paths.Debug, "*.png");
-		foreach (string file in files)
+		var files = Directory.GetFiles(RatConfig.Paths.Debug, "*.png");
+		foreach (var file in files)
 			try {
 				File.Delete(file);
 			} catch (Exception) {
@@ -136,24 +137,24 @@ internal static class Logger {
 	private static void OpenFAQ(string message) {
 		// Remove everything after ':' which is commonly a path
 		message = message.Split(':')[0];
-		string url = ApiManager.GetResource(ApiManager.ResourceType.FAQLink);
+		var url = ApiManager.GetResource(ApiManager.ResourceType.FAQLink);
 		url += "#:~:text=" + WebUtility.HtmlEncode(message);
 		OpenURL(url);
 	}
 
 	private static void CreateGitHubIssue(string message, Exception e) {
-		string body = "**Error**\n" + message + "\n";
+		var body = "**Error**\n" + message + "\n";
 		if (e != null) body += "```\n" + LimitLength(e.ToString(), 1000) + "\n```\n";
 
 		body += "<details>\n<summary>Log</summary>\n\n```\n";
 		body += LimitLength(ReadAll(), 3000);
 		body += "\n```\n</details>";
 
-		string title = message;
+		var title = message;
 
-		string labels = "bug";
+		var labels = "bug";
 
-		string url = ApiManager.GetResource(ApiManager.ResourceType.GithubLink);
+		var url = ApiManager.GetResource(ApiManager.ResourceType.GithubLink);
 		url += "/issues/new";
 		url += "?body=" + WebUtility.UrlEncode(body);
 		url += "&title=" + WebUtility.UrlEncode(title);
@@ -171,7 +172,7 @@ internal static class Logger {
 			FileName = url,
 			UseShellExecute = true,
 		};
-		Process.Start(psi);
+		_ = Process.Start(psi);
 	}
 
 	private static string ReadAll() {

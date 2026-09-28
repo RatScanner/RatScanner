@@ -8,16 +8,16 @@ using System.Text;
 
 namespace RatScanner;
 
-internal class SimpleConfig {
+internal partial class SimpleConfig {
 	internal string Path;
 	internal string Section;
 	internal string EnumerableSeparator = ";";
 
-	[DllImport("kernel32")]
-	private static extern long WritePrivateProfileString(string section, string key, string val, string filePath);
+	[LibraryImport("kernel32", EntryPoint = "WritePrivateProfileStringW", StringMarshalling = StringMarshalling.Utf16)]
+	private static partial long WritePrivateProfileString(string section, string key, string val, string filePath);
 
-	[DllImport("kernel32")]
-	private static extern int GetPrivateProfileString(string section, string key, string def, StringBuilder retVal, int size, string filePath);
+	[LibraryImport("kernel32", EntryPoint = "GetPrivateProfileStringW", StringMarshalling = StringMarshalling.Utf16)]
+	private static partial int GetPrivateProfileString(string section, string key, string def, [Out] char[] retVal, int size, string filePath);
 
 	internal SimpleConfig(string configPath, string section = "default") {
 		Path = configPath;
@@ -25,17 +25,17 @@ internal class SimpleConfig {
 	}
 
 	internal void WriteString(string key, string value) {
-		WritePrivateProfileString(Section, key.ToLower(), value, Path);
+		_ = WritePrivateProfileString(Section, key.ToLower(), value, Path);
 	}
 	internal void WriteSecureString(string key, string value) {
 		if (string.IsNullOrEmpty(value)) {
 			WriteString(key, value);
 			return;
 		}
-		byte[] bytes = Encoding.ASCII.GetBytes(value);
-		byte[] encryptedBytes = ProtectedData.Protect(bytes, null, DataProtectionScope.CurrentUser);
-		string hexString = Convert.ToHexString(encryptedBytes);
-		WritePrivateProfileString(Section, key.ToLower(), hexString, Path);
+		var bytes = Encoding.ASCII.GetBytes(value);
+		var encryptedBytes = ProtectedData.Protect(bytes, null, DataProtectionScope.CurrentUser);
+		var hexString = Convert.ToHexString(encryptedBytes);
+		_ = WritePrivateProfileString(Section, key.ToLower(), hexString, Path);
 	}
 
 	internal void WriteInt(string key, int value) {
@@ -64,10 +64,10 @@ internal class SimpleConfig {
 	}
 
 	private string ReadStringInternal(string key) {
-		StringBuilder temp = new(1024);
+		var temp = new char[short.MaxValue];
 		const string def = "RatScanner.Config.Default.Exception";
-		GetPrivateProfileString(Section, key.ToLower(), def, temp, short.MaxValue, Path);
-		string result = temp.ToString();
+		var length = GetPrivateProfileString(Section, key.ToLower(), def, temp, temp.Length, Path);
+		string result = new(temp, 0, length);
 		return result == def ? throw new Exception(def) : result;
 	}
 
@@ -81,10 +81,10 @@ internal class SimpleConfig {
 
 	internal string ReadSecureString(string key, string defaultValue) {
 		try {
-			string hexString = ReadStringInternal(key);
+			var hexString = ReadStringInternal(key);
 			if (string.IsNullOrEmpty(hexString)) return "";
-			byte[] encryptedBytes = Convert.FromHexString(hexString);
-			byte[] decryptedBytes = ProtectedData.Unprotect(encryptedBytes, null, DataProtectionScope.CurrentUser);
+			var encryptedBytes = Convert.FromHexString(hexString);
+			var decryptedBytes = ProtectedData.Unprotect(encryptedBytes, null, DataProtectionScope.CurrentUser);
 			return Encoding.ASCII.GetString(decryptedBytes);
 		} catch (Exception) {
 			return defaultValue;
@@ -117,11 +117,16 @@ internal class SimpleConfig {
 
 	internal IEnumerable<TEnum> ReadEnumerableEnum<TEnum>(string key, IEnumerable<TEnum> defaultValue) where TEnum : struct, Enum {
 		try {
-			string[]? readStrings = ReadStringInternal(key)?.Split(EnumerableSeparator);
-			if (readStrings[0] == "null") return Enumerable.Empty<TEnum>();
-			if (readStrings == null) return defaultValue;
-			if (readStrings.Length == 1 && readStrings[0] == "") return defaultValue;
-			return readStrings.Select(Enum.Parse<TEnum>);
+			var readStrings = ReadStringInternal(key)?.Split(EnumerableSeparator);
+			if (readStrings[0] == "null") {
+				return [];
+			} else if (readStrings == null) {
+				return defaultValue;
+			} else if (readStrings.Length == 1 && readStrings[0] == "") {
+				return defaultValue;
+			} else {
+				return readStrings.Select(Enum.Parse<TEnum>);
+			}
 		} catch (Exception) {
 			return defaultValue;
 		}
@@ -129,8 +134,8 @@ internal class SimpleConfig {
 
 	internal Hotkey ReadHotkey(string key, Hotkey? defaultValue) {
 		defaultValue ??= new Hotkey();
-		IEnumerable<System.Windows.Input.Key> keyboardKeys = ReadEnumerableEnum(key + "Keyboard", defaultValue.KeyboardKeys);
-		IEnumerable<System.Windows.Input.MouseButton> mouseButtons = ReadEnumerableEnum(key + "Mouse", defaultValue.MouseButtons);
-		return new Hotkey(keyboardKeys.ToList(), mouseButtons.ToList());
+		var keyboardKeys = ReadEnumerableEnum(key + "Keyboard", defaultValue.KeyboardKeys);
+		var mouseButtons = ReadEnumerableEnum(key + "Mouse", defaultValue.MouseButtons);
+		return new Hotkey([.. keyboardKeys], [.. mouseButtons]);
 	}
 }

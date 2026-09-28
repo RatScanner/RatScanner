@@ -21,12 +21,9 @@ using Timer = System.Threading.Timer;
 namespace RatScanner;
 
 public class RatScannerMain : INotifyPropertyChanged {
-	private static RatScannerMain _instance = null!;
-	internal static RatScannerMain Instance => _instance ??= new RatScannerMain();
+	internal static RatScannerMain Instance { get => field ??= new RatScannerMain(); private set; } = null!;
 
 	internal readonly HotkeyManager HotkeyManager;
-
-	private Timer? _marketDBRefreshTimer;
 	private Timer? _tarkovTrackerDBRefreshTimer;
 	private Timer? _scanRefreshTimer;
 
@@ -55,7 +52,7 @@ public class RatScannerMain : INotifyPropertyChanged {
 	internal ItemQueue ItemScans = new();
 
 	public RatScannerMain() {
-		_instance = this;
+		Instance = this;
 
 		// Remove old log
 		Logger.Clear();
@@ -67,7 +64,7 @@ public class RatScannerMain : INotifyPropertyChanged {
 		Logger.LogInfo($"Screen Info: {RatConfig.ScreenWidth}x{RatConfig.ScreenHeight} at {RatConfig.ScreenScale * 100}%");
 
 		Logger.LogInfo("Initializing TarkovDev API...");
-		
+
 		// Try to load from offline cache first for faster startup
 		if (TarkovDevAPI.TryInitializeCacheFromOffline()) {
 			// Cache loaded from offline storage, queue background refresh
@@ -118,31 +115,31 @@ public class RatScannerMain : INotifyPropertyChanged {
 		}).Start();
 	}
 
-	private void CheckForUpdates() {
-		string mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ClientVersion);
+	private static void CheckForUpdates() {
+		var mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ClientVersion);
 		if (RatConfig.Version == mostRecentVersion) return;
 		Logger.LogInfo("A new version is available: " + mostRecentVersion);
 
-		string forceVersions = ApiManager.GetResource(ApiManager.ResourceType.ClientForceUpdateVersions);
+		var forceVersions = ApiManager.GetResource(ApiManager.ResourceType.ClientForceUpdateVersions);
 		if (forceVersions.Contains($"[{RatConfig.Version}]")) {
 			UpdateRatScanner();
 			return;
 		}
 
-		string message = "Version " + mostRecentVersion + " is available!\n";
+		var message = "Version " + mostRecentVersion + " is available!\n";
 		message += "You are using: " + RatConfig.Version + "\n\n";
 		message += "Do you want to install it now?";
-		Window temp = new Window() { Visibility = Visibility.Hidden };
+		var temp = new Window() { Visibility = Visibility.Hidden };
 		temp.Show();
-		MessageBoxResult result = MessageBox.Show(temp, message, "Rat Scanner Updater", MessageBoxButton.YesNo);
+		var result = MessageBox.Show(temp, message, "Rat Scanner Updater", MessageBoxButton.YesNo);
 		if (result == MessageBoxResult.Yes) UpdateRatScanner();
 	}
 
-	private void UpdateRatScanner() {
+	private static void UpdateRatScanner() {
 		if (!File.Exists(RatConfig.Paths.Updater)) {
 			Logger.LogWarning(RatConfig.Paths.Updater + " could not be found!");
 			try {
-				string updaterLink = ApiManager.GetResource(ApiManager.ResourceType.UpdaterLink);
+				var updaterLink = ApiManager.GetResource(ApiManager.ResourceType.UpdaterLink);
 				ApiManager.DownloadFile(updaterLink, RatConfig.Paths.Updater);
 			} catch (Exception e) {
 				Logger.LogError("Unable to download updater, please update manually.", e);
@@ -150,11 +147,12 @@ public class RatScannerMain : INotifyPropertyChanged {
 			}
 		}
 
-		ProcessStartInfo startInfo = new(RatConfig.Paths.Updater);
-		startInfo.UseShellExecute = true;
+		ProcessStartInfo startInfo = new(RatConfig.Paths.Updater) {
+			UseShellExecute = true
+		};
 		startInfo.ArgumentList.Add("--start");
 		startInfo.ArgumentList.Add("--update");
-		Process.Start(startInfo);
+		_ = Process.Start(startInfo);
 		Environment.Exit(0);
 	}
 
@@ -166,7 +164,7 @@ public class RatScannerMain : INotifyPropertyChanged {
 		RatEyeEngine = new RatEyeEngine(GetRatEyeConfig(), RatStashDatabaseFromTarkovDev());
 	}
 
-	private RatEye.Config GetRatEyeConfig(bool highlighted = true) {
+	private static Config GetRatEyeConfig(bool highlighted = true) {
 		return new Config() {
 			PathConfig = new Config.Path() {
 				TrainedData = RatConfig.Paths.TrainedData,
@@ -189,17 +187,17 @@ public class RatScannerMain : INotifyPropertyChanged {
 		};
 	}
 
-	private Database RatStashDatabaseFromTarkovDev() {
-		List<Item> rsItems = new();
-		foreach (TarkovDev.Json.Item i in TarkovDevAPI.GetItems()) {
-			rsItems.Add(new RatStash.Item() {
+	private static Database RatStashDatabaseFromTarkovDev() {
+		List<Item> rsItems = [];
+		foreach (var i in TarkovDevAPI.GetItems()) {
+			rsItems.Add(new Item() {
 				Id = i.Id,
 				Name = i.Name,
 				ShortName = i.ShortName,
 
 			});
 		}
-		return RatStash.Database.FromItems(rsItems);
+		return Database.FromItems(rsItems);
 	}
 
 	/// <summary>
@@ -213,22 +211,22 @@ public class RatScannerMain : INotifyPropertyChanged {
 			Thread.Sleep(50);
 
 			// Get raw screenshot which includes the icon and text
-			int markerScanSize = RatConfig.NameScan.MarkerScanSize;
-			int sizeWidth = markerScanSize + RatConfig.NameScan.TextWidth;
-			int sizeHeight = markerScanSize;
+			var markerScanSize = RatConfig.NameScan.MarkerScanSize;
+			var sizeWidth = markerScanSize + RatConfig.NameScan.TextWidth;
+			var sizeHeight = markerScanSize;
 
 			position -= new Vector2(markerScanSize / 2, markerScanSize / 2);
 
-			Bitmap screenshot = GetScreenshot(position, new Size(sizeWidth, sizeHeight));
+			var screenshot = GetScreenshot(position, new Size(sizeWidth, sizeHeight));
 
 			// Scan the item
-			RatEye.Processing.Inspection inspection = RatEyeEngine.NewInspection(screenshot);
+			var inspection = RatEyeEngine.NewInspection(screenshot);
 
 			if (!inspection.ContainsMarker || inspection.Item == null) return;
 
-			float scale = RatEyeEngine.Config.ProcessingConfig.Scale;
-			Bitmap marker = RatEyeEngine.Config.ProcessingConfig.InspectionConfig.Marker;
-			Vector2 toolTipPosition = inspection.MarkerPosition;
+			var scale = RatEyeEngine.Config.ProcessingConfig.Scale;
+			var marker = RatEyeEngine.Config.ProcessingConfig.InspectionConfig.Marker;
+			var toolTipPosition = inspection.MarkerPosition;
 			toolTipPosition += new Vector2(-(int)(marker.Width * scale), (int)(marker.Height * scale));
 			toolTipPosition += position;
 
@@ -249,22 +247,22 @@ public class RatScannerMain : INotifyPropertyChanged {
 	internal void NameScanScreen(object? _ = null) {
 		lock (NameScanLock) {
 			Logger.LogDebug("Name scanning screen");
-			Vector2 mousePosition = UserActivityHelper.GetMousePosition();
-			Rectangle bounds = Screen.AllScreens.First(screen => screen.Bounds.Contains(mousePosition)).Bounds;
+			var mousePosition = UserActivityHelper.GetMousePosition();
+			var bounds = Screen.AllScreens.First(screen => screen.Bounds.Contains(mousePosition)).Bounds;
 
 			Vector2 position = new(bounds.X, bounds.Y);
-			Bitmap screenshot = GetScreenshot(position, bounds.Size);
+			var screenshot = GetScreenshot(position, bounds.Size);
 
 			// Scan the item
-			RatEye.Processing.MultiInspection multiInspection = RatEyeEngine.NewMultiInspection(screenshot);
+			var multiInspection = RatEyeEngine.NewMultiInspection(screenshot);
 
 			if (multiInspection.Inspections.Count == 0) return;
 
-			foreach (RatEye.Processing.Inspection? inspection in multiInspection.Inspections) {
-				float scale = RatEyeEngine.Config.ProcessingConfig.Scale;
-				Vector2 toolTipPosition = inspection.MarkerPosition;
+			foreach (var inspection in multiInspection.Inspections) {
+				var scale = RatEyeEngine.Config.ProcessingConfig.Scale;
+				var toolTipPosition = inspection.MarkerPosition;
 				toolTipPosition += position;
-				Bitmap marker = RatEyeEngine.Config.ProcessingConfig.InspectionConfig.Marker;
+				var marker = RatEyeEngine.Config.ProcessingConfig.InspectionConfig.Marker;
 				toolTipPosition += new Vector2(0, (int)(marker.Height * scale));
 
 				ItemNameScan tempNameScan = new(
@@ -286,20 +284,20 @@ public class RatScannerMain : INotifyPropertyChanged {
 	internal void IconScan(Vector2 position) {
 		lock (IconScanLock) {
 			Logger.LogDebug("Icon scanning at: " + position);
-			int x = position.X - RatConfig.IconScan.ScanWidth / 2;
-			int y = position.Y - RatConfig.IconScan.ScanHeight / 2;
+			var x = position.X - (RatConfig.IconScan.ScanWidth / 2);
+			var y = position.Y - (RatConfig.IconScan.ScanHeight / 2);
 
 			Vector2 screenshotPosition = new(x, y);
 			Size size = new(RatConfig.IconScan.ScanWidth, RatConfig.IconScan.ScanHeight);
-			Bitmap screenshot = GetScreenshot(screenshotPosition, size);
+			var screenshot = GetScreenshot(screenshotPosition, size);
 
 			// Scan the item
-			RatEye.Processing.Inventory inventory = RatEyeEngine.NewInventory(screenshot);
-			RatEye.Processing.Icon? icon = inventory.LocateIcon();
+			var inventory = RatEyeEngine.NewInventory(screenshot);
+			var icon = inventory.LocateIcon();
 
 			if (icon?.DetectionConfidence <= 0 || icon?.Item == null) return;
 
-			Vector2 toolTipPosition = position;
+			var toolTipPosition = position;
 			toolTipPosition += icon.Position + icon.ItemPosition;
 			toolTipPosition -= new Vector2(RatConfig.IconScan.ScanWidth, RatConfig.IconScan.ScanHeight) / 2;
 
@@ -311,11 +309,11 @@ public class RatScannerMain : INotifyPropertyChanged {
 	}
 
 	// Returns the ruff screenshot
-	private Bitmap GetScreenshot(Vector2 vector2, Size size) {
+	private static Bitmap GetScreenshot(Vector2 vector2, Size size) {
 		Bitmap bmp = new(size.Width, size.Height, PixelFormat.Format24bppRgb);
 
 		try {
-			using Graphics gfx = Graphics.FromImage(bmp);
+			using var gfx = Graphics.FromImage(bmp);
 			gfx.CopyFromScreen(vector2.X, vector2.Y, 0, 0, size, CopyPixelOperation.SourceCopy);
 		} catch (Exception e) {
 			Logger.LogWarning("Unable to capture screenshot", e);
@@ -326,8 +324,8 @@ public class RatScannerMain : INotifyPropertyChanged {
 
 	private void RefreshTarkovTrackerDB(object? o = null) {
 		Logger.LogInfo("Refreshing TarkovTracker DB...");
-		TarkovTrackerDB.Init();
-		_tarkovTrackerDBRefreshTimer.Change(RatConfig.Tracking.TarkovTracker.RefreshTime, Timeout.Infinite);
+		_ = TarkovTrackerDB.Init();
+		_ = _tarkovTrackerDBRefreshTimer.Change(RatConfig.Tracking.TarkovTracker.RefreshTime, Timeout.Infinite);
 	}
 
 	private void RefreshOverlay(object? o = null) {

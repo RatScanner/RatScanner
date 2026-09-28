@@ -25,22 +25,25 @@
             <MudPaper Class="d-flex flex-column pa-1" Elevation="2">
                 <MudPaper>
                     <MudTextField @ref="_searchTextField" T="string" Variant="Variant.Outlined"
-                                  Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search"
-                                  DebounceInterval="20" OnDebounceIntervalElapsed="ExecuteSearch" @bind-Value="@_searchText">
+                                  Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" DebounceInterval="20"
+                                  OnDebounceIntervalElapsed="ExecuteSearch" @bind-Value="@_searchText">
                     </MudTextField>
                 </MudPaper>
 
                 <MudStack Spacing="2" Class="py-2 overflow-visible" Style="max-height:50vh; overflow-y: auto;">
-                    @for (int _i = 0; _i < _searchResults.Count(); _i++) {
+                    @for (int _i = 0; _i < _searchResults.Count(); _i++)
+                    {
                         int i = _i;
                         SearchResult searchResult = _searchResults.ElementAt(i);
                         
-                        @if (searchResult.Data is Item item) {
+                        @if (searchResult.Data is Item item)
+                        {
                             <ItemSearchResult Item="@item" OnClick="@(() => SelectResult(i))" />
-                        } 
-                        else if (searchResult.Data is TarkovTask task) {
+                        }
+                        else if (searchResult.Data is TarkovTask task)
+                        {
                             <TaskSearchResult Task="@task" OnClick="@(() => SelectResult(i))" />
-                        } 
+                        }
                         @* TODO: Re-enable map search results when MapViewer is fixed
                         else if (searchResult.Data is Map map) {
                             <MapSearchResult Map="@map" OnMapClick="@(() => OpenMapViewer(map))" />
@@ -81,30 +84,31 @@
     private List<TarkovDev.Json.Item>? _items;
     private string _searchText;
     private IEnumerable<SearchResult> _searchResults = new List<SearchResult>();
-    private readonly SearchService _searchService = new();
     private int _selectedResultIndex { get; set; } = 0;
 
     private SearchResult _searchResult;
 
-    protected override void OnInitialized() {
+    protected override void OnInitialized()
+    {
         MenuVM.PropertyChanged += PropertyChangeHandler;
     }
 
     private async void ExecuteSearch(string value)
     {
-        var sanitizedValue = _searchService.SanitizeSearch(value);
+        var sanitizedValue = SearchService.SanitizeSearch(value);
         var results = Enumerable.Empty<SearchResult>();
-        results = results.Concat(await _searchService.SearchItemsAsync(sanitizedValue));
-        results = results.Concat(await _searchService.SearchTasksAsync(sanitizedValue));
+        results = results.Concat(await SearchService.SearchItemsAsync(sanitizedValue));
+        results = results.Concat(await SearchService.SearchTasksAsync(sanitizedValue));
         // TODO: Re-enable map search when MapViewer is fixed
-        // results = results.Concat(await _searchService.SearchMapsAsync(sanitizedValue));
+        // results = results.Concat(await SearchService.SearchMapsAsync(sanitizedValue));
         results = results.Where(result => result != null && result.Data != null);
         results = results.OrderBy(result => result.Score).Take(4);
         _searchResults = results;
         _selectedResultIndex = 0;
     }
 
-    private void SelectResult(int index) {
+    private void SelectResult(int index)
+    {
         _selectedResultIndex = index;
         _searchResult = _searchResults.ElementAt(_selectedResultIndex);
         _searchTextField.Clear();
@@ -112,28 +116,34 @@
         StateHasChanged();
     }
 
-    private void OpenWiki() {
+    private void OpenWiki()
+    {
         OpenURL(MenuVM.LastItem?.WikiLink);
     }
 
-    private void OpenTarkovDev() {
+    private void OpenTarkovDev()
+    {
         OpenURL(MenuVM.LastItem?.Link);
     }
 
-    private void OpenURL(string? url) {
+    private void OpenURL(string? url)
+    {
         if (string.IsNullOrEmpty(url)) return;
-        var psi = new ProcessStartInfo {
+        var psi = new ProcessStartInfo
+        {
             FileName = url,
             UseShellExecute = true,
         };
         Process.Start(psi);
     }
 
-    private async void PropertyChangeHandler(object? sender, EventArgs e) {
+    private async void PropertyChangeHandler(object? sender, EventArgs e)
+    {
         await InvokeAsync(StateHasChanged);
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
         MenuVM.PropertyChanged -= PropertyChangeHandler;
     }
 }

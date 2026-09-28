@@ -49,7 +49,7 @@ public static class UiLanguageExtensions {
 public class LocalizationService {
 	private static Dictionary<string, string>? Translations;
 
-	public void SetLanguage(UiLanguage language) {
+	public static void SetLanguage(UiLanguage language) {
 		try {
 			var filePath = Path.Combine(RatConfig.Paths.i18nDir, language.GetTranslationFileName());
 			if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) {
@@ -69,13 +69,18 @@ public class LocalizationService {
 
 	public string this[string key] => Translate(key);
 
-	public string Translate(string key) {
-		if (Translations == null) return key;
-		return Translations.TryGetValue(key, out var value) ? value : key;
+	public static string Translate(string key) {
+		if (Translations == null) {
+			return key;
+		} else if (Translations.TryGetValue(key, out var value)) {
+			return value;
+		} else {
+			return key;
+		}
 	}
 
-	public string Format(string key, params object[] args) {
-		string format = Translate(key);
+	public static string Format(string key, params object[] args) {
+		var format = Translate(key);
 		return args == null || args.Length == 0
 			? format
 			: string.Format(CultureInfo.CurrentCulture, format, args);
