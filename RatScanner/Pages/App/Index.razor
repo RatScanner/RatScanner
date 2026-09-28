@@ -55,9 +55,9 @@
         </MudItem>
 
         <!-- Last Scanned Item -->
-        @if (_searchResult?.Data is Item item)
+        @if (GetDisplayedItem() is Item displayed)
         {
-            <ItemSearchResult Item="@item" Detail="Pages.InteractableOverlay.Index.DetailAmount.Max" />
+            <ItemSearchResult Item="@displayed" Detail="Pages.InteractableOverlay.Index.DetailAmount.Max" />
         }
     </MudStack>
 </div>
@@ -87,6 +87,20 @@
     private int _selectedResultIndex { get; set; } = 0;
 
     private SearchResult _searchResult;
+    private bool _showSearchResult;
+    private Item? _shownScanItem;
+
+    private Item? GetLastScannedItem()
+    {
+        var scans = MenuVM.ItemScans;
+        return scans.Count > 0 ? scans.Last().Item : null;
+    }
+
+    private Item? GetDisplayedItem()
+    {
+        if (_showSearchResult && _searchResult?.Data is Item searched) return searched;
+        return GetLastScannedItem();
+    }
 
     protected override void OnInitialized()
     {
@@ -111,6 +125,7 @@
     {
         _selectedResultIndex = index;
         _searchResult = _searchResults.ElementAt(_selectedResultIndex);
+        _showSearchResult = true;
         _searchTextField.Clear();
         _searchResults = [];
         StateHasChanged();
@@ -139,6 +154,13 @@
 
     private async void PropertyChangeHandler(object? sender, EventArgs e)
     {
+        var latest = GetLastScannedItem();
+        if (latest is not null && !ReferenceEquals(latest, _shownScanItem))
+        {
+            _shownScanItem = latest;
+            _showSearchResult = false;
+        }
+
         await InvokeAsync(StateHasChanged);
     }
 
