@@ -38,18 +38,15 @@
 </div>
 
 @code {
-    protected override void OnInitialized()
-    {
+    protected override void OnInitialized() {
         SettingsVM.PropertyChanged += PropertyChangeHandler;
     }
 
-    private async void PropertyChangeHandler(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
+    private async void PropertyChangeHandler(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
         await InvokeAsync(() => StateHasChanged());
     }
 
-    public void Dispose()
-    {
+    public void Dispose() {
         SettingsVM.PropertyChanged -= PropertyChangeHandler;
     }
 }

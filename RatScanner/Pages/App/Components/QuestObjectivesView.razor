@@ -11,8 +11,7 @@
     <div class="objective-list">
         <span class="objective-empty">@Localizer["QuestNoObjectives"]</span>
     </div>
-}
-else {
+} else {
     <div class="objective-list">
         @foreach (var objective in Entry.ObjectiveList) {
             var isDone = Entry.IsComplete || objective.IsComplete;

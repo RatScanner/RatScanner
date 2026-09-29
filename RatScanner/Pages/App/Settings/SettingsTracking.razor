@@ -24,15 +24,12 @@
             @* Connection status lives with the credentials it describes, rather than
                in a section of its own. *@
             <div class="connection-state">
-                @if (_checkingToken)
-                {
+                @if (_checkingToken) {
                     <MudProgressCircular Size="Size.Small" Indeterminate="true" Color="Color.Primary" />
                     <div>
                         <MudText Typo="Typo.body1">@Localizer["ConnectionCheckingLabel"]</MudText>
                     </div>
-                }
-                else
-                {
+                } else {
                     <MudIcon Icon="@ConnectionIcon" Color="@ConnectionColor" Size="Size.Medium" />
                     <div>
                         <MudText Typo="Typo.body1">@ConnectionLabel</MudText>
@@ -182,8 +179,7 @@
         });
     }
 
-    private IEnumerable<string> CheckToken(string token)
-    {
+    private IEnumerable<string> CheckToken(string token) {
         if (string.IsNullOrEmpty(token)) yield break;
 
         // Only report a verdict for a token we have actually finished checking;
@@ -194,19 +190,16 @@
         if (!_isConnected) yield return Localizer["InvalidToken"];
     }
 
-    protected override async Task OnInitializedAsync()
-    {
+    protected override async Task OnInitializedAsync() {
         SettingsVM.PropertyChanged += PropertyChangeHandler;
         await RunConnectionCheckAsync();
     }
 
-    private async void PropertyChangeHandler(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
+    private async void PropertyChangeHandler(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
         await InvokeAsync(() => StateHasChanged());
     }
 
-    public void Dispose()
-    {
+    public void Dispose() {
         SettingsVM.PropertyChanged -= PropertyChangeHandler;
         _debounce?.Dispose();
     }

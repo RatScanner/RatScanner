@@ -27,8 +27,7 @@
                     </MudText>
                     <MudNumericField T="int" Value="@SettingsVM.ScreenWidth"
                                      ValueChanged="@((int v) => { SettingsVM.ScreenWidth = v; SettingsVM.MarkDirty(); })"
-                                     Variant="Variant.Outlined" Margin="Margin.Dense"
-                                     HideSpinButtons="true" Min="100" Max="99999" />
+                                     Variant="Variant.Outlined" Margin="Margin.Dense" HideSpinButtons="true" Min="100" Max="99999" />
                 </div>
                 <div class="resolution-field">
                     <MudText Typo="Typo.caption" Color="Color.Secondary" Class="resolution-label">
@@ -36,8 +35,7 @@
                     </MudText>
                     <MudNumericField T="int" Value="@SettingsVM.ScreenHeight"
                                      ValueChanged="@((int v) => { SettingsVM.ScreenHeight = v; SettingsVM.MarkDirty(); })"
-                                     Variant="Variant.Outlined" Margin="Margin.Dense"
-                                     HideSpinButtons="true" Min="100" Max="99999" />
+                                     Variant="Variant.Outlined" Margin="Margin.Dense" HideSpinButtons="true" Min="100" Max="99999" />
                 </div>
                 <div class="resolution-field">
                     <MudText Typo="Typo.caption" Color="Color.Secondary" Class="resolution-label">
@@ -54,27 +52,24 @@
 
     <SettingsCard Title="@Localizer["DiagnosticsGroup"]" Subtitle="@Localizer["DiagnosticsGroupDesc"]">
         <SettingsRow Label="@Localizer["ConfigFile"]" SubLabel="@Localizer["ConfigFileHint"]">
-            <MudButton Variant="Variant.Text" Size="Size.Small" Color="Color.Secondary"
-                       Class="path-button" EndIcon="@Icons.Material.Filled.FolderOpen"
-                       OnClick="@(() => RevealInExplorer(ConfigPath))"
+            <MudButton Variant="Variant.Text" Size="Size.Small" Color="Color.Secondary" Class="path-button"
+                       EndIcon="@Icons.Material.Filled.FolderOpen" OnClick="@(() => RevealInExplorer(ConfigPath))"
                        Title="@($"{Localizer["RevealInExplorerHint"]} - {ConfigPath}")">
                 <span class="path-text">@DisplayPath(ConfigPath)</span>
             </MudButton>
         </SettingsRow>
 
         <SettingsRow Label="@Localizer["LogFile"]" SubLabel="@Localizer["LogFileHint"]">
-            <MudButton Variant="Variant.Text" Size="Size.Small" Color="Color.Secondary"
-                       Class="path-button" EndIcon="@Icons.Material.Filled.FolderOpen"
-                       OnClick="@(() => RevealInExplorer(LogPath))"
+            <MudButton Variant="Variant.Text" Size="Size.Small" Color="Color.Secondary" Class="path-button"
+                       EndIcon="@Icons.Material.Filled.FolderOpen" OnClick="@(() => RevealInExplorer(LogPath))"
                        Title="@($"{Localizer["RevealInExplorerHint"]} - {LogPath}")">
                 <span class="path-text">@DisplayPath(LogPath)</span>
             </MudButton>
         </SettingsRow>
 
         <SettingsRow Label="@Localizer["DataFolder"]" SubLabel="@Localizer["DataFolderHint"]">
-            <MudButton Variant="Variant.Text" Size="Size.Small" Color="Color.Secondary"
-                       Class="path-button" EndIcon="@Icons.Material.Filled.FolderOpen"
-                       OnClick="@(() => RevealInExplorer(DataPath))"
+            <MudButton Variant="Variant.Text" Size="Size.Small" Color="Color.Secondary" Class="path-button"
+                       EndIcon="@Icons.Material.Filled.FolderOpen" OnClick="@(() => RevealInExplorer(DataPath))"
                        Title="@($"{Localizer["RevealInExplorerHint"]} - {DataPath}")">
                 <span class="path-text">@DisplayPath(DataPath)</span>
             </MudButton>
@@ -83,11 +78,9 @@
 </div>
 
 @code {
-    private static readonly Converter<float> _percentageConverter = new()
-    {
+    private static readonly Converter<float> _percentageConverter = new() {
         SetFunc = value => (int)(value * 100) + "%",
-        GetFunc = text =>
-        {
+        GetFunc = text => {
             text = text?.TrimEnd('%') ?? "";
             return int.TryParse(text, out var num) ? num / 100f : 1f;
         },
@@ -137,18 +130,15 @@
         }
     }
 
-    protected override void OnInitialized()
-    {
+    protected override void OnInitialized() {
         SettingsVM.PropertyChanged += PropertyChangeHandler;
     }
 
-    private async void PropertyChangeHandler(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
+    private async void PropertyChangeHandler(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
         await InvokeAsync(() => StateHasChanged());
     }
 
-    public void Dispose()
-    {
+    public void Dispose() {
         SettingsVM.PropertyChanged -= PropertyChangeHandler;
     }
 }

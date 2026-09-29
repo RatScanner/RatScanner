@@ -25,8 +25,7 @@
             <MudSelect T="UiLanguage" Value="@SettingsVM.UiLanguage"
                        ValueChanged="@((UiLanguage v) => { SettingsVM.UiLanguage = v; SettingsVM.MarkDirty(); })"
                        Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Style="min-width: 220px;">
-                @foreach (var language in GetUiLanguages())
-                {
+                @foreach (var language in GetUiLanguages()) {
                     <MudSelectItem Value="@language">@language.ToCultureName()</MudSelectItem>
                 }
             </MudSelect>
@@ -52,18 +51,15 @@
     private IEnumerable<UiLanguage> GetUiLanguages() =>
         (Enum.GetValues(typeof(UiLanguage)) as IEnumerable<UiLanguage>)!.OrderBy(l => l.ToCultureName());
 
-    protected override void OnInitialized()
-    {
+    protected override void OnInitialized() {
         SettingsVM.PropertyChanged += PropertyChangeHandler;
     }
 
-    private async void PropertyChangeHandler(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
+    private async void PropertyChangeHandler(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
         await InvokeAsync(() => StateHasChanged());
     }
 
-    public void Dispose()
-    {
+    public void Dispose() {
         SettingsVM.PropertyChanged -= PropertyChangeHandler;
     }
 }

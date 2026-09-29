@@ -63,55 +63,46 @@
         <SettingsCard Title="@Localizer["PreviewGroup"]" Subtitle="@Localizer["PreviewGroupDesc"]">
             <div class="preview-surface">
                 <div class="preview-card" style="background-color: @PreviewBackdrop">
-                    @if (SettingsVM.ShowName)
-                    {
+                    @if (SettingsVM.ShowName) {
                         <div class="preview-name">Salewa FIRST AID KIT</div>
                     }
-                    @if (SettingsVM.ShowUpdated)
-                    {
+                    @if (SettingsVM.ShowUpdated) {
                         <div class="preview-updated">updated 4m ago</div>
                     }
                     <div class="preview-divider"></div>
-                    @if (SettingsVM.ShowAvgDayPrice)
-                    {
+                    @if (SettingsVM.ShowAvgDayPrice) {
                         <div class="preview-line">
                             <span>Avg 24h price</span><span class="preview-value">24 118 ₽</span>
                         </div>
                     }
-                    @if (SettingsVM.ShowPricePerSlot)
-                    {
+                    @if (SettingsVM.ShowPricePerSlot) {
                         <div class="preview-line">
                             <span>Per slot</span><span class="preview-value">1 582 ₽</span>
                         </div>
                     }
-                    @if (SettingsVM.ShowTraderPrice)
-                    {
+                    @if (SettingsVM.ShowTraderPrice) {
                         <div class="preview-line">
                             <span>Best trader</span><span class="preview-value">21 500 ₽</span>
                         </div>
                     }
-                    @if (SettingsVM.ShowKappa)
-                    {
+                    @if (SettingsVM.ShowKappa) {
                         <div class="preview-line">
                             <span>Kappa needed</span><span class="preview-value preview-warn">2 400</span>
                         </div>
                     }
-                    @if (SettingsVM.ShowQuestHideoutTracker)
-                    {
+                    @if (SettingsVM.ShowQuestHideoutTracker) {
                         <div class="preview-line">
                             <span>Quest / hideout</span><span class="preview-value">3</span>
                         </div>
                     }
-                    @if (SettingsVM.ShowQuestHideoutTeamTracker)
-                    {
+                    @if (SettingsVM.ShowQuestHideoutTeamTracker) {
                         <div class="preview-line">
                             <span>Team needs</span><span class="preview-value">1</span>
                         </div>
                     }
                 </div>
             </div>
-            @if (!AnyFieldEnabled())
-            {
+            @if (!AnyFieldEnabled()) {
                 <MudText Typo="Typo.caption" Color="Color.Warning" Class="d-block mt-2">
                     @Localizer["PreviewEmptyLabel"]
                 </MudText>
@@ -123,10 +114,8 @@
 @code {
     // Mirrors RatConfig.MinimalUi.OpacityToAlpha so the preview matches the real
     // minimal UI, which fades the backdrop rather than the whole card.
-    private string PreviewBackdrop
-    {
-        get
-        {
+    private string PreviewBackdrop {
+        get {
             return $"rgba(30, 30, 30, {(SettingsVM.Opacity / 100.0).ToString(CultureInfo.InvariantCulture)})";
         }
     }
@@ -136,18 +125,15 @@
         SettingsVM.ShowTraderPrice || SettingsVM.ShowKappa || SettingsVM.ShowQuestHideoutTracker ||
         SettingsVM.ShowQuestHideoutTeamTracker || SettingsVM.ShowUpdated;
 
-    protected override void OnInitialized()
-    {
+    protected override void OnInitialized() {
         SettingsVM.PropertyChanged += PropertyChangeHandler;
     }
 
-    private async void PropertyChangeHandler(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
+    private async void PropertyChangeHandler(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
         await InvokeAsync(() => StateHasChanged());
     }
 
-    public void Dispose()
-    {
+    public void Dispose() {
         SettingsVM.PropertyChanged -= PropertyChangeHandler;
     }
 }

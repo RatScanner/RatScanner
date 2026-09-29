@@ -2,7 +2,8 @@
 @using System.Diagnostics;
 @using static RatScanner.Pages.InteractableOverlay.Index
 
-<MudPaper Class="pa-2 overflow-hidden" Elevation="3" Style="@(Detail == DetailAmount.Max ? "" : "cursor: pointer;")" @onclick="HandleClick">
+<MudPaper Class="pa-2 overflow-hidden" Elevation="3" Style="@(Detail == DetailAmount.Max ? "" : "cursor: pointer;")"
+          @onclick="HandleClick">
     <MudStack Row="true" Justify="Justify.SpaceBetween" Style="height: 6vh;">
         <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1;">
             <MudStack Justify="Justify.Center">
@@ -17,8 +18,10 @@
                         @Task.Name
                     </MudText>
                     <MudText Align="Align.Center">
-                        <MudIconButton Icon="@Constants.Icon.TarkovDev" Size="Size.Small" OnClick=@(() => OpenURL($"https://tarkov.dev/task/{Task.Id}")) />
-                        <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" OnClick=@(() => OpenURL(Task.WikiLink)) />
+                        <MudIconButton Icon="@Constants.Icon.TarkovDev" Size="Size.Small" OnClick=@(() =>
+                                       OpenURL($"https://tarkov.dev/task/{Task.Id}")) />
+                        <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" OnClick=@(() =>
+                                       OpenURL(Task.WikiLink)) />
                     </MudText>
                 } else {
                     <MudText Class="ellipsis" Typo="Typo.body1">
@@ -31,16 +34,15 @@
             <MudStack Row="true" Justify="Justify.FlexEnd">
                 <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Spacing="0">
                     <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Center" Spacing="0">
-                        <MudAvatar Image="@Task.Trader?.ImageLink"
-                                   Size="Size.Large" Style="float: left;" Square="true" Variant="Variant.Outlined" />
+                        <MudAvatar Image="@Task.Trader?.ImageLink" Size="Size.Large" Style="float: left;" Square="true"
+                                   Variant="Variant.Outlined" />
                     </MudStack>
                 </MudStack>
             </MudStack>
         }
     </MudStack>
 
-    @if (Detail == DetailAmount.Max)
-    {
+    @if (Detail == DetailAmount.Max) {
         <MudDivider Vertical="false" DividerType="DividerType.Middle" Class="mx-0 my-2" />
 
         <MudStack Row="false" Style="max-height:200px; overflow:hidden; position:relative">
@@ -53,11 +55,8 @@
                         <MudText Class="flex-1">@objective.Description</MudText>
                     </MudStack>
                     @if (HasMapForObjective(objective)) {
-                        <MudIconButton Icon="@Icons.Material.Filled.Map" 
-                                      Size="Size.Small" 
-                                      Color="Color.Primary"
-                                      Title="View on map"
-                                      OnClick="@(() => OnMapClick.InvokeAsync((Task, objective)))" />
+                        <MudIconButton Icon="@Icons.Material.Filled.Map" Size="Size.Small" Color="Color.Primary" Title="View on map"
+                                       OnClick="@(() => OnMapClick.InvokeAsync((Task, objective)))" />
                     }
                 </MudStack>
             }

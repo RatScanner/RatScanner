@@ -22,8 +22,8 @@
             <div style="width: 40vw; pointer-events: auto;">
                 <MudPaper>
                     <MudTextField @ref="_searchTextField" T="string" Variant="Variant.Outlined"
-                                  Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search"
-                                  DebounceInterval="20" OnDebounceIntervalElapsed="ExecuteSearch" @bind-Value="@_searchText">
+                                  Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" DebounceInterval="20"
+                                  OnDebounceIntervalElapsed="ExecuteSearch" @bind-Value="@_searchText">
                     </MudTextField>
                 </MudPaper>
 
@@ -33,16 +33,15 @@
                         SearchResult searchResult = _searchResults.ElementAt(i);
                         
                         @if (searchResult.Data is Item item) {
-                            <ItemSearchResult Item="@item" 
-                                            Detail="@(i == _selectedResultIndex ? DetailAmount.Max : DetailAmount.Med)" 
-                                            OnClick="@(() => SelectResult(i))" />
-                        } 
-                        else if (searchResult.Data is TarkovTask task) {
-                            <TaskSearchResult Task="@task" 
-                                            Detail="@(i == _selectedResultIndex ? DetailAmount.Max : DetailAmount.Med)" 
-                                            OnMapClick="@((tuple) => OpenMapForObjective(tuple.task, tuple.objective))"
-                                            OnClick="@(() => SelectResult(i))" />
-                        } 
+                            <ItemSearchResult Item="@item"
+                                              Detail="@(i == _selectedResultIndex ? DetailAmount.Max : DetailAmount.Med)"
+                                              OnClick="@(() => SelectResult(i))" />
+                        } else if (searchResult.Data is TarkovTask task) {
+                            <TaskSearchResult Task="@task"
+                                              Detail="@(i == _selectedResultIndex ? DetailAmount.Max : DetailAmount.Med)"
+                                              OnMapClick="@((tuple) => OpenMapForObjective(tuple.task, tuple.objective))"
+                                              OnClick="@(() => SelectResult(i))" />
+                        }
                         @* TODO: Re-enable map search results when MapViewer is fixed
                         else if (searchResult.Data is Map map) {
                             <MapSearchResult Map="@map" OnMapClick="@(() => OpenMapViewer(map))" />
@@ -77,8 +76,7 @@
     private TaskObjective? _selectedObjective = null;
     private List<TaskZone?>? _selectedObjectiveZones = null;
 
-    public enum DetailAmount
-    {
+    public enum DetailAmount {
         Min,
         Med,
         Max,

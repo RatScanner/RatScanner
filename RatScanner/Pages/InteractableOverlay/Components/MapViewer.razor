@@ -12,35 +12,27 @@
                 </MudStack>
                 <MudText Typo="Typo.caption" Class="mt-1">@Objective.Description</MudText>
             }
-            <MudText Typo="Typo.caption" Class="mt-1">Scroll to zoom • Drag to pan</MudText>
+            <MudText Typo="Typo.caption" Class="mt-1">Scroll to zoom ï¿½ Drag to pan</MudText>
         </MudPaper>
     </div>
     <div class="map-viewer-close" @onclick:stopPropagation="true">
         <MudIconButton Icon="@Icons.Material.Filled.Close" Size="Size.Large" Color="Color.Error" OnClick="OnClose" />
     </div>
-    <div class="map-viewer-container" 
-         @onclick:stopPropagation="true"
-         @onwheel="HandleWheel"
-         @onmousedown="HandleMouseDown"
-         @onmousemove="HandleMouseMove"
-         @onmouseup="HandleMouseUp"
+    <div class="map-viewer-container" @onclick:stopPropagation="true" @onwheel="HandleWheel"
+         @onmousedown="HandleMouseDown" @onmousemove="HandleMouseMove" @onmouseup="HandleMouseUp"
          @onmouseleave="HandleMouseUp">
         <div class="map-transform-wrapper @(_isDragging ? "dragging" : "")"
              style="transform: translate(@(_translateX)px, @(_translateY)px) translate(-50%, -50%) scale(@(_scale.ToString(System.Globalization.CultureInfo.InvariantCulture)));">
-            <img src="@MapDataLoader.GetMapSvgUrl(Map?.Id)"
-                 class="map-image"
-                 draggable="false" />
+            <img src="@MapDataLoader.GetMapSvgUrl(Map?.Id)" class="map-image" draggable="false" />
             
             @* Render objective markers *@
             @if (ObjectiveZones != null && Objective != null) {
                 @foreach (var zone in ObjectiveZones.Where(z => z?.Position != null)) {
                     var pos = zone!.Position!;
-                    <div class="objective-marker" 
-                         style="left: @(pos.X)%; top: @(pos.Y)%;">
+                    <div class="objective-marker" style="left: @(pos.X)%; top: @(pos.Y)%;">
                         <div class="marker-icon">
-                            <MudIcon Icon="@Constants.Icon.TaskObjective.FromType(Objective.Type)" 
-                                    Size="Size.Large" 
-                                    Color="Color.Warning" />
+                            <MudIcon Icon="@Constants.Icon.TaskObjective.FromType(Objective.Type)" Size="Size.Large"
+                                     Color="Color.Warning" />
                         </div>
                         <div class="marker-label">@Objective.Type</div>
                     </div>
@@ -145,9 +137,12 @@
     }
 
     @@keyframes markerPulse {
-        0%, 100% {
+
+        0%,
+        100% {
             transform: translate(-50%, -50%) scale(1);
         }
+
         50% {
             transform: translate(-50%, -50%) scale(1.1);
         }
@@ -182,8 +177,7 @@
     private double _lastMouseX = 0;
     private double _lastMouseY = 0;
 
-    protected override void OnInitialized()
-    {
+    protected override void OnInitialized() {
         _scale = 1.0;
         _translateX = 0;
         _translateY = 0;

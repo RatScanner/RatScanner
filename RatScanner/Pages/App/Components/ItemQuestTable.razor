@@ -13,8 +13,9 @@
 @if (Requiring.Count > 0) {
     <div class="quest-section">
         <MudText Typo="Typo.h6" Class="quest-title">@Localizer["QuestsRequiring"] @Item.Name</MudText>
-        <MudTable T="QuestItemEntry" Items="@Requiring" Dense="true" Hover="true" Elevation="0" Outlined="true" Breakpoint="Breakpoint.None"
-                  RowClassFunc="@RowClass" OnRowClick="@(args => Toggle(args.Item))" Class="quest-table">
+        <MudTable T="QuestItemEntry" Items="@Requiring" Dense="true" Hover="true" Elevation="0" Outlined="true"
+                  Breakpoint="Breakpoint.None" RowClassFunc="@RowClass" OnRowClick="@(args => Toggle(args.Item))"
+                  Class="quest-table">
             <ColGroup>
                 <col style="width: 40px;" />
                 <col />
@@ -34,109 +35,110 @@
                         <MudImage Src="@(entry.Task.Trader?.ImageLink ?? entry.Task.TaskImageLink)"
                                   Style="width: 40px; height: 40px; object-fit: contain;" />
                         <MudStack Spacing="0" Style="min-width: 0;">
-                            <MudText Typo="Typo.body2" Class="@($"quest-name{(entry.IsComplete ? " quest-done" : "")}")">@entry.Task.Name</MudText>
-                            @if (entry.IsComplete) {
-                                <MudText Typo="Typo.caption" Color="Color.Success">@Localizer["QuestCompleted"]</MudText>
-                            }
-                            else if (entry.IsFailed) {
-                                <MudText Typo="Typo.caption" Color="Color.Error">@Localizer["QuestFailed"]</MudText>
-                            }
+                            <MudText Typo="Typo.body2" Class="@($"quest-name{(entry.IsComplete ? " quest-done" : "")}")">
+                                @entry.Task.Name</MudText>
+                                @if (entry.IsComplete) {
+                                    <MudText Typo="Typo.caption" Color="Color.Success">@Localizer["QuestCompleted"]</MudText>
+                                } else if (entry.IsFailed) {
+                                    <MudText Typo="Typo.caption" Color="Color.Error">@Localizer["QuestFailed"]</MudText>
+                                }
+                            </MudStack>
                         </MudStack>
-                    </MudStack>
-                </MudTd>
-                <MudTd DataLabel="@Localizer["QuestRequiredItems"]">
-                    <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
-                        <MudPaper Style="width: 48px; height: 48px;" Outlined="true">
-                            <MudImage Src="@Item.BaseImageLink" Style="width: 100%; height: 100%; object-fit: contain;" />
-                        </MudPaper>
-                        <MudStack Spacing="0">
-                            <MudText Typo="Typo.body2">@Item.Name</MudText>
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">
-                                @string.Format(Localizer["QuestAmount"], entry.Count)@(entry.HasAlternates ? $" ({Localizer["QuestHasAlternates"]})" : "")
-                            </MudText>
+                    </MudTd>
+                    <MudTd DataLabel="@Localizer["QuestRequiredItems"]">
+                        <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                            <MudPaper Style="width: 48px; height: 48px;" Outlined="true">
+                                <MudImage Src="@Item.BaseImageLink" Style="width: 100%; height: 100%; object-fit: contain;" />
+                            </MudPaper>
+                            <MudStack Spacing="0">
+                                <MudText Typo="Typo.body2">@Item.Name</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    @string.Format(Localizer["QuestAmount"], entry.Count)@(entry.HasAlternates ? $" ({Localizer["QuestHasAlternates"]})" : "")
+                                </MudText>
+                            </MudStack>
                         </MudStack>
-                    </MudStack>
-                </MudTd>
-            </RowTemplate>
-            <ChildRowContent Context="entry">
-                @if (entry.IsExpanded) {
-                    <MudTr Item="@entry">
-                        <MudTd colspan="3">
-                            <div class="objective-cell" @onclick:stopPropagation="true">
-                                <QuestObjectivesView Entry="entry" />
-                            </div>
-                        </MudTd>
-                    </MudTr>
-                }
-            </ChildRowContent>
-        </MudTable>
-    </div>
-}
+                    </MudTd>
+                </RowTemplate>
+                <ChildRowContent Context="entry">
+                    @if (entry.IsExpanded) {
+                        <MudTr Item="@entry">
+                            <MudTd colspan="3">
+                                <div class="objective-cell" @onclick:stopPropagation="true">
+                                    <QuestObjectivesView Entry="entry" />
+                                </div>
+                            </MudTd>
+                        </MudTr>
+                    }
+                </ChildRowContent>
+            </MudTable>
+        </div>
+    }
 
-@if (Rewarding.Count > 0) {
-    <div class="quest-section">
-        <MudText Typo="Typo.h6" Class="quest-title">@Localizer["QuestsRewarding"] @Item.Name</MudText>
-        <MudTable T="QuestItemEntry" Items="@Rewarding" Dense="true" Hover="true" Elevation="0" Outlined="true" Breakpoint="Breakpoint.None"
-                  RowClassFunc="@RowClass" OnRowClick="@(args => Toggle(args.Item))" Class="quest-table">
-            <ColGroup>
-                <col style="width: 40px;" />
-                <col />
-                <col />
-            </ColGroup>
-            <HeaderContent>
-                <MudTh></MudTh>
-                <MudTh>@Localizer["QuestTask"]</MudTh>
-                <MudTh>@Localizer["QuestRewardItems"]</MudTh>
-            </HeaderContent>
-            <RowTemplate Context="entry">
-                <MudTd DataLabel="">
-                    <MudIcon Icon="@ExpandIcon(entry.IsExpanded)" Size="Size.Small" />
-                </MudTd>
-                <MudTd DataLabel="@Localizer["QuestTask"]">
-                    <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
-                        <MudImage Src="@(entry.Task.Trader?.ImageLink ?? entry.Task.TaskImageLink)"
-                                  Style="width: 40px; height: 40px; object-fit: contain;" />
-                        <MudStack Spacing="0" Style="min-width: 0;">
-                            <MudText Typo="Typo.body2" Class="@($"quest-name{(entry.IsComplete ? " quest-done" : "")}")">@entry.Task.Name</MudText>
-                            @if (entry.IsComplete) {
-                                <MudText Typo="Typo.caption" Color="Color.Success">@Localizer["QuestCompleted"]</MudText>
-                            }
-                            else if (entry.IsFailed) {
-                                <MudText Typo="Typo.caption" Color="Color.Error">@Localizer["QuestFailed"]</MudText>
-                            }
-                        </MudStack>
-                    </MudStack>
-                </MudTd>
-                <MudTd DataLabel="@Localizer["QuestRewardItems"]">
-                    <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
-                        <MudPaper Style="width: 48px; height: 48px;" Outlined="true">
-                            <MudImage Src="@Item.BaseImageLink" Style="width: 100%; height: 100%; object-fit: contain;" />
-                        </MudPaper>
-                        <MudStack Spacing="0">
-                            <MudText Typo="Typo.body2">@Item.Name</MudText>
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">
-                                @string.Format(Localizer["QuestAmount"], entry.Count)
-                            </MudText>
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">@Localizer["QuestOnTaskCompletion"]
-                            </MudText>
-                        </MudStack>
-                    </MudStack>
-                </MudTd>
-            </RowTemplate>
-            <ChildRowContent Context="entry">
-                @if (entry.IsExpanded) {
-                    <MudTr Item="@entry">
-                        <MudTd colspan="3">
-                            <div class="objective-cell" @onclick:stopPropagation="true">
-                                <QuestObjectivesView Entry="entry" />
-                            </div>
+    @if (Rewarding.Count > 0) {
+        <div class="quest-section">
+            <MudText Typo="Typo.h6" Class="quest-title">@Localizer["QuestsRewarding"] @Item.Name</MudText>
+            <MudTable T="QuestItemEntry" Items="@Rewarding" Dense="true" Hover="true" Elevation="0" Outlined="true"
+                      Breakpoint="Breakpoint.None" RowClassFunc="@RowClass" OnRowClick="@(args => Toggle(args.Item))"
+                      Class="quest-table">
+                <ColGroup>
+                    <col style="width: 40px;" />
+                    <col />
+                    <col />
+                </ColGroup>
+                <HeaderContent>
+                    <MudTh></MudTh>
+                    <MudTh>@Localizer["QuestTask"]</MudTh>
+                    <MudTh>@Localizer["QuestRewardItems"]</MudTh>
+                </HeaderContent>
+                <RowTemplate Context="entry">
+                    <MudTd DataLabel="">
+                        <MudIcon Icon="@ExpandIcon(entry.IsExpanded)" Size="Size.Small" />
+                    </MudTd>
+                    <MudTd DataLabel="@Localizer["QuestTask"]">
+                        <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                            <MudImage Src="@(entry.Task.Trader?.ImageLink ?? entry.Task.TaskImageLink)"
+                                      Style="width: 40px; height: 40px; object-fit: contain;" />
+                            <MudStack Spacing="0" Style="min-width: 0;">
+                                <MudText Typo="Typo.body2" Class="@($"quest-name{(entry.IsComplete ? " quest-done" : "")}")">
+                                    @entry.Task.Name</MudText>
+                                    @if (entry.IsComplete) {
+                                        <MudText Typo="Typo.caption" Color="Color.Success">@Localizer["QuestCompleted"]</MudText>
+                                    } else if (entry.IsFailed) {
+                                        <MudText Typo="Typo.caption" Color="Color.Error">@Localizer["QuestFailed"]</MudText>
+                                    }
+                                </MudStack>
+                            </MudStack>
                         </MudTd>
-                    </MudTr>
-                }
-            </ChildRowContent>
-        </MudTable>
-    </div>
-}
+                        <MudTd DataLabel="@Localizer["QuestRewardItems"]">
+                            <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                                <MudPaper Style="width: 48px; height: 48px;" Outlined="true">
+                                    <MudImage Src="@Item.BaseImageLink" Style="width: 100%; height: 100%; object-fit: contain;" />
+                                </MudPaper>
+                                <MudStack Spacing="0">
+                                    <MudText Typo="Typo.body2">@Item.Name</MudText>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                        @string.Format(Localizer["QuestAmount"], entry.Count)
+                                    </MudText>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@Localizer["QuestOnTaskCompletion"]
+                                    </MudText>
+                                </MudStack>
+                            </MudStack>
+                        </MudTd>
+                    </RowTemplate>
+                    <ChildRowContent Context="entry">
+                        @if (entry.IsExpanded) {
+                            <MudTr Item="@entry">
+                                <MudTd colspan="3">
+                                    <div class="objective-cell" @onclick:stopPropagation="true">
+                                        <QuestObjectivesView Entry="entry" />
+                                    </div>
+                                </MudTd>
+                            </MudTr>
+                        }
+                    </ChildRowContent>
+                </MudTable>
+            </div>
+        }
 
 @code {
     [Parameter, EditorRequired]

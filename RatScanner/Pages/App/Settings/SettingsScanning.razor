@@ -8,43 +8,31 @@
 @implements IDisposable
 
 <div class="settings-stack">
-    <SettingsCard Title="@Localizer["NameScanGroup"]"
-                  Subtitle="@Localizer["NameScanGroupDesc"]">
-        <SettingsRow Label="@Localizer["EnableNameScan"]"
-                     SubLabel="@Localizer["EnableNameScanHint"]">
-            <MudSwitch T="bool"
-                       Checked="@SettingsVM.EnableNameScan"
+    <SettingsCard Title="@Localizer["NameScanGroup"]" Subtitle="@Localizer["NameScanGroupDesc"]">
+        <SettingsRow Label="@Localizer["EnableNameScan"]" SubLabel="@Localizer["EnableNameScanHint"]">
+            <MudSwitch T="bool" Checked="@SettingsVM.EnableNameScan"
                        CheckedChanged="@((bool v) => { SettingsVM.EnableNameScan = v; SettingsVM.MarkDirty(); })"
                        Color="Color.Primary" Dense="true" />
         </SettingsRow>
 
-        <SettingsRow Label="@Localizer["NameScanHotkey"]"
-                     SubLabel="@Localizer["NameScanHotkeyHint"]"
+        <SettingsRow Label="@Localizer["NameScanHotkey"]" SubLabel="@Localizer["NameScanHotkeyHint"]"
                      Disabled="@(!SettingsVM.EnableNameScan)">
-            <HotkeySelector Hotkey="@SettingsVM.NameScanHotkey"
-                            @key="SettingsVM.NameScanHotkey"
+            <HotkeySelector Hotkey="@SettingsVM.NameScanHotkey" @key="SettingsVM.NameScanHotkey"
                             OnHotkeyChanged="@(() => SettingsVM.MarkDirty())" />
         </SettingsRow>
 
-        <SettingsRow Label="@Localizer["AutomaticScanning"]"
-                     SubLabel="@Localizer["AutomaticScanningHint"]"
+        <SettingsRow Label="@Localizer["AutomaticScanning"]" SubLabel="@Localizer["AutomaticScanningHint"]"
                      Disabled="@(!SettingsVM.EnableNameScan)">
-            <MudSwitch T="bool"
-                       Checked="@SettingsVM.EnableAutoNameScan"
+            <MudSwitch T="bool" Checked="@SettingsVM.EnableAutoNameScan"
                        CheckedChanged="@((bool v) => { SettingsVM.EnableAutoNameScan = v; SettingsVM.MarkDirty(); })"
                        Color="Color.Primary" Dense="true" />
         </SettingsRow>
 
-        <SettingsRow Label="@Localizer["NameScanLanguage"]"
-                     SubLabel="@Localizer["NameScanLanguageHint"]"
+        <SettingsRow Label="@Localizer["NameScanLanguage"]" SubLabel="@Localizer["NameScanLanguageHint"]"
                      Disabled="@(!SettingsVM.EnableNameScan)">
-            <MudSelect T="int"
-                       Value="@SettingsVM.NameScanLanguage"
+            <MudSelect T="int" Value="@SettingsVM.NameScanLanguage"
                        ValueChanged="@((int v) => { SettingsVM.NameScanLanguage = v; SettingsVM.MarkDirty(); })"
-                       Variant="Variant.Outlined"
-                       Margin="Margin.Dense"
-                       Dense="true"
-                       Style="min-width: 220px;">
+                       Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Style="min-width: 220px;">
                 @foreach (var language in GetLanguages()) {
                     <MudSelectItem T="int" Value="@language.ordinal">@language.name</MudSelectItem>
                 }
@@ -52,38 +40,29 @@
         </SettingsRow>
     </SettingsCard>
 
-    <SettingsCard Title="@Localizer["IconScanGroup"]"
-                  Subtitle="@Localizer["IconScanGroupDesc"]">
-        <SettingsRow Label="@Localizer["EnableIconScan"]"
-                     SubLabel="@Localizer["EnableIconScanHint"]">
-            <MudSwitch T="bool"
-                       Checked="@SettingsVM.EnableIconScan"
+    <SettingsCard Title="@Localizer["IconScanGroup"]" Subtitle="@Localizer["IconScanGroupDesc"]">
+        <SettingsRow Label="@Localizer["EnableIconScan"]" SubLabel="@Localizer["EnableIconScanHint"]">
+            <MudSwitch T="bool" Checked="@SettingsVM.EnableIconScan"
                        CheckedChanged="@((bool v) => { SettingsVM.EnableIconScan = v; SettingsVM.MarkDirty(); })"
                        Color="Color.Primary" Dense="true" />
         </SettingsRow>
 
-        <SettingsRow Label="@Localizer["IconScanHotkey"]"
-                     SubLabel="@Localizer["IconScanHotkeyHint"]"
+        <SettingsRow Label="@Localizer["IconScanHotkey"]" SubLabel="@Localizer["IconScanHotkeyHint"]"
                      Disabled="@(!SettingsVM.EnableIconScan)">
-            <HotkeySelector Hotkey="@SettingsVM.IconScanHotkey"
-                            @key="SettingsVM.IconScanHotkey"
+            <HotkeySelector Hotkey="@SettingsVM.IconScanHotkey" @key="SettingsVM.IconScanHotkey"
                             OnHotkeyChanged="@(() => SettingsVM.MarkDirty())" />
         </SettingsRow>
 
-        <SettingsRow Label="@Localizer["ScanRotatedIcons"]"
-                     SubLabel="@Localizer["ScanRotatedIconsHint"]"
+        <SettingsRow Label="@Localizer["ScanRotatedIcons"]" SubLabel="@Localizer["ScanRotatedIconsHint"]"
                      Disabled="@(!SettingsVM.EnableIconScan)">
-            <MudSwitch T="bool"
-                       Checked="@SettingsVM.ScanRotatedIcons"
+            <MudSwitch T="bool" Checked="@SettingsVM.ScanRotatedIcons"
                        CheckedChanged="@((bool v) => { SettingsVM.ScanRotatedIcons = v; SettingsVM.MarkDirty(); })"
                        Color="Color.Primary" Dense="true" />
         </SettingsRow>
 
-        <SettingsRow Label="@Localizer["UseCachedIcons"]"
-                     SubLabel="@Localizer["UseCachedIconsHint"]"
+        <SettingsRow Label="@Localizer["UseCachedIcons"]" SubLabel="@Localizer["UseCachedIconsHint"]"
                      Disabled="@(!SettingsVM.EnableIconScan)">
-            <MudSwitch T="bool"
-                       Checked="@SettingsVM.UseCachedIcons"
+            <MudSwitch T="bool" Checked="@SettingsVM.UseCachedIcons"
                        CheckedChanged="@((bool v) => { SettingsVM.UseCachedIcons = v; SettingsVM.MarkDirty(); })"
                        Color="Color.Primary" Dense="true" />
         </SettingsRow>
