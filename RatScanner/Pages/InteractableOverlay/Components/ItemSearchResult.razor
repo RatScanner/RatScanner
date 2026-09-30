@@ -7,92 +7,85 @@
           Style="@(Detail == DetailAmount.Max ? "" : "cursor: pointer;")" @onclick="HandleClick">
     @{
         string minHeight = Detail switch {
-            DetailAmount.Min => "40",
             DetailAmount.Med => "40",
             DetailAmount.Max => "80",
+            _ => "40",
         };
-        minHeight = $"min-height: {minHeight}px; height: 6vh;";
+        minHeight = $"min-height: {minHeight}px;";
     }
 
-    @if (Detail != DetailAmount.Max) {
+    @if (Detail == DetailAmount.Min) {
+        <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" Style="height: 6vh;">
+            <MudStack Justify="Justify.Center" Class="flex-shrink-0">
+                <MudPaper Outlined="true" Style="height: 100%; aspect-ratio: 1 / 1; overflow: hidden;">
+                    <MudImage Src="@Item.BaseImageLink" Style="width: 100%; height: 100%; object-fit: contain;" />
+                </MudPaper>
+            </MudStack>
+
+            <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Start">
+                <MudText Typo="Typo.body1"
+                         Style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 16vw; min-width: 0;">
+                    @Item.Name
+                </MudText>
+            </MudStack>
+        </MudStack>
+    }
+
+    @if (Detail == DetailAmount.Med) {
         <MudStack Row="true" Justify="Justify.SpaceBetween" Style="@minHeight">
             <!--Left side of the search result item-->
-            <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" Style="">
-                <MudPaper Style="aspect-ratio : 1 / 1;" Outlined="true">
+            <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" Style="min-width: 0;">
+                <MudPaper Style="width: 48px; height: 48px; min-width: 48px;" Outlined="true">
                     <MudImage Src="@Item.BaseImageLink" Style="width: 100%; height: 100%; object-fit: contain;" />
                 </MudPaper>
 
-                <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Style="width: 4vw;">
-                    <MudChip OnClose="() => { }" CloseIcon="@Icons.Material.Filled.Checklist" Size="Size.Small"
-                             Variant="Variant.Outlined"
+                <MudStack Spacing="0" Style="min-width: 0; overflow: hidden;">
+                    <MudText Typo="Typo.subtitle1"
+                             Style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;">
+                        @Item.Name
+                    </MudText>
+                    <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary">@Item.ShortName</MudText>
+                        <MudIconButton Icon="@Constants.Icon.TarkovDev" Size="Size.Small" OnClick=@(() =>
+                                       OpenURL($"https://tarkov.dev/item/{Item.Id}")) />
+                        <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" OnClick=@(() =>
+                                       OpenURL(Item.WikiLink)) />
+                    </MudStack>
+                </MudStack>
+            </MudStack>
+
+            <!--Right side of the search result item-->
+            <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Center">
+                <MudStack Spacing="0" AlignItems="AlignItems.End">
+                    <MudChip T="string" Size="Size.Small" Variant="Variant.Text"
                              Color="@(Item.GetTaskRemaining().Item1 > 0 ? Color.Success : Color.Default)">
+                        <MudIcon Icon="@Icons.Material.Filled.Checklist" Size="Size.Small" Class="mr-1" />
                         @Item.GetTaskRemaining().Item1.ToShortString()
                     </MudChip>
-                    <MudChip OnClose="() => { }" CloseIcon="@Icons.Material.Filled.House" Size="Size.Small"
-                             Variant="Variant.Outlined"
+                    <MudChip T="string" Size="Size.Small" Variant="Variant.Text"
                              Color="@(Item.GetHideoutRemaining() > 0 ? Color.Success : Color.Default)">
+                        <MudIcon Icon="@Icons.Material.Filled.House" Size="Size.Small" Class="mr-1" />
                         @Item.GetHideoutRemaining().ToShortString()
                     </MudChip>
                 </MudStack>
 
                 <MudDivider Vertical="true" FlexItem="true" />
 
-                <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Start">
-                    <MudText Class="ellipsis" Typo="Typo.h6" Style="max-width: 16vw">
-                        @Item.Name
-                    </MudText>
-                    <MudText Align="Align.Center">
-                        @Item.ShortName
-                        <MudIconButton Icon="@Constants.Icon.TarkovDev" Size="Size.Small" OnClick=@(() =>
-                                       OpenURL($"https://tarkov.dev/item/{Item.Id}")) />
-                        <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" OnClick=@(() =>
-                                       OpenURL(Item.WikiLink)) />
-                    </MudText>
-                </MudStack>
-            </MudStack>
-
-            <!--Right side of the search result item-->
-            <MudStack Row="true" Justify="Justify.FlexEnd">
-                <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Style="width: 8vw" Spacing="0">
-                    <MudText Typo="Typo.h6">
-                        @Item.Avg24HPrice.AsRubs()
-                    </MudText>
-                    <MudText>
-                        @Item.GetAvg24hMarketPricePerSlot().AsRubs()
+                <MudStack Spacing="0" AlignItems="AlignItems.End" Style="min-width: 80px;">
+                    <MudText Typo="Typo.subtitle2">@Item.Avg24HPrice.AsRubs()</MudText>
+                    <MudText Typo="Typo.caption" Color="Color.Secondary">@Item.GetAvg24hMarketPricePerSlot().AsRubs()/slot
                     </MudText>
                 </MudStack>
 
                 <MudDivider Vertical="true" FlexItem="true" />
 
-                <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Center" Style="width: 3vw" Spacing="0">
+                <MudStack Spacing="0" AlignItems="AlignItems.Center" Style="min-width: 50px;">
                     @{
-                        var bestTraderOffer = Item.GetBestSellToTraderOffer();
-                        var traderImage = bestTraderOffer?.Trader?.ImageLink;
+                        var medBestTrader = Item.GetBestSellToTraderOffer();
+                        var medTraderImage = medBestTrader?.Trader?.ImageLink;
                     }
-                </MudStack>
-            </MudStack>
-
-            <!--Right side of the search result item-->
-            <MudStack Row="true" Justify="Justify.FlexEnd">
-                <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Style="width: 8vw" Spacing="0">
-                    <MudText Typo="Typo.h6">
-                        @Item.Avg24HPrice.AsRubs()
-                    </MudText>
-                    <MudText>
-                        @Item.GetAvg24hMarketPricePerSlot().AsRubs()
-                    </MudText>
-                </MudStack>
-
-                <MudDivider Vertical="true" FlexItem="true" />
-
-                <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Center" Style="width: 3vw" Spacing="0">
-                    @{
-                        var bestTraderOffer = Item.GetBestSellToTraderOffer();
-                        var traderImage = bestTraderOffer?.Trader?.ImageLink;
-                    }
-                    <MudAvatar Image="@traderImage" Size="Size.Medium" Style="float: left;" Square="true"
-                               Variant="Variant.Outlined" />
-                    <MudText Typo="Typo.subtitle2" Style="float: right;">@bestTraderOffer?.PriceRub.AsRubs()</MudText>
+                    <MudAvatar Image="@medTraderImage" Size="Size.Small" Square="true" Variant="Variant.Outlined" />
+                    <MudText Typo="Typo.caption">@medBestTrader?.PriceRub.AsRubs()</MudText>
                 </MudStack>
             </MudStack>
         </MudStack>
@@ -122,7 +115,8 @@
         @* Item.BartersFor?.Count > 0, Item.BartersFor?.Count ?? 0 *@
         );
 
-        <MudText Typo="Typo.subtitle1" Class="font-weight-bold ellipsis px-1 pb-1">
+        <MudText Typo="Typo.subtitle1" Class="font-weight-bold px-1 pb-1"
+                 Style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
             @Item.Name
         </MudText>
 
@@ -326,15 +320,6 @@
                 </MudStack>
             }
         </MudPaper>
-
-        <style>
-            .ellipsis {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                min-width: 0;
-            }
-        </style>
 
 @code {
     [Parameter]

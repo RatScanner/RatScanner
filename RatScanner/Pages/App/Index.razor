@@ -36,9 +36,11 @@
                         SearchResult searchResult = _searchResults.ElementAt(i);
                         
                         @if (searchResult.Data is Item item) {
-                            <ItemSearchResult Item="@item" OnClick="@(() => SelectResult(i))" />
+                            <ItemSearchResult Item="@item" Detail="Pages.InteractableOverlay.Index.DetailAmount.Min"
+                                              OnClick="@(() => SelectResult(i))" />
                         } else if (searchResult.Data is TarkovTask task) {
-                            <TaskSearchResult Task="@task" OnClick="@(() => SelectResult(i))" />
+                            <TaskSearchResult Task="@task" Detail="Pages.InteractableOverlay.Index.DetailAmount.Min"
+                                              OnClick="@(() => SelectResult(i))" />
                         }
                         @* TODO: Re-enable map search results when MapViewer is fixed
                         else if (searchResult.Data is Map map) {
