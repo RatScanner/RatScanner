@@ -64,7 +64,8 @@
                         <MudTr Item="@entry">
                             <MudTd colspan="3">
                                 <div class="objective-cell" @onclick:stopPropagation="true">
-                                    <QuestObjectivesView Entry="entry" />
+                                    <QuestObjectivesView Objectives="entry.ObjectiveList" TaskComplete="entry.IsComplete"
+                                                         Task="@entry.Task" />
                                 </div>
                             </MudTd>
                         </MudTr>
@@ -130,7 +131,8 @@
                             <MudTr Item="@entry">
                                 <MudTd colspan="3">
                                     <div class="objective-cell" @onclick:stopPropagation="true">
-                                        <QuestObjectivesView Entry="entry" />
+                                        <QuestObjectivesView Objectives="entry.ObjectiveList" TaskComplete="entry.IsComplete"
+                                                             Task="@entry.Task" />
                                     </div>
                                 </MudTd>
                             </MudTr>
@@ -242,72 +244,14 @@
         white-space: nowrap;
     }
 
-    .objective-list {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        padding: 4px 8px 8px 8px;
-        min-width: 0;
-    }
-
     /* Without this the expanded item strip's max-content width propagates up
-       and the whole quest section scrolls sideways instead of just the strip. */
+       and the whole quest section scrolls sideways instead of just the strip.
+       The objective row styles themselves live in QuestObjectivesView, which
+       is the component that renders them. */
+
     .objective-cell {
         max-width: 100%;
         min-width: 0;
         overflow: hidden;
-    }
-
-    .objective {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 0.85rem;
-    }
-
-    .objective-done {
-        opacity: 0.6;
-    }
-
-    .objective-text {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex-wrap: wrap;
-    }
-
-    .objective-count,
-    .objective-flag,
-    .objective-empty {
-        font-size: 0.75rem;
-        color: var(--mud-palette-text-secondary, rgba(255, 255, 255, 0.5));
-    }
-
-    .objective-flag {
-        border: 1px solid var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
-        border-radius: 4px;
-        padding: 0 4px;
-    }
-
-    /* FIR is a warning-style constraint, so give it a warm accent to set it
-       apart from the neutral flags. */
-    .objective-fir {
-        color: #f0a02a;
-        border-color: rgba(240, 160, 42, 0.45);
-    }
-
-    /* ANY means the objective has substitutes, a positive/relaxed condition. */
-    .objective-any {
-        color: #66bb6a;
-        border-color: rgba(102, 187, 106, 0.45);
-    }
-
-    /* Tooltips render through MudPopoverProvider, so this must stay global.
-       The default mud-tooltip styling is a light grey that clashes here. */
-    .flag-tooltip {
-        background: #1e1e1e;
-        color: rgba(255, 255, 255, 0.9);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        font-weight: 400;
     }
 </style>

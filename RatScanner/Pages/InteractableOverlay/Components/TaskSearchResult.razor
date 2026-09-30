@@ -1,66 +1,376 @@
 @using RatScanner.TarkovDev.Json
+@using RatScanner.FetchModels.TarkovTracker
+@using RatScanner.Pages.App.Components
+@using Color = MudBlazor.Color
 @using System.Diagnostics;
 @using static RatScanner.Pages.InteractableOverlay.Index
+@using TaskState = RatScanner.TaskStatus
 
-<MudPaper Class="pa-2 overflow-hidden" Elevation="3" Style="@(Detail == DetailAmount.Max ? "" : "cursor: pointer;")"
-          @onclick="HandleClick">
-    <MudStack Row="true" Justify="Justify.SpaceBetween" Style="height: 6vh;">
-        <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1;">
-            <MudStack Justify="Justify.Center">
-                <MudPaper Style="height: 100%;" Outlined="true">
-                    <MudImage Src="@Task.TaskImageLink" Style="height: 100%;" />
+@*
+    Renders a quest at three sizes:
+    Min - the single line used in the interactive search list
+    Med - the overlay search list entry: name, trader, objective progress
+    Max - the full detail view: name, task image, trader, progress synced from
+          TarkovTracker, objectives, prerequisites, follow-up quests and rewards
+*@
+
+<MudPaper Class="@(Detail == DetailAmount.Max ? "pa-1 overflow-hidden" : "pa-2 overflow-hidden")" Elevation="3"
+          Style="@(Detail == DetailAmount.Max ? "" : "cursor: pointer;")" @onclick="HandleClick">
+    @if (Detail == DetailAmount.Min) {
+        <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" Style="height: 6vh;">
+            <MudStack Justify="Justify.Center" Class="flex-shrink-0">
+                <MudPaper Outlined="true" Style="height: 100%; aspect-ratio: 1 / 1; overflow: hidden;">
+                    <MudImage Src="@Task.TaskImageLink" Style="width: 100%; height: 100%; object-fit: contain;" />
                 </MudPaper>
             </MudStack>
 
             <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Start">
-                @if (Detail != DetailAmount.Min) {
-                    <MudText Class="ellipsis" Typo="Typo.h6" Style="max-width: 16vw">
-                        @Task.Name
-                    </MudText>
-                    <MudText Align="Align.Center">
-                        <MudIconButton Icon="@Constants.Icon.TarkovDev" Size="Size.Small" OnClick=@(() =>
-                                       OpenURL($"https://tarkov.dev/task/{Task.Id}")) />
-                        <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" OnClick=@(() =>
-                                       OpenURL(Task.WikiLink)) />
-                    </MudText>
-                } else {
-                    <MudText Class="ellipsis" Typo="Typo.body1">
-                        @Task.Name
-                    </MudText>
-                }
+                <MudText Typo="Typo.body1" Class="ellipsis">
+                    @Task.Name
+                </MudText>
             </MudStack>
         </MudStack>
-        @if (Detail != DetailAmount.Min) {
-            <MudStack Row="true" Justify="Justify.FlexEnd">
-                <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.End" Spacing="0">
-                    <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Center" Spacing="0">
-                        <MudAvatar Image="@Task.Trader?.ImageLink" Size="Size.Large" Style="float: left;" Square="true"
-                                   Variant="Variant.Outlined" />
+    }
+
+    @if (Detail == DetailAmount.Med) {
+        var medObjectives = ObjectiveProgress;
+        var medComplete = IsComplete;
+
+        <MudStack Row="true" Justify="Justify.SpaceBetween">
+            <!-- Left side: task image, name and quick links -->
+            <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" Style="min-width: 0;">
+                <MudPaper Outlined="true" Style="width: 48px; height: 48px; min-width: 48px;">
+                    <MudImage Src="@Task.TaskImageLink" Style="width: 100%; height: 100%; object-fit: contain;" />
+                </MudPaper>
+
+                <MudStack Spacing="0" Style="min-width: 0; overflow: hidden;">
+                    <MudText Typo="Typo.subtitle1" Class="ellipsis">@Task.Name</MudText>
+                    <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                        <MudText Typo="Typo.caption" Color="Color.Secondary" Class="ellipsis">@Task.Trader?.Name</MudText>
+                        <MudIconButton Icon="@Constants.Icon.TarkovDev" Size="Size.Small" OnClick="@(() =>
+                                       OpenURL($"https://tarkov.dev/task/{Task.Id}"))" />
+                        <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small" OnClick="@(() =>
+                                       OpenURL(Task.WikiLink))" />
                     </MudStack>
                 </MudStack>
             </MudStack>
+
+            <!-- Right side: progress chips and the trader giving the task -->
+            <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Center">
+                @if (medObjectives.Total > 0) {
+                    <MudChip T="string" Size="Size.Small" Variant="Variant.Text"
+                             Color="@(medObjectives.Complete >= medObjectives.Total ? Color.Success : Color.Default)">
+                        <MudIcon Icon="@Icons.Material.Filled.Checklist" Size="Size.Small" Class="mr-1" />
+                        @($"{medObjectives.Complete}/{medObjectives.Total}")
+                    </MudChip>
+                }
+                @if (Task.KappaRequired) {
+                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Warning">
+                        @Localizer["QuestKappa"]
+                    </MudChip>
+                }
+                @if (medComplete) {
+                    <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Color="Color.Success">
+                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" Class="mr-1" />
+                        @Localizer["QuestCompleted"]
+                    </MudChip>
+                }
+
+                <MudDivider Vertical="true" FlexItem="true" />
+
+                <MudAvatar Image="@Task.Trader?.ImageLink" Size="Size.Small" Square="true" Variant="Variant.Outlined" />
+            </MudStack>
+        </MudStack>
+
+        @* Objectives for the selected result, inside its own card. The overlay
+           passes ShowObjectives so the list expands with the selection. *@
+        @if (ShowObjectives && OutstandingObjectives.Count > 0) {
+            <MudDivider Vertical="false" DividerType="DividerType.Middle" Class="mx-0 my-2" />
+
+            <div class="med-objectives">
+                <QuestObjectivesView Objectives="OutstandingObjectives"
+                                    TaskComplete="IsComplete"
+                                    Task="@Task"
+                                    ShowOptional="true"
+                                    OnMapClick="OnMapClick" />
+            </div>
         }
-    </MudStack>
+    }
 
     @if (Detail == DetailAmount.Max) {
-        <MudDivider Vertical="false" DividerType="DividerType.Middle" Class="mx-0 my-2" />
+        var prereqs = Prerequisites;
+        var unlocks = Unlocks;
+        var objectiveProgress = ObjectiveProgress;
+        var isComplete = IsComplete;
 
-        <MudStack Row="false" Style="max-height:200px; overflow:hidden; position:relative">
-            <div class="fadeOut" style="top: 200px;"></div>
-            @foreach (TaskObjective? objective in Task.Objectives ?? Enumerable.Empty<TaskObjective?>()) {
-                if (objective == null) continue;
-                <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
-                    <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" AlignItems="AlignItems.Center">
-                        <MudIcon Icon="@Constants.Icon.TaskObjective.FromType(objective.Type)" />
-                        <MudText Class="flex-1">@objective.Description</MudText>
-                    </MudStack>
-                    @if (HasMapForObjective(objective)) {
-                        <MudIconButton Icon="@Icons.Material.Filled.Map" Size="Size.Small" Color="Color.Primary" Title="View on map"
-                                       OnClick="@(() => OnMapClick.InvokeAsync((Task, objective)))" />
+        <MudText Typo="Typo.subtitle1" Class="font-weight-bold px-1 pb-1"
+                 Style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            @Task.Name
+        </MudText>
+
+        <div class="d-flex align-start pa-1" Style="gap: 8px;">
+            <!-- Left: the task image. Quest images are wide banner art rather
+                 than the square item icons, so this card is wider than tall and
+                 keeps a fixed width so it cannot claim a share of the row. -->
+            <MudPaper Outlined="true" Class="d-flex align-center justify-center flex-shrink-0"
+                      Style="width: 160px; min-height: 104px;">
+                <MudImage Src="@Task.TaskImageLink" Alt="@Task.Name"
+                          Style="width: 144px; height: 88px; object-fit: contain;" />
+            </MudPaper>
+
+            <!-- Right content area -->
+            <div class="flex-grow-1" Style="min-width: 0;">
+                <MudStack Spacing="1">
+                    <MudGrid Spacing="1">
+                        <!-- Trader handing out the task, at the loyalty level that unlocks it -->
+                        <MudItem xs="6">
+                            <MudPaper Outlined="true" Class="pa-1 px-2 d-flex align-center justify-space-between h-100"
+                                      Style="background-color: var(--mud-palette-background-grey);">
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Style="min-width: 0;">
+                                    <MudAvatar Image="@Task.Trader?.ImageLink" Size="Size.Small" Square="true" />
+                                    <div style="min-width: 0;">
+                                        <MudText Typo="Typo.body2" Class="font-weight-bold ellipsis">
+                                            @(Task.Trader?.Name ?? "-")
+                                        </MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary" Class="ellipsis">
+                                            @Localizer["QuestGiver"]
+                                        </MudText>
+                                    </div>
+                                </MudStack>
+                                @if (TraderOfferLevel is not null) {
+                                    <MudTooltip Text="@Localizer["QuestTraderLevelHint"]" Placement="Placement.Top" Delay="200">
+                                        <ChildContent>
+                                            <MudText Typo="Typo.body2" Class="font-weight-bold flex-shrink-0"
+                                                     Color="@(IsComplete ? Color.Success : Color.Default)">
+                                                LL<span>@TraderOfferLevel</span>
+                                            </MudText>
+                                        </ChildContent>
+                                    </MudTooltip>
+                                }
+                            </MudPaper>
+                        </MudItem>
+
+                        <!-- Tracker synced progress -->
+                        <MudItem xs="6">
+                            <MudPaper Outlined="true" Class="pa-1 px-2 d-flex align-center justify-space-between h-100"
+                                      Style="background-color: var(--mud-palette-background-grey);">
+                                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2" Style="min-width: 0;">
+                                    <MudAvatar
+                                        Color="@(isComplete ? Color.Success : IsFailed ? Color.Error : Color.Primary)"
+                                        Size="Size.Small" Square="true">
+                                        <MudIcon Icon="@(isComplete? Icons.Material.Filled.CheckCircle
+                                                            : Icons.Material.Outlined.Circle)" />
+                                    </MudAvatar>
+                                    <div style="min-width: 0;">
+                                        <MudText Typo="Typo.body2" Class="font-weight-bold ellipsis">
+                                            @(isComplete ? Localizer["QuestCompleted"] : IsFailed
+                                                ? Localizer["QuestFailed"] : Localizer["QuestInProgress"])
+                                        </MudText>
+                                        <MudText Typo="Typo.caption" Color="Color.Secondary" Class="ellipsis">
+                                            @Localizer["QuestProgress"]
+                                        </MudText>
+                                    </div>
+                                </MudStack>
+                                @if (objectiveProgress.Total > 0) {
+                                    <MudText Typo="Typo.body2" Class="font-weight-bold flex-shrink-0"
+                                             Color="@(objectiveProgress.Complete >= objectiveProgress.Total ? Color.Success : Color.Primary)">
+                                        @($"{objectiveProgress.Complete}/{objectiveProgress.Total}")
+                                    </MudText>
+                                }
+                            </MudPaper>
+                        </MudItem>
+                    </MudGrid>
+
+                    <!-- Requirements & usage -->
+                    <MudPaper Outlined="true" Class="pa-2">
+                        <div class="d-flex align-center flex-wrap" Style="gap: 4px;">
+                            <MudFlexWrap Spacing="1" Class="gap-1 flex-grow-1">
+                                <MudTooltip Text="@Localizer["QuestObjectivesChipHint"]" Placement="Placement.Top"
+                                            Delay="200">
+                                    <ChildContent>
+                                        <MudChip T="string" Icon="@Icons.Material.Filled.Checklist" Variant="Variant.Filled"
+                                                 Color="@(objectiveProgress.Complete >= objectiveProgress.Total ? Color.Success : Color.Primary)"
+                                                 Size="Size.Small">
+                                            <span>@Localizer["QuestObjectivesChip"]</span>
+                                            <b>@objectiveProgress.Complete/@objectiveProgress.Total</b>
+                                        </MudChip>
+                                    </ChildContent>
+                                </MudTooltip>
+
+                                <MudTooltip Text="@Localizer["QuestPrereqChipHint"]" Placement="Placement.Top" Delay="200">
+                                    <ChildContent>
+                                        <MudChip T="string" Icon="@Icons.Material.Filled.AccountTree"
+                                                 Variant="Variant.Outlined"
+                                                 Color="@(prereqs.All(p => p.IsComplete) ? Color.Success : Color.Warning)"
+                                                 Size="Size.Small">
+                                            <span>@Localizer["QuestPrereqChip"]</span> <b>@prereqs.Count(p =>
+                                                                                                                                                                                p.IsComplete)/@prereqs.Count</b>
+                                        </MudChip>
+                                    </ChildContent>
+                                </MudTooltip>
+
+                                <MudTooltip Text="@Localizer["QuestKappaHint"]" Placement="Placement.Top" Delay="200">
+                                    <ChildContent>
+                                        <MudChip T="string" Icon="@Icons.Material.Filled.Verified"
+                                                 Variant="Variant.Outlined" Color="Color.Warning" Size="Size.Small">
+                                            @Localizer["QuestKappa"]
+                                        </MudChip>
+                                    </ChildContent>
+                                </MudTooltip>
+
+                                @if (IsLevelRequired) {
+                                    <MudTooltip Text="@Localizer["QuestLevelHint"]" Placement="Placement.Top" Delay="200">
+                                        <ChildContent>
+                                            <MudChip T="string" Icon="@Icons.Material.Filled.TrendingUp"
+                                                     Variant="Variant.Outlined" Color="@(LevelMet ? Color.Success : Color.Warning)"
+                                                     Size="Size.Small">
+                                                <span>@Localizer["QuestLevel"]</span> <b>@Task.MinPlayerLevel</b>
+                                            </MudChip>
+                                        </ChildContent>
+                                    </MudTooltip>
+                                }
+
+                                <MudTooltip Text="@Localizer["QuestExperienceHint"]" Placement="Placement.Top" Delay="200">
+                                    <ChildContent>
+                                        <MudChip T="string" Icon="@Icons.Material.Filled.Star" Variant="Variant.Outlined"
+                                                 Color="Color.Secondary" Size="Size.Small">
+                                            <b>@Task.Experience</b>&nbsp;@Localizer["QuestExperience"]
+                                        </MudChip>
+                                    </ChildContent>
+                                </MudTooltip>
+
+                                @if (!string.IsNullOrEmpty(Task.FactionName)) {
+                                    <MudTooltip Text="@Localizer["QuestFactionHint"]" Placement="Placement.Top" Delay="200">
+                                        <ChildContent>
+                                            <MudChip T="string" Icon="@Icons.Material.Filled.Badge" Variant="Variant.Outlined"
+                                                     Color="Color.Secondary" Size="Size.Small">
+                                                @Task.FactionName
+                                            </MudChip>
+                                        </ChildContent>
+                                    </MudTooltip>
+                                }
+
+                                @if (Task.LightkeeperRequired) {
+                                    <MudTooltip Text="@Localizer["QuestLightkeeperHint"]" Placement="Placement.Top" Delay="200">
+                                        <ChildContent>
+                                            <MudChip T="string" Icon="@Icons.Material.Filled.NightsStay"
+                                                     Variant="Variant.Outlined" Color="Color.Info" Size="Size.Small">
+                                                @Localizer["QuestLightkeeper"]
+                                            </MudChip>
+                                        </ChildContent>
+                                    </MudTooltip>
+                                }
+
+                                @if (Task.Restartable) {
+                                    <MudTooltip Text="@Localizer["QuestRestartableHint"]" Placement="Placement.Top" Delay="200">
+                                        <ChildContent>
+                                            <MudChip T="string" Icon="@Icons.Material.Filled.Replay" Variant="Variant.Outlined"
+                                                     Color="Color.Default" Size="Size.Small">
+                                                @Localizer["QuestRestartable"]
+                                            </MudChip>
+                                        </ChildContent>
+                                    </MudTooltip>
+                                }
+
+                                @if (AnyNeeded) {
+                                    <MudTooltip Text="@Localizer["QuestNeededKeysHint"]" Placement="Placement.Top" Delay="200">
+                                        <ChildContent>
+                                            <MudChip T="string" Icon="@Constants.Icon.TaskObjective.Key"
+                                                     Variant="Variant.Outlined" Color="Color.Default" Size="Size.Small">
+                                                @Localizer["QuestNeededKeys"] <b>@NeededKeyCount</b>
+                                            </MudChip>
+                                        </ChildContent>
+                                    </MudTooltip>
+                                }
+
+                                @if (HasAnyOf) {
+                                    <MudTooltip Text="@Localizer["QuestAnyOfChipHint"]" Placement="Placement.Top" Delay="200">
+                                        <ChildContent>
+                                            <MudChip T="string" Icon="@Icons.Material.Filled.CallSplit"
+                                                     Variant="Variant.Outlined" Color="Color.Default" Size="Size.Small">
+                                                @Localizer["QuestAnyOf"]
+                                            </MudChip>
+                                        </ChildContent>
+                                    </MudTooltip>
+                                }
+
+                                <MudTooltip Text="@Localizer["QuestUnmodeledHint"]" Placement="Placement.Top" Delay="200">
+                                    <ChildContent>
+                                        <MudChip T="string" Icon="@Icons.Material.Filled.HelpOutline"
+                                                 Variant="Variant.Outlined" Color="Color.Default" Size="Size.Small">
+                                            @Localizer["QuestComplexRequirements"]
+                                        </MudChip>
+                                    </ChildContent>
+                                </MudTooltip>
+                            </MudFlexWrap>
+
+                            <MudButton Variant="Variant.Outlined" Color="Color.Primary"
+                                       StartIcon="@Constants.Icon.TarkovDev" Size="Size.Small"
+                                       OnClick="@(() => OpenURL($"https://tarkov.dev/task/{Task.Id}"))">
+                                Tarkov.dev
+                            </MudButton>
+                            <MudButton Variant="Variant.Outlined" Color="Color.Secondary"
+                                       StartIcon="@Icons.Material.Filled.OpenInNew" Size="Size.Small"
+                                       OnClick="@(() => OpenURL(Task.WikiLink))">
+                                Wiki
+                            </MudButton>
+                        </div>
+                    </MudPaper>
+
+                    <!-- Prerequisite tasks, with the tracker state of each. -->
+                    @if (prereqs.Count > 0) {
+                        <MudPaper Outlined="true" Class="pa-2">
+                            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
+                                <MudText Typo="Typo.subtitle2">@Localizer["QuestPrerequisites"]</MudText>
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                                    @($"{prereqs.Count(p => p.IsComplete)}/{prereqs.Count}")
+                                </MudText>
+                            </MudStack>
+                            <MudStack Spacing="1" Class="mt-1">
+                                @foreach (var prereq in prereqs) {
+                                    <div class="related-task @(prereq.IsComplete ? "related-done" : "")">
+                                        <MudAvatar Image="@(prereq.Task.Trader?.ImageLink ?? prereq.Task.TaskImageLink)"
+                                                   Size="Size.Small" Square="true" Variant="Variant.Outlined" />
+                                        <MudStack Spacing="0" Style="min-width: 0; flex: 1 1 auto;">
+                                            <MudText Typo="Typo.body2" Class="ellipsis">@prereq.Task.Name</MudText>
+                                            <MudText Typo="Typo.caption" Color="@(prereq.IsFailed ? Color.Error : Color.Secondary)">
+                                                @StatusText(prereq)
+                                            </MudText>
+                                        </MudStack>
+                                        <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small"
+                                                       OnClick="@(() => OpenURL($"https://tarkov.dev/task/{prereq.Task.Id}"))" />
+                                    </div>
+                                }
+                            </MudStack>
+                        </MudPaper>
+                    }
+
+                    <!-- The quests this one leads into. -->
+                    @if (unlocks.Count > 0) {
+                        <MudPaper Outlined="true" Class="pa-2">
+                            <MudText Typo="Typo.subtitle2">@Localizer["QuestUnlocks"]</MudText>
+                            <MudStack Spacing="1" Class="mt-1">
+                                @foreach (var next in unlocks) {
+                                    var nextComplete = Item.IsTaskComplete(next, Progress);
+                                    <div class="related-task @(nextComplete ? "related-done" : "")">
+                                        <MudAvatar Image="@(next.Trader?.ImageLink ?? next.TaskImageLink)" Size="Size.Small"
+                                                   Square="true" Variant="Variant.Outlined" />
+                                        <MudStack Spacing="0" Style="min-width: 0; flex: 1 1 auto;">
+                                            <MudText Typo="Typo.body2" Class="ellipsis">@next.Name</MudText>
+                                            <MudText Typo="Typo.caption" Color="Color.Secondary" Class="ellipsis">
+                                                @next.Trader?.Name
+                                            </MudText>
+                                        </MudStack>
+                                        <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small"
+                                                       OnClick="@(() => OpenURL($"https://tarkov.dev/task/{next.Id}"))" />
+                                    </div>
+                                }
+                            </MudStack>
+                        </MudPaper>
                     }
                 </MudStack>
-            }
-        </MudStack>
+            </div>
+        </div>
     }
 </MudPaper>
 
@@ -70,6 +380,23 @@
         text-overflow: ellipsis;
         white-space: nowrap;
         min-width: 0;
+    }
+
+    /* The objective list brings its own padding; this wrapper only stops it
+       from being constrained by the card's flex parent. */
+    .med-objectives {
+        min-width: 0;
+    }
+
+    .related-task {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+    }
+
+    .related-done {
+        opacity: 0.6;
     }
 </style>
 
@@ -81,19 +408,82 @@
     public required TarkovTask Task { get; set; }
 
     [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    /// <summary>
+    /// Whether to list the outstanding objectives beneath the Med row. Only the
+    /// selected result sets this, so the objectives expand with the selection.
+    /// </summary>
+    [Parameter]
+    public bool ShowObjectives { get; set; }
+
+    /// <summary>
+    /// Per-objective map button target. Left unset when no viewer is wired up,
+    /// which hides the button rather than opening a viewer that is not there.
+    /// </summary>
+    [Parameter]
     public EventCallback<(TarkovTask task, TaskObjective objective)> OnMapClick { get; set; }
 
-    [Parameter]
-    public EventCallback OnClick { get; set; }
+    [Inject]
+    public LocalizationService Localizer { get; set; } = null!;
+
+    /// <summary>
+    /// TarkovTracker progress, read per render so the view stays in sync with
+    /// the tracker without needing an event subscription.
+    /// </summary>
+    private UserProgress Progress => Item.SelfProgress;
+
+    private bool IsComplete => Item.IsTaskComplete(Task, Progress);
+
+    private bool IsFailed => Item.IsTaskFailed(Task, Progress);
+
+    private bool LevelMet => !Item.HasTracker || Task.MinPlayerLevel <= (Progress.PlayerLevel ?? 0);
+
+    /// <summary>Loyalty level of the giving trader that unlocks this task.</summary>
+    private int? TraderOfferLevel => Task.GetTraderOfferLevel();
+
+    private bool IsLevelRequired => Task.MinPlayerLevel > 0;
+
+    private int NeededKeyCount => NeededKeys.Sum(k => k.Keys?.Count ?? 0);
+
+    private bool AnyNeeded => NeededKeys.Count > 0;
+
+    /// <summary>True when any objective accepts more than one item.</summary>
+    private bool HasAnyOf => ObjectiveList.Any(o => o.HasAlternates);
+
+    private List<TaskRequirementEntry> Prerequisites => Task.GetPrerequisites();
+
+    private List<QuestObjectiveEntry> ObjectiveList => Task.GetObjectives();
+
+    /// <summary>
+    /// Objectives the player still has to do. Done objectives drop off so the
+    /// overlay shows a to-do list rather than the full quest.
+    /// </summary>
+    private List<QuestObjectiveEntry> OutstandingObjectives {
+        get {
+            var complete = IsComplete;
+            return [.. ObjectiveList.Where(o => !complete && !o.IsComplete)];
+        }
+    }
+
+    private List<TarkovTask> Unlocks => Task.GetUnlocks();
+
+    private List<TaskNeededKey> NeededKeys => Task.NeededKeys ?? [];
+
+    private (int Complete, int Total) ObjectiveProgress => Task.GetObjectiveProgressSummary();
 
     private void HandleClick() {
         OnClick.InvokeAsync();
     }
 
-    private bool HasMapForObjective(TaskObjective objective) {
-        // Check if objective has zones with positions
-        return objective.Zones != null && objective.Zones.Any(z => z?.Position != null);
-    }
+    private static string StatusText(TaskRequirementEntry entry) => entry.Status switch {
+        TaskState.Complete => LocalizationService.Translate("QuestCompleted"),
+        TaskState.Failed => LocalizationService.Translate("QuestFailed"),
+        TaskState.Ready => LocalizationService.Translate("QuestStatusReady"),
+        TaskState.Possible => LocalizationService.Translate("QuestStatusPossible"),
+        TaskState.Active => LocalizationService.Translate("QuestStatusActive"),
+        _ => LocalizationService.Translate("QuestStatusUnknown"),
+    };
 
     private void OpenURL(string? url) {
         if (string.IsNullOrEmpty(url)) return;

@@ -1,0 +1,166 @@
+@using RatScanner.TarkovDev.Json
+@using RatScanner.FetchModels.TarkovTracker
+@using Color = MudBlazor.Color
+
+@*
+    Sections shown under the quest summary, mirroring how ItemQuestTable adds
+    the "Quests requiring"/"Quests rewarding" tables under the item summary.
+    Rendered by the page, not by TaskSearchResult, so both views compose the
+    same way.
+*@
+
+@* Objectives *@
+@if (VisibleObjectives.Count > 0) {
+    <div class="quest-section">
+        <MudPaper Outlined="true" Elevation="0" Class="pa-2">
+            <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="pb-1">
+                <MudText Typo="Typo.subtitle1" Class="font-weight-bold">@Localizer["QuestObjectives"] @Task.Name</MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                    @($"{VisibleObjectives.Count(o => IsComplete || o.IsComplete)}/{VisibleObjectives.Count}")
+                </MudText>
+            </MudStack>
+            <QuestObjectivesView Objectives="VisibleObjectives" TaskComplete="IsComplete" Task="@Task" ShowOptional="true"
+                                 OnMapClick="OnMapClick" />
+        </MudPaper>
+    </div>
+}
+
+@* Completion rewards *@
+@if (ShowRewards && (Standing.Count > 0 || Rewards.Count > 0)) {
+    <div class="quest-section">
+        <MudPaper Outlined="true" Elevation="0" Class="pa-2">
+            <MudText Typo="Typo.subtitle1" Class="font-weight-bold pb-1">@Localizer["QuestRewards"]</MudText>
+            <div class="d-flex flex-wrap align-center" Style="gap: 4px;">
+                @if (Standing.Count > 0) {
+                    <MudFlexWrap Spacing="1" Class="gap-1 flex-grow-1">
+                        @foreach (var entry in Standing) {
+                            <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Color="Color.Info"
+                                     Icon="@Icons.Material.Filled.TrendingUp">
+                                @(entry.Trader?.Name ?? entry.TraderId)&nbsp;+@entry.StandingText
+                            </MudChip>
+                        }
+                    </MudFlexWrap>
+                }
+                @if (Rewards.Count > 0) {
+                    <div class="reward-items">
+                        @foreach (var reward in Rewards) {
+                            <div class="reward-item">
+                                @if (reward.Item is not null) {
+                                    <MudImage Src="@reward.Item.BaseImageLink"
+                                              Style="width: 100%; height: 44px; object-fit: contain;" />
+                                    <span>@reward.Item.Name</span>
+                                    @if (reward.Count > 1) {
+                                        <span class="reward-count">@reward.Count</span>
+                                    }
+                                } else {
+                                    <MudIcon Icon="@Icons.Material.Filled.HelpOutline" />
+                                    <span>@Localizer["QuestUnknownReward"]</span>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </MudPaper>
+    </div>
+}
+
+<style>
+    .quest-section {
+        margin-top: 8px;
+    }
+
+    /* Own strip classes rather than reusing the objective list's, because Blazor
+       scopes those to QuestObjectivesView and they would not apply here. Kept as
+       a single scrolling row so a long reward list does not stretch the page. */
+    .reward-items {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 8px;
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        padding: 2px 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: thin;
+    }
+
+    .reward-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 0 0 64px;
+        width: 64px;
+        text-align: center;
+        font-size: 0.7rem;
+        line-height: 1.2;
+    }
+
+    .reward-item .mud-image {
+        width: 100%;
+    }
+
+    .reward-item span {
+        margin-top: 2px;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .reward-count {
+        color: var(--mud-palette-text-secondary);
+    }
+</style>
+
+
+@code {
+    [Parameter, EditorRequired]
+    public TarkovTask Task { get; set; } = null!;
+
+    /// <summary>
+    /// Objective map button target. Left unset outside the overlay, which hides
+    /// the button rather than wiring up a viewer that is not there.
+    /// </summary>
+    [Parameter]
+    public EventCallback<(TarkovTask task, TaskObjective objective)> OnMapClick { get; set; }
+
+    [Inject]
+    public LocalizationService Localizer { get; set; } = null!;
+
+    /// <summary>
+    /// Whether to hide objectives the tracker already reports as done. The
+    /// interactive overlay wants a to-do list, while the main view shows the
+    /// full set so finished ones stay visible.
+    /// </summary>
+    [Parameter]
+    public bool OutstandingOnly { get; set; }
+
+    /// <summary>
+    /// Whether to show the rewards section. Off in the interactive overlay,
+    /// which stays focused on what still needs doing.
+    /// </summary>
+    [Parameter]
+    public bool ShowRewards { get; set; } = true;
+
+    private UserProgress Progress => Item.SelfProgress;
+
+    private bool IsComplete => Item.IsTaskComplete(Task, Progress);
+
+    private List<QuestObjectiveEntry> Objectives => Task.GetObjectives();
+
+    /// <summary>
+    /// Objectives to list. The interactive overlay only wants the ones still
+    /// outstanding, so finished objectives drop off as the player works through
+    /// the task.
+    /// </summary>
+    private List<QuestObjectiveEntry> VisibleObjectives =>
+        OutstandingOnly
+            ? [.. Objectives.Where(o => !IsComplete && !o.IsComplete)]
+            : Objectives;
+
+    private List<TaskRewardEntry> Rewards => Task.GetFinishRewards();
+
+    private List<TaskStandingEntry> Standing => Task.GetTraderStandingRewards();
+}

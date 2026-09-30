@@ -57,6 +57,12 @@
             <ItemSearchResult Item="@displayed" Detail="Pages.InteractableOverlay.Index.DetailAmount.Max" />
             <ItemQuestTable Item="@displayed" />
         }
+
+        <!-- Selected Task -->
+        @if (GetDisplayedTask() is TarkovTask selectedTask) {
+            <TaskSearchResult Task="@selectedTask" Detail="Pages.InteractableOverlay.Index.DetailAmount.Max" />
+            <TaskDetailsTable Task="@selectedTask" />
+        }
     </MudStack>
 </div>
 
@@ -87,6 +93,7 @@
     private SearchResult _searchResult;
     private bool _showSearchResult;
     private Item? _shownScanItem;
+    private TarkovTask? _selectedTask;
 
     private Item? GetLastScannedItem() {
         var scans = MenuVM.ItemScans;
@@ -94,8 +101,13 @@
     }
 
     private Item? GetDisplayedItem() {
-        if (_showSearchResult && _searchResult?.Data is Item searched) return searched;
+        if (_showSearchResult) return _searchResult?.Data as Item;
         return GetLastScannedItem();
+    }
+
+    private TarkovTask? GetDisplayedTask() {
+        if (_showSearchResult && _searchResult?.Data is TarkovTask searched) return searched;
+        return _selectedTask;
     }
 
     protected override void OnInitialized() {
@@ -119,6 +131,7 @@
         _selectedResultIndex = index;
         _searchResult = _searchResults.ElementAt(_selectedResultIndex);
         _showSearchResult = true;
+        _selectedTask = _searchResult.Data as TarkovTask;
         _searchTextField.Clear();
         _searchResults = [];
         StateHasChanged();
@@ -146,6 +159,7 @@
         if (latest is not null && !ReferenceEquals(latest, _shownScanItem)) {
             _shownScanItem = latest;
             _showSearchResult = false;
+            _selectedTask = null;
         }
 
         await InvokeAsync(StateHasChanged);
