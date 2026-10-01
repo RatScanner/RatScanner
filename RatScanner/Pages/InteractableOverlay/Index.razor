@@ -35,11 +35,11 @@
 
                         @if (searchResult.Data is Item item) {
                             <ItemSearchResult Item="@item"
-                                              Detail="@(i == _selectedResultIndex ? DetailAmount.Max : DetailAmount.Med)"
+                                              Detail="@(i == _selectedResultIndex ? DetailLevel.Full : DetailLevel.OverlayRow)"
                                               OnClick="@(() => SelectResult(i))" />
                         } else if (searchResult.Data is TarkovTask task) {
-                            <TaskSearchResult Task="@task" Detail="DetailAmount.Med"
-                                              ShowObjectives="@(i == _selectedResultIndex)"
+                            <TaskSearchResult Task="@task"
+                                              Detail="@(i == _selectedResultIndex ? DetailLevel.OverlayExpanded : DetailLevel.OverlayRow)"
                                               OnMapClick="@((tuple) => OpenMapForObjective(tuple.task, tuple.objective))"
                                               OnClick="@(() => SelectResult(i))" />
                         }
@@ -76,12 +76,6 @@
     private TarkovTask? _selectedTask = null;
     private TaskObjective? _selectedObjective = null;
     private List<TaskZone?>? _selectedObjectiveZones = null;
-
-    public enum DetailAmount {
-        Min,
-        Med,
-        Max,
-    }
 
     private async void ExecuteSearch(string value) {
         var sanitizedValue = SearchService.SanitizeSearch(value);

@@ -3,20 +3,30 @@
 @using RatScanner.Pages.App.Components
 @using Color = MudBlazor.Color
 @using System.Diagnostics;
-@using static RatScanner.Pages.InteractableOverlay.Index
 @using TaskState = RatScanner.TaskStatus
 
 @*
-    Renders a quest at three sizes:
-    Min - the single line used in the interactive search list
-    Med - the overlay search list entry: name, trader, objective progress
-    Max - the full detail view: name, task image, trader, progress synced from
-          TarkovTracker, objectives, prerequisites, follow-up quests and rewards
+    Renders a quest in three contexts:
+
+    SearchRow       - a bare row in the main UI search list
+    OverlayRow      - a compact row in the interactive overlay: name, trader,
+                      objective progress, quick links
+    OverlayExpanded - the same compact row with the outstanding objectives
+                      listed underneath, used for the selected overlay result
+    Full          - the full card in the main UI: task image, trader, progress
+                      synced from TarkovTracker, prerequisites, follow-up quests
+
+    The compact row is a local fragment so OverlayRow and OverlayExpanded cannot
+    drift apart.
 *@
 
-<MudPaper Class="@(Detail == DetailAmount.Max ? "pa-1 overflow-hidden" : "pa-2 overflow-hidden")" Elevation="3"
-          Style="@(Detail == DetailAmount.Max ? "" : "cursor: pointer;")" @onclick="HandleClick">
-    @if (Detail == DetailAmount.Min) {
+<MudPaper Class="@(Detail == DetailLevel.Full ? "pa-1 overflow-hidden" : "pa-2 overflow-hidden")" Elevation="3"
+          Style="@(Detail == DetailLevel.Full ? "" : "cursor: pointer;")" @onclick="HandleClick">
+    @{
+        var isCompact = Detail is DetailLevel.OverlayRow or DetailLevel.OverlayExpanded;
+    }
+
+    @if (Detail == DetailLevel.SearchRow) {
         <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" Style="height: 6vh;">
             <MudStack Justify="Justify.Center" Class="flex-shrink-0">
                 <MudPaper Outlined="true" Style="height: 100%; aspect-ratio: 1 / 1; overflow: hidden;">
@@ -32,9 +42,9 @@
         </MudStack>
     }
 
-    @if (Detail == DetailAmount.Med) {
-        var medObjectives = ObjectiveProgress;
-        var medComplete = IsComplete;
+    @if (isCompact) {
+        var objectives = ObjectiveProgress;
+        var complete = IsComplete;
 
         <MudStack Row="true" Justify="Justify.SpaceBetween">
             <!-- Left side: task image, name and quick links -->
@@ -57,11 +67,11 @@
 
             <!-- Right side: progress chips and the trader giving the task -->
             <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Center">
-                @if (medObjectives.Total > 0) {
+                @if (objectives.Total > 0) {
                     <MudChip T="string" Size="Size.Small" Variant="Variant.Text"
-                             Color="@(medObjectives.Complete >= medObjectives.Total ? Color.Success : Color.Default)">
+                             Color="@(objectives.Complete >= objectives.Total ? Color.Success : Color.Default)">
                         <MudIcon Icon="@Icons.Material.Filled.Checklist" Size="Size.Small" Class="mr-1" />
-                        @($"{medObjectives.Complete}/{medObjectives.Total}")
+                        @($"{objectives.Complete}/{objectives.Total}")
                     </MudChip>
                 }
                 @if (Task.KappaRequired) {
@@ -69,7 +79,7 @@
                         @Localizer["QuestKappa"]
                     </MudChip>
                 }
-                @if (medComplete) {
+                @if (complete) {
                     <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Color="Color.Success">
                         <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" Class="mr-1" />
                         @Localizer["QuestCompleted"]
@@ -82,22 +92,19 @@
             </MudStack>
         </MudStack>
 
-        @* Objectives for the selected result, inside its own card. The overlay
-           passes ShowObjectives so the list expands with the selection. *@
-        @if (ShowObjectives && OutstandingObjectives.Count > 0) {
+        @* Only the expanded level lists objectives, so an unselected row stays a
+           single compact line. *@
+        @if (Detail == DetailLevel.OverlayExpanded && OutstandingObjectives.Count > 0) {
             <MudDivider Vertical="false" DividerType="DividerType.Middle" Class="mx-0 my-2" />
 
-            <div class="med-objectives">
-                <QuestObjectivesView Objectives="OutstandingObjectives"
-                                    TaskComplete="IsComplete"
-                                    Task="@Task"
-                                    ShowOptional="true"
-                                    OnMapClick="OnMapClick" />
+            <div class="expanded-objectives">
+                <QuestObjectivesView Objectives="OutstandingObjectives" TaskComplete="IsComplete" Task="@Task"
+                                     ShowOptional="true" OnMapClick="OnMapClick" />
             </div>
         }
     }
 
-    @if (Detail == DetailAmount.Max) {
+    @if (Detail == DetailLevel.Full) {
         var prereqs = Prerequisites;
         var unlocks = Unlocks;
         var objectiveProgress = ObjectiveProgress;
@@ -159,7 +166,7 @@
                                         Color="@(isComplete ? Color.Success : IsFailed ? Color.Error : Color.Primary)"
                                         Size="Size.Small" Square="true">
                                         <MudIcon Icon="@(isComplete? Icons.Material.Filled.CheckCircle
-                                                            : Icons.Material.Outlined.Circle)" />
+                                             : Icons.Material.Outlined.Circle)" />
                                     </MudAvatar>
                                     <div style="min-width: 0;">
                                         <MudText Typo="Typo.body2" Class="font-weight-bold ellipsis">
@@ -203,8 +210,8 @@
                                                  Variant="Variant.Outlined"
                                                  Color="@(prereqs.All(p => p.IsComplete) ? Color.Success : Color.Warning)"
                                                  Size="Size.Small">
-                                            <span>@Localizer["QuestPrereqChip"]</span> <b>@prereqs.Count(p =>
-                                                                                                                                                                                p.IsComplete)/@prereqs.Count</b>
+                                            <span>@Localizer["QuestPrereqChip"]</span>
+                                            <b>@prereqs.Count(p => p.IsComplete)/@prereqs.Count</b>
                                         </MudChip>
                                     </ChildContent>
                                 </MudTooltip>
@@ -384,7 +391,7 @@
 
     /* The objective list brings its own padding; this wrapper only stops it
        from being constrained by the card's flex parent. */
-    .med-objectives {
+    .expanded-objectives {
         min-width: 0;
     }
 
@@ -401,21 +408,15 @@
 </style>
 
 @code {
+    /// <summary>Which context to render this quest in.</summary>
     [Parameter]
-    public DetailAmount Detail { get; set; }
+    public DetailLevel Detail { get; set; }
 
     [Parameter]
     public required TarkovTask Task { get; set; }
 
     [Parameter]
     public EventCallback OnClick { get; set; }
-
-    /// <summary>
-    /// Whether to list the outstanding objectives beneath the Med row. Only the
-    /// selected result sets this, so the objectives expand with the selection.
-    /// </summary>
-    [Parameter]
-    public bool ShowObjectives { get; set; }
 
     /// <summary>
     /// Per-objective map button target. Left unset when no viewer is wired up,
@@ -457,7 +458,7 @@
 
     /// <summary>
     /// Objectives the player still has to do. Done objectives drop off so the
-    /// overlay shows a to-do list rather than the full quest.
+    /// expanded overlay row shows a to-do list rather than the whole quest.
     /// </summary>
     private List<QuestObjectiveEntry> OutstandingObjectives {
         get {

@@ -36,11 +36,9 @@
                         SearchResult searchResult = _searchResults.ElementAt(i);
                         
                         @if (searchResult.Data is Item item) {
-                            <ItemSearchResult Item="@item" Detail="Pages.InteractableOverlay.Index.DetailAmount.Min"
-                                              OnClick="@(() => SelectResult(i))" />
+                            <ItemSearchResult Item="@item" Detail="DetailLevel.SearchRow" OnClick="@(() => SelectResult(i))" />
                         } else if (searchResult.Data is TarkovTask task) {
-                            <TaskSearchResult Task="@task" Detail="Pages.InteractableOverlay.Index.DetailAmount.Min"
-                                              OnClick="@(() => SelectResult(i))" />
+                            <TaskSearchResult Task="@task" Detail="DetailLevel.SearchRow" OnClick="@(() => SelectResult(i))" />
                         }
                         @* TODO: Re-enable map search results when MapViewer is fixed
                         else if (searchResult.Data is Map map) {
@@ -54,13 +52,13 @@
 
         <!-- Last Scanned Item -->
         @if (GetDisplayedItem() is Item displayed) {
-            <ItemSearchResult Item="@displayed" Detail="Pages.InteractableOverlay.Index.DetailAmount.Max" />
+            <ItemSearchResult Item="@displayed" Detail="DetailLevel.Full" />
             <ItemQuestTable Item="@displayed" />
         }
 
         <!-- Selected Task -->
         @if (GetDisplayedTask() is TarkovTask selectedTask) {
-            <TaskSearchResult Task="@selectedTask" Detail="Pages.InteractableOverlay.Index.DetailAmount.Max" />
+            <TaskSearchResult Task="@selectedTask" Detail="DetailLevel.Full" />
             <TaskDetailsTable Task="@selectedTask" />
         }
     </MudStack>

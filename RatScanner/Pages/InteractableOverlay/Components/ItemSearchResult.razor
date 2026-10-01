@@ -1,20 +1,32 @@
 @using RatScanner.TarkovDev.Json
 @using Color = MudBlazor.Color
 @using System.Diagnostics;
-@using static RatScanner.Pages.InteractableOverlay.Index
 
-<MudPaper Class="@(Detail == DetailAmount.Max ? "pa-1 overflow-hidden" : "pa-2 overflow-hidden")" Elevation="3"
-          Style="@(Detail == DetailAmount.Max ? "" : "cursor: pointer;")" @onclick="HandleClick">
+@*
+    Renders an item in three contexts:
+
+    SearchRow       - a bare row in the main UI search list
+    OverlayRow      - a compact row in the interactive overlay: name, short name,
+                      quest and hideout counts, price, best trader offer
+    OverlayExpanded - not used for items; the selected overlay result is shown at
+                      full detail instead, since expanding an item means showing its
+                      prices
+    Full            - the full card: best sell/buy pricing, requirement chips
+                      and, for ammo, the same-caliber comparison table
+*@
+
+<MudPaper Class="@(Detail == DetailLevel.Full ? "pa-1 overflow-hidden" : "pa-2 overflow-hidden")" Elevation="3"
+          Style="@(Detail == DetailLevel.Full ? "" : "cursor: pointer;")" @onclick="HandleClick">
     @{
         string minHeight = Detail switch {
-            DetailAmount.Med => "40",
-            DetailAmount.Max => "80",
+            DetailLevel.OverlayRow => "40",
+            DetailLevel.Full => "80",
             _ => "40",
         };
         minHeight = $"min-height: {minHeight}px;";
     }
 
-    @if (Detail == DetailAmount.Min) {
+    @if (Detail == DetailLevel.SearchRow) {
         <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" Style="height: 6vh;">
             <MudStack Justify="Justify.Center" Class="flex-shrink-0">
                 <MudPaper Outlined="true" Style="height: 100%; aspect-ratio: 1 / 1; overflow: hidden;">
@@ -31,7 +43,7 @@
         </MudStack>
     }
 
-    @if (Detail == DetailAmount.Med) {
+    @if (Detail == DetailLevel.OverlayRow) {
         <MudStack Row="true" Justify="Justify.SpaceBetween" Style="@minHeight">
             <!--Left side of the search result item-->
             <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" Style="min-width: 0;">
@@ -91,7 +103,7 @@
         </MudStack>
     }
 
-    @if (Detail == DetailAmount.Max) {
+    @if (Detail == DetailLevel.Full) {
         // Calculate Best Sell: Higher of Flea Market Sell Profit or Trader Buyback
         var fleaProfit = Item.GetAvg24hMarketSellProfit();
         var bestTraderSellOffer = Item.GetBestSellToTraderOffer();
@@ -211,7 +223,7 @@
                                         @if (questReport.FutureKnown > 0) {
                                             <MudChip T="string" Icon="@Icons.Material.Filled.Lock" Variant="Variant.Outlined"
                                                      Color="Color.Warning" Size="Size.Small">
-                                                Locked: <b>@questReport.FutureKnown</b>@(questReport.UnlockLevel.HasValue ? $" (Lvl                              {questReport.UnlockLevel.Value})" : "")
+                                                Locked: <b>@questReport.FutureKnown</b>@(questReport.UnlockLevel.HasValue ? $" (Lvl                                {questReport.UnlockLevel.Value})" : "")
                                             </MudChip>
                                         }
 
@@ -268,7 +280,7 @@
                 </div>
             }
 
-            @if (Detail == DetailAmount.Max && Item.Properties?.PropertiesType == "ItemPropertiesAmmo") {
+            @if (Detail == DetailLevel.Full && Item.Properties?.PropertiesType == "ItemPropertiesAmmo") {
                 <MudDivider Vertical="false" DividerType="DividerType.Middle" Class="mx-0 my-2" />
 
                 <MudStack Row="false">
@@ -322,8 +334,9 @@
         </MudPaper>
 
 @code {
+    /// <summary>Which context to render this item in.</summary>
     [Parameter]
-    public DetailAmount Detail { get; set; }
+    public DetailLevel Detail { get; set; }
 
     [Parameter]
     public required Item Item { get; set; }
