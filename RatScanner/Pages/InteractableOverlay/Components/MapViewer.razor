@@ -1,59 +1,96 @@
 @using RatScanner.TarkovDev.Json
+@using Microsoft.JSInterop
+@using System.Globalization
 
-<div class="map-viewer-overlay" @onclick="OnClose">
-    <div class="map-viewer-header" @onclick:stopPropagation="true">
-        <MudPaper Class="pa-2">
-            <MudText Typo="Typo.h5">@Map.Name</MudText>
-            @if (Task != null && Objective != null) {
-                <MudDivider Class="my-1" />
-                <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="1">
-                    <MudIcon Icon="@Constants.Icon.TaskObjective.FromType(Objective.Type)" Size="Size.Small" />
-                    <MudText Typo="Typo.body2">@Task.Name</MudText>
-                </MudStack>
-                <MudText Typo="Typo.caption" Class="mt-1">@Objective.Description</MudText>
-            }
-            <MudText Typo="Typo.caption" Class="mt-1">Scroll to zoom � Drag to pan</MudText>
-        </MudPaper>
-    </div>
-    <div class="map-viewer-close" @onclick:stopPropagation="true">
-        <MudIconButton Icon="@Icons.Material.Filled.Close" Size="Size.Large" Color="Color.Error" OnClick="OnClose" />
-    </div>
-    <div class="map-viewer-container" @onclick:stopPropagation="true" @onwheel="HandleWheel"
-         @onmousedown="HandleMouseDown" @onmousemove="HandleMouseMove" @onmouseup="HandleMouseUp"
-         @onmouseleave="HandleMouseUp">
-        <div class="map-transform-wrapper @(_isDragging ? "dragging" : "")"
-             style="transform: translate(@(_translateX)px, @(_translateY)px) translate(-50%, -50%) scale(@(_scale.ToString(System.Globalization.CultureInfo.InvariantCulture)));">
-            <img src="@MapDataLoader.GetMapSvgUrl(Map?.Id)" class="map-image" draggable="false" />
-            
-            @* Render objective markers *@
-            @if (ObjectiveZones != null && Objective != null) {
-                @foreach (var zone in ObjectiveZones.Where(z => z?.Position != null)) {
-                    var pos = zone!.Position!;
-                    <div class="objective-marker" style="left: @(pos.X)%; top: @(pos.Y)%;">
-                        <div class="marker-icon">
-                            <MudIcon Icon="@Constants.Icon.TaskObjective.FromType(Objective.Type)" Size="Size.Large"
-                                     Color="Color.Warning" />
-                        </div>
-                        <div class="marker-label">@Objective.Type</div>
-                    </div>
-                }
-            }
+@*
+    A zoomable, draggable map.
+
+    Rendered inline by the main UI below the selected map's info card, and
+    full-screen by the interactable overlay. Inline mode sizes the map to fill
+    its container, so the map data and markers are shared between the two.
+*@
+
+<div class="@(Inline ? "map-viewer map-viewer-inline" : "map-viewer map-viewer-full")">
+    @if (!Inline) {
+        <div class="map-viewer-header">
+            <MudPaper Class="pa-2">
+                <MudText Typo="Typo.h5">@Map.Name</MudText>
+                <MudText Typo="Typo.caption" Class="mt-1">@Localizer["MapViewerHint"]</MudText>
+            </MudPaper>
         </div>
+        <div class="map-viewer-close">
+            <MudIconButton Icon="@Icons.Material.Filled.Close" Size="Size.Large" Color="Color.Error" OnClick="OnClose" />
+        </div>
+    }
+
+    @* The map fills a box of known size, and the image is scaled inside it.
+         Using a definite height here (rather than a viewport unit) is what lets
+         this work both inline and full-screen. *@
+    <div class="map-viewer-container" @ref="_container" @onwheel="HandleWheel" @onpointerdown="HandlePointerDown"
+         @onpointermove="HandlePointerMove" @onpointerup="HandlePointerUp" @onpointercancel="HandlePointerUp"
+         @onpointerleave="HandlePointerUp">
+        @if (!HasSvg) {
+            <div class="map-viewer-missing">
+                <MudIcon Icon="@Icons.Material.Filled.HelpOutline" Size="Size.Large" />
+                <MudText Typo="Typo.body2" Class="mt-1">@Localizer["MapNoDataHint"]</MudText>
+            </div>
+        } else {
+            <div class="map-transform-wrapper @(_isDragging ? "dragging" : "")"
+                 style="--map-x: @(_translateX.ToString(CultureInfo.InvariantCulture))px; --map-y: @(_translateY.ToString(CultureInfo.InvariantCulture))px; --map-scale: @(_scale.ToString(CultureInfo.InvariantCulture));">
+                @* Aspect ratio taken from the map's own viewBox, so the canvas
+                   matches the artwork and percentages land in the right place. *@
+                <div class="map-canvas" style="aspect-ratio: @CanvasAspectRatio">
+                    @* Inlined rather than an <img>: a SVG in an img is rasterized
+                       once at display size, so scaling it up magnifies those pixels
+                       and the map goes blurry. Inline markup stays vector. *@
+                    @((MarkupString)(SvgContent ?? ""))
+
+                    @* Markers. Positioned in percentages of the canvas, which
+                       scales with the zoom, so they track the map when it moves. *@
+                    @if (Pois is { Count: > 0 }) {
+                        foreach (var poi in Pois) {
+                            <div class="poi"
+                                 style="left: @(poi.X.ToString(CultureInfo.InvariantCulture))%; top: @(poi.Y.ToString(CultureInfo.InvariantCulture))%;">
+                                <div class="poi-icon">
+                                    @if (!string.IsNullOrWhiteSpace(poi.IconSvg)) {
+                                        @((MarkupString)poi.IconSvg)
+                                    } else {
+                                        <span class="poi-dot"></span>
+                                    }
+                                </div>
+                                @if (!string.IsNullOrWhiteSpace(poi.Name)) {
+                                    <div class="poi-name" style="@NameStyle(poi)">@poi.Name</div>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        }
     </div>
 </div>
 
 <style>
-    .map-viewer-overlay {
+    /* Full-screen: fills the viewport. Inline: a fixed-height block in the page
+       flow, directly under the map's info card. */
+    .map-viewer-full {
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.95);
+        inset: 0;
         z-index: 9999;
+        background: rgba(0, 0, 0, 0.95);
+    }
+
+    .map-viewer-inline {
+        /* Size comes from the parent rather than the page flow, so the map
+           fills the space left over instead of taking a fixed slice. A
+           definite height here is what lets the percentage heights below
+           (container, transform wrapper, svg) resolve all the way down. */
+        width: 100%;
+        height: 100%;
         display: flex;
-        align-items: center;
-        justify-content: center;
+        flex-direction: column;
+        flex: 1;
+        min-height: 120px;
     }
 
     .map-viewer-header {
@@ -72,13 +109,27 @@
     }
 
     .map-viewer-container {
+        position: relative;
         width: 100%;
-        height: 100%;
         overflow: hidden;
         cursor: grab;
         user-select: none;
         -webkit-user-select: none;
-        position: relative;
+        /* Stop the browser from claiming pointer moves for scrolling or text
+           selection, which would otherwise compete with dragging. */
+        touch-action: none;
+    }
+
+    .map-viewer-full .map-viewer-container {
+        height: 100%;
+    }
+
+    .map-viewer-inline .map-viewer-container {
+        /* flex:1 fills the inline viewer; min-height:0 lets it shrink. The
+           height property is left to the flex parent. */
+        flex: 1;
+        min-height: 0;
+        border-radius: 4px;
     }
 
     .map-viewer-container:active,
@@ -86,27 +137,77 @@
         cursor: grabbing;
     }
 
+    .map-viewer-missing {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding: 16px;
+        text-align: center;
+        color: var(--mud-palette-text-secondary);
+    }
+
+    /* Centred on the container, then dragged by the inline transform.
+       Absolutely positioned so it does not affect layout, and a flex box so the
+       canvas inside it can be centred and clipped to the frame. */
     .map-transform-wrapper {
         position: absolute;
         top: 50%;
         left: 50%;
-        transform-origin: center center;
-        transition: transform 0.1s ease-out;
+        width: calc(100% * var(--map-scale, 1));
+        height: calc(100% * var(--map-scale, 1));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* Only translate here. Zoom deliberately does NOT use transform: scale,
+           because that (together with the layer promotion from will-change)
+           makes the browser rasterize the SVG into a texture once and scale
+           that bitmap, which is what made the map blurry. */
+        transform: translate(var(--map-x, 0px), var(--map-y, 0px)) translate(-50%, -50%);
+        /* Promote to its own layer so dragging is a compositor-only operation
+           and does not repaint the large SVG each frame. Safe now that the
+           transform is translate-only. */
+        will-change: transform;
     }
 
-    .map-image {
-        max-height: 50vh;
-        max-width: 70vw;
-        height: auto;
-        width: auto;
-        display: block;
-        pointer-events: none;
+    /* Holds the svg and the markers together, so markers can be positioned in
+       percentages of the artwork rather than of the viewport.
+
+       The box is sized to the artwork's own aspect ratio. Sizing it to the frame
+       instead made the canvas taller than the letterboxed map, so every marker's
+       top percentage resolved against the wrong box and they bunched up around
+       the middle of the frame. */
+    .map-canvas {
         position: relative;
-        left: -50%;
-        top: -50%;
+        /* Width drives the height via aspect-ratio, so the box is exactly the
+           artwork's shape and percentages land on it correctly. A tall map may
+           overflow the frame vertically; the container clips it and dragging
+           brings the rest into view. */
+        width: 100%;
+        height: auto;
+        max-width: 100%;
     }
 
-    .objective-marker {
+    /* The canvas is exactly the artwork's size, so the svg fills it with no
+       letterboxing left over for the markers to drift into. */
+    .map-canvas>svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+
+    /* A point of interest: icon with the name underneath.
+
+       The position refers to the icon, not to the whole marker, so the box is
+       anchored by its top-left corner and only shifted left by half its own
+       width. Centring the whole box would let a long or wrapped label push the
+       icon above the spot it marks. The label then hangs below the icon,
+       outside the anchored area, without affecting where the icon sits. */
+    .poi {
         position: absolute;
         transform: translate(-50%, -50%);
         pointer-events: auto;
@@ -114,21 +215,41 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        animation: markerPulse 2s ease-in-out infinite;
+        /* The icon is the anchor, so it must not be squashed by a tall label. */
+        align-self: flex-start;
     }
 
-    .marker-icon {
+    /* Boxed background so the icon reads against any part of the map. */
+    .poi-icon {
         background: rgba(255, 152, 0, 0.9);
         border-radius: 50%;
-        padding: 8px;
-        box-shadow: 0 0 20px rgba(255, 152, 0, 0.8);
+        padding: 6px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
         border: 2px solid #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    .marker-label {
+    /* The icon's own svg. Fixed size so different icons line up with each other. */
+    .poi-icon>svg {
+        width: 20px;
+        height: 20px;
+        display: block;
+    }
+
+    /* Fallback when a POI has no icon. */
+    .poi-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #fff;
+        display: block;
+    }
+
+    .poi-name {
         background: rgba(0, 0, 0, 0.8);
-        color: white;
-        padding: 4px 8px;
+        padding: 2px 6px;
         border-radius: 4px;
         margin-top: 4px;
         font-size: 12px;
@@ -136,19 +257,7 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
     }
 
-    @@keyframes markerPulse {
-
-        0%,
-        100% {
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        50% {
-            transform: translate(-50%, -50%) scale(1.1);
-        }
-    }
-
-    .objective-marker:hover .marker-icon {
+    .poi:hover .poi-icon {
         background: rgba(255, 193, 7, 1);
         box-shadow: 0 0 30px rgba(255, 193, 7, 1);
     }
@@ -158,17 +267,29 @@
     [Parameter]
     public required Map Map { get; set; }
 
+    /// <summary>
+    /// Whether to render in the page flow under the map's info card instead of
+    /// covering the screen. The main UI uses inline; the overlay uses full.
+    /// </summary>
     [Parameter]
-    public TarkovTask? Task { get; set; }
+    public bool Inline { get; set; }
 
+    /// <summary>
+    /// Points of interest to draw on the map, e.g. extractions, traders, scav
+    /// spawns or quest objectives. Coordinates are percentages of the map, so
+    /// they stay put across zoom and pan.
+    /// </summary>
     [Parameter]
-    public TaskObjective? Objective { get; set; }
-
-    [Parameter]
-    public List<TaskZone?>? ObjectiveZones { get; set; }
+    public List<POI>? Pois { get; set; }
 
     [Parameter]
     public EventCallback OnClose { get; set; }
+
+    [Inject]
+    public LocalizationService Localizer { get; set; } = null!;
+
+    private const double MinScale = 0.3;
+    private const double MaxScale = 5.0;
 
     private double _scale = 1.0;
     private double _translateX = 0;
@@ -177,38 +298,172 @@
     private double _lastMouseX = 0;
     private double _lastMouseY = 0;
 
-    protected override void OnInitialized() {
-        _scale = 1.0;
-        _translateX = 0;
-        _translateY = 0;
-        _isDragging = false;
+    /// <summary>
+    /// The map that is currently shown. Used to detect a map change so the view
+    /// can be reset.
+    /// </summary>
+    private Map? _shownMap;
+
+    /// <summary>
+    /// Whether interactive SVG data exists for this map. Without it there is
+    /// nothing to draw, so a message replaces the map rather than a blank box.
+    /// </summary>
+    private bool HasSvg => !string.IsNullOrEmpty(MapDataLoader.GetMapSvgUrl(Map.Id));
+
+    /// <summary>
+    /// The map's SVG markup, inlined so zooming stays sharp. Null when the map
+    /// has no data or the fetch failed, in which case the container shows the
+    /// missing-data message instead.
+    /// </summary>
+    private string? SvgContent => MapDataLoader.GetMapSvgContent(Map.Id);
+
+    /// <summary>
+    /// The map's own aspect ratio, read from the svg's viewBox. The canvas uses
+    /// it so percentage-positioned markers land on the artwork rather than on
+    /// the edges of the frame.
+    /// </summary>
+    private string CanvasAspectRatio {
+        get {
+            if (!MapDataLoader.TryGetSvgViewBoxSize(Map.Id, out var w, out var h) || w <= 0 || h <= 0) {
+                return "auto";
+            }
+
+            return $"{w.ToString(CultureInfo.InvariantCulture)} / {h.ToString(CultureInfo.InvariantCulture)}";
+        }
+    }
+
+    /// <summary>
+    /// Inline style for a POI's name label. The color is optional, so fall back
+    /// to the theme's text color when the POI does not specify one.
+    /// </summary>
+    private static string NameStyle(POI poi) {
+        var color = string.IsNullOrWhiteSpace(poi.NameColor) ? "var(--mud-palette-text-primary)" : poi.NameColor;
+        return $"color: {color};";
+    }
+
+    protected override void OnParametersSet() {
+        // Reset the view when a different map is shown, so a previous map's pan
+        // and zoom do not carry over.
+        if (!ReferenceEquals(_shownMap, Map)) {
+            _shownMap = Map;
+            _scale = 1.0;
+            _translateX = 0;
+            _translateY = 0;
+            _isDragging = false;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        // The cursor-anchored zoom needs to know where the container sits on
+        // screen. Refreshed after every render (this does not itself trigger a
+        // render) so a resized or moved window keeps zooming in the right spot.
+        await RefreshViewportAsync();
+    }
+
+    /// <summary>
+    /// The map's container, used to turn the cursor's screen position into a
+    /// position within the map.
+    /// </summary>
+    private ElementReference _container;
+
+    [Inject]
+    private IJSRuntime JSRuntime { get; set; } = null!;
+
+    /// <summary>
+    /// The container's last known position and size on screen. Refreshed whenever
+    /// the map is shown or resized, so a wheel event does not have to await a
+    /// round trip to JS before it can be handled.
+    /// </summary>
+    private MapViewport _viewport;
+
+    private readonly record struct MapViewport(double Left, double Top, double Width, double Height) {
+        /// <summary>
+        /// Whether the viewport has a usable size, so the cursor's position can be
+        /// measured against it.
+        /// </summary>
+        public bool IsValid => Width > 0 && Height > 0;
+
+        /// <summary>
+        /// Horizontal centre of the container. The zoom anchor is measured from
+        /// here, not from <see cref="Left"/>.
+        /// </summary>
+        public double CentreX => Left + Width / 2;
+
+        /// <summary>Vertical centre of the container. See <see cref="CentreX"/>.</summary>
+        public double CentreY => Top + Height / 2;
     }
 
     private void HandleWheel(WheelEventArgs e) {
-        double zoomFactor = e.DeltaY < 0 ? 1.1 : 0.9;
-        _scale = Math.Clamp(_scale * zoomFactor, 0.3, 5.0);
+        // Let the page scroll when the map is already at its zoom limit,
+        // otherwise the wheel event is swallowed by the map.
+        var zoomingIn = e.DeltaY < 0;
+        if ((zoomingIn && _scale >= MaxScale) || (!zoomingIn && _scale <= MinScale)) return;
+
+        var previous = _scale;
+        _scale = Math.Clamp(_scale * (zoomingIn ? 1.1 : 0.9), MinScale, MaxScale);
+        if (_scale == previous || !_viewport.IsValid) return;
+
+        // Keep the point under the cursor still.
+        //
+        // The wrapper is laid out at container size * scale, positioned with
+        // `top/left: 50%` (the container's centre) and then offset by
+        // translate(--map-x, --map-y). So a point on screen is measured from the
+        // container's CENTRE, not its top-left corner.
+        //
+        // Zooming grows the wrapper about that same centre, which moves a point
+        // at distance d from the centre out to d * ratio. To keep the point
+        // under the cursor, translate has to move back by exactly the difference:
+        //
+        // offset = cursor - centre - translate (distance from wrapper centre)
+        // newTranslate = cursor - centre - offset*ratio
+        //
+        // Dropping the centre term (using Left/Top instead) biases every step by
+        // centre*(1 - ratio), which makes the map creep away from the cursor on
+        // every wheel tick.
+        var ratio = _scale / previous;
+        var offsetX = e.ClientX - _viewport.CentreX - _translateX;
+        var offsetY = e.ClientY - _viewport.CentreY - _translateY;
+
+        _translateX = e.ClientX - _viewport.CentreX - offsetX * ratio;
+        _translateY = e.ClientY - _viewport.CentreY - offsetY * ratio;
     }
 
-    private void HandleMouseDown(MouseEventArgs e) {
+    private async Task RefreshViewportAsync() {
+        try {
+            var rect = await JSRuntime.InvokeAsync<MapRect?>("ratScanner.getBoundingRect", _container);
+
+            if (rect != null) {
+                _viewport = new MapViewport(rect.Left, rect.Top, rect.Width, rect.Height);
+            }
+        } catch (Exception e) {
+            Logger.LogWarning($"Could not read map container bounds: {e.Message}");
+        }
+    }
+
+    private sealed class MapRect {
+        public double Left { get; set; }
+        public double Top { get; set; }
+        public double Width { get; set; }
+        public double Height { get; set; }
+    }
+
+    private void HandlePointerDown(PointerEventArgs e) {
         _isDragging = true;
         _lastMouseX = e.ClientX;
         _lastMouseY = e.ClientY;
     }
 
-    private void HandleMouseMove(MouseEventArgs e) {
+    private void HandlePointerMove(PointerEventArgs e) {
         if (!_isDragging) return;
-        
-        double deltaX = e.ClientX - _lastMouseX;
-        double deltaY = e.ClientY - _lastMouseY;
-        
-        _translateX += deltaX;
-        _translateY += deltaY;
-        
+
+        _translateX += e.ClientX - _lastMouseX;
+        _translateY += e.ClientY - _lastMouseY;
+
         _lastMouseX = e.ClientX;
         _lastMouseY = e.ClientY;
     }
 
-    private void HandleMouseUp(MouseEventArgs e) {
+    private void HandlePointerUp(PointerEventArgs e) {
         _isDragging = false;
     }
 }

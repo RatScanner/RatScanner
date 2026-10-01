@@ -57,11 +57,7 @@
 
 @* TODO: Re-enable MapViewer when it is fixed
 @if (_selectedMap != null) {
-    <MapViewer Map="@_selectedMap"
-              Task="@_selectedTask"
-              Objective="@_selectedObjective"
-              ObjectiveZones="@_selectedObjectiveZones"
-              OnClose="@CloseMapViewer" />
+    <MapViewer Map="@_selectedMap" Pois="@_selectedPois" OnClose="@CloseMapViewer" />
 }
 *@
 
@@ -73,9 +69,7 @@
 
     // Map viewer state
     private Map? _selectedMap = null;
-    private TarkovTask? _selectedTask = null;
-    private TaskObjective? _selectedObjective = null;
-    private List<TaskZone?>? _selectedObjectiveZones = null;
+    private List<POI>? _selectedPois = null;
 
     private async void ExecuteSearch(string value) {
         var sanitizedValue = SearchService.SanitizeSearch(value);
@@ -113,9 +107,17 @@
 
         if (map == null) return;
 
-        _selectedTask = task;
-        _selectedObjective = objective;
-        _selectedObjectiveZones = zones.Where(z => z?.Position != null).ToList();
+        // Every zone with a position becomes a marker on the map.
+        _selectedPois = zones
+            .Where(z => z?.Position != null)
+            .Select(z => new POI {
+                Name = objective.Type.ToString(),
+                NameColor = "#ff9800",
+                X = z!.Position!.X,
+                Y = z.Position.Y,
+            })
+            .ToList();
+
         OpenMapViewer(map);
     }
 
@@ -126,9 +128,7 @@
 
     private void CloseMapViewer() {
         _selectedMap = null;
-        _selectedTask = null;
-        _selectedObjective = null;
-        _selectedObjectiveZones = null;
+        _selectedPois = null;
         StateHasChanged();
     }
 

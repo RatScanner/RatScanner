@@ -125,7 +125,12 @@ public class InteractiveMapData {
 		[JsonProperty("orientation")]
 		public string Orientation { get; set; }
 
+		/// <summary>
+		/// The extent the map artwork is actually drawn into, when it differs from
+		/// the playable area in bounds. Same shape and units as Bounds, so the two are
+		/// interchangeable.
+		/// </summary>
 		[JsonProperty("svgBounds")]
-		public List<List<int?>> SvgBounds { get; set; }
+		public List<List<double?>> SvgBounds { get; set; }
 	}
 }

@@ -227,5 +227,14 @@
   "QuestRestartableHint": "This task can be handed in more than once.",
   "QuestNeededKeysHint": "Keys that must be held for the maps this task takes place on.",
   "QuestAnyOfChipHint": "At least one objective accepts several different items, so any one of them counts.",
-  "QuestTraderLevelHint": "The trader loyalty level needed for this trader to offer the task."
+  "QuestTraderLevelHint": "The trader loyalty level needed for this trader to offer the task.",
+  "MapViewerHint": "Scroll to zoom, drag to pan",
+  "QuestViewMapHint": "Click to open the map",
+  "MapName": "Map",
+  "MapScene": "Raid location",
+  "MapInteractive": "Interactive map available",
+  "MapNoData": "No map data",
+  "MapNoDataHint": "This map has no interactive map data, so it cannot be displayed.",
+  "MapOpen": "Open map",
+  "MapShowExtracts": "Show extracts"
 }

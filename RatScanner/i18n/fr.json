@@ -227,5 +227,14 @@
   "QuestRestartableHint": "Cette tache peut etre rendue plusieurs fois.",
   "QuestNeededKeysHint": "Cles a posseder sur les cartes ou se déroule cette tache.",
   "QuestAnyOfChipHint": "Au moins un objectif accepte plusieurs objets differents, un seul suffit.",
-  "QuestTraderLevelHint": "Niveau de loyaute necessaire pour que le marchand propose la tache."
+  "QuestTraderLevelHint": "Niveau de loyaute necessaire pour que le marchand propose la tache.",
+  "MapViewerHint": "Molette pour zoomer, glisser pour deplacer",
+  "QuestViewMapHint": "Cliquez pour ouvrir la carte",
+  "MapName": "Carte",
+  "MapScene": "Lieu d'incursion",
+  "MapInteractive": "Carte interactive disponible",
+  "MapNoData": "Pas de donnees de carte",
+  "MapNoDataHint": "Cette carte n'a pas de donnees interactives, elle ne peut pas etre affichee.",
+  "MapOpen": "Ouvrir la carte",
+  "MapShowExtracts": "Afficher les sorties"
 }

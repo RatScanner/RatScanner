@@ -1,15 +1,125 @@
 @using RatScanner.TarkovDev.Json
+@using Color = MudBlazor.Color
+@using System.Diagnostics;
 
-<MudPaper Class="pa-2" Elevation="3" Style="cursor: pointer;" @onclick="OnMapClick">
-    <MudStack Row="true" Justify="Justify.SpaceBetween" Style="height: 6vh;">
-        <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" AlignItems="AlignItems.Center">
-            <MudIcon Icon="@Icons.Material.Filled.Map" Size="Size.Large" Color="Color.Primary" />
+@*
+    Renders a map in the two contexts a map can appear in:
+
+    SearchRow  - a bare row in the main UI search list, clickable to open the map
+    OverlayRow - a compact overlay row, which opens the map directly on click
+*@
+
+<MudPaper Class="pa-2 overflow-hidden" Elevation="3" Style="cursor: pointer;">
+    @if (Detail == DetailLevel.SearchRow) {
+        <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" Style="height: 6vh;" @onclick="OnMapClick">
+            <MudStack Justify="Justify.Center" Class="flex-shrink-0">
+                <MudPaper Outlined="true" Style="height: 100%; aspect-ratio: 1 / 1; overflow: hidden;">
+                    <MudIcon Icon="@Icons.Material.Filled.Map" Size="Size.Small" Color="Color.Primary" />
+                </MudPaper>
+            </MudStack>
+
             <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Start">
-                <MudText Class="ellipsis" Typo="Typo.h6" Style="max-width: 16vw">@Map.Name</MudText>
-                <MudText Typo="Typo.caption">Click to view map</MudText>
+                <MudText Typo="Typo.body1" Class="ellipsis">
+                    @Map.Name
+                </MudText>
             </MudStack>
         </MudStack>
-    </MudStack>
+    }
+
+    @if (Detail == DetailLevel.OverlayRow) {
+        <MudStack Row="true" Justify="Justify.SpaceBetween" Style="min-height: 40px;">
+            <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" Style="min-width: 0;">
+                <MudPaper Outlined="true" Style="width: 48px; height: 48px; min-width: 48px;">
+                    <MudIcon Icon="@Icons.Material.Filled.Map" Size="Size.Medium" Color="Color.Primary" />
+                </MudPaper>
+
+                <MudStack Spacing="0" Style="min-width: 0; overflow: hidden;">
+                    <MudText Typo="Typo.subtitle1" Class="ellipsis">@Map.Name</MudText>
+                    <MudText Typo="Typo.caption" Color="Color.Secondary" Class="ellipsis">
+                        @Localizer["QuestViewMapHint"]
+                    </MudText>
+                </MudStack>
+            </MudStack>
+
+            <MudIconButton Icon="@Icons.Material.Filled.OpenInFull" Size="Size.Small" Color="Color.Primary" />
+        </MudStack>
+    }
+
+    @if (Detail == DetailLevel.Full) {
+        <MudText Typo="Typo.subtitle1" Class="font-weight-bold px-1 pb-1"
+                 Style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+            @Map.Name
+        </MudText>
+
+        <div class="d-flex align-start pa-1" Style="gap: 8px;">
+            <!-- Left: a map glyph in the same fixed square the item card uses. -->
+            <MudPaper Outlined="true" Class="d-flex align-center justify-center flex-shrink-0"
+                      Style="width: 104px; height: 104px;">
+                <MudIcon Icon="@Icons.Material.Filled.Map" Size="Size.Large" Color="Color.Primary" />
+            </MudPaper>
+
+            <div class="flex-grow-1" Style="min-width: 0;">
+                <MudStack Spacing="1">
+                    <MudPaper Outlined="true" Class="pa-2">
+                        <div class="d-flex align-center flex-wrap" Style="gap: 4px;">
+                            <MudFlexWrap Spacing="1" Class="gap-1 flex-grow-1">
+                                <MudChip T="string" Icon="@Icons.Material.Filled.Map" Variant="Variant.Filled"
+                                         Color="Color.Primary" Size="Size.Small">
+                                    @Localizer["MapName"]
+                                </MudChip>
+
+                                @if (!string.IsNullOrEmpty(Map.ScenePath)) {
+                                    <MudChip T="string" Icon="@Icons.Material.Filled.Landscape" Variant="Variant.Outlined"
+                                             Color="Color.Secondary" Size="Size.Small">
+                                        @Localizer["MapScene"]
+                                    </MudChip>
+                                }
+
+                                @if (HasSvg) {
+                                    <MudChip T="string" Icon="@Icons.Material.Filled.CheckCircle" Variant="Variant.Outlined"
+                                             Color="Color.Success" Size="Size.Small">
+                                        @Localizer["MapInteractive"]
+                                    </MudChip>
+                                } else {
+                                    <MudTooltip Text="@Localizer["MapNoDataHint"]" Placement="Placement.Top" Delay="200">
+                                        <ChildContent>
+                                            <MudChip T="string" Icon="@Icons.Material.Filled.HelpOutline"
+                                                     Variant="Variant.Outlined" Color="Color.Warning" Size="Size.Small">
+                                                @Localizer["MapNoData"]
+                                            </MudChip>
+                                        </ChildContent>
+                                    </MudTooltip>
+                                }
+                            </MudFlexWrap>
+
+                            <MudButton Variant="Variant.Outlined" Color="Color.Primary"
+                                       StartIcon="@Icons.Material.Filled.OpenInFull" Size="Size.Small" Disabled="@(!HasSvg)"
+                                       OnClick="@(() => OnMapClick.InvokeAsync())">
+                                @Localizer["MapOpen"]
+                            </MudButton>
+                            <MudButton Variant="Variant.Outlined" Color="Color.Secondary"
+                                       StartIcon="@Icons.Material.Filled.OpenInNew" Size="Size.Small"
+                                       OnClick="@(() => OpenURL(Map.Wiki))">
+                                Wiki
+                            </MudButton>
+                        </div>
+                    </MudPaper>
+
+                    @* Toggle for overlaying extraction points on the map below.
+                       Hidden entirely when the map has none, rather than shown
+                       disabled, so the card stays uncluttered.
+                       MudBlazor 6.x binds switches through Checked/CheckedChanged
+                       inherited from MudBooleanInput, not Value/ValueChanged. *@
+                    @if (Map.Extracts.Count > 0) {
+                        <MudPaper Outlined="true" Class="pa-2">
+                            <MudSwitch T="bool" Checked="@ShowExtracts" CheckedChanged="@OnShowExtractsChanged"
+                                       Color="Color.Primary" Dense="true" Label="@Localizer["MapShowExtracts"]" />
+                        </MudPaper>
+                    }
+                </MudStack>
+            </div>
+        </div>
+    }
 </MudPaper>
 
 <style>
@@ -23,8 +133,44 @@
 
 @code {
     [Parameter]
+    public DetailLevel Detail { get; set; } = DetailLevel.SearchRow;
+
+    [Parameter]
     public required Map Map { get; set; }
 
     [Parameter]
     public EventCallback OnMapClick { get; set; }
+
+    /// <summary>
+    /// Whether extraction points are overlaid on the map. Defaults to off so
+    /// the map is not covered in markers unless asked for.
+    /// </summary>
+    [Parameter]
+    public bool ShowExtracts { get; set; }
+
+    /// <summary>
+    /// Raised when the extracts switch is toggled, so the owning page can pass
+    /// the POIs down to the viewer.
+    /// </summary>
+    [Parameter]
+    public EventCallback<bool> OnShowExtractsChanged { get; set; }
+
+    [Inject]
+    public LocalizationService Localizer { get; set; } = null!;
+
+    /// <summary>
+    /// Whether interactive SVG data exists for this map. Maps without it have
+    /// nothing the viewer can draw, so the open button is disabled rather than
+    /// opening an empty overlay.
+    /// </summary>
+    private bool HasSvg => !string.IsNullOrEmpty(MapDataLoader.GetMapSvgUrl(Map.Id));
+
+    private void OpenURL(string? url) {
+        if (string.IsNullOrEmpty(url)) return;
+        var psi = new ProcessStartInfo {
+            FileName = url,
+            UseShellExecute = true,
+        };
+        Process.Start(psi);
+    }
 }

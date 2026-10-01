@@ -227,5 +227,14 @@
   "QuestRestartableHint": "该任务可以重复完成。",
   "QuestNeededKeysHint": "进行该任务的地图上需要持有的钥匙。",
   "QuestAnyOfChipHint": "至少有一个目标可接受多种不同物品，完成其中任意一个即可。",
-  "QuestTraderLevelHint": "商人提供该任务所需的忠诚等级。"
+  "QuestTraderLevelHint": "商人提供该任务所需的忠诚等级。",
+  "MapViewerHint": "滚轮缩放，拖动平移",
+  "QuestViewMapHint": "点击打开地图",
+  "MapName": "地图",
+  "MapScene": "突袭地点",
+  "MapInteractive": "有交互地图",
+  "MapNoData": "无地图数据",
+  "MapNoDataHint": "该地图没有交互数据，因此无法显示。",
+  "MapOpen": "打开地图",
+  "MapShowExtracts": "显示撤离点"
 }

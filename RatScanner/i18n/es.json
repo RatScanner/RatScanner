@@ -227,5 +227,14 @@
   "QuestRestartableHint": "Esta tarea se puede entregar mas de una vez.",
   "QuestNeededKeysHint": "Llaves que debes tener para los mapas donde ocurre esta tarea.",
   "QuestAnyOfChipHint": "Al menos un objetivo acepta varios objetos distintos, asi que basta con uno.",
-  "QuestTraderLevelHint": "Nivel de lealtad necesario para que el comerciante ofrezca la tarea."
+  "QuestTraderLevelHint": "Nivel de lealtad necesario para que el comerciante ofrezca la tarea.",
+  "MapViewerHint": "Rueda para acercar, arrastra para mover",
+  "QuestViewMapHint": "Haz clic para abrir el mapa",
+  "MapName": "Mapa",
+  "MapScene": "Ubicacion de incursión",
+  "MapInteractive": "Mapa interactivo disponible",
+  "MapNoData": "Sin datos del mapa",
+  "MapNoDataHint": "Este mapa no tiene datos de mapa interactivo, asi que no se puede mostrar.",
+  "MapOpen": "Abrir mapa",
+  "MapShowExtracts": "Mostrar extracciones"
 }

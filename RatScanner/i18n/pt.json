@@ -227,5 +227,14 @@
   "QuestRestartableHint": "Esta missao pode ser entregue mais de uma vez.",
   "QuestNeededKeysHint": "Chaves que precisa ter para os mapas onde esta missao acontece.",
   "QuestAnyOfChipHint": "Pelo menos um objetivo aceita varios itens diferentes, basta um.",
-  "QuestTraderLevelHint": "Nivel de lealdade necessario para o comerciante oferecer a missao."
+  "QuestTraderLevelHint": "Nivel de lealdade necessario para o comerciante oferecer a missao.",
+  "MapViewerHint": "Role para aproximar, arraste para mover",
+  "QuestViewMapHint": "Clique para abrir o mapa",
+  "MapName": "Mapa",
+  "MapScene": "Local de incursao",
+  "MapInteractive": "Mapa interativo disponivel",
+  "MapNoData": "Sem dados do mapa",
+  "MapNoDataHint": "Este mapa nao tem dados interativos, por isso nao pode ser exibido.",
+  "MapOpen": "Abrir mapa",
+  "MapShowExtracts": "Mostrar saídas"
 }

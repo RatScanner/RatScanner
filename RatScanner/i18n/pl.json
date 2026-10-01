@@ -227,5 +227,14 @@
   "QuestRestartableHint": "To zadanie mozna oddac wiecej niz raz.",
   "QuestNeededKeysHint": "Klucze, ktore musisz miec na mapy, gdzie odbywa sie to zadanie.",
   "QuestAnyOfChipHint": "Co najmniej jeden cel akceptuje kilka różnych przedmiotow, wystarczy jeden.",
-  "QuestTraderLevelHint": "Poziom lojalnosci wymagany, aby handlarz udostepnil to zadanie."
+  "QuestTraderLevelHint": "Poziom lojalnosci wymagany, aby handlarz udostepnil to zadanie.",
+  "MapViewerHint": "Przewijaj, aby przyblizyc, przeciagaj, aby przesuwac",
+  "QuestViewMapHint": "Kliknij, aby otworzyc mape",
+  "MapName": "Mapa",
+  "MapScene": "Miejsce wyprawy",
+  "MapInteractive": "Dostepna mapa interaktywna",
+  "MapNoData": "Brak danych mapy",
+  "MapNoDataHint": "Ta mapa nie ma danych interaktywnych, wiec nie mozna jej wyswietlic.",
+  "MapOpen": "Otworz mape",
+  "MapShowExtracts": "Pokaż wyjścia"
 }

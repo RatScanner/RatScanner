@@ -17,11 +17,14 @@
 @inject LocalizationService Localizer
 @implements IDisposable
 
-<div>
+<div class="page">
     <!-- Main Content -->
     <MudStack Spacing="2" Class="pa-2 main-content">
         <!-- Search Box -->
-        <MudItem xs="12">
+        @* flex:none matters here. MudItem renders flex-basis:100% from xs="12",
+           which in this now-definite-height column would size the search box to
+           the full height and shove everything else off the bottom. *@
+        <MudItem xs="12" Class="search-box">
             <MudPaper Class="d-flex flex-column pa-1" Elevation="2">
                 <MudPaper>
                     <MudTextField @ref="_searchTextField" T="string" Variant="Variant.Outlined"
@@ -39,12 +42,9 @@
                             <ItemSearchResult Item="@item" Detail="DetailLevel.SearchRow" OnClick="@(() => SelectResult(i))" />
                         } else if (searchResult.Data is TarkovTask task) {
                             <TaskSearchResult Task="@task" Detail="DetailLevel.SearchRow" OnClick="@(() => SelectResult(i))" />
+                        } else if (searchResult.Data is Map map) {
+                            <MapSearchResult Map="@map" Detail="DetailLevel.SearchRow" OnMapClick="@(() => SelectResult(i))" />
                         }
-                        @* TODO: Re-enable map search results when MapViewer is fixed
-                        else if (searchResult.Data is Map map) {
-                            <MapSearchResult Map="@map" OnMapClick="@(() => OpenMapViewer(map))" />
-                        }
-                        *@
                     }
                 </MudStack>
             </MudPaper>
@@ -61,13 +61,76 @@
             <TaskSearchResult Task="@selectedTask" Detail="DetailLevel.Full" />
             <TaskDetailsTable Task="@selectedTask" />
         }
+
+        <!-- Selected Map -->
+        @if (GetDisplayedMap() is Map selectedMap) {
+            <MapSearchResult Map="@selectedMap" Detail="DetailLevel.Full" ShowExtracts="@_showExtracts"
+                             OnShowExtractsChanged="@OnShowExtractsChanged" OnMapClick="@(() => OpenMapViewer(selectedMap))" />
+            @* The map sits right under its info card, ready to pan and zoom. The
+               border lives here rather than in MapViewer so the component stays
+               reusable in the interactable overlay. *@
+            <MudPaper Outlined="true" Class="map-frame">
+                <MapViewer Map="@selectedMap" Inline="true" Pois="@SelectedMapPois" />
+            </MudPaper>
+        }
     </MudStack>
 </div>
 
+@* Full-screen map viewer, opened from the selected map's info card. Kept
+   separate from the selected map so closing it leaves the info card in place. *@
+@if (_viewerMap != null) {
+    <MapViewer Map="@_viewerMap" Pois="@ViewerMapPois" OnClose="CloseMapViewer" />
+}
+
 <style>
+    /* Fill the layout's body and clip, so the map at the bottom can absorb the
+       leftover height instead of pushing the window into a scroll. .app-body is
+       the flex parent, so this needs flex + min-height:0 to shrink properly. */
+    .page {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+    }
+
     .main-content {
         display: flex;
         flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    /* The cards above the map keep their natural height; only the map frame
+       grows. Without flex:none they would be stretched by the column. */
+    .search-box,
+    .main-content> :not(.map-frame) {
+        flex: 0 0 auto;
+    }
+
+    /* The map frame takes whatever height is left after the cards above it.
+       flex:1 with a 0 basis wins the free space over the default flex-basis,
+       and min-height:0 lets it shrink instead of overflowing. */
+    .map-frame {
+        margin-top: 8px;
+        overflow: hidden;
+        flex: 1 1 0;
+        min-height: 120px;
+    }
+
+    .map-frame ::deep .map-viewer-inline {
+        margin-top: 0;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+    }
+
+    .map-frame ::deep .map-viewer-inline .map-viewer-container {
+        border-radius: 0;
+        flex: 1;
+        min-height: 0;
     }
 
     .ellipsis {
@@ -78,6 +141,22 @@
 
     .selected-result {
         background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Outlined frame around the inline map, matching the info card and quest
+       table borders. Clips the map's corners and gives the map the same inset
+       look as the other cards. */
+    .map-frame {
+        margin-top: 8px;
+        overflow: hidden;
+    }
+
+    .map-frame ::deep .map-viewer-inline {
+        margin-top: 0;
+    }
+
+    .map-frame ::deep .map-viewer-container {
+        border-radius: 0;
     }
 </style>
 
@@ -92,6 +171,8 @@
     private bool _showSearchResult;
     private Item? _shownScanItem;
     private TarkovTask? _selectedTask;
+    private Map? _selectedMap;
+    private Map? _viewerMap;
 
     private Item? GetLastScannedItem() {
         var scans = MenuVM.ItemScans;
@@ -108,6 +189,33 @@
         return _selectedTask;
     }
 
+    private Map? GetDisplayedMap() {
+        if (_showSearchResult) return _searchResult?.Data as Map;
+        return _selectedMap;
+    }
+
+    /// <summary>
+    /// Whether extraction points are overlaid on the maps. Off by default so the
+    /// map is not covered in markers unless asked for.
+    /// </summary>
+    private bool _showExtracts;
+
+    /// <summary>
+    /// Extracts for the map shown inline, or null when the toggle is off or the
+    /// map has none.
+    /// </summary>
+    private List<POI>? SelectedMapPois => _showExtracts ? GetDisplayedMap()?.GetExtractPois() : null;
+
+    /// <summary>
+    /// Same, for the full-screen viewer. Kept separate from the inline map since
+    /// it can show a different map than the selected one.
+    /// </summary>
+    private List<POI>? ViewerMapPois => _showExtracts ? _viewerMap?.GetExtractPois() : null;
+
+    private void OnShowExtractsChanged(bool value) {
+        _showExtracts = value;
+    }
+
     protected override void OnInitialized() {
         MenuVM.PropertyChanged += PropertyChangeHandler;
     }
@@ -117,8 +225,7 @@
         var results = Enumerable.Empty<SearchResult>();
         results = results.Concat(await SearchService.SearchItemsAsync(sanitizedValue));
         results = results.Concat(await SearchService.SearchTasksAsync(sanitizedValue));
-        // TODO: Re-enable map search when MapViewer is fixed
-        // results = results.Concat(await SearchService.SearchMapsAsync(sanitizedValue));
+        results = results.Concat(await SearchService.SearchMapsAsync(sanitizedValue));
         results = results.Where(result => result != null && result.Data != null);
         results = results.OrderBy(result => result.Score).Take(4);
         _searchResults = results;
@@ -130,6 +237,9 @@
         _searchResult = _searchResults.ElementAt(_selectedResultIndex);
         _showSearchResult = true;
         _selectedTask = _searchResult.Data as TarkovTask;
+        // Keep a map selected after the search box clears, so its info and viewer
+        // stay put the same way a selected item or quest does.
+        _selectedMap = _searchResult.Data as Map;
         _searchTextField.Clear();
         _searchResults = [];
         StateHasChanged();
@@ -137,6 +247,23 @@
 
     private void OpenWiki() {
         OpenURL(MenuVM.LastItem?.WikiLink);
+    }
+
+    /// <summary>
+    /// Opens the full-screen viewer for a map. Maps without interactive SVG data
+    /// have nothing to draw, so those are ignored rather than opening a blank
+    /// overlay.
+    /// </summary>
+    private void OpenMapViewer(Map map) {
+        if (string.IsNullOrEmpty(MapDataLoader.GetMapSvgUrl(map.Id))) return;
+
+        _viewerMap = map;
+        StateHasChanged();
+    }
+
+    private void CloseMapViewer() {
+        _viewerMap = null;
+        StateHasChanged();
     }
 
     private void OpenTarkovDev() {
@@ -158,6 +285,7 @@
             _shownScanItem = latest;
             _showSearchResult = false;
             _selectedTask = null;
+            _selectedMap = null;
         }
 
         await InvokeAsync(StateHasChanged);
