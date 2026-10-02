@@ -1,6 +1,7 @@
 @using RatScanner.TarkovDev.Json
 @using RatScanner.FetchModels.TarkovTracker
 @using Color = MudBlazor.Color
+@implements IDisposable
 
 @*
     Sections shown under the quest summary, mirroring how ItemQuestTable adds
@@ -20,7 +21,7 @@
                 </MudText>
             </MudStack>
             <QuestObjectivesView Objectives="VisibleObjectives" TaskComplete="IsComplete" Task="@Task" ShowOptional="true"
-                                 OnMapClick="OnMapClick" />
+                                 OnMapClick="OnMapClick" OnProgressEdited="OnProgressEdited" />
         </MudPaper>
     </div>
 }
@@ -150,6 +151,13 @@
 
     private List<QuestObjectiveEntry> Objectives => Task.GetObjectives();
 
+    private Task OnProgressEdited(bool _) {
+        StateHasChanged();
+        return System.Threading.Tasks.Task.CompletedTask;
+    }
+
+    private void OnLocalProgressChanged() => InvokeAsync(StateHasChanged);
+
     /// <summary>
     /// Objectives to list. The interactive overlay only wants the ones still
     /// outstanding, so finished objectives drop off as the player works through
@@ -163,4 +171,8 @@
     private List<TaskRewardEntry> Rewards => Task.GetFinishRewards();
 
     private List<TaskStandingEntry> Standing => Task.GetTraderStandingRewards();
+
+    protected override void OnInitialized() => LocalProgressStore.Changed += OnLocalProgressChanged;
+
+    public void Dispose() => LocalProgressStore.Changed -= OnLocalProgressChanged;
 }

@@ -38,6 +38,8 @@ internal static partial class RatConfig {
 		internal static string StaticIcon = Path.Combine(Data, "icons");
 		internal static string Locales = Path.Combine(Data, "locales");
 
+		internal static string UserData = Path.Combine(Base, "UserData");
+
 		private const string EftTempDir = "Battlestate Games\\EscapeFromTarkov\\";
 		private static readonly string EftTemp = Path.Combine(Path.GetTempPath(), EftTempDir);
 		private static readonly string TempDir = Path.Combine(Path.GetTempPath(), "RatScanner");
@@ -122,6 +124,8 @@ internal static partial class RatConfig {
 
 		internal static bool ShowKappaNeeds = false;
 
+		internal static ProgressSource Source = ProgressSource.Local;
+
 		internal static class TarkovTracker {
 			internal static TarkovTrackerBackend Backend = TarkovTrackerBackend.TarkovTrackerIO;
 			internal static string Endpoint => Backend == TarkovTrackerBackend.TarkovTrackerIO
@@ -138,6 +142,12 @@ internal static partial class RatConfig {
 	public enum TarkovTrackerBackend {
 		TarkovTrackerIO,
 		TarkovTrackerORG,
+	}
+
+	/// <summary>Where quest progress comes from.</summary>
+	public enum ProgressSource {
+		Local,
+		TarkovTracker,
 	}
 
 	// Overlay options
@@ -255,6 +265,7 @@ internal static partial class RatConfig {
 		MinimalUi.Opacity = config.ReadInt(nameof(MinimalUi.Opacity), MinimalUi.Opacity);
 
 		config.Section = nameof(Tracking);
+		Tracking.Source = (ProgressSource)config.ReadInt(nameof(Tracking.Source), (int)Tracking.Source);
 		Tracking.ShowNonFIRNeeds = config.ReadBool(nameof(Tracking.ShowNonFIRNeeds), Tracking.ShowNonFIRNeeds);
 		Tracking.ShowKappaNeeds = config.ReadBool(nameof(Tracking.ShowKappaNeeds), Tracking.ShowKappaNeeds);
 
@@ -333,6 +344,7 @@ internal static partial class RatConfig {
 		config.WriteInt(nameof(MinimalUi.Opacity), MinimalUi.Opacity);
 
 		config.Section = nameof(Tracking);
+		config.WriteInt(nameof(Tracking.Source), (int)Tracking.Source);
 		config.WriteBool(nameof(Tracking.ShowNonFIRNeeds), Tracking.ShowNonFIRNeeds);
 		config.WriteBool(nameof(Tracking.ShowKappaNeeds), Tracking.ShowKappaNeeds);
 

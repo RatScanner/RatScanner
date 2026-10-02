@@ -246,5 +246,17 @@
   "MapOverlayHazardsShort": "Dangers",
   "ResultTypeItem": "Objet",
   "ResultTypeQuest": "Quête",
-  "ResultTypeMap": "Carte"
+  "ResultTypeMap": "Carte",
+  "QuestMarkComplete": "Marquer l objectif comme termine",
+  "QuestMarkIncomplete": "Marquer l objectif comme non termine",
+  "QuestIncrease": "Augmenter la progression",
+  "QuestDecrease": "Diminuer la progression",
+  "ProgressSourceTitle": "Stockage de la progression",
+  "ProgressSourceDesc": "Ou sont enregistrees les quetes et objectifs(termines",
+  "ProgressSourceLabel": "Enregistrer la progression dans",
+  "ProgressSourceHint": "RatScanner enregistre votre progression dans un fichier sur cet ordinateur. TarkovTracker l'enregistre sur votre compte TarkovTracker.",
+  "ProgressSourceLocal": "RatScanner",
+  "ProgressSourceTarkovTracker": "TarkovTracker",
+  "TarkovTrackerInactive": "Passez le stockage sur TarkovTracker pour connecter un compte et y enregistrer votre progression.",
+  "ConnectionPendingDetail": "Pas encore verifie"
 }

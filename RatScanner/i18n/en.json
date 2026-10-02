@@ -246,5 +246,17 @@
   "MapOverlayHazardsShort": "Hazards",
   "ResultTypeItem": "Item",
   "ResultTypeQuest": "Quest",
-  "ResultTypeMap": "Map"
+  "ResultTypeMap": "Map",
+  "QuestMarkComplete": "Mark objective complete",
+  "QuestMarkIncomplete": "Mark objective incomplete",
+  "QuestIncrease": "Increase progress",
+  "QuestDecrease": "Decrease progress",
+  "ProgressSourceTitle": "Progress Storage",
+  "ProgressSourceDesc": "Where completed quests and objectives are saved",
+  "ProgressSourceLabel": "Store progress in",
+  "ProgressSourceHint": "RatScanner saves your progress in a file on this computer. TarkovTracker saves it on your TarkovTracker account.",
+  "ProgressSourceLocal": "RatScanner",
+  "ProgressSourceTarkovTracker": "TarkovTracker",
+  "TarkovTrackerInactive": "Set Progress Storage to TarkovTracker to connect an account and save your progress there.",
+  "ConnectionPendingDetail": "Not checked yet"
 }

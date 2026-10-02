@@ -44,6 +44,8 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 	public bool ShowKappaNeeds { get; set; }
 
+	public RatConfig.ProgressSource ProgressSource { get; set; }
+
 	// TarkovTracker Specific Tracking Settings
 	public string TarkovTrackerToken { get; set; }
 
@@ -103,6 +105,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 		ShowNonFIRNeeds = RatConfig.Tracking.ShowNonFIRNeeds;
 		ShowKappaNeeds = RatConfig.Tracking.ShowKappaNeeds;
+		ProgressSource = RatConfig.Tracking.Source;
 
 		TarkovTrackerToken = RatConfig.Tracking.TarkovTracker.Token;
 		ShowTarkovTrackerTeam = RatConfig.Tracking.TarkovTracker.ShowTeam;
@@ -195,6 +198,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 		RatConfig.Tracking.ShowNonFIRNeeds = ShowNonFIRNeeds;
 		RatConfig.Tracking.ShowKappaNeeds = ShowKappaNeeds;
+		RatConfig.Tracking.Source = ProgressSource;
 
 		RatConfig.Tracking.TarkovTracker.Token = TarkovTrackerToken.Trim();
 		RatConfig.Tracking.TarkovTracker.ShowTeam = ShowTarkovTrackerTeam;
@@ -214,7 +218,12 @@ internal class SettingsVM : INotifyPropertyChanged {
 			RatConfig.ScreenScale = ScreenScale;
 			RatConfig.OverrideScreenConfig = true;
 		}
+		var previousGameMode = RatConfig.GameMode;
 		RatConfig.GameMode = GameMode;
+
+		if (previousGameMode != GameMode) {
+			LocalProgressStore.NotifyChanged();
+		}
 		RatConfig.MinimizeToTray = MinimizeToTray;
 		RatConfig.AlwaysOnTop = AlwaysOnTop;
 		RatConfig.LogDebug = LogDebug;

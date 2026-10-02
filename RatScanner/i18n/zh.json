@@ -246,5 +246,17 @@
   "MapOverlayHazardsShort": "危险",
   "ResultTypeItem": "物品",
   "ResultTypeQuest": "任务",
-  "ResultTypeMap": "地图"
+  "ResultTypeMap": "地图",
+  "QuestMarkComplete": "标记目标完成",
+  "QuestMarkIncomplete": "标记目标未完成",
+  "QuestIncrease": "增加进度",
+  "QuestDecrease": "减少进度",
+  "ProgressSourceTitle": "进度存储",
+  "ProgressSourceDesc": "已完成任务和目标的保存位置",
+  "ProgressSourceLabel": "将进度保存到",
+  "ProgressSourceHint": "RatScanner 将你的进度保存在本机的文件中。TarkovTracker 将其保存在你的 TarkovTracker 账号中。",
+  "ProgressSourceLocal": "RatScanner",
+  "ProgressSourceTarkovTracker": "TarkovTracker",
+  "TarkovTrackerInactive": "将进度存储设置为 TarkovTracker 以连接账号并保存在那里。",
+  "ConnectionPendingDetail": "尚未验证"
 }

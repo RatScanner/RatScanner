@@ -246,5 +246,17 @@
   "MapOverlayHazardsShort": "Опасности",
   "ResultTypeItem": "Предмет",
   "ResultTypeQuest": "Задание",
-  "ResultTypeMap": "Карта"
+  "ResultTypeMap": "Карта",
+  "QuestMarkComplete": "Отметить цель выполненной",
+  "QuestMarkIncomplete": "Отметить цель невыполненной",
+  "QuestIncrease": "Увеличить прогресс",
+  "QuestDecrease": "Уменьшить прогресс",
+  "ProgressSourceTitle": "Хранение прогресса",
+  "ProgressSourceDesc": "Где сохраняются выполненные задания и цели",
+  "ProgressSourceLabel": "Сохранять прогресс в",
+  "ProgressSourceHint": "RatScanner сохраняет ваш прогресс в файле на этом компьютере. TarkovTracker хранит его в вашем аккаунте TarkovTracker.",
+  "ProgressSourceLocal": "RatScanner",
+  "ProgressSourceTarkovTracker": "TarkovTracker",
+  "TarkovTrackerInactive": "Переключите хранение на TarkovTracker, чтобы подключить аккаунт и сохранять прогресс там.",
+  "ConnectionPendingDetail": "Ещё не проверен"
 }

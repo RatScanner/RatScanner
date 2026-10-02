@@ -44,6 +44,7 @@ public partial class BlazorUI : UserControl, ISwitchable {
 		_ = serviceCollection.AddSingleton(s => new VirtualScreenOffset(left, top));
 
 		_ = serviceCollection.AddSingleton(s => RatScannerMain.Instance.TarkovTrackerDB);
+		_ = serviceCollection.AddSingleton(s => RatScannerMain.Instance.LocalProgress);
 
 		var serviceProvider = serviceCollection.BuildServiceProvider();
 

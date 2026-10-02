@@ -10,65 +10,89 @@
 
 <div class="settings-split">
     <div class="settings-stack">
-        <SettingsCard Title="@Localizer["TrackingGroup"]" Subtitle="@Localizer["TrackingGroupDesc"]">
-            <SettingsSwitchRow Label="@Localizer["ShowNonFirNeeds"]" SubLabel="@Localizer["ShowNonFirNeedsHint"]"
-                               Value="@SettingsVM.ShowNonFIRNeeds"
-                               ValueChanged="@((bool v) => { SettingsVM.ShowNonFIRNeeds = v; SettingsVM.MarkDirty(); })" />
-
-            <SettingsSwitchRow Label="@Localizer["ShowKappaNeeds"]" SubLabel="@Localizer["ShowKappaNeedsHint"]"
-                               Value="@SettingsVM.ShowKappaNeeds"
-                               ValueChanged="@((bool v) => { SettingsVM.ShowKappaNeeds = v; SettingsVM.MarkDirty(); })" />
-        </SettingsCard>
-
-        <SettingsCard Title="@Localizer["TarkovTrackerTitle"]" Subtitle="@Localizer["TarkovTrackerGroupDesc"]">
-            @* Connection status lives with the credentials it describes, rather than
-               in a section of its own. *@
-            <div class="connection-state">
-                @if (_checkingToken) {
-                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Color="Color.Primary" />
-                    <div>
-                        <MudText Typo="Typo.body1">@Localizer["ConnectionCheckingLabel"]</MudText>
-                    </div>
-                } else {
-                    <MudIcon Icon="@ConnectionIcon" Color="@ConnectionColor" Size="Size.Medium" />
-                    <div>
-                        <MudText Typo="Typo.body1">@ConnectionLabel</MudText>
-                        <MudText Typo="Typo.caption" Color="Color.Secondary">@ConnectionDetail</MudText>
-                    </div>
-                }
-            </div>
-
-            <MudDivider Class="my-2" />
-
-            <SettingsRow Label="@Localizer["BackendLabel"]" SubLabel="@Localizer["BackendLabelHint"]">
-                <MudSelect T="TarkovTrackerBackend" Value="@SettingsVM.TarkovTrackerBackend"
-                           ValueChanged="@((TarkovTrackerBackend v) => { SettingsVM.TarkovTrackerBackend = v; SettingsVM.MarkDirty(); ScheduleConnectionCheck(); })"
+        <SettingsCard Title="@Localizer["ProgressSourceTitle"]" Subtitle="@Localizer["ProgressSourceDesc"]">
+            <SettingsRow Label="@Localizer["ProgressSourceLabel"]" SubLabel="@Localizer["ProgressSourceHint"]">
+                <MudSelect T="ProgressSource" Value="@SettingsVM.ProgressSource"
+                           ValueChanged="@((ProgressSource v) => { SettingsVM.ProgressSource = v; SettingsVM.MarkDirty(); ScheduleConnectionCheck(); })"
                            Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Style="min-width: 220px;">
-                    <MudSelectItem T="TarkovTrackerBackend" Value="@TarkovTrackerBackend.TarkovTrackerIO">
-                        TarkovTracker.io</MudSelectItem>
-                        <MudSelectItem T="TarkovTrackerBackend" Value="@TarkovTrackerBackend.TarkovTrackerORG">
-                            TarkovTracker.org</MudSelectItem>
+                    <MudSelectItem T="ProgressSource" Value="@ProgressSource.Local">
+                        @Localizer["ProgressSourceLocal"]</MudSelectItem>
+                        <MudSelectItem T="ProgressSource" Value="@ProgressSource.TarkovTracker">
+                            @Localizer["ProgressSourceTarkovTracker"]</MudSelectItem>
                         </MudSelect>
                     </SettingsRow>
-
-                    <SettingsRow Label="@Localizer["ApiToken"]" SubLabel="@Localizer["ApiTokenHint"]">
-                        <MudTextField T="string" Value="@SettingsVM.TarkovTrackerToken"
-                                      ValueChanged="@((string v) => { SettingsVM.TarkovTrackerToken = v; SettingsVM.MarkDirty(); ScheduleConnectionCheck(); })"
-                                      Validation="@(new Func<string, IEnumerable<string>>(CheckToken))" InputType="@TokenInputType"
-                                      Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End"
-                                      AdornmentIcon="@(_showToken ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
-                                      OnAdornmentClick="@(() => _showToken = !_showToken)" Immediate="true" Style="min-width: 260px;" />
-                    </SettingsRow>
-
-                    <SettingsRow Label="@Localizer["ShowTeammates"]" SubLabel="@Localizer["ShowTeammatesHint"]"
-                                 Disabled="@(!IsConnected)">
-                        <MudSwitch T="bool" Checked="@SettingsVM.ShowTarkovTrackerTeam"
-                                   CheckedChanged="@((bool v) => { SettingsVM.ShowTarkovTrackerTeam = v; SettingsVM.MarkDirty(); })"
-                                   Color="Color.Primary" Dense="true" />
-                    </SettingsRow>
                 </SettingsCard>
-            </div>
-        </div>
+
+                <SettingsCard Title="@Localizer["TarkovTrackerTitle"]" Subtitle="@Localizer["TarkovTrackerGroupDesc"]">
+                    @if (!UsesTarkovTracker) {
+                        @* Shown instead of the credentials while another storage option is selected, so
+               the card explains itself rather than looking broken. *@
+                        <div class="tracker-inactive">
+                            <MudIcon Icon="@Icons.Material.Outlined.CloudOff" Size="Size.Small" Color="Color.Secondary" />
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">
+                                @Localizer["TarkovTrackerInactive"]
+                            </MudText>
+                        </div>
+                    } else {
+                        @* Connection status lives with the credentials it describes, rather than
+               in a section of its own. *@
+                        <div class="connection-state">
+                            @if (_checkingToken) {
+                                <MudProgressCircular Size="Size.Small" Indeterminate="true" Color="Color.Primary" />
+                                <div>
+                                    <MudText Typo="Typo.body1">@Localizer["ConnectionCheckingLabel"]</MudText>
+                                </div>
+                            } else {
+                                <MudIcon Icon="@ConnectionIcon" Color="@ConnectionColor" Size="Size.Medium" />
+                                <div>
+                                    <MudText Typo="Typo.body1">@ConnectionLabel</MudText>
+                                    <MudText Typo="Typo.caption" Color="Color.Secondary">@ConnectionDetail</MudText>
+                                </div>
+                            }
+                        </div>
+
+                        <MudDivider Class="my-2" />
+
+                        <SettingsRow Label="@Localizer["BackendLabel"]" SubLabel="@Localizer["BackendLabelHint"]">
+                            <MudSelect T="TarkovTrackerBackend" Value="@SettingsVM.TarkovTrackerBackend"
+                                       ValueChanged="@((TarkovTrackerBackend v) => { SettingsVM.TarkovTrackerBackend = v; SettingsVM.MarkDirty(); ScheduleConnectionCheck(); })"
+                                       Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Style="min-width: 220px;">
+                                <MudSelectItem T="TarkovTrackerBackend" Value="@TarkovTrackerBackend.TarkovTrackerIO">
+                                    TarkovTracker.io</MudSelectItem>
+                                    <MudSelectItem T="TarkovTrackerBackend" Value="@TarkovTrackerBackend.TarkovTrackerORG">
+                                        TarkovTracker.org</MudSelectItem>
+                                    </MudSelect>
+                                </SettingsRow>
+
+                                <SettingsRow Label="@Localizer["ApiToken"]" SubLabel="@Localizer["ApiTokenHint"]">
+                                    <MudTextField T="string" Value="@SettingsVM.TarkovTrackerToken"
+                                                  ValueChanged="@((string v) => { SettingsVM.TarkovTrackerToken = v; SettingsVM.MarkDirty(); ScheduleConnectionCheck(); })"
+                                                  Validation="@(new Func<string, IEnumerable<string>>(CheckToken))" InputType="@TokenInputType"
+                                                  Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End"
+                                                  AdornmentIcon="@(_showToken ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
+                                                  OnAdornmentClick="@(() => _showToken = !_showToken)" Immediate="true" Style="min-width: 260px;" />
+                                </SettingsRow>
+
+                                <SettingsRow Label="@Localizer["ShowTeammates"]" SubLabel="@Localizer["ShowTeammatesHint"]"
+                                             Disabled="@(!IsConnected)">
+                                    <MudSwitch T="bool" Checked="@SettingsVM.ShowTarkovTrackerTeam"
+                                               CheckedChanged="@((bool v) => { SettingsVM.ShowTarkovTrackerTeam = v; SettingsVM.MarkDirty(); })"
+                                               Color="Color.Primary" Dense="true" />
+                                </SettingsRow>
+                            }
+                        </SettingsCard>
+
+                        <SettingsCard Title="@Localizer["TrackingGroup"]" Subtitle="@Localizer["TrackingGroupDesc"]">
+                            <SettingsSwitchRow Label="@Localizer["ShowNonFirNeeds"]" SubLabel="@Localizer["ShowNonFirNeedsHint"]"
+                                               Value="@SettingsVM.ShowNonFIRNeeds"
+                                               ValueChanged="@((bool v) => { SettingsVM.ShowNonFIRNeeds = v; SettingsVM.MarkDirty(); })" />
+
+                            <SettingsSwitchRow Label="@Localizer["ShowKappaNeeds"]" SubLabel="@Localizer["ShowKappaNeedsHint"]"
+                                               Value="@SettingsVM.ShowKappaNeeds"
+                                               ValueChanged="@((bool v) => { SettingsVM.ShowKappaNeeds = v; SettingsVM.MarkDirty(); })" />
+                        </SettingsCard>
+                    </div>
+                </div>
 
 @code {
     private const int DebounceMs = 600;
@@ -84,30 +108,43 @@
 
     private bool IsConnected => _isConnected;
 
+    /// <summary>
+    /// Whether the saved token has been through a check that finished. Until it has,
+    /// its validity is unknown rather than false.
+    /// </summary>
+    private bool TokenChecked => !string.IsNullOrEmpty(_checkedToken)
+        && _checkedToken == (SettingsVM.TarkovTrackerToken?.Trim() ?? "")
+        && _checkedBackend == SettingsVM.TarkovTrackerBackend;
+
+    /// <summary>
+    /// Whether TarkovTracker is the selected source. Its card shows a prompt instead of
+    /// the credentials while this is false.
+    /// </summary>
+    private bool UsesTarkovTracker => SettingsVM.ProgressSource == ProgressSource.TarkovTracker;
     private bool HasToken => !string.IsNullOrWhiteSpace(SettingsVM.TarkovTrackerToken);
 
     private string ConnectionLabel => _isConnected
         ? Localizer["ConnectionOkLabel"]
         : HasToken
-            ? Localizer["ConnectionInvalidLabel"]
+            ? TokenChecked ? Localizer["ConnectionInvalidLabel"] : Localizer["ConnectionCheckingLabel"]
             : Localizer["ConnectionNoneLabel"];
 
     private string ConnectionDetail => _isConnected
         ? Localizer["ConnectionOkDetail"]
         : HasToken
-            ? Localizer["ConnectionInvalidDetail"]
+            ? TokenChecked ? Localizer["ConnectionInvalidDetail"] : Localizer["ConnectionPendingDetail"]
             : Localizer["ConnectionNoneDetail"];
 
     private string ConnectionIcon => _isConnected
         ? Icons.Material.Filled.CheckCircle
         : HasToken
-            ? Icons.Material.Filled.Error
+            ? TokenChecked ? Icons.Material.Filled.Error : Icons.Material.Filled.CloudQueue
             : Icons.Material.Filled.CloudOff;
 
     private Color ConnectionColor => _isConnected
         ? Color.Success
         : HasToken
-            ? Color.Error
+            ? TokenChecked ? Color.Error : Color.Default
             : Color.Default;
 
     /// <summary>
@@ -127,6 +164,18 @@
     private async Task RunConnectionCheckAsync() {
         string token = SettingsVM.TarkovTrackerToken?.Trim() ?? "";
         var backend = SettingsVM.TarkovTrackerBackend;
+
+        // Nothing is checked while another source is selected, since the credentials are
+        // not on screen. Clears the verdict so re-selecting re-checks.
+        if (!UsesTarkovTracker) {
+            await InvokeAsync(() => {
+                _isConnected = false;
+                _checkingToken = false;
+                _checkedToken = "";
+                StateHasChanged();
+            });
+            return;
+        }
 
         if (string.IsNullOrEmpty(token)) {
             await InvokeAsync(() => {
@@ -213,5 +262,14 @@
         /* Match the card title inset so the icon lines up with the heading
            rather than sitting flush against the card edge. */
         padding: 8px 16px;
+    }
+
+    /* Shown in place of the credentials while another storage option is selected.
+       Indented like the connection state above so both read as the same slot. */
+    .tracker-inactive {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 16px;
     }
 </style>

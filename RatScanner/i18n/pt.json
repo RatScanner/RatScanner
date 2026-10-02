@@ -246,5 +246,17 @@
   "MapOverlayHazardsShort": "Perigos",
   "ResultTypeItem": "Item",
   "ResultTypeQuest": "Tarefa",
-  "ResultTypeMap": "Mapa"
+  "ResultTypeMap": "Mapa",
+  "QuestMarkComplete": "Marcar objetivo como concluido",
+  "QuestMarkIncomplete": "Marcar objetivo como nao concluido",
+  "QuestIncrease": "Aumentar progresso",
+  "QuestDecrease": "Diminuir progresso",
+  "ProgressSourceTitle": "Armazenamento de progresso",
+  "ProgressSourceDesc": "Onde as missoes e objetivos concluidos sao salvos",
+  "ProgressSourceLabel": "Salvar o progresso em",
+  "ProgressSourceHint": "O RatScanner salva o seu progresso em um arquivo neste computador. O TarkovTracker salva-o na sua conta do TarkovTracker.",
+  "ProgressSourceLocal": "RatScanner",
+  "ProgressSourceTarkovTracker": "TarkovTracker",
+  "TarkovTrackerInactive": "Mude o armazenamento para TarkovTracker para conectar uma conta e salvar o seu progresso la.",
+  "ConnectionPendingDetail": "Ainda nao verificado"
 }

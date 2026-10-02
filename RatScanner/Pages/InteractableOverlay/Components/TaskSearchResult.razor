@@ -4,6 +4,7 @@
 @using Color = MudBlazor.Color
 @using System.Diagnostics;
 @using TaskState = RatScanner.TaskStatus
+@implements IDisposable
 
 @*
     Renders a quest in three contexts:
@@ -115,7 +116,7 @@
 
             <div class="expanded-objectives">
                 <QuestObjectivesView Objectives="OutstandingObjectives" TaskComplete="IsComplete" Task="@Task"
-                                     ShowOptional="true" OnMapClick="OnMapClick" />
+                                     ShowOptional="true" OnMapClick="OnMapClick" OnProgressEdited="OnProgressEdited" />
             </div>
         }
     }
@@ -472,6 +473,14 @@
 
     private List<QuestObjectiveEntry> ObjectiveList => Task.GetObjectives();
 
+    /// <summary>Re-renders after an objective was edited.</summary>
+    private Task OnProgressEdited(bool _) {
+        StateHasChanged();
+        return System.Threading.Tasks.Task.CompletedTask;
+    }
+
+    private void OnLocalProgressChanged() => InvokeAsync(StateHasChanged);
+
     /// <summary>
     /// Objectives the player still has to do. Done objectives drop off so the
     /// expanded overlay row shows a to-do list rather than the whole quest.
@@ -492,6 +501,10 @@
     private void HandleClick() {
         OnClick.InvokeAsync();
     }
+
+    protected override void OnInitialized() => LocalProgressStore.Changed += OnLocalProgressChanged;
+
+    public void Dispose() => LocalProgressStore.Changed -= OnLocalProgressChanged;
 
     private static string StatusText(TaskRequirementEntry entry) => entry.Status switch {
         TaskState.Complete => LocalizationService.Translate("QuestCompleted"),

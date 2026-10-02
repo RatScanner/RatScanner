@@ -56,6 +56,16 @@ public record QuestObjectiveEntry(
 	/// <summary>Item ids the objective accepts.</summary>
 	public IEnumerable<string> ItemIds => Objective.ItemIds ?? [];
 
+	/// <summary>
+	/// Whether this objective can be edited. Only true while the local store is
+	/// the source.
+	/// </summary>
+	public bool CanEdit => Item.CanEditLocalProgress;
+
+	public void SetComplete(bool complete) => Item.SetLocalObjectiveComplete(Objective.Id, complete, Required);
+
+	public void Step(int delta) => Item.StepLocalObjective(Objective.Id, delta, Required);
+
 	private static Dictionary<string, Item>? _itemLookup;
 
 	/// <summary>
@@ -114,30 +124,35 @@ public record QuestObjectiveEntry(
 }
 
 public partial class Item {
+	/// <summary>
+	/// Whether the tracker is the selected source and has returned data. Falls
+	/// back to local progress otherwise, including before the first fetch lands.
+	/// </summary>
+	private static bool UseTarkovTracker =>
+		RatConfig.Tracking.Source == RatConfig.ProgressSource.TarkovTracker
+		&& RatConfig.Tracking.TarkovTracker.Enable
+		&& RatScannerMain.Instance.TarkovTrackerDB.Progress.Count >= 1;
+
 	private static UserProgress GetUserProgress() {
-		UserProgress? progress = null;
-		if (RatConfig.Tracking.TarkovTracker.Enable && RatScannerMain.Instance.TarkovTrackerDB.Progress.Count >= 1) {
+		if (UseTarkovTracker) {
 			var teamProgress = RatScannerMain.Instance.TarkovTrackerDB.Progress;
-			progress = teamProgress.FirstOrDefault(x => x.UserId == RatScannerMain.Instance.TarkovTrackerDB.Self);
+			var tracked = teamProgress.FirstOrDefault(x => x.UserId == RatScannerMain.Instance.TarkovTrackerDB.Self);
+			if (tracked != null) return tracked;
 		}
-		return progress ?? new UserProgress();
+
+		return RatScannerMain.Instance.LocalProgress.GetProgress();
 	}
 
 	/// <summary>
-	/// The player's own TarkovTracker progress, or an empty instance when the
-	/// tracker is disabled or has not loaded yet. Use <see cref="HasTracker"/>
-	/// to tell "no progress recorded" apart from "recorded as not done".
+	/// The player's own progress. Use <see cref="HasTracker"/> to tell "no
+	/// progress recorded" apart from "recorded as not done".
 	/// </summary>
 	public static UserProgress SelfProgress => GetUserProgress();
 
 	/// <summary>
-	/// True when TarkovTracker is enabled and has returned progress for the
-	/// player, so completion states can be trusted.
+	/// Whether any progress exists to show, from either source.
 	/// </summary>
-	public static bool HasTracker =>
-		RatConfig.Tracking.TarkovTracker.Enable
-		&& RatScannerMain.Instance.TarkovTrackerDB.Progress.Count >= 1
-		&& RatScannerMain.Instance.TarkovTrackerDB.Self.Length > 0;
+	public static bool HasTracker => UseTarkovTracker || RatScannerMain.Instance.LocalProgress.HasProgress;
 
 	/// <summary>
 	/// TarkovTracker state for a task, or null when the tracker is off, has no
@@ -152,12 +167,20 @@ public partial class Item {
 	}
 
 	/// <summary>
-	/// Whether TarkovTracker marks the task complete. False when the tracker is
-	/// off or has no entry, so callers must not treat false as "not done".
+	/// Whether the task counts as done: the tracker marks it complete, or every
+	/// objective that gates it is complete. Optional objectives never gate.
 	/// </summary>
 	public static bool IsTaskComplete(TarkovTask task, UserProgress progress) {
 		var entry = progress.Tasks?.FirstOrDefault(t => t.Id == task.Id && !t.Invalid);
-		return entry is { Complete: true };
+		if (entry is { Complete: true }) return true;
+
+		if (task.Objectives is not { Count: > 0 }) return false;
+
+		var required = GetObjectiveProgress(task, progress)
+			.Where(o => !o.Objective.Optional)
+			.ToList();
+
+		return required.Count > 0 && required.All(o => o.IsComplete);
 	}
 
 	/// <summary>
@@ -187,6 +210,30 @@ public partial class Item {
 		}
 
 		return result;
+	}
+
+	/// <summary>
+	/// Whether progress can be edited here. Only while the local store is the
+	/// selected source, since the tracker would overwrite local edits.
+	/// </summary>
+	public static bool CanEditLocalProgress => !UseTarkovTracker;
+
+	/// <summary>Records an objective's completion in the local store.</summary>
+	public static void SetLocalObjectiveComplete(string? objectiveId, bool complete, int required) {
+		if (!CanEditLocalProgress) return;
+		RatScannerMain.Instance.LocalProgress.SetObjectiveComplete(objectiveId ?? "", complete, required);
+	}
+
+	/// <summary>Moves an objective's counter in the local store.</summary>
+	public static void StepLocalObjective(string? objectiveId, int delta, int required) {
+		if (!CanEditLocalProgress) return;
+		RatScannerMain.Instance.LocalProgress.StepObjective(objectiveId ?? "", delta, required);
+	}
+
+	/// <summary>Records a task's completion in the local store.</summary>
+	public static void SetLocalTaskComplete(string? taskId, bool complete) {
+		if (!CanEditLocalProgress) return;
+		RatScannerMain.Instance.LocalProgress.SetTaskComplete(taskId ?? "", complete);
 	}
 
 	public (int count, int kappaCount) GetTaskRemaining() => GetTaskRemaining(GetUserProgress());

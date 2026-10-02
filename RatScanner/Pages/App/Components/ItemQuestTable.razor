@@ -1,6 +1,7 @@
 @using RatScanner.FetchModels.TarkovTracker
 @using RatScanner.TarkovDev.Json
 @using Color = MudBlazor.Color
+@implements IDisposable
 
 @*
     Two quest tables for an item, mirroring tarkov.dev: quests that require
@@ -65,7 +66,7 @@
                             <MudTd colspan="3">
                                 <div class="objective-cell" @onclick:stopPropagation="true">
                                     <QuestObjectivesView Objectives="entry.ObjectiveList" TaskComplete="entry.IsComplete"
-                                                         Task="@entry.Task" />
+                                                         Task="@entry.Task" OnProgressEdited="OnProgressEdited" />
                                 </div>
                             </MudTd>
                         </MudTr>
@@ -132,7 +133,7 @@
                                 <MudTd colspan="3">
                                     <div class="objective-cell" @onclick:stopPropagation="true">
                                         <QuestObjectivesView Objectives="entry.ObjectiveList" TaskComplete="entry.IsComplete"
-                                                             Task="@entry.Task" />
+                                                             Task="@entry.Task" OnProgressEdited="OnProgressEdited" />
                                     </div>
                                 </MudTd>
                             </MudTr>
@@ -174,6 +175,21 @@
         _requiring = Build(Item.GetQuestsRequiringItem(), progress);
         _rewarding = Build(Item.GetQuestsRewardingItem(), progress);
     }
+
+    protected override void OnInitialized() => LocalProgressStore.Changed += OnLocalProgressChanged;
+
+    public void Dispose() => LocalProgressStore.Changed -= OnLocalProgressChanged;
+
+    private Task OnProgressEdited(bool _) {
+        _builtProgress = null;
+        StateHasChanged();
+        return System.Threading.Tasks.Task.CompletedTask;
+    }
+
+    private void OnLocalProgressChanged() => InvokeAsync(() => {
+        _builtProgress = null;
+        StateHasChanged();
+    });
 
     private static List<QuestItemEntry> Build(List<QuestItemEntry> entries, UserProgress progress) {
         return entries.Select(entry => entry with {

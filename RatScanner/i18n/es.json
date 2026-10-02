@@ -246,5 +246,17 @@
   "MapOverlayHazardsShort": "Peligros",
   "ResultTypeItem": "Objeto",
   "ResultTypeQuest": "Misión",
-  "ResultTypeMap": "Mapa"
+  "ResultTypeMap": "Mapa",
+  "QuestMarkComplete": "Marcar objetivo como completado",
+  "QuestMarkIncomplete": "Marcar objetivo como pendiente",
+  "QuestIncrease": "Aumentar progreso",
+  "QuestDecrease": "Reducir progreso",
+  "ProgressSourceTitle": "Almacenamiento de progreso",
+  "ProgressSourceDesc": "Donde se guardan las misiones y objetivos completados",
+  "ProgressSourceLabel": "Guardar el progreso en",
+  "ProgressSourceHint": "RatScanner guarda tu progreso en un archivo de este equipo. TarkovTracker lo guarda en tu cuenta de TarkovTracker.",
+  "ProgressSourceLocal": "RatScanner",
+  "ProgressSourceTarkovTracker": "TarkovTracker",
+  "TarkovTrackerInactive": "Cambia el almacenamiento a TarkovTracker para conectar una cuenta y guardar tu progreso alli.",
+  "ConnectionPendingDetail": "Todavia sin comprobar"
 }

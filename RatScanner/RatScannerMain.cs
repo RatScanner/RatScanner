@@ -44,6 +44,7 @@ public class RatScannerMain : INotifyPropertyChanged {
 	internal static object IconScanLock = new();
 
 	public TarkovTrackerDB TarkovTrackerDB;
+	public LocalProgressStore LocalProgress;
 
 	internal RatEyeEngine RatEyeEngine;
 
@@ -81,6 +82,9 @@ public class RatScannerMain : INotifyPropertyChanged {
 
 		Logger.LogInfo("Initializing tarkov tracker database");
 		TarkovTrackerDB = new TarkovTrackerDB();
+
+		Logger.LogInfo("Initializing local progress store");
+		LocalProgress = new LocalProgressStore();
 
 		Logger.LogInfo("Initializing hotkey manager...");
 		HotkeyManager = new HotkeyManager();

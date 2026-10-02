@@ -22,9 +22,19 @@
             var isDone = TaskComplete || objective.IsComplete;
             var items = objective.AlternateItems;
             <div class="@("objective" + (isDone ? " objective-done" : ""))">
-                @* A finished objective swaps its type icon for a green check
-                   mark, so done and outstanding read at a glance. *@
-                @if (isDone) {
+                @* Editing is only offered when the local store is the source, since the
+                   tracker would overwrite it. *@
+                @if (objective.CanEdit) {
+                    <MudTooltip Text="@(isDone ? Localizer["QuestMarkIncomplete"] : Localizer["QuestMarkComplete"])"
+                                Placement="Placement.Top" Delay="200">
+                        <ChildContent>
+                            <MudIconButton
+                            Icon="@(isDone ? Icons.Material.Filled.CheckCircle : Icons.Material.Outlined.CheckCircle)"
+                            Size="Size.Small" Color="@(isDone ? Color.Success : Color.Default)"
+                            OnClick="@(() => ToggleAsync(objective, isDone))" />
+                        </ChildContent>
+                    </MudTooltip>
+                } else if (isDone) {
                     <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" Size="Size.Small" />
                 } else {
                     <MudIcon Icon="@Constants.Icon.TaskObjective.FromType(objective.Objective.Type)" Size="Size.Small" />
@@ -59,6 +69,16 @@
                     <MudIconButton Icon="@Icons.Material.Filled.Map" Size="Size.Small" Color="Color.Primary"
                                    title="@Localizer["QuestViewOnMap"]"
                                    OnClick="@(() => OnMapClick.InvokeAsync((Task, objective.Objective)))" />
+                }
+                @if (objective.CanEdit && objective.Required > 1) {
+                    <div class="objective-stepper">
+                        <MudIconButton Icon="@Icons.Material.Filled.Remove" Size="Size.Small"
+                                       Disabled="@(objective.ProgressCount <= 0)" title="@Localizer["QuestDecrease"]"
+                                       OnClick="@(() => StepAsync(objective, -1))" />
+                        <MudIconButton Icon="@Icons.Material.Filled.Add" Size="Size.Small"
+                                       Disabled="@(objective.ProgressCount >= objective.Required)" title="@Localizer["QuestIncrease"]"
+                                       OnClick="@(() => StepAsync(objective, 1))" />
+                    </div>
                 }
             </div>
             @if (items.Count > 0) {
@@ -108,6 +128,10 @@
         gap: 8px;
         flex-wrap: wrap;
         min-width: 0;
+        /* Must be allowed to shrink, otherwise it claims the full row width and
+           pushes the trailing buttons past the end. */
+        flex: 1 1 auto;
+        overflow: hidden;
     }
 
     .objective-count,
@@ -194,9 +218,25 @@
         border: 1px solid rgba(255, 255, 255, 0.12);
         font-weight: 400;
     }
+
+    /* Never shrunk, so the map and stepper buttons keep their place however long
+       the description is. */
+    .objective-stepper {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        flex-shrink: 0;
+    }
+
+    .objective> :deep(.mud-icon-button) {
+        flex-shrink: 0;
+    }
 </style>
 
 @code {
+    [Parameter]
+    public EventCallback<bool> OnProgressEdited { get; set; }
+
     /// <summary>Objectives to render, already paired with tracker state.</summary>
     [Parameter, EditorRequired]
     public List<QuestObjectiveEntry> Objectives { get; set; } = null!;
@@ -227,6 +267,16 @@
     private static bool HasLocation(TaskObjective? objective) {
         if (objective?.Zones == null) return false;
         return objective.Zones.Any(z => z != null && (z.Position != null || (z.Outline is { Count: >= 3 })));
+    }
+
+    private async Task ToggleAsync(QuestObjectiveEntry objective, bool isDone) {
+        objective.SetComplete(!isDone);
+        await OnProgressEdited.InvokeAsync(true);
+    }
+
+    private async Task StepAsync(QuestObjectiveEntry objective, int delta) {
+        objective.Step(delta);
+        await OnProgressEdited.InvokeAsync(true);
     }
 
     /// <summary>

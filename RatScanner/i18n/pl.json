@@ -246,5 +246,17 @@
   "MapOverlayHazardsShort": "Zagrożenia",
   "ResultTypeItem": "Przedmiot",
   "ResultTypeQuest": "Zadanie",
-  "ResultTypeMap": "Mapa"
+  "ResultTypeMap": "Mapa",
+  "QuestMarkComplete": "Oznacz cel jako ukonczony",
+  "QuestMarkIncomplete": "Oznacz cel jako niewykonany",
+  "QuestIncrease": "Zwieksz postep",
+  "QuestDecrease": "Zmniejsz postep",
+  "ProgressSourceTitle": "Przechowywanie postepu",
+  "ProgressSourceDesc": "Gdzie zapisywane sa ukonczone zadania i cele",
+  "ProgressSourceLabel": "Zapisuj postep w",
+  "ProgressSourceHint": "RatScanner zapisuje postep w pliku na tym komputerze. TarkovTracker zapisuje go na twoim koncie TarkovTracker.",
+  "ProgressSourceLocal": "RatScanner",
+  "ProgressSourceTarkovTracker": "TarkovTracker",
+  "TarkovTrackerInactive": "Zmien przechowywanie na TarkovTracker, aby polaczyc konto i zapisac tam postep.",
+  "ConnectionPendingDetail": "Jeszcze nie sprawdzono"
 }
