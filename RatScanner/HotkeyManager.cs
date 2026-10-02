@@ -17,9 +17,20 @@ internal class HotkeyManager {
 	internal ActiveHotkey NameScanHotkey;
 	internal ActiveHotkey IconScanHotkey;
 	internal ActiveHotkey OpenInteractableOverlayHotkey;
-	internal ActiveHotkey CloseInteractableOverlayHotkey;
+	internal ActiveHotkey EscapeKeyHotkey;
 	internal ActiveHotkey OpenWikiHotkey;
 	internal ActiveHotkey OpenTarkovDevHotkey;
+
+	/// <summary>
+	/// Raised when the Escape hotkey fires, letting an open view consume the key
+	/// before it falls through to closing the interactive overlay.
+	///
+	/// A subscriber returns <see langword="true"/> if it handled the key. The
+	/// first one to do so wins and no later subscriber is called, so whichever
+	/// view is on top of the others gets the key. With nobody handling it the
+	/// overlay closes, which is what Escape has always done.
+	/// </summary>
+	internal event Func<bool>? EscapePressed;
 
 	internal HotkeyManager() {
 		UserActivityHelper.Start(true, true);
@@ -41,7 +52,7 @@ internal class HotkeyManager {
 		nameof(NameScanHotkey),
 		nameof(IconScanHotkey),
 		nameof(OpenInteractableOverlayHotkey),
-		nameof(CloseInteractableOverlayHotkey),
+		nameof(EscapeKeyHotkey),
 		nameof(OpenWikiHotkey),
 		nameof(OpenTarkovDevHotkey))
 	]
@@ -52,7 +63,7 @@ internal class HotkeyManager {
 		NameScanHotkey = new ActiveHotkey(NameScan.Hotkey, OnNameScanHotkey, ref NameScan.Enable);
 		IconScanHotkey = new ActiveHotkey(IconScan.Hotkey, OnIconScanHotkey, ref IconScan.Enable);
 		OpenInteractableOverlayHotkey = new ActiveHotkey(OverlayC.Search.Hotkey, OnOpenInteractableOverlayHotkey, ref OverlayC.Search.Enable);
-		CloseInteractableOverlayHotkey = new ActiveHotkey(OverlayC.Search.CloseHotkey, OnCloseInteractableOverlayHotkey);
+		EscapeKeyHotkey = new ActiveHotkey(OverlayC.Search.CloseHotkey, OnEscapeKey);
 		OpenWikiHotkey = new ActiveHotkey(Hotkeys.OpenWiki, OnOpenWikiHotkey);
 		OpenTarkovDevHotkey = new ActiveHotkey(Hotkeys.OpenTarkovDev, OnOpenTarkovDevHotkey);
 	}
@@ -64,7 +75,7 @@ internal class HotkeyManager {
 		NameScanHotkey?.Dispose();
 		IconScanHotkey?.Dispose();
 		OpenInteractableOverlayHotkey?.Dispose();
-		CloseInteractableOverlayHotkey?.Dispose();
+		EscapeKeyHotkey?.Dispose();
 		OpenWikiHotkey?.Dispose();
 		OpenTarkovDevHotkey?.Dispose();
 	}
@@ -96,8 +107,24 @@ internal class HotkeyManager {
 		Wrap(() => Application.Current.Dispatcher.Invoke(() => Wrap(() => BlazorUI.BlazorInteractableOverlay.ShowOverlay())));
 	}
 
-	private void OnCloseInteractableOverlayHotkey(object? sender, KeyUpEventArgs e) {
-		Wrap(() => Application.Current.Dispatcher.Invoke(() => Wrap(() => BlazorUI.BlazorInteractableOverlay.HideOverlay())));
+	/// <summary>
+	/// Escape. Offers the key to <see cref="EscapePressed"/> first and only hides
+	/// the overlay if nothing wanted it, so an open map can take the key and
+	/// close itself instead of the whole overlay vanishing underneath it.
+	/// </summary>
+	private void OnEscapeKey(object? sender, KeyUpEventArgs e) {
+		Wrap(() => Application.Current.Dispatcher.Invoke(() => Wrap(() => {
+			// Snapshot before invoking: a handler may unsubscribe, and this must
+			// not then re-enter a handler that has already gone away.
+			var handlers = EscapePressed?.GetInvocationList();
+			if (handlers != null) {
+				foreach (var handler in handlers) {
+					if ((bool)((Func<bool>)handler)()) return;
+				}
+			}
+
+			BlazorUI.BlazorInteractableOverlay.HideOverlay();
+		})));
 	}
 
 	private void OnOpenWikiHotkey(object? sender, KeyUpEventArgs e) {

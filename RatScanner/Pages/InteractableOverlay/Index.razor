@@ -137,6 +137,18 @@
 
     protected override void OnInitialized() {
         MenuVM.PropertyChanged += PropertyChangeHandler;
+        RatScannerMain.Instance.HotkeyManager.EscapePressed += OnEscapePressed;
+    }
+
+    /// <summary>
+    /// Closes the map when Escape is pressed. Returns whether the key was
+    /// consumed, so Escape only closes the whole overlay once no map is open.
+    /// </summary>
+    private bool OnEscapePressed() {
+        if (_selectedMap == null) return false;
+
+        _ = InvokeAsync(CloseMapViewer);
+        return true;
     }
 
     private async void PropertyChangeHandler(object? sender, EventArgs e) {
@@ -145,5 +157,6 @@
 
     public void Dispose() {
         MenuVM.PropertyChanged -= PropertyChangeHandler;
+        RatScannerMain.Instance.HotkeyManager.EscapePressed -= OnEscapePressed;
     }
 }

@@ -318,6 +318,19 @@
 
     protected override void OnInitialized() {
         MenuVM.PropertyChanged += PropertyChangeHandler;
+        RatScannerMain.Instance.HotkeyManager.EscapePressed += OnEscapePressed;
+    }
+
+    /// <summary>
+    /// Closes the full-screen map viewer when Escape is pressed. Returns whether
+    /// the key was consumed, so the hotkey manager only falls through to closing
+    /// the interactive overlay when there is no map to dismiss.
+    /// </summary>
+    private bool OnEscapePressed() {
+        if (_viewerMap == null) return false;
+
+        _ = InvokeAsync(CloseMapViewer);
+        return true;
     }
 
     private async void ExecuteSearch(string value) {
@@ -426,5 +439,6 @@
 
     public void Dispose() {
         MenuVM.PropertyChanged -= PropertyChangeHandler;
+        RatScannerMain.Instance.HotkeyManager.EscapePressed -= OnEscapePressed;
     }
 }
