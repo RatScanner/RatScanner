@@ -1,4 +1,5 @@
 using RatScanner.TarkovDev.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -6,10 +7,32 @@ using System.Threading.Tasks;
 namespace RatScanner.Pages.InteractableOverlay.Services;
 
 public class SearchService {
+	/// <summary>
+	/// Maps that share their artwork with another map and so duplicate an entry
+	/// that is already listed.
+	///
+	/// The Lab, The Lab (Dark), Ground Zero and Ground Zero 21 all come back as
+	/// separate results but point at the same map data as their base map, so
+	/// searching showed the same artwork repeatedly under slightly different
+	/// names. Matching is on <see cref="Map.NormalizedName"/> rather than the
+	/// display name, because the name is translated and a translated string
+	/// would not match.
+	///
+	/// The Labyrinth is deliberately NOT in this list: it is a distinct map that
+	/// happens to share a name prefix with The Lab.
+	/// </summary>
+	private static readonly HashSet<string> HiddenMapIds = new(StringComparer.OrdinalIgnoreCase) {
+		"the-lab-dark",
+		"ground-zero-21",
+		"ground-zero-tutorial",
+	};
+
 	public static async Task<IEnumerable<SearchResult>> SearchMapsAsync(string value) {
 		if (string.IsNullOrEmpty(value)) return [];
 
 		SearchResult? filter(Map map) {
+			if (HiddenMapIds.Contains(map.NormalizedName)) return null;
+
 			if (SanitizeSearch(map.Name) == value) return new(map, 3);
 			if (SanitizeSearch(map.Name).StartsWith(value)) return new(map, 15);
 			if (SanitizeSearch(map.Name).Contains(value)) return new(map, 45);
