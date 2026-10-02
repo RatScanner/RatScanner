@@ -77,7 +77,7 @@ internal readonly struct MapProjection {
     /// <summary>
     /// The position as a percentage of the artwork, clamped to the frame.
     /// </summary>
-    public (double X, double Y) ToPercent(TarkovDev.Json.ExtractPosition position) {
+    public (double X, double Y) ToPercent(TarkovDev.Json.WorldPosition position) {
         var (x, y) = Project(position.X, position.Z);
         return (Percent(x, _left, _right), Percent(y, _top, _bottom));
     }
