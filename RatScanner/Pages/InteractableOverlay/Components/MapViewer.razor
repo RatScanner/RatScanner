@@ -565,14 +565,29 @@
         public double CentreY => Top + Height / 2;
     }
 
+    /// <summary>Zoom multiplier for one wheel notch. See <see cref="ZoomStep"/>.</summary>
+    private const double ZoomFactor = 1.2;
+
+    /// <summary>
+    /// One wheel notch, as a power of <see cref="ZoomFactor"/>.
+    ///
+    /// Raising the factor to a power rather than using it directly is what makes
+    /// the zoom feel exponential: 1.2^1.35 is about 1.28x per notch, and the
+    /// curve stays smooth rather than stepping by a fixed amount.
+    /// </summary>
+    private const double ZoomStep = 1.35;
+
     private void HandleWheel(WheelEventArgs e) {
         // Let the page scroll when the map is already at its zoom limit,
         // otherwise the wheel event is swallowed by the map.
         var zoomingIn = e.DeltaY < 0;
         if ((zoomingIn && _scale >= MaxScale) || (!zoomingIn && _scale <= MinScale)) return;
 
+        // Negated exponent when zooming out, so one branch covers both
+        // directions. Math.Pow cannot take a negative base, hence the
+        // separate signs rather than Math.Pow(ZoomFactor, -ZoomStep).
         var previous = _scale;
-        _scale = Math.Clamp(_scale * (zoomingIn ? 1.1 : 0.9), MinScale, MaxScale);
+        _scale = Math.Clamp(_scale * Math.Pow(ZoomFactor, zoomingIn ? ZoomStep : -ZoomStep), MinScale, MaxScale);
         if (_scale == previous || !_viewport.IsValid) return;
 
         // Keep the point under the cursor still.
