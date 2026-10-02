@@ -243,5 +243,8 @@
   "MapOverlayExtractsShort": "撤离",
   "MapOverlayLocksShort": "门",
   "MapOverlayTransitsShort": "通道",
-  "MapOverlayHazardsShort": "危险"
+  "MapOverlayHazardsShort": "危险",
+  "ResultTypeItem": "物品",
+  "ResultTypeQuest": "任务",
+  "ResultTypeMap": "地图"
 }

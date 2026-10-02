@@ -34,11 +34,27 @@
                 </MudPaper>
             </MudStack>
 
-            <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Start">
-                <MudText Typo="Typo.body1"
-                         Style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 16vw; min-width: 0;">
+            <MudStack Justify="Justify.SpaceAround" AlignItems="AlignItems.Start" Spacing="0" Class="flex-1"
+                      Style="min-width: 0;">
+                <MudText Typo="Typo.body1" Class="ellipsis"
+                         Style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 16vw; min-width: 0; line-height: 1.15;">
                     @Item.Name
                 </MudText>
+
+                @* Type badge under the name, colour-coded so a mixed list can be
+                   scanned without reading every row. Each type gets its own
+                   hue: items amber, quests blue, maps green.
+
+                   Sized inline rather than via a style block: MudChip's
+                   stylesheet sets margin:4px and a fixed height:24px, and
+                   together those overran the row's fixed 6vh and clipped
+                   the name. An inline style outranks a class rule, so this
+                   needs no !important and no extra css. *@
+                <MudChip T="string" Variant="Variant.Text" Color="Color.Warning" Size="Size.Small"
+                         Icon="@Icons.Material.Outlined.Inventory2"
+                         Style="height:18px;min-height:18px;margin:1px 0 0 0;font-size:11px;">
+                    @Localizer["ResultTypeItem"]
+                </MudChip>
             </MudStack>
         </MudStack>
     }
@@ -343,6 +359,9 @@
 
     [Parameter]
     public EventCallback OnClick { get; set; }
+
+    [Inject]
+    public LocalizationService Localizer { get; set; } = null!;
 
     private void HandleClick() {
         OnClick.InvokeAsync();

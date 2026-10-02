@@ -243,5 +243,8 @@
   "MapOverlayExtractsShort": "Sorties",
   "MapOverlayLocksShort": "Portes",
   "MapOverlayTransitsShort": "Passages",
-  "MapOverlayHazardsShort": "Dangers"
+  "MapOverlayHazardsShort": "Dangers",
+  "ResultTypeItem": "Objet",
+  "ResultTypeQuest": "Quête",
+  "ResultTypeMap": "Carte"
 }

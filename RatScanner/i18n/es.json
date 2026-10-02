@@ -243,5 +243,8 @@
   "MapOverlayExtractsShort": "Salidas",
   "MapOverlayLocksShort": "Puertas",
   "MapOverlayTransitsShort": "Pasajes",
-  "MapOverlayHazardsShort": "Peligros"
+  "MapOverlayHazardsShort": "Peligros",
+  "ResultTypeItem": "Objeto",
+  "ResultTypeQuest": "Misión",
+  "ResultTypeMap": "Mapa"
 }

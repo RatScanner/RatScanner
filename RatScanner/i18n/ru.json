@@ -243,5 +243,8 @@
   "MapOverlayExtractsShort": "Выходы",
   "MapOverlayLocksShort": "Двери",
   "MapOverlayTransitsShort": "Переходы",
-  "MapOverlayHazardsShort": "Опасности"
+  "MapOverlayHazardsShort": "Опасности",
+  "ResultTypeItem": "Предмет",
+  "ResultTypeQuest": "Задание",
+  "ResultTypeMap": "Карта"
 }

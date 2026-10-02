@@ -22,10 +22,26 @@
                 </MudPaper>
             </MudStack>
 
-            <MudStack Justify="Justify.SpaceEvenly" AlignItems="AlignItems.Start">
-                <MudText Typo="Typo.body1" Class="ellipsis">
+            <MudStack Justify="Justify.SpaceAround" AlignItems="AlignItems.Start" Spacing="0" Class="flex-1"
+                      Style="min-width: 0;">
+                <MudText Typo="Typo.body1" Class="ellipsis" Style="line-height: 1.15;">
                     @Map.Name
                 </MudText>
+
+                @* Type badge under the name, colour-coded so a mixed list can be
+                   scanned without reading every row. Each type gets its own hue:
+                   items amber, quests blue, maps green.
+
+                   Sized inline rather than via a style block: MudChip's
+                   stylesheet sets margin:4px and a fixed height:24px, and
+                   together those overran the row's fixed 6vh and clipped the
+                   name. An inline style outranks a class rule, so this needs no
+                   !important and no extra css. *@
+                <MudChip T="string" Variant="Variant.Text" Color="Color.Success" Size="Size.Small"
+                         Icon="@Icons.Material.Outlined.Map"
+                         Style="height:18px;min-height:18px;margin:1px 0 0 0;font-size:11px;">
+                    @Localizer["ResultTypeMap"]
+                </MudChip>
             </MudStack>
         </MudStack>
     }
@@ -62,8 +78,7 @@
         <div class="d-flex align-start pa-1" Style="gap: 8px;">
             <!-- Left: the map's banner art, in the same fixed square the item card uses.
                  Falls back to a map glyph when the map has no banner on disk. -->
-            <MudPaper Outlined="true" Class="flex-shrink-0"
-                      Style="width: 104px; height: 104px; overflow: hidden;">
+            <MudPaper Outlined="true" Class="flex-shrink-0" Style="width: 104px; height: 104px; overflow: hidden;">
                 @if (BannerUrl is not null) {
                     <MudImage Src="@BannerUrl" Alt="@Map.Name" Style="width: 100%; height: 100%; object-fit: cover;" />
                 } else {
