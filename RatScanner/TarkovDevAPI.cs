@@ -255,8 +255,9 @@ public static class TarkovDevAPI {
 
 					// The API sends translation keys for the map's nested
 					// features rather than plain names, so each one is looked up
-					// by its own key. Without this, transits show raw keys like
-					// "FAC_TRANSIT_12_DESC" and hazards show "DamageType_Landmine".
+					// by its own key. Without this, extracts show raw keys like
+					// "Sniper_exit", transits show "FAC_TRANSIT_12_DESC" and
+					// hazards show "DamageType_Landmine".
 					foreach (var boss in map.Bosses) {
 						foreach (var location in boss.SpawnLocations) {
 							if (translations.TryGetValue(location.Name, out var zoneName)) location.Name = zoneName;
@@ -264,6 +265,13 @@ public static class TarkovDevAPI {
 					}
 					foreach (var hazard in map.Hazards) {
 						if (translations.TryGetValue(hazard.Name, out var hazardName)) hazard.Name = hazardName;
+					}
+
+					// Keyed on the raw name, which is itself the translation key.
+					// Rewritten in place, so the map must not be re-read from cache
+					// expecting the key to still be there.
+					foreach (var extract in map.Extracts) {
+						if (translations.TryGetValue(extract.Name, out var extractName)) extract.Name = extractName;
 					}
 					foreach (var transit in map.Transits) {
 						if (translations.TryGetValue(transit.Description, out var transitDescription)) transit.Description = transitDescription;
