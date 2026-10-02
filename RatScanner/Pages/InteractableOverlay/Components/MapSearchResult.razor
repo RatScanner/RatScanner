@@ -47,7 +47,11 @@
     }
 
     @if (Detail == DetailLevel.OverlayRow) {
-        <MudStack Row="true" Justify="Justify.SpaceBetween" Style="min-height: 40px;">
+        @* The click lives on the row rather than the expand icon, so the whole
+           row opens the map, matching how the item and task overlay rows behave.
+           Without it this branch renders but does nothing. *@
+        <MudStack Row="true" Justify="Justify.SpaceBetween" Style="min-height: 40px; cursor: pointer;"
+                  @onclick="OnMapClick">
             <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" Style="min-width: 0;">
                 <MudPaper Outlined="true" Style="width: 48px; height: 48px; min-width: 48px; overflow: hidden;">
                     @if (BannerUrl is not null) {

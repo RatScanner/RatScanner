@@ -43,7 +43,12 @@
                                               OnMapClick="@((tuple) => OpenMapForObjective(tuple.task, tuple.objective))"
                                               OnClick="@(() => SelectResult(i))" />
                         } else if (searchResult.Data is Map map) {
-                            <MapSearchResult Map="@map" OnMapClick="@(() => OpenMapViewer(map))" />
+                            @* OverlayRow rather than the default SearchRow, which is
+                               sized for the main UI list. A map row opens the viewer
+                               directly, so it has nothing to expand into when
+                               selected, unlike an item or a quest. *@
+                            <MapSearchResult Map="@map" Detail="DetailLevel.OverlayRow"
+                                             OnMapClick="@(() => OpenMapViewer(map))" />
                         }
                     }
                 </MudStack>
@@ -73,8 +78,7 @@
         var results = Enumerable.Empty<SearchResult>();
         results = results.Concat(await SearchService.SearchItemsAsync(sanitizedValue));
         results = results.Concat(await SearchService.SearchTasksAsync(sanitizedValue));
-        // TODO: Re-enable map search when MapViewer is fixed
-        // results = results.Concat(await SearchService.SearchMapsAsync(sanitizedValue));
+        results = results.Concat(await SearchService.SearchMapsAsync(sanitizedValue));
         results = results.Where(result => result != null && result.Data != null);
         results = results.OrderBy(result => result.Score).Take(4);
         _searchResults = results;
