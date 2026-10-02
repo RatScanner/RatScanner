@@ -46,26 +46,60 @@ public static class MapDataLoader {
 	private static Dictionary<string, Map> BuildMapIdCache(List<InteractiveMapData> mapsData) {
 		Dictionary<string, Map> cache = [];
 
+		// Fetched once instead of per entry: this walks every entry in the file,
+		// and each call would otherwise rebuild the map list.
+		var tarkovMaps = TarkovDevAPI.GetMaps().ToList();
+
 		foreach (var mapData in mapsData) {
 			if (mapData.Maps == null) continue;
+			if (string.IsNullOrEmpty(mapData.NormalizedName)) continue;
 
 			foreach (var map in mapData.Maps) {
 				if (string.IsNullOrEmpty(map.Key)) continue;
 				if (map.Projection != "interactive") continue;
 				if (string.IsNullOrEmpty(map.SvgPath)) continue;
 
-				// The interactive map key is the tarkov.dev map's normalized name.
-				// Without a matching tarkov.dev map there is nothing to show it for.
-				var tMap = TarkovDevAPI.GetMaps()
-					.FirstOrDefault(m => m.NormalizedName == mapData.NormalizedName);
-				if (tMap == null || string.IsNullOrEmpty(tMap.Id)) continue;
-
-				cache[tMap.Id] = map;
+				// Index this entry against every tarkov.dev map it can serve.
+				// Exact matches win; a prefix match is the fallback for variants
+				// that share an artwork with their base map.
+				foreach (var tMap in ResolveTarkovMaps(tarkovMaps, mapData.NormalizedName)) {
+					if (string.IsNullOrEmpty(tMap.Id)) continue;
+					cache[tMap.Id] = map;
+				}
 			}
 		}
 
 		return cache;
 	}
+
+	/// <summary>
+	/// The tarkov.dev maps a maps.json entry applies to.
+	///
+	/// The two sources do not always name a map the same way. maps.json has one
+	/// entry per artwork, while the API has a separate map per variant, so
+	/// "ground-zero" is the artwork behind "ground-zero", "ground-zero-21" and
+	/// "ground-zero-tutorial". Matching on equality alone leaves the variants
+	/// with no map data at all, so they silently cannot be opened.
+	///
+	/// An exact match and any longer names sharing its prefix are both returned,
+	/// since the artwork legitimately covers all of them. Order does not matter
+	/// here: every hit maps to the same artwork.
+	/// </summary>
+	private static IEnumerable<TarkovDev.Json.Map> ResolveTarkovMaps(List<TarkovDev.Json.Map> tarkovMaps, string normalizedName) {
+		// Guarded so a short or near-empty name cannot swallow most of the map
+		// list; every real artwork name is well past this length.
+		if (normalizedName.Length < MinPrefixLength) return [];
+
+		return tarkovMaps.Where(m =>
+			m.NormalizedName != null &&
+			m.NormalizedName.StartsWith(normalizedName, StringComparison.Ordinal));
+	}
+
+	/// <summary>
+	/// Shortest maps.json name allowed to match by prefix, to keep a loosely
+	/// named entry from matching every map that happens to start the same way.
+	/// </summary>
+	private const int MinPrefixLength = 4;
 
 	/// <summary>
 	/// Gets the dictionary mapping map IDs to InteractiveMapData

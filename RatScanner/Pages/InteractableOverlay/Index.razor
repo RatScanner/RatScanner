@@ -42,12 +42,9 @@
                                               Detail="@(i == _selectedResultIndex ? DetailLevel.OverlayExpanded : DetailLevel.OverlayRow)"
                                               OnMapClick="@((tuple) => OpenMapForObjective(tuple.task, tuple.objective))"
                                               OnClick="@(() => SelectResult(i))" />
-                        }
-                        @* TODO: Re-enable map search results when MapViewer is fixed
-                        else if (searchResult.Data is Map map) {
+                        } else if (searchResult.Data is Map map) {
                             <MapSearchResult Map="@map" OnMapClick="@(() => OpenMapViewer(map))" />
                         }
-                        *@
                     }
                 </MudStack>
             </div>
@@ -55,11 +52,11 @@
     </div>
 </div>
 
-@* TODO: Re-enable MapViewer when it is fixed
+@* The full-screen map viewer, opened from a map result or a quest objective.
+   Centred on the objective's zones when it was opened from one. *@
 @if (_selectedMap != null) {
-    <MapViewer Map="@_selectedMap" Pois="@_selectedPois" OnClose="@CloseMapViewer" />
+    <MapViewer Map="@_selectedMap" Pois="@_selectedPois" FocusPois="@_selectedPois" OnClose="@CloseMapViewer" />
 }
-*@
 
 @code {
     private static MudTextField<string> _searchTextField { get; set; } = null!;
@@ -90,35 +87,26 @@
     }
 
     private void OpenMapForObjective(TarkovTask task, TaskObjective objective) {
-        // TODO: Re-enable when MapViewer is fixed
-        return;
+        // Only objectives that name a place can be shown on a map; the caller
+        // hides the button otherwise.
+        if (objective?.Zones == null || objective.Zones.Count == 0) return;
 
-        // Get zones from the objective
-        ICollection<TaskZone?>? zones = objective.Zones;
+        // Zones are per-map. The first one decides which map to open, so an
+        // objective spanning several maps starts on the one it lists first.
+        var mapId = objective.Zones
+            .Select(z => z?.Map)
+            .FirstOrDefault(m => !string.IsNullOrEmpty(m));
+        if (mapId == null) return;
 
-        if (zones == null || !zones.Any()) return;
-
-        // Get the first zone with a position
-        TaskZone? zone = zones.FirstOrDefault(z => z?.Position != null);
-
-        // Find the matching map
-        if (zone?.Map == null) return;
-        Map? map = TarkovDevAPI.GetMaps().FirstOrDefault(m => m.Id == zone.Map);
-
+        var map = TarkovDevAPI.GetMaps().FirstOrDefault(m => m.Id == mapId);
         if (map == null) return;
 
-        // Every zone with a position becomes a marker on the map.
-        _selectedPois = zones
-            .Where(z => z?.Position != null)
-            .Select(z => new POI {
-                Name = objective.Type.ToString(),
-                NameColor = "#ff9800",
-                X = z!.Position!.X,
-                Y = z.Position.Y,
-            })
-            .ToList();
+        // Every zone becomes a marker with its outline drawn as an area.
+        _selectedPois = map.GetZonePois(objective.Zones);
+        if (_selectedPois.Count == 0) return;
 
-        OpenMapViewer(map);
+        _selectedMap = map;
+        StateHasChanged();
     }
 
     private void OpenMapViewer(Map map) {

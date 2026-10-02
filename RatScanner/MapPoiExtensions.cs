@@ -1,6 +1,7 @@
 using RatScanner.TarkovDev.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace RatScanner;
 
@@ -228,6 +229,95 @@ public static class MapPoiExtensions {
 		     stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
 			<circle cx="12" cy="12" r="7.5" />
 			<path d="M12 1.8v4.2M12 18v4.2M1.8 12H6M18 12h4.2" />
+		</svg>
+		""";
+
+    /// <summary>
+    /// A quest objective's zones as POIs, ready to hand to MapViewer.
+    ///
+    /// Zones are only returned for the map the projection belongs to, so an
+    /// objective spanning several maps yields a marker on each one. Every zone
+    /// in the data carries both a centre and a rectangular outline; the outline
+    /// becomes the polygon's vertices and the centre anchors the icon, which
+    /// keeps the icon sitting inside its own area.
+    ///
+    /// Returns an empty list when the map has no projection, since world
+    /// coordinates mean nothing without one.
+    /// </summary>
+    public static List<POI> GetZonePois(this Map map, IEnumerable<TaskZone> zones, string? label = null) {
+        var projection = MapDataLoader.GetMapsById().GetValueOrDefault(map.Id);
+        if (projection == null || MapProjection.Create(projection) is not { } frame) return [];
+
+        var pois = new List<POI>();
+
+        foreach (var zone in zones) {
+            // A zone belongs to exactly one map. Zones for other maps must not be
+            // drawn here, as their coordinates belong to a different frame.
+            if (!string.Equals(zone?.Map, map.Id, StringComparison.OrdinalIgnoreCase)) continue;
+
+            var hasOutline = zone.Outline is { Count: >= 3 };
+            var hasPosition = zone.Position != null;
+
+            // Neither a centre nor an outline means nothing to draw at all.
+            if (!hasOutline && !hasPosition) continue;
+
+            // Prefer the outline's own centre when there is no explicit position,
+            // so a shape-only zone still gets an icon in the middle of itself.
+            double x, y;
+            if (hasPosition) {
+                (x, y) = frame.ToPercent(new WorldPosition {
+                    X = zone.Position.X,
+                    Y = zone.Position.Y,
+                    Z = zone.Position.Z,
+                });
+            } else {
+                var vertices = zone.Outline!.Select(o => frame.ToPercent(new WorldPosition {
+                    X = o.X,
+                    Y = o.Y,
+                    Z = o.Z,
+                })).ToList();
+                x = vertices.Average(v => v.X);
+                y = vertices.Average(v => v.Y);
+            }
+
+            var poi = new POI {
+                Name = label ?? string.Empty,
+                IconSvg = ZoneIcon,
+                X = x,
+                Y = y,
+                NameColor = ZoneNameColor,
+                IconColor = ZoneColor,
+                IconColorHover = ZoneColorHover,
+            };
+
+            if (hasOutline) {
+                poi.Points = zone.Outline!.Select(o => frame.ToPercent(new WorldPosition {
+                    X = o.X,
+                    Y = o.Y,
+                    Z = o.Z,
+                })).Select(p => new POIPoint { X = p.X, Y = p.Y }).ToList();
+                poi.FillPolygon = true;
+            }
+
+            pois.Add(poi);
+        }
+
+        return pois;
+    }
+
+    /// <summary>Quest objective zones are cyan, distinct from every other overlay.</summary>
+    private const string ZoneColor = "#00838f";
+
+    private const string ZoneColorHover = "#26c6da";
+
+    private const string ZoneNameColor = "#4dd0e1";
+
+    /// <summary>A target ring over a dashed square, for an objective area.</summary>
+    private const string ZoneIcon = """
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+		     stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+			<path d="M9 3H4a1 1 0 0 0-1 1v5M15 3h5a1 1 0 0 1 1 1v5M9 21H4a1 1 0 0 1-1-1v-5M15 21h5a1 1 0 0 0 1-1v-5" />
+			<circle cx="12" cy="12" r="3.2" />
 		</svg>
 		""";
 }

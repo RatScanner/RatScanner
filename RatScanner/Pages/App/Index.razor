@@ -58,8 +58,11 @@
 
         <!-- Selected Task -->
         @if (GetDisplayedTask() is TarkovTask selectedTask) {
-            <TaskSearchResult Task="@selectedTask" Detail="DetailLevel.Full" />
-            <TaskDetailsTable Task="@selectedTask" />
+            @* Wired so objectives that name a place get a map button. Objectives
+               without location data hide it themselves. *@
+            <TaskSearchResult Task="@selectedTask" Detail="DetailLevel.Full"
+                              OnMapClick="@((tuple) => OpenMapForObjective(tuple.objective))" />
+            <TaskDetailsTable Task="@selectedTask" OnMapClick="@((tuple) => OpenMapForObjective(tuple.objective))" />
         }
 
         <!-- Selected Map -->
@@ -82,7 +85,7 @@
 @* Full-screen map viewer, opened from the selected map's info card. Kept
    separate from the selected map so closing it leaves the info card in place. *@
 @if (_viewerMap != null) {
-    <MapViewer Map="@_viewerMap" Pois="@ViewerMapPois" OnClose="CloseMapViewer" />
+    <MapViewer Map="@_viewerMap" Pois="@ViewerPois" FocusPois="@ViewerFocusPois" OnClose="CloseMapViewer" />
 }
 
 <style>
@@ -264,6 +267,39 @@
     /// </summary>
     private List<POI>? ViewerMapPois => BuildPois(_viewerMap);
 
+    /// <summary>
+    /// Zones for a quest objective's map, held while the viewer is open so the
+    /// objective's areas stay on the map alongside the toggle overlays. Kept
+    /// separate from the overlay toggles because these are not user-selectable:
+    /// they come from whichever objective was clicked.
+    /// </summary>
+    private List<POI>? _viewerZonePois;
+
+    /// <summary>
+    /// The full-screen viewer's markers: the enabled overlays for whatever map
+    /// is open, plus the objective zones if an objective put us here.
+    /// </summary>
+    private List<POI>? ViewerPois {
+        get {
+            var overlays = ViewerMapPois;
+            if (_viewerZonePois == null || _viewerZonePois.Count == 0) return overlays;
+
+            var combined = new List<POI>();
+            if (overlays != null) combined.AddRange(overlays);
+            combined.AddRange(_viewerZonePois);
+            return combined;
+        }
+    }
+
+    /// <summary>
+    /// The markers the viewer should open centred on. Only the objective zones:
+    /// these are what the user asked to see, whereas the extraction and door
+    /// overlays can be anywhere on the map and would drag the view off target.
+    /// Null when the viewer was opened from a map rather than an objective, so
+    /// the map shows in its default position.
+    /// </summary>
+    private List<POI>? ViewerFocusPois => _viewerZonePois is { Count: > 0 } ? _viewerZonePois : null;
+
     private void OnShowExtractsChanged(bool value) {
         _showExtracts = value;
     }
@@ -322,11 +358,44 @@
         if (string.IsNullOrEmpty(MapDataLoader.GetMapSvgUrl(map.Id))) return;
 
         _viewerMap = map;
+        // Zones belong to the objective that opened the viewer, so a plain map
+        // open must not inherit them from a previous objective.
+        _viewerZonePois = null;
         StateHasChanged();
     }
 
     private void CloseMapViewer() {
         _viewerMap = null;
+        _viewerZonePois = null;
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Opens the full-screen viewer on the map a quest objective happens in,
+    /// with the objective's zones drawn as areas.
+    /// </summary>
+    private void OpenMapForObjective(TaskObjective objective) {
+        if (objective?.Zones == null || objective.Zones.Count == 0) return;
+
+        // Zones are per-map. The first one picks the map to open, so an
+        // objective spanning several maps starts on the one it lists first.
+        var mapId = objective.Zones
+            .Select(z => z?.Map)
+            .FirstOrDefault(m => !string.IsNullOrEmpty(m));
+        if (mapId == null) return;
+
+        var map = TarkovDevAPI.GetMaps().FirstOrDefault(m => m.Id == mapId);
+        if (map == null) return;
+
+        // A map with no SVG has nothing to draw the zones onto.
+        if (string.IsNullOrEmpty(MapDataLoader.GetMapSvgUrl(map.Id))) return;
+
+        // Keep the overlay toggles as they were; the zones are extra markers,
+        // not a replacement.
+        _viewerMap = map;
+        _viewerZonePois = map.GetZonePois(objective.Zones);
+        if (_viewerZonePois.Count == 0) return;
+
         StateHasChanged();
     }
 

@@ -52,7 +52,10 @@
                         </MudTooltip>
                     }
                 </div>
-                @if (OnMapClick.HasDelegate && Task is not null) {
+                @* Only offered when the objective actually says where it happens. Most
+                   objectives are about items or traders and have no location, so
+                   a button there would open a map with nothing on it. *@
+                @if (OnMapClick.HasDelegate && Task is not null && HasLocation(objective.Objective)) {
                     <MudIconButton Icon="@Icons.Material.Filled.Map" Size="Size.Small" Color="Color.Primary"
                                    title="@Localizer["QuestViewOnMap"]"
                                    OnClick="@(() => OnMapClick.InvokeAsync((Task, objective.Objective)))" />
@@ -215,6 +218,16 @@
     /// </summary>
     [Parameter]
     public EventCallback<(TarkovTask task, TaskObjective objective)> OnMapClick { get; set; }
+
+    /// <summary>
+    /// Whether an objective points at a place on a map. Zones carry the actual
+    /// geometry; the map id list alone is not enough, since a map we cannot
+    /// project would still leave the button with nothing to show.
+    /// </summary>
+    private static bool HasLocation(TaskObjective? objective) {
+        if (objective?.Zones == null) return false;
+        return objective.Zones.Any(z => z != null && (z.Position != null || (z.Outline is { Count: >= 3 })));
+    }
 
     /// <summary>
     /// Whether to flag optional objectives. Off for the item quest rows, which

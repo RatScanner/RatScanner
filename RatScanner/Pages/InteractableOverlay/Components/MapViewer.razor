@@ -45,6 +45,19 @@
                        and the map goes blurry. Inline markup stays vector. *@
                     @((MarkupString)(SvgContent ?? ""))
 
+                    @* Area shapes. Drawn under the markers so an icon is never
+                       hidden by the zone it belongs to. The layer shares the
+                       canvas box and uses a 0-100 viewBox, so the vertex
+                       percentages feed straight into it without conversion. *@
+                    @if (HasPolygons) {
+                        <svg class="poi-shapes" viewBox="0 0 100 100" preserveAspectRatio="none">
+                            @foreach (var poi in Pois!) {
+                                if (poi.Points == null || poi.Points.Count < 3) continue;
+                                <polygon points="@PointsAttribute(poi)" style="@ShapeStyle(poi)" />
+                            }
+                        </svg>
+                    }
+
                     @* Markers. Positioned in percentages of the canvas, which
                        scales with the zoom, so they track the map when it moves. *@
                     @if (Pois is { Count: > 0 }) {
@@ -263,6 +276,19 @@
         background: var(--poi-icon-color-hover, rgba(255, 193, 7, 1));
         box-shadow: 0 0 30px var(--poi-icon-color-hover, rgba(255, 193, 7, 1));
     }
+
+    /* The polygon layer. Stretched over the whole canvas box with a 0-100
+       viewBox, which is why it needs no positioning of its own, and it must
+       not eat pointer events meant for dragging the map. */
+    .poi-shapes {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 90;
+        overflow: visible;
+    }
 </style>
 
 @code {
@@ -283,6 +309,18 @@
     /// </summary>
     [Parameter]
     public List<POI>? Pois { get; set; }
+
+    /// <summary>
+    /// Subset of <see cref="Pois"/> to centre the view on when the map opens,
+    /// or null to show the map as it comes. Used to bring a quest objective's
+    /// area into view instead of leaving it somewhere off in a corner.
+    ///
+    /// A subset rather than all of <see cref="Pois"/> on purpose: the objective
+    /// markers usually sit alongside extraction and door overlays, and
+    /// centring on those too would average the view away from the objective.
+    /// </summary>
+    [Parameter]
+    public List<POI>? FocusPois { get; set; }
 
     [Parameter]
     public EventCallback OnClose { get; set; }
@@ -305,6 +343,18 @@
     /// can be reset.
     /// </summary>
     private Map? _shownMap;
+
+    /// <summary>
+    /// The focus set the view was last centred on, so a new one is only applied
+    /// when the caller actually changed it rather than on every render.
+    /// </summary>
+    private List<POI>? _shownFocusPois;
+
+    /// <summary>
+    /// Whether a pan is still owed. Set when the focus changes and cleared once
+    /// the container has been measured.
+    /// </summary>
+    private bool _focusPending;
 
     /// <summary>
     /// Whether interactive SVG data exists for this map. Without it there is
@@ -355,16 +405,116 @@
         return $"--poi-icon-color: {poi.IconColor};--poi-icon-color-hover: {hover};";
     }
 
+    /// <summary>
+    /// Whether any POI carries a polygon. Avoids emitting the SVG layer at all
+    /// for the common all-point case.
+    /// </summary>
+    private bool HasPolygons => Pois is { Count: > 0 } && Pois.Any(p => p.Points is { Count: >= 3 });
+
+    /// <summary>
+    /// The polygon vertices as an SVG "points" list. Culture is forced so a
+    /// machine set to a comma-decimal locale does not emit "1,5" and split the
+    /// number in two.
+    /// </summary>
+    private static string PointsAttribute(POI poi) {
+        return string.Join(" ", poi.Points.Select(p =>
+            $"{p.X.ToString(CultureInfo.InvariantCulture)},{p.Y.ToString(CultureInfo.InvariantCulture)}"));
+    }
+
+    /// <summary>
+    /// Inline style for a POI's polygon. Reuses the icon colors so a marker and
+    /// the area around it are recognisably the same thing, and keeps the stroke
+    /// at a constant on-screen weight via a non-scaling stroke.
+    /// </summary>
+    private static string ShapeStyle(POI poi) {
+        var color = string.IsNullOrWhiteSpace(poi.IconColor) ? "rgba(255, 152, 0, 0.9)" : poi.IconColor;
+        var width = poi.StrokeWidth > 0 ? poi.StrokeWidth : 2;
+        var style =
+            $"fill: {(poi.FillPolygon ? color : "none")};" +
+            $"stroke: {color};" +
+            $"stroke-width: {width.ToString(CultureInfo.InvariantCulture)};" +
+            "stroke-linejoin: round;" +
+            "vector-effect: non-scaling-stroke;";
+
+        // A filled polygon at full opacity hides the map under it, so only the
+        // outline is drawn at full strength unless a fill was asked for.
+        if (poi.FillPolygon) {
+            style += "fill-opacity: 0.25;";
+        }
+
+        return style;
+    }
+
     protected override void OnParametersSet() {
         // Reset the view when a different map is shown, so a previous map's pan
         // and zoom do not carry over.
-        if (!ReferenceEquals(_shownMap, Map)) {
+        var mapChanged = !ReferenceEquals(_shownMap, Map);
+        if (mapChanged) {
             _shownMap = Map;
             _scale = 1.0;
             _translateX = 0;
             _translateY = 0;
             _isDragging = false;
         }
+
+        // Queue the pan rather than doing it here. Centring needs the container's
+        // measured size, which does not exist until after the first render, and
+        // it must not fight the user's own panning afterwards, so it is applied
+        // once when the next viewport measurement arrives.
+        //
+        // Re-queued on a map change too: the reset above wipes the pan, and the
+        // focus list can legitimately be the same instance as before.
+        if (mapChanged || !ReferenceEquals(_shownFocusPois, FocusPois)) {
+            _shownFocusPois = FocusPois;
+            _focusPending = true;
+        }
+    }
+
+    /// <summary>
+    /// Pans so the focused markers sit in the middle of the container, without
+    /// changing the zoom level.
+    ///
+    /// The pan has to account for the artwork being letterboxed inside the
+    /// canvas. A marker at 50% height is at the canvas's centre, but the canvas
+    /// itself may be shorter than the wrapper, so the vertical offset is measured
+    /// against the canvas height rather than the wrapper height. Getting this
+    /// wrong is invisible on a square map and visibly off-centre on a wide one.
+    /// </summary>
+    private void ApplyFocus() {
+        var focus = FocusPois;
+        if (focus == null || focus.Count == 0 || !_viewport.IsValid) return;
+
+        // Centre on the middle of the group rather than on the first marker, so
+        // an objective spread over several zones ends up framed as a whole.
+        double percentX, percentY;
+        if (HasPolygons && focus.Any(p => p.Points is { Count: >= 3 })) {
+            // For a zone, the middle of its shape reads better than the middle of
+            // a set of points that may be skewed by one distant vertex.
+            var points = focus.SelectMany(p => p.Points ?? []).ToList();
+            percentX = points.Average(p => p.X);
+            percentY = points.Average(p => p.Y);
+        } else {
+            percentX = focus.Average(p => p.X);
+            percentY = focus.Average(p => p.Y);
+        }
+
+        var wrapperWidth = _viewport.Width * _scale;
+        var wrapperHeight = _viewport.Height * _scale;
+
+        // The canvas is as wide as the wrapper and takes its height from the
+        // artwork's aspect ratio, so it can be shorter than the wrapper. That
+        // leftover is split evenly above and below by the flex centring.
+        var canvasHeight = MapDataLoader.TryGetSvgViewBoxSize(Map.Id, out var w, out var h) && w > 0 && h > 0
+            ? wrapperWidth / (w / h)
+            : wrapperHeight;
+
+        // Offset of the target from the wrapper's centre, which is where the
+        // wrapper is anchored. Shifting by its negative moves it onto the centre.
+        var offsetX = (percentX / 100 - 0.5) * wrapperWidth;
+        var offsetY = (percentY / 100 - 0.5) * canvasHeight;
+
+        _translateX = -offsetX;
+        _translateY = -offsetY;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender) {
@@ -372,6 +522,14 @@
         // screen. Refreshed after every render (this does not itself trigger a
         // render) so a resized or moved window keeps zooming in the right spot.
         await RefreshViewportAsync();
+
+        // Centring can only happen once the container has a measured size. The
+        // resulting pan changes the rendered transform, so re-render to apply it.
+        if (_focusPending && _viewport.IsValid) {
+            _focusPending = false;
+            ApplyFocus();
+            StateHasChanged();
+        }
     }
 
     /// <summary>

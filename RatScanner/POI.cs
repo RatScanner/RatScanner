@@ -1,4 +1,18 @@
+using System.Collections.Generic;
+
 namespace RatScanner;
+
+/// <summary>
+/// A single vertex of a POI's polygon, in the same percentage space as
+/// <see cref="POI.X"/> and <see cref="POI.Y"/>.
+/// </summary>
+public class POIPoint {
+    /// <summary>Percentage of the map's width (0-100).</summary>
+    public double X { get; set; }
+
+    /// <summary>Percentage of the map's height (0-100).</summary>
+    public double Y { get; set; }
+}
 
 /// <summary>
 /// A point of interest to draw on a map, e.g. an extraction, a trader, a
@@ -48,4 +62,31 @@ public class POI {
     /// identity on hover.
     /// </summary>
     public string IconColorHover { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Outline of the area this POI covers, as a series of vertices in the same
+    /// percentage space as <see cref="X"/> and <see cref="Y"/>. Empty for the
+    /// common case of a POI that is just a single spot.
+    ///
+    /// Percentages rather than world coordinates so the shape survives the
+    /// per-map projection, exactly as the point position does. When set, the
+    /// polygon is filled and stroked behind the icon, and the icon stays
+    /// anchored at <see cref="X"/>/<see cref="Y"/>.
+    /// </summary>
+    public List<POIPoint> Points { get; set; } = new();
+
+    /// <summary>
+    /// Whether the polygon should be drawn filled and stroked rather than just
+    /// stroked. Off by default so an outline-only zone does not obscure the
+    /// map underneath it.
+    /// </summary>
+    public bool FillPolygon { get; set; }
+
+    /// <summary>
+    /// Stroke width of the polygon, in screen pixels. Drawn with a
+    /// non-scaling stroke so it keeps the same on-screen weight at every zoom
+    /// level instead of ballooning as the map is scaled up. Zero falls back to
+    /// a default.
+    /// </summary>
+    public double StrokeWidth { get; set; }
 }
