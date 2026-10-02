@@ -252,6 +252,28 @@ public static class TarkovDevAPI {
 				case Map map:
 					if (translations.TryGetValue($"{map.Id} Name", out var mapName)) map.Name = mapName;
 					if (translations.TryGetValue($"{map.Id} Description", out var mapDescription)) map.Description = mapDescription;
+
+					// The API sends translation keys for the map's nested
+					// features rather than plain names, so each one is looked up
+					// by its own key. Without this, transits show raw keys like
+					// "FAC_TRANSIT_12_DESC" and hazards show "DamageType_Landmine".
+					foreach (var boss in map.Bosses) {
+						foreach (var location in boss.SpawnLocations) {
+							if (translations.TryGetValue(location.Name, out var zoneName)) location.Name = zoneName;
+						}
+					}
+					foreach (var hazard in map.Hazards) {
+						if (translations.TryGetValue(hazard.Name, out var hazardName)) hazard.Name = hazardName;
+					}
+					foreach (var transit in map.Transits) {
+						if (translations.TryGetValue(transit.Description, out var transitDescription)) transit.Description = transitDescription;
+					}
+					foreach (var btrStop in map.BtrStops) {
+						if (translations.TryGetValue(btrStop.Name, out var stopName)) btrStop.Name = stopName;
+					}
+					foreach (var mapSwitch in map.Switches) {
+						if (translations.TryGetValue(mapSwitch.Name, out var switchName)) mapSwitch.Name = switchName;
+					}
 					break;
 				case HideoutStation station:
 					if (translations.TryGetValue(station.Name, out var stationName)) station.Name = stationName;

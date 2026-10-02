@@ -14,7 +14,11 @@
         <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" Style="height: 6vh;" @onclick="OnMapClick">
             <MudStack Justify="Justify.Center" Class="flex-shrink-0">
                 <MudPaper Outlined="true" Style="height: 100%; aspect-ratio: 1 / 1; overflow: hidden;">
-                    <MudIcon Icon="@Icons.Material.Filled.Map" Size="Size.Small" Color="Color.Primary" />
+                    @if (BannerUrl is not null) {
+                        <MudImage Src="@BannerUrl" Alt="@Map.Name" Style="width: 100%; height: 100%; object-fit: cover;" />
+                    } else {
+                        <MudIcon Icon="@Icons.Material.Filled.Map" Size="Size.Small" Color="Color.Primary" />
+                    }
                 </MudPaper>
             </MudStack>
 
@@ -29,8 +33,12 @@
     @if (Detail == DetailLevel.OverlayRow) {
         <MudStack Row="true" Justify="Justify.SpaceBetween" Style="min-height: 40px;">
             <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" Style="min-width: 0;">
-                <MudPaper Outlined="true" Style="width: 48px; height: 48px; min-width: 48px;">
-                    <MudIcon Icon="@Icons.Material.Filled.Map" Size="Size.Medium" Color="Color.Primary" />
+                <MudPaper Outlined="true" Style="width: 48px; height: 48px; min-width: 48px; overflow: hidden;">
+                    @if (BannerUrl is not null) {
+                        <MudImage Src="@BannerUrl" Alt="@Map.Name" Style="width: 100%; height: 100%; object-fit: cover;" />
+                    } else {
+                        <MudIcon Icon="@Icons.Material.Filled.Map" Size="Size.Medium" Color="Color.Primary" />
+                    }
                 </MudPaper>
 
                 <MudStack Spacing="0" Style="min-width: 0; overflow: hidden;">
@@ -52,10 +60,17 @@
         </MudText>
 
         <div class="d-flex align-start pa-1" Style="gap: 8px;">
-            <!-- Left: a map glyph in the same fixed square the item card uses. -->
-            <MudPaper Outlined="true" Class="d-flex align-center justify-center flex-shrink-0"
-                      Style="width: 104px; height: 104px;">
-                <MudIcon Icon="@Icons.Material.Filled.Map" Size="Size.Large" Color="Color.Primary" />
+            <!-- Left: the map's banner art, in the same fixed square the item card uses.
+                 Falls back to a map glyph when the map has no banner on disk. -->
+            <MudPaper Outlined="true" Class="flex-shrink-0"
+                      Style="width: 104px; height: 104px; overflow: hidden;">
+                @if (BannerUrl is not null) {
+                    <MudImage Src="@BannerUrl" Alt="@Map.Name" Style="width: 100%; height: 100%; object-fit: cover;" />
+                } else {
+                    <div class="d-flex align-center justify-center" Style="width: 100%; height: 100%;">
+                        <MudIcon Icon="@Icons.Material.Filled.Map" Size="Size.Large" Color="Color.Primary" />
+                    </div>
+                }
             </MudPaper>
 
             <div class="flex-grow-1" Style="min-width: 0;">
@@ -105,15 +120,64 @@
                         </div>
                     </MudPaper>
 
-                    @* Toggle for overlaying extraction points on the map below.
-                       Hidden entirely when the map has none, rather than shown
-                       disabled, so the card stays uncluttered.
-                       MudBlazor 6.x binds switches through Checked/CheckedChanged
-                       inherited from MudBooleanInput, not Value/ValueChanged. *@
-                    @if (Map.Extracts.Count > 0) {
+                    @* Overlay toggles for the map below. Each control is hidden entirely when
+                       the map has nothing to show for it, rather than shown
+                       disabled, so the card stays uncluttered. *@
+                    @if (Map.Extracts.Count > 0 || Map.Locks.Count > 0 || Map.Transits.Count > 0 || Map.Hazards.Count > 0) {
+                        @* Overlay toggles as one joined row of buttons. Four stacked
+                           labelled switches took four lines and squeezed the map
+                           out of the card, and icon-only buttons lost the labels
+                           entirely, so these keep a short label plus an icon and
+                           sit side by side in a single row.
+
+                           Each overlay keeps its own colour in both states, so the
+                           buttons match the markers they toggle: green for
+                           extracts, amber for keyed doors, blue for passages and
+                           red for hazards. Colour carries the meaning even when
+                           the labels are unreadable.
+
+                           MudToggleIconButton is deliberately not used here: in
+                           MudBlazor 6.10 it derives from MudComponentBase rather
+                           than MudBaseButton, so it cannot join a button group's
+                           borders, and it has no ChildContent to hold a label.
+                           MudButton is group-compatible and carries both.
+
+                           Colors are MudBlazor presets rather than exact hex:
+                           Color is a preset-only struct with no FromHtml, so the
+                           button tints are the nearest palette match to the POI
+                           marker colours rather than the identical value. *@
                         <MudPaper Outlined="true" Class="pa-2">
-                            <MudSwitch T="bool" Checked="@ShowExtracts" CheckedChanged="@OnShowExtractsChanged"
-                                       Color="Color.Primary" Dense="true" Label="@Localizer["MapShowExtracts"]" />
+                            <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false" Size="Size.Small"
+                                            Color="Color.Primary">
+                                @if (Map.Extracts.Count > 0) {
+                                    <MudButton StartIcon="@Icons.Material.Filled.Logout"
+                                               Variant="@(ShowExtracts ? Variant.Filled : Variant.Outlined)" Color="Color.Success"
+                                               OnClick="@(() => OnShowExtractsChanged.InvokeAsync(!ShowExtracts))">
+                                        @Localizer["MapOverlayExtractsShort"]
+                                    </MudButton>
+                                }
+                                @if (Map.Locks.Count > 0) {
+                                    <MudButton StartIcon="@Icons.Material.Filled.Key"
+                                               Variant="@(ShowLocks ? Variant.Filled : Variant.Outlined)" Color="Color.Warning"
+                                               OnClick="@(() => OnShowLocksChanged.InvokeAsync(!ShowLocks))">
+                                        @Localizer["MapOverlayLocksShort"]
+                                    </MudButton>
+                                }
+                                @if (Map.Transits.Count > 0) {
+                                    <MudButton StartIcon="@Icons.Material.Filled.CompareArrows"
+                                               Variant="@(ShowTransits ? Variant.Filled : Variant.Outlined)" Color="Color.Info"
+                                               OnClick="@(() => OnShowTransitsChanged.InvokeAsync(!ShowTransits))">
+                                        @Localizer["MapOverlayTransitsShort"]
+                                    </MudButton>
+                                }
+                                @if (Map.Hazards.Count > 0) {
+                                    <MudButton StartIcon="@Icons.Material.Filled.Warning"
+                                               Variant="@(ShowHazards ? Variant.Filled : Variant.Outlined)" Color="Color.Error"
+                                               OnClick="@(() => OnShowHazardsChanged.InvokeAsync(!ShowHazards))">
+                                        @Localizer["MapOverlayHazardsShort"]
+                                    </MudButton>
+                                }
+                            </MudButtonGroup>
                         </MudPaper>
                     }
                 </MudStack>
@@ -149,11 +213,41 @@
     public bool ShowExtracts { get; set; }
 
     /// <summary>
+    /// Whether keyed doors and trunks are overlaid on the map.
+    /// </summary>
+    [Parameter]
+    public bool ShowLocks { get; set; }
+
+    /// <summary>
+    /// Whether passages to other maps are overlaid on the map.
+    /// </summary>
+    [Parameter]
+    public bool ShowTransits { get; set; }
+
+    /// <summary>
+    /// Whether environmental hazards are overlaid on the map.
+    /// </summary>
+    [Parameter]
+    public bool ShowHazards { get; set; }
+
+    /// <summary>
     /// Raised when the extracts switch is toggled, so the owning page can pass
     /// the POIs down to the viewer.
     /// </summary>
     [Parameter]
     public EventCallback<bool> OnShowExtractsChanged { get; set; }
+
+    /// <summary>Raised when the keyed doors switch is toggled.</summary>
+    [Parameter]
+    public EventCallback<bool> OnShowLocksChanged { get; set; }
+
+    /// <summary>Raised when the transits switch is toggled.</summary>
+    [Parameter]
+    public EventCallback<bool> OnShowTransitsChanged { get; set; }
+
+    /// <summary>Raised when the hazards switch is toggled.</summary>
+    [Parameter]
+    public EventCallback<bool> OnShowHazardsChanged { get; set; }
 
     [Inject]
     public LocalizationService Localizer { get; set; } = null!;
@@ -164,6 +258,20 @@
     /// opening an empty overlay.
     /// </summary>
     private bool HasSvg => !string.IsNullOrEmpty(MapDataLoader.GetMapSvgUrl(Map.Id));
+
+    /// <summary>
+    /// The map's banner art, served from the local Data folder, which the
+    /// WebView exposes as https://local.data. Falls back to the shared banner
+    /// when a map has no art of its own, and to null when even that is missing.
+    /// </summary>
+    private string? BannerUrl {
+        get {
+            if (!string.IsNullOrEmpty(Map.Id) && MapDataLoader.MapBannerExists(Map.Id)) {
+                return $"https://local.data/banner/{Map.Id}.png";
+            }
+            return MapDataLoader.DefaultBannerExists ? "https://local.data/banner/default.png" : null;
+        }
+    }
 
     private void OpenURL(string? url) {
         if (string.IsNullOrEmpty(url)) return;

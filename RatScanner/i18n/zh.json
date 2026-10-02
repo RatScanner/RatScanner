@@ -236,5 +236,12 @@
   "MapNoData": "无地图数据",
   "MapNoDataHint": "该地图没有交互数据，因此无法显示。",
   "MapOpen": "打开地图",
-  "MapShowExtracts": "显示撤离点"
+  "MapShowExtracts": "显示撤离点",
+  "MapShowLocks": "显示带钥匙的门",
+  "MapShowTransits": "显示通道",
+  "MapShowHazards": "显示危险区域",
+  "MapOverlayExtractsShort": "撤离",
+  "MapOverlayLocksShort": "门",
+  "MapOverlayTransitsShort": "通道",
+  "MapOverlayHazardsShort": "危险"
 }

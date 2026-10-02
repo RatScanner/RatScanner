@@ -51,7 +51,7 @@
                         foreach (var poi in Pois) {
                             <div class="poi"
                                  style="left: @(poi.X.ToString(CultureInfo.InvariantCulture))%; top: @(poi.Y.ToString(CultureInfo.InvariantCulture))%;">
-                                <div class="poi-icon">
+                                <div class="poi-icon" style="@IconStyle(poi)">
                                     @if (!string.IsNullOrWhiteSpace(poi.IconSvg)) {
                                         @((MarkupString)poi.IconSvg)
                                     } else {
@@ -219,9 +219,11 @@
         align-self: flex-start;
     }
 
-    /* Boxed background so the icon reads against any part of the map. */
+    /* Boxed background so the icon reads against any part of the map. The
+       default is overridden per marker via POI.IconColor, so each kind of
+       point reads differently at a glance. */
     .poi-icon {
-        background: rgba(255, 152, 0, 0.9);
+        background: var(--poi-icon-color, rgba(255, 152, 0, 0.9));
         border-radius: 50%;
         padding: 6px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.6);
@@ -258,8 +260,8 @@
     }
 
     .poi:hover .poi-icon {
-        background: rgba(255, 193, 7, 1);
-        box-shadow: 0 0 30px rgba(255, 193, 7, 1);
+        background: var(--poi-icon-color-hover, rgba(255, 193, 7, 1));
+        box-shadow: 0 0 30px var(--poi-icon-color-hover, rgba(255, 193, 7, 1));
     }
 </style>
 
@@ -339,6 +341,18 @@
     private static string NameStyle(POI poi) {
         var color = string.IsNullOrWhiteSpace(poi.NameColor) ? "var(--mud-palette-text-primary)" : poi.NameColor;
         return $"color: {color};";
+    }
+
+    /// <summary>
+    /// Inline style for a POI's icon disc. Each kind of marker gets its own
+    /// color so overlays are told apart on the map without reading the labels.
+    /// The hover color is the same hue brightened, so the hover state keeps
+    /// the marker's identity rather than always going yellow.
+    /// </summary>
+    private static string IconStyle(POI poi) {
+        if (string.IsNullOrWhiteSpace(poi.IconColor)) return string.Empty;
+        var hover = string.IsNullOrWhiteSpace(poi.IconColorHover) ? poi.IconColor : poi.IconColorHover;
+        return $"--poi-icon-color: {poi.IconColor};--poi-icon-color-hover: {hover};";
     }
 
     protected override void OnParametersSet() {

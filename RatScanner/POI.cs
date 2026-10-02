@@ -34,4 +34,18 @@ public class POI {
     /// primary text color when empty.
     /// </summary>
     public string NameColor { get; set; } = string.Empty;
+
+    /// <summary>
+    /// CSS color for the marker's icon disc, e.g. "#4fc3f7". Defaults to amber
+    /// when empty. Set this so each kind of marker is told apart at a glance on
+    /// the map; the label color alone only affects the text.
+    /// </summary>
+    public string IconColor { get; set; } = string.Empty;
+
+    /// <summary>
+    /// CSS color for the icon disc while hovered. Falls back to
+    /// <see cref="IconColor"/> when empty, so a marker does not lose its
+    /// identity on hover.
+    /// </summary>
+    public string IconColorHover { get; set; } = string.Empty;
 }

@@ -65,7 +65,10 @@
         <!-- Selected Map -->
         @if (GetDisplayedMap() is Map selectedMap) {
             <MapSearchResult Map="@selectedMap" Detail="DetailLevel.Full" ShowExtracts="@_showExtracts"
-                             OnShowExtractsChanged="@OnShowExtractsChanged" OnMapClick="@(() => OpenMapViewer(selectedMap))" />
+                             ShowLocks="@_showLocks" ShowTransits="@_showTransits" ShowHazards="@_showHazards"
+                             OnShowExtractsChanged="@OnShowExtractsChanged" OnShowLocksChanged="@OnShowLocksChanged"
+                             OnShowTransitsChanged="@OnShowTransitsChanged" OnShowHazardsChanged="@OnShowHazardsChanged"
+                             OnMapClick="@(() => OpenMapViewer(selectedMap))" />
             @* The map sits right under its info card, ready to pan and zoom. The
                border lives here rather than in MapViewer so the component stays
                reusable in the interactable overlay. *@
@@ -200,20 +203,81 @@
     /// </summary>
     private bool _showExtracts;
 
+    /// <summary>Whether keyed doors and trunks are overlaid on the maps.</summary>
+    private bool _showLocks;
+
+    /// <summary>Whether passages to other maps are overlaid on the maps.</summary>
+    private bool _showTransits;
+
+    /// <summary>Whether environmental hazards are overlaid on the maps.</summary>
+    private bool _showHazards;
+
+    /// <summary>
+    /// Lazily-built name lookups, shared by every map the viewer shows. Building
+    /// these eagerly would pull the whole items and maps cache in just to resolve
+    /// a label, so they are only created once a toggle actually needs one.
+    /// </summary>
+    private Dictionary<string, string>? _itemNames;
+    private Dictionary<string, string>? _mapNames;
+
+    private string? ResolveItemName(string id) {
+        _itemNames ??= TarkovDevAPI.GetItems().ToDictionary(i => i.Id, i => i.Name);
+        return _itemNames.GetValueOrDefault(id);
+    }
+
+    private string? ResolveMapName(string id) {
+        _mapNames ??= TarkovDevAPI.GetMaps().ToDictionary(m => m.Id, m => m.Name);
+        return _mapNames.GetValueOrDefault(id);
+    }
+
+    /// <summary>
+    /// The POIs for a map, combining every enabled overlay. Null when nothing is
+    /// enabled, so the viewer skips marker rendering entirely.
+    /// </summary>
+    private List<POI>? BuildPois(Map? map) {
+        if (map == null) return null;
+
+        List<POI>? pois = null;
+
+        void Add(List<POI> more) {
+            if (more.Count == 0) return;
+            (pois ??= []).AddRange(more);
+        }
+
+        if (_showExtracts) Add(map.GetExtractPois());
+        if (_showLocks) Add(map.GetLockPois(ResolveItemName));
+        if (_showTransits) Add(map.GetTransitPois(ResolveMapName));
+        if (_showHazards) Add(map.GetHazardPois());
+
+        return pois;
+    }
+
     /// <summary>
     /// Extracts for the map shown inline, or null when the toggle is off or the
     /// map has none.
     /// </summary>
-    private List<POI>? SelectedMapPois => _showExtracts ? GetDisplayedMap()?.GetExtractPois() : null;
+    private List<POI>? SelectedMapPois => BuildPois(GetDisplayedMap());
 
     /// <summary>
     /// Same, for the full-screen viewer. Kept separate from the inline map since
     /// it can show a different map than the selected one.
     /// </summary>
-    private List<POI>? ViewerMapPois => _showExtracts ? _viewerMap?.GetExtractPois() : null;
+    private List<POI>? ViewerMapPois => BuildPois(_viewerMap);
 
     private void OnShowExtractsChanged(bool value) {
         _showExtracts = value;
+    }
+
+    private void OnShowLocksChanged(bool value) {
+        _showLocks = value;
+    }
+
+    private void OnShowTransitsChanged(bool value) {
+        _showTransits = value;
+    }
+
+    private void OnShowHazardsChanged(bool value) {
+        _showHazards = value;
     }
 
     protected override void OnInitialized() {

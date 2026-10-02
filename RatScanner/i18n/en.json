@@ -236,5 +236,12 @@
   "MapNoData": "No map data",
   "MapNoDataHint": "This map has no interactive map data, so it cannot be displayed.",
   "MapOpen": "Open map",
-  "MapShowExtracts": "Show extracts"
+  "MapShowExtracts": "Show extracts",
+  "MapShowLocks": "Show keyed doors",
+  "MapShowTransits": "Show passages",
+  "MapShowHazards": "Show hazards",
+  "MapOverlayExtractsShort": "Exits",
+  "MapOverlayLocksShort": "Doors",
+  "MapOverlayTransitsShort": "Passages",
+  "MapOverlayHazardsShort": "Hazards"
 }

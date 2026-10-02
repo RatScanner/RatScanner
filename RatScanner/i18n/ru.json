@@ -236,5 +236,12 @@
   "MapNoData": "Нет данных карты",
   "MapNoDataHint": "У этой карты нет интерактивных данных, поэтому её нельзя отобразить.",
   "MapOpen": "Открыть карту",
-  "MapShowExtracts": "Показать выходы"
+  "MapShowExtracts": "Показать выходы",
+  "MapShowLocks": "Показать двери с замком",
+  "MapShowTransits": "Показать переходы",
+  "MapShowHazards": "Показать опасности",
+  "MapOverlayExtractsShort": "Выходы",
+  "MapOverlayLocksShort": "Двери",
+  "MapOverlayTransitsShort": "Переходы",
+  "MapOverlayHazardsShort": "Опасности"
 }

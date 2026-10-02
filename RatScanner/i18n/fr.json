@@ -236,5 +236,12 @@
   "MapNoData": "Pas de donnees de carte",
   "MapNoDataHint": "Cette carte n'a pas de donnees interactives, elle ne peut pas etre affichee.",
   "MapOpen": "Ouvrir la carte",
-  "MapShowExtracts": "Afficher les sorties"
+  "MapShowExtracts": "Afficher les sorties",
+  "MapShowLocks": "Afficher les portes à clé",
+  "MapShowTransits": "Afficher les passages",
+  "MapShowHazards": "Afficher les dangers",
+  "MapOverlayExtractsShort": "Sorties",
+  "MapOverlayLocksShort": "Portes",
+  "MapOverlayTransitsShort": "Passages",
+  "MapOverlayHazardsShort": "Dangers"
 }

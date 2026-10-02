@@ -100,6 +100,22 @@ public static class MapDataLoader {
 
 	private static readonly Dictionary<string, string?> _svgContentCache = [];
 
+	/// <summary>
+	/// Whether a map has its own banner art on disk. Banners are named after the
+	/// map id, matching the SVG maps, so the file is looked up directly rather
+	/// than through the projection data.
+	/// </summary>
+	public static bool MapBannerExists(string? mapId) {
+		if (string.IsNullOrEmpty(mapId)) return false;
+		return File.Exists(Path.Combine(RatConfig.Paths.Data, "banner", $"{mapId}.png"));
+	}
+
+	/// <summary>
+	/// Whether the shared fallback banner is available, used for maps that have
+	/// no art of their own.
+	/// </summary>
+	public static bool DefaultBannerExists => File.Exists(Path.Combine(RatConfig.Paths.Data, "banner", "default.png"));
+
 	/// <summary>Shared for SVG fetches, which are immutable and cached below.</summary>
 	private static readonly HttpClient SvgHttpClient = new();
 
