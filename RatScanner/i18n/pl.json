@@ -290,5 +290,13 @@
   "LogTrackingRaidStartingOn": "Wyprawa zaczyna się na {0}",
   "LogTrackingRaidStarted": "Wyprawa rozpoczęta",
   "LogTrackingRaidEnded": "Wyprawa zakończona",
-  "LogTrackingRaidMatchingAborted": "Wyszukiwanie anulowane"
+  "LogTrackingRaidMatchingAborted": "Wyszukiwanie anulowane",
+  "LogTrackingHistory": "Poprzednie sesje logów",
+  "LogTrackingHistoryHint": "Odczytuje log poprzedniej sesji, aby uwzględnić zadania ukończone w rozegranych już nalotach.",
+  "LogTrackingHistoryAction": "Odczytaj poprzednie logi",
+  "LogTrackingHistoryReading": "Odczyt...",
+  "LogTrackingHistoryPick": "Wybierz sesję do odczytania.",
+  "LogTrackingHistoryNone": "Nie znaleziono poprzednich sesji w {0}.",
+  "LogTrackingHistoryDone": "Odczytano {0}.",
+  "LogTrackingHistoryFailed": "Nie można odczytać poprzednich logów: {0}"
 }

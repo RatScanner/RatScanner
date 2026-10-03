@@ -290,5 +290,13 @@
   "LogTrackingRaidStartingOn": "Рейд начинается на карте {0}",
   "LogTrackingRaidStarted": "Рейд начался",
   "LogTrackingRaidEnded": "Рейд закончился",
-  "LogTrackingRaidMatchingAborted": "Поиск отменён"
+  "LogTrackingRaidMatchingAborted": "Поиск отменён",
+  "LogTrackingHistory": "Прошлые сеансы журнала",
+  "LogTrackingHistoryHint": "Читает журнал прошлого сеанса, чтобы учесть задания, выполненные в уже сыгранных рейдах.",
+  "LogTrackingHistoryAction": "Прочитать прошлые журналы",
+  "LogTrackingHistoryReading": "Чтение...",
+  "LogTrackingHistoryPick": "Выберите сеанс для чтения.",
+  "LogTrackingHistoryNone": "В папке {0} прошлых сеансов не найдено.",
+  "LogTrackingHistoryDone": "Прочитан {0}.",
+  "LogTrackingHistoryFailed": "Не удалось прочитать прошлые журналы: {0}"
 }

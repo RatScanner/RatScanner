@@ -290,5 +290,13 @@
   "LogTrackingRaidStartingOn": "Le raid commence sur {0}",
   "LogTrackingRaidStarted": "Raid started",
   "LogTrackingRaidEnded": "Raid termine",
-  "LogTrackingRaidMatchingAborted": "Recherche annulee"
+  "LogTrackingRaidMatchingAborted": "Recherche annulee",
+  "LogTrackingHistory": "Sessions de journal précédentes",
+  "LogTrackingHistoryHint": "Lit le journal d'une session précédente pour récupérer les quêtes terminées lors de raids déjà joués.",
+  "LogTrackingHistoryAction": "Lire les anciens journaux",
+  "LogTrackingHistoryReading": "Lecture...",
+  "LogTrackingHistoryPick": "Choisissez une session à lire.",
+  "LogTrackingHistoryNone": "Aucune session précédente trouvée dans {0}.",
+  "LogTrackingHistoryDone": "{0} a été lu.",
+  "LogTrackingHistoryFailed": "Impossible de lire les anciens journaux : {0}"
 }

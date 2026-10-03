@@ -290,5 +290,13 @@
   "LogTrackingRaidStartingOn": "Raid starting on {0}",
   "LogTrackingRaidStarted": "Raid started",
   "LogTrackingRaidEnded": "Raid ended",
-  "LogTrackingRaidMatchingAborted": "Matching cancelled"
+  "LogTrackingRaidMatchingAborted": "Matching cancelled",
+  "LogTrackingHistory": "Past log sessions",
+  "LogTrackingHistoryHint": "Read a previous session's logs to pick up quests finished in raids that already happened.",
+  "LogTrackingHistoryAction": "Read past logs",
+  "LogTrackingHistoryReading": "Reading...",
+  "LogTrackingHistoryPick": "Choose a session to read.",
+  "LogTrackingHistoryNone": "No past sessions found in {0}.",
+  "LogTrackingHistoryDone": "Read {0}.",
+  "LogTrackingHistoryFailed": "Could not read past logs: {0}"
 }

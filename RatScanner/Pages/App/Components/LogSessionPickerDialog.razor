@@ -1,0 +1,47 @@
+@using Microsoft.AspNetCore.Components
+@using MudBlazor
+@using MudBlazor.Dialog
+@inject LocalizationService Localizer
+
+@* Picks one past EFT log session to replay. MudBlazor's message box only offers
+   yes/no/cancel, so choosing between N sessions needs a real dialog. *@
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.body1">@Localizer["LogTrackingHistoryPick"]</MudText>
+
+        @if (Sessions.Count == 0) {
+            <MudText Typo="Typo.body2" Color="Color.Warning" Class="mt-2">
+                @LocalizationService.Format("LogTrackingHistoryNone", LogsFolder)
+            </MudText>
+        } else {
+            <MudList T="string" Class="mt-2" Dense="true" Style="max-height: 320px; overflow-y: auto;">
+                @foreach (var session in Sessions) {
+                    <MudListItem T="string" Value="@session.Label" OnClick="@(() => Pick(session))">
+                        <MudText Typo="Typo.body2">@session.Label</MudText>
+                    </MudListItem>
+                }
+            </MudList>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@Cancel">@Localizer["CancelButton"]</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance? MudDialog { get; set; }
+
+    /// <summary>Sessions to choose from, newest first.</summary>
+    [Parameter]
+    public List<EftLogHistory.Session> Sessions { get; set; } = [];
+
+    /// <summary>Logs folder, shown when there is nothing to pick.</summary>
+    [Parameter]
+    public string LogsFolder { get; set; } = "";
+
+    private void Pick(EftLogHistory.Session session) => MudDialog?.Close(DialogResult.Ok(session));
+
+    private void Cancel() => MudDialog?.Cancel();
+}

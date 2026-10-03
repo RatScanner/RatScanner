@@ -290,5 +290,13 @@
   "LogTrackingRaidStartingOn": "A incursão está começando em {0}",
   "LogTrackingRaidStarted": "Incursão iniciada",
   "LogTrackingRaidEnded": "Incursão encerrada",
-  "LogTrackingRaidMatchingAborted": "Busca cancelada"
+  "LogTrackingRaidMatchingAborted": "Busca cancelada",
+  "LogTrackingHistory": "Sessões de log anteriores",
+  "LogTrackingHistoryHint": "Lê o log de uma sessão anterior para recuperar missões concluídas em incursões já jogadas.",
+  "LogTrackingHistoryAction": "Ler logs anteriores",
+  "LogTrackingHistoryReading": "A ler...",
+  "LogTrackingHistoryPick": "Escolha uma sessão para ler.",
+  "LogTrackingHistoryNone": "Nenhuma sessão anterior encontrada em {0}.",
+  "LogTrackingHistoryDone": "Leitura de {0} concluída.",
+  "LogTrackingHistoryFailed": "Não foi possível ler os logs anteriores: {0}"
 }

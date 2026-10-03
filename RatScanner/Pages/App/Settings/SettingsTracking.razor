@@ -1,11 +1,15 @@
 @page "/app/settings/tracking"
 @layout SettingsLayout
 @using System.Threading;
+@using System.Threading.Tasks
+@using MudBlazor
 @using RatScanner
+@using RatScanner.Pages.App.Components
 @using static RatScanner.RatConfig
 @inject SettingsVM SettingsVM
 @inject RatScanner.TarkovTrackerDB TarkovTrackerDB
 @inject LocalizationService Localizer
+@inject IDialogService DialogService
 @implements IDisposable
 
 <div class="settings-split">
@@ -150,6 +154,18 @@
                                     }
                                 </MudText>
                             }
+
+                            @* Reading past logs is a manual action: it rewrites quest
+                               progress, so it never runs on its own. *@
+                            <SettingsRow Label="@Localizer["LogTrackingHistory"]"
+                                         SubLabel="@Localizer["LogTrackingHistoryHint"]"
+                                         Disabled="@(!SettingsVM.EnableLogTracking || !SettingsVM.LogTrackQuests || _replaying)">
+                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@_replaying"
+                                           OnClick="@ReadPastLogsAsync"
+                                           StartIcon="@Icons.Material.Filled.History">
+                                    @(_replaying ? Localizer["LogTrackingHistoryReading"] : Localizer["LogTrackingHistoryAction"])
+                                </MudButton>
+                            </SettingsRow>
                         </SettingsCard>
                     </div>
                 </div>
@@ -189,6 +205,54 @@
     /// <summary>Resolved logs folder, so a failed detection is visible rather than silent.</summary>
     private string _logsFolder = "";
     private bool _logsResolved;
+
+    /// <summary>True while past logs are being read, so the button cannot be pressed twice.</summary>
+    private bool _replaying;
+
+    /// <summary>
+    /// Offers the past sessions and replays the one picked. Reading rewrites quest
+    /// progress, so the choice is always made by hand and never happens on startup.
+    /// </summary>
+    private async Task ReadPastLogsAsync() {
+        if (_replaying) return;
+
+        _replaying = true;
+        try {
+            // Listing walks the disk, so it stays off the UI thread.
+            var sessions = await Task.Run(RatScannerMain.Instance.PastLogSessions);
+
+            // Only the most recent are worth offering; anything older is already
+            // covered by whatever was read before it.
+            var options = sessions.Take(20).ToList();
+
+            var dialog = await DialogService.ShowAsync<LogSessionPickerDialog>(
+                Localizer["LogTrackingHistory"],
+                options: new DialogOptions { MaxWidth = MaxWidth.ExtraSmall },
+                parameters: new DialogParameters {
+                    { nameof(LogSessionPickerDialog.Sessions), options },
+                    { nameof(LogSessionPickerDialog.LogsFolder), _logsFolder },
+                });
+
+            // In MudBlazor 6 the typed result comes off the reference, not the
+            // call itself.
+            var result = await dialog.Result;
+            if (result is null || result.Canceled) return;
+            if (result.Data is not EftLogHistory.Session session) return;
+
+            await Task.Run(() => RatScannerMain.Instance.ReplayPastSession(session));
+
+            await DialogService.ShowMessageBox(
+                Localizer["LogTrackingTitle"],
+                LocalizationService.Format("LogTrackingHistoryDone", session.Label));
+        } catch (Exception e) {
+            Logger.LogWarning($"Could not read past EFT logs: {e.Message}");
+            await DialogService.ShowMessageBox(
+                Localizer["LogTrackingTitle"],
+                LocalizationService.Format("LogTrackingHistoryFailed", e.Message));
+        } finally {
+            _replaying = false;
+        }
+    }
 
     private void ResolveLogsFolder() {
         try {

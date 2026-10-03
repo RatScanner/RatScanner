@@ -199,6 +199,30 @@ public class RatScannerMain : INotifyPropertyChanged {
 
 	private void OnPlayerPositionChanged() => PlayerPositionChanged?.Invoke();
 
+	/// <summary>
+	/// The past log sessions that could be replayed, newest first. Empty when the
+	/// logs folder cannot be found, which is a normal state.
+	/// </summary>
+	internal List<EftLogHistory.Session> PastLogSessions() => EftLogHistory.Sessions();
+
+	/// <summary>
+	/// Replays a past session's logs through the same parsers the live monitor
+	/// feeds, so quest progress from raids that already happened is picked up.
+	///
+	/// Only quest tracking is replayed: the raid lifecycle would announce a raid
+	/// that finished long ago, and the position marker has no timestamps to place.
+	/// </summary>
+	internal void ReplayPastSession(EftLogHistory.Session session) {
+		if (!RatConfig.LogTracking.TrackQuests) return;
+
+		foreach (var (type, data) in EftLogHistory.Read(session)) {
+			if (type != EftLogType.Notifications) continue;
+			EftQuestTracker.Consume(data);
+		}
+
+		Logger.LogInfo($"Replayed past EFT session {session.Label}.");
+	}
+
 	private void OnEftLogData(EftLogType type, string data) {
 		switch (type) {
 			case EftLogType.Application:

@@ -290,5 +290,13 @@
   "LogTrackingRaidStartingOn": "突袭即将在 {0} 开始",
   "LogTrackingRaidStarted": "突袭已开始",
   "LogTrackingRaidEnded": "突袭已结束",
-  "LogTrackingRaidMatchingAborted": "已取消匹配"
+  "LogTrackingRaidMatchingAborted": "已取消匹配",
+  "LogTrackingHistory": "往期日志会话",
+  "LogTrackingHistoryHint": "读取之前会话的日志，以补上已在过往局中完成的任务。",
+  "LogTrackingHistoryAction": "读取往期日志",
+  "LogTrackingHistoryReading": "读取中...",
+  "LogTrackingHistoryPick": "选择要读取的会话。",
+  "LogTrackingHistoryNone": "在 {0} 中未找到往期会话。",
+  "LogTrackingHistoryDone": "已读取 {0}。",
+  "LogTrackingHistoryFailed": "无法读取往期日志：{0}"
 }
