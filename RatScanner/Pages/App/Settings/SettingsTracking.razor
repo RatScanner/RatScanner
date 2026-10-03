@@ -112,8 +112,8 @@
                                                ValueChanged="@((bool v) => { SettingsVM.LogTrackGameMode = v; SettingsVM.MarkDirty(); })"
                                                Disabled="@(!SettingsVM.EnableLogTracking)" />
 
-                            <SettingsSwitchRow Label="@Localizer["LogTrackingPosition"]" SubLabel="@Localizer["LogTrackingPositionHint"]"
-                                               Value="@SettingsVM.LogTrackPlayerPosition"
+                            <SettingsSwitchRow Label="@Localizer["LogTrackingPosition"]"
+                                               SubLabel="@Localizer["LogTrackingPositionHint"]" Value="@SettingsVM.LogTrackPlayerPosition"
                                                ValueChanged="@((bool v) => { SettingsVM.LogTrackPlayerPosition = v; SettingsVM.MarkDirty(); })"
                                                Disabled="@(!SettingsVM.EnableLogTracking)" />
 
@@ -125,12 +125,13 @@
                                               Style="min-width: 320px;" />
                             </SettingsRow>
 
-                            <SettingsRow Label="@Localizer["LogTrackingPositionMap"]" SubLabel="@Localizer["LogTrackingPositionMapHint"]"
-                                         Disabled="@(!SettingsVM.EnableLogTracking)">
+                            <SettingsRow Label="@Localizer["LogTrackingPositionMap"]"
+                                         SubLabel="@Localizer["LogTrackingPositionMapHint"]" Disabled="@(!SettingsVM.EnableLogTracking)">
                                 <MudSelect T="string" Value="@SettingsVM.PositionMapFallback"
                                            ValueChanged="@((string v) => { SettingsVM.PositionMapFallback = v; SettingsVM.MarkDirty(); })"
                                            Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Style="min-width: 220px;">
-                                    <MudSelectItem T="string" Value="@(string.Empty)">@Localizer["LogTrackingPositionMapNone"]</MudSelectItem>
+                                    <MudSelectItem T="string" Value="@(string.Empty)">@Localizer["LogTrackingPositionMapNone"]
+                                    </MudSelectItem>
                                     @foreach (var map in AvailableMaps) {
                                         <MudSelectItem T="string" Value="@map.Id">@map.Name</MudSelectItem>
                                     }

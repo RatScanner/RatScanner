@@ -27,6 +27,7 @@ public class RatScannerMain : INotifyPropertyChanged {
 	internal readonly HotkeyManager HotkeyManager;
 	private Timer? _tarkovTrackerDBRefreshTimer;
 	private Timer? _scanRefreshTimer;
+	private EftLogMonitor? _eftLogMonitor;
 
 	/// <summary>
 	/// Lock for name scanning
@@ -126,11 +127,39 @@ public class RatScannerMain : INotifyPropertyChanged {
 			_tarkovTrackerDBRefreshTimer = new Timer(RefreshTarkovTrackerDB, null, RatConfig.Tracking.TarkovTracker.RefreshTime, Timeout.Infinite);
 			_scanRefreshTimer = new Timer(RefreshOverlay, null, 1000, 100);
 
+			if (RatConfig.LogTracking.Enable) {
+				Logger.LogInfo("Starting EFT log tracking...");
+				_eftLogMonitor = new EftLogMonitor();
+				_eftLogMonitor.DataReceived += OnEftLogData;
+				_eftLogMonitor.Start();
+			}
+
 			Logger.LogInfo("Enabling hotkeys...");
 			HotkeyManager.RegisterHotkeys();
 
 			Logger.LogInfo("Ready!");
 		}).Start();
+	}
+
+	/// <summary>
+	/// Restarts log tracking after the settings changed. Safe to call when it is
+	/// already stopped or running.
+	/// </summary>
+	internal void RestartEftLogTracking() {
+		_eftLogMonitor?.Dispose();
+		_eftLogMonitor = null;
+
+		if (!RatConfig.LogTracking.Enable) return;
+
+		_eftLogMonitor = new EftLogMonitor();
+		_eftLogMonitor.DataReceived += OnEftLogData;
+		_eftLogMonitor.Start();
+	}
+
+	private void OnEftLogData(EftLogType type, string data) {
+		// Parsing arrives in the later phases; for now the feed only has to prove
+		// it reaches us without taking the app down.
+		Logger.LogDebug($"EFT {type} log: {data.Length} chars");
 	}
 
 	private static void CheckForUpdates() {

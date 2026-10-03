@@ -297,6 +297,10 @@ internal class SettingsVM : INotifyPropertyChanged {
 		RatEye.Config.LogDebug = RatConfig.LogDebug;
 		RatScannerMain.Instance.HotkeyManager.RegisterHotkeys();
 
+		// Restarted unconditionally so a changed logs path or a freshly enabled
+		// toggle takes effect without needing the app restarted.
+		RatScannerMain.Instance.RestartEftLogTracking();
+
 		// Save config to file
 		Logger.LogInfo("Saving config...");
 		RatConfig.SaveConfig();
