@@ -10,10 +10,6 @@ namespace RatScanner;
 /// asked first.
 /// </summary>
 internal static class EftGameModeDetector {
-	private const string LogPattern =
-		@"(?<date>^\d{4}-\d{2}-\d{2}) (?<time>\d{2}:\d{2}:\d{2}\.\d{3})(?<tzoffset> [+-]\d{2}:\d{2})?\|(?<message>.+?)(?:\s*(?<json>^{[\s\S]+?^}))?$";
-
-	private static readonly Regex LineRegex = new(LogPattern, RegexOptions.Multiline);
 
 	// The game has used several spellings for this line across versions, so all of
 	// them are accepted rather than only the current one.
@@ -57,7 +53,7 @@ internal static class EftGameModeDetector {
 
 		MatchCollection lines;
 		try {
-			lines = LineRegex.Matches(chunk);
+			lines = EftLogLine.Matches(chunk);
 		} catch (Exception e) {
 			Logger.LogWarning($"Could not parse the EFT application log: {e.Message}");
 			return;

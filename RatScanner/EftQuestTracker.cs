@@ -12,11 +12,6 @@ namespace RatScanner;
 /// marked without being ticked by hand.
 /// </summary>
 internal static class EftQuestTracker {
-	private const string LogPattern =
-		@"(?<date>^\d{4}-\d{2}-\d{2}) (?<time>\d{2}:\d{2}:\d{2}\.\d{3})(?<tzoffset> [+-]\d{2}:\d{2})?\|(?<message>.+?)(?:\s*(?<json>^{[\s\S]+?^}))?$";
-
-	private static readonly Regex LineRegex = new(LogPattern, RegexOptions.Multiline);
-
 	// Numeric message types from the game's chat message shape. Only the task
 	// range is interesting here; the rest are ignored.
 	private const int PlayerMessage = 1;
@@ -29,7 +24,7 @@ internal static class EftQuestTracker {
 
 		MatchCollection lines;
 		try {
-			lines = LineRegex.Matches(chunk);
+			lines = EftLogLine.Matches(chunk);
 		} catch (Exception e) {
 			Logger.LogWarning($"Could not parse the EFT notifications log: {e.Message}");
 			return;

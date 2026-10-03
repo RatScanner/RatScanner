@@ -16,6 +16,30 @@ internal enum EftLogType {
 }
 
 /// <summary>
+/// The shape shared by every line the game writes to its logs: a timestamp, a
+/// pipe, then the message, with an optional multi-line JSON body on the lines
+/// that follow.
+/// </summary>
+/// <remarks>
+/// The message group is GREEDY on purpose. With a lazy <c>.+?</c> the optional
+/// JSON group never matches, because the lazy match stops at the first character
+/// that lets the whole line succeed and the <c>^</c>-anchored JSON branch is then
+/// never reached. Every event that carries a body — which is all of them — comes
+/// back with no JSON at all and is silently skipped.
+/// </remarks>
+internal static class EftLogLine {
+	private const string Prefix =
+		@"(?<date>^\d{4}-\d{2}-\d{2}) (?<time>\d{2}:\d{2}:\d{2}\.\d{3})(?<tzoffset> [+-]\d{2}:\d{2})?\|";
+
+	private const string Pattern = Prefix + @"(?<message>.+$)\s*(?<json>^{[\s\S]+?^})?";
+
+	private static readonly Regex LineRegex = new(Pattern, RegexOptions.Multiline);
+
+	/// <summary>The timestamp, message and JSON body of every line in a chunk.</summary>
+	internal static MatchCollection Matches(string chunk) => LineRegex.Matches(chunk);
+}
+
+/// <summary>
 /// Follows the game's log files and hands newly appended text to a callback.
 /// </summary>
 /// <remarks>

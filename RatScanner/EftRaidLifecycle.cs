@@ -14,10 +14,6 @@ namespace RatScanner;
 /// shows. With tracking off nothing is parsed at all.
 /// </remarks>
 internal static class EftRaidLifecycle {
-	private const string LogPattern =
-		@"(?<date>^\d{4}-\d{2}-\d{2}) (?<time>\d{2}:\d{2}:\d{2}\.\d{3})(?<tzoffset> [+-]\d{2}:\d{2})?\|(?<message>.+?)(?:\s*(?<json>^{[\s\S]+?^}))?$";
-
-	private static readonly Regex LineRegex = new(LogPattern, RegexOptions.Multiline);
 	private static readonly Regex ScenePathRegex = new(@"scene preset path:(?<scenePath>maps\/[a-zA-Z0-9_]+\.bundle)", RegexOptions.IgnoreCase);
 
 	private static readonly object Gate = new();
@@ -54,7 +50,7 @@ internal static class EftRaidLifecycle {
 
 		MatchCollection lines;
 		try {
-			lines = LineRegex.Matches(chunk);
+			lines = EftLogLine.Matches(chunk);
 		} catch (Exception e) {
 			Logger.LogWarning($"Could not parse the EFT application log: {e.Message}");
 			return;
