@@ -1,4 +1,7 @@
 ## Custom ignores
+# Temp data
+temp/
+
 # Static icon data
 RatScanner/[Dd]ata/*
 

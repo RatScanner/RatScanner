@@ -160,8 +160,8 @@
         return true;
     }
 
-    private async void PropertyChangeHandler(object? sender, EventArgs e) {
-        await InvokeAsync(() => StateHasChanged());
+    private void PropertyChangeHandler(object? sender, EventArgs e) {
+        _ = InvokeAsync(() => StateHasChanged());
     }
 
     public void Dispose() {

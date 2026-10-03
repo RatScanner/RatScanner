@@ -531,8 +531,12 @@
         _ = InvokeAsync(StateHasChanged);
     }
 
-    private async void PropertyChangeHandler(object? sender, EventArgs e) {
-        await InvokeAsync(StateHasChanged);
+    private void PropertyChangeHandler(object? sender, EventArgs e) {
+        // Fire and forget: the scan timer fires this ~10x a second, and the
+        // dispatcher is torn down when the window closes. Awaited here, the
+        // cancellation that follows the teardown escapes an async void and
+        // breaks the debugger on the way out.
+        _ = InvokeAsync(StateHasChanged);
     }
 
     public void Dispose() {

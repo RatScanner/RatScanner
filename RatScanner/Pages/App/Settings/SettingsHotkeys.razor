@@ -54,8 +54,8 @@
         SettingsVM.PropertyChanged += PropertyChangeHandler;
     }
 
-    private async void PropertyChangeHandler(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
-        await InvokeAsync(() => StateHasChanged());
+    private void PropertyChangeHandler(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
+        _ = InvokeAsync(() => StateHasChanged());
     }
 
     public void Dispose() {
