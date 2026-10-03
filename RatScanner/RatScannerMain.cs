@@ -157,9 +157,9 @@ public class RatScannerMain : INotifyPropertyChanged {
 	}
 
 	private void OnEftLogData(EftLogType type, string data) {
-		// Parsing arrives in the later phases; for now the feed only has to prove
-		// it reaches us without taking the app down.
-		Logger.LogDebug($"EFT {type} log: {data.Length} chars");
+		if (type != EftLogType.Application) return;
+
+		EftGameModeDetector.Consume(data);
 	}
 
 	private static void CheckForUpdates() {
