@@ -91,6 +91,52 @@
                                                Value="@SettingsVM.ShowKappaNeeds"
                                                ValueChanged="@((bool v) => { SettingsVM.ShowKappaNeeds = v; SettingsVM.MarkDirty(); })" />
                         </SettingsCard>
+
+                        <SettingsCard Title="@Localizer["LogTrackingTitle"]" Subtitle="@Localizer["LogTrackingDesc"]">
+                            <SettingsSwitchRow Label="@Localizer["LogTrackingEnable"]" SubLabel="@Localizer["LogTrackingEnableHint"]"
+                                               Value="@SettingsVM.EnableLogTracking"
+                                               ValueChanged="@((bool v) => { SettingsVM.EnableLogTracking = v; SettingsVM.MarkDirty(); })" />
+
+                            <SettingsSwitchRow Label="@Localizer["LogTrackingQuests"]" SubLabel="@Localizer["LogTrackingQuestsHint"]"
+                                               Value="@SettingsVM.LogTrackQuests"
+                                               ValueChanged="@((bool v) => { SettingsVM.LogTrackQuests = v; SettingsVM.MarkDirty(); })"
+                                               Disabled="@(!SettingsVM.EnableLogTracking)" />
+
+                            <SettingsSwitchRow Label="@Localizer["LogTrackingRaid"]" SubLabel="@Localizer["LogTrackingRaidHint"]"
+                                               Value="@SettingsVM.LogTrackRaidLifecycle"
+                                               ValueChanged="@((bool v) => { SettingsVM.LogTrackRaidLifecycle = v; SettingsVM.MarkDirty(); })"
+                                               Disabled="@(!SettingsVM.EnableLogTracking)" />
+
+                            <SettingsSwitchRow Label="@Localizer["LogTrackingMode"]" SubLabel="@Localizer["LogTrackingModeHint"]"
+                                               Value="@SettingsVM.LogTrackGameMode"
+                                               ValueChanged="@((bool v) => { SettingsVM.LogTrackGameMode = v; SettingsVM.MarkDirty(); })"
+                                               Disabled="@(!SettingsVM.EnableLogTracking)" />
+
+                            <SettingsSwitchRow Label="@Localizer["LogTrackingPosition"]" SubLabel="@Localizer["LogTrackingPositionHint"]"
+                                               Value="@SettingsVM.LogTrackPlayerPosition"
+                                               ValueChanged="@((bool v) => { SettingsVM.LogTrackPlayerPosition = v; SettingsVM.MarkDirty(); })"
+                                               Disabled="@(!SettingsVM.EnableLogTracking)" />
+
+                            <SettingsRow Label="@Localizer["LogTrackingPath"]" SubLabel="@Localizer["LogTrackingPathHint"]"
+                                         Disabled="@(!SettingsVM.EnableLogTracking)">
+                                <MudTextField T="string" Value="@SettingsVM.LogPathOverride"
+                                              ValueChanged="@((string v) => { SettingsVM.LogPathOverride = v; SettingsVM.MarkDirty(); })"
+                                              Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Immediate="true"
+                                              Style="min-width: 320px;" />
+                            </SettingsRow>
+
+                            <SettingsRow Label="@Localizer["LogTrackingPositionMap"]" SubLabel="@Localizer["LogTrackingPositionMapHint"]"
+                                         Disabled="@(!SettingsVM.EnableLogTracking)">
+                                <MudSelect T="string" Value="@SettingsVM.PositionMapFallback"
+                                           ValueChanged="@((string v) => { SettingsVM.PositionMapFallback = v; SettingsVM.MarkDirty(); })"
+                                           Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Style="min-width: 220px;">
+                                    <MudSelectItem T="string" Value="@(string.Empty)">@Localizer["LogTrackingPositionMapNone"]</MudSelectItem>
+                                    @foreach (var map in AvailableMaps) {
+                                        <MudSelectItem T="string" Value="@map.Id">@map.Name</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </SettingsRow>
+                        </SettingsCard>
                     </div>
                 </div>
 
@@ -122,6 +168,9 @@
     /// </summary>
     private bool UsesTarkovTracker => SettingsVM.ProgressSource == ProgressSource.TarkovTracker;
     private bool HasToken => !string.IsNullOrWhiteSpace(SettingsVM.TarkovTrackerToken);
+
+    /// <summary>Maps offered as the position-marker fallback, sorted by name.</summary>
+    private List<RatScanner.TarkovDev.Json.Map> AvailableMaps { get; set; } = [];
 
     private string ConnectionLabel => _isConnected
         ? Localizer["ConnectionOkLabel"]
@@ -241,6 +290,13 @@
 
     protected override async Task OnInitializedAsync() {
         SettingsVM.PropertyChanged += PropertyChangeHandler;
+
+        try {
+            AvailableMaps = [.. TarkovDevAPI.GetMaps().OrderBy(m => m.Name)];
+        } catch (Exception e) {
+            Logger.LogWarning($"Could not load maps for the position map picker: {e.Message}");
+        }
+
         await RunConnectionCheckAsync();
     }
 

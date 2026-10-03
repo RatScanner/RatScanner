@@ -60,6 +60,15 @@ internal class SettingsVM : INotifyPropertyChanged {
 	public Hotkey InteractableOverlayHotkey { get; set; }
 	public Hotkey CloseOverlayHotkey { get; set; }
 
+	// EFT log tracking
+	public bool EnableLogTracking { get; set; }
+	public bool LogTrackQuests { get; set; }
+	public bool LogTrackRaidLifecycle { get; set; }
+	public bool LogTrackGameMode { get; set; }
+	public bool LogTrackPlayerPosition { get; set; }
+	public string LogPathOverride { get; set; } = "";
+	public string PositionMapFallback { get; set; } = "";
+
 	// Application hotkeys
 	public Hotkey OpenWikiHotkey { get; set; }
 	public Hotkey OpenTarkovDevHotkey { get; set; }
@@ -116,6 +125,14 @@ internal class SettingsVM : INotifyPropertyChanged {
 		BlurBehindSearch = RatConfig.Overlay.Search.BlurBehind;
 		InteractableOverlayHotkey = new Hotkey(RatConfig.Overlay.Search.Hotkey);
 		CloseOverlayHotkey = new Hotkey(RatConfig.Overlay.Search.CloseHotkey);
+
+		EnableLogTracking = RatConfig.LogTracking.Enable;
+		LogTrackQuests = RatConfig.LogTracking.TrackQuests;
+		LogTrackRaidLifecycle = RatConfig.LogTracking.TrackRaidLifecycle;
+		LogTrackGameMode = RatConfig.LogTracking.TrackGameMode;
+		LogTrackPlayerPosition = RatConfig.LogTracking.TrackPlayerPosition;
+		LogPathOverride = RatConfig.LogTracking.LogsPathOverride;
+		PositionMapFallback = RatConfig.LogTracking.PositionMapFallback;
 
 		OpenWikiHotkey = new Hotkey(RatConfig.Hotkeys.OpenWiki);
 		OpenTarkovDevHotkey = new Hotkey(RatConfig.Hotkeys.OpenTarkovDev);
@@ -246,6 +263,14 @@ internal class SettingsVM : INotifyPropertyChanged {
 		RatConfig.Overlay.Search.BlurBehind = BlurBehindSearch;
 		RatConfig.Overlay.Search.Hotkey = InteractableOverlayHotkey;
 		RatConfig.Overlay.Search.CloseHotkey = CloseOverlayHotkey;
+
+		RatConfig.LogTracking.Enable = EnableLogTracking;
+		RatConfig.LogTracking.TrackQuests = LogTrackQuests;
+		RatConfig.LogTracking.TrackRaidLifecycle = LogTrackRaidLifecycle;
+		RatConfig.LogTracking.TrackGameMode = LogTrackGameMode;
+		RatConfig.LogTracking.TrackPlayerPosition = LogTrackPlayerPosition;
+		RatConfig.LogTracking.LogsPathOverride = LogPathOverride.Trim();
+		RatConfig.LogTracking.PositionMapFallback = PositionMapFallback;
 
 		RatConfig.Hotkeys.OpenWiki = OpenWikiHotkey;
 		RatConfig.Hotkeys.OpenTarkovDev = OpenTarkovDevHotkey;

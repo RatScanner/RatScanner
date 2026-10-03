@@ -144,6 +144,21 @@ internal static partial class RatConfig {
 		TarkovTrackerORG,
 	}
 
+	/// <summary>Reads the game's own log files to track quests, raids and position.</summary>
+	internal static class LogTracking {
+		internal static bool Enable = false;
+		internal static bool TrackQuests = true;
+		internal static bool TrackRaidLifecycle = true;
+		internal static bool TrackGameMode = true;
+		internal static bool TrackPlayerPosition = true;
+
+		/// <summary>Overrides the auto-detected logs folder when set.</summary>
+		internal static string LogsPathOverride = "";
+
+		/// <summary>Map shown for the player position when no raid was tracked.</summary>
+		internal static string PositionMapFallback = "";
+	}
+
 	/// <summary>Where quest progress comes from.</summary>
 	public enum ProgressSource {
 		Local,
@@ -274,6 +289,15 @@ internal static partial class RatConfig {
 		Tracking.TarkovTracker.Token = config.ReadSecureString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);
 		Tracking.TarkovTracker.ShowTeam = config.ReadBool(nameof(Tracking.TarkovTracker.ShowTeam), Tracking.TarkovTracker.ShowTeam);
 
+		config.Section = nameof(LogTracking);
+		LogTracking.Enable = config.ReadBool(nameof(LogTracking.Enable), LogTracking.Enable);
+		LogTracking.TrackQuests = config.ReadBool(nameof(LogTracking.TrackQuests), LogTracking.TrackQuests);
+		LogTracking.TrackRaidLifecycle = config.ReadBool(nameof(LogTracking.TrackRaidLifecycle), LogTracking.TrackRaidLifecycle);
+		LogTracking.TrackGameMode = config.ReadBool(nameof(LogTracking.TrackGameMode), LogTracking.TrackGameMode);
+		LogTracking.TrackPlayerPosition = config.ReadBool(nameof(LogTracking.TrackPlayerPosition), LogTracking.TrackPlayerPosition);
+		LogTracking.LogsPathOverride = config.ReadString(nameof(LogTracking.LogsPathOverride), LogTracking.LogsPathOverride);
+		LogTracking.PositionMapFallback = config.ReadString(nameof(LogTracking.PositionMapFallback), LogTracking.PositionMapFallback);
+
 		config.Section = nameof(Overlay);
 
 		config.Section = nameof(Overlay.Search);
@@ -352,6 +376,15 @@ internal static partial class RatConfig {
 		config.WriteInt(nameof(Tracking.TarkovTracker.Backend), (int)Tracking.TarkovTracker.Backend);
 		config.WriteSecureString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);
 		config.WriteBool(nameof(Tracking.TarkovTracker.ShowTeam), Tracking.TarkovTracker.ShowTeam);
+
+		config.Section = nameof(LogTracking);
+		config.WriteBool(nameof(LogTracking.Enable), LogTracking.Enable);
+		config.WriteBool(nameof(LogTracking.TrackQuests), LogTracking.TrackQuests);
+		config.WriteBool(nameof(LogTracking.TrackRaidLifecycle), LogTracking.TrackRaidLifecycle);
+		config.WriteBool(nameof(LogTracking.TrackGameMode), LogTracking.TrackGameMode);
+		config.WriteBool(nameof(LogTracking.TrackPlayerPosition), LogTracking.TrackPlayerPosition);
+		config.WriteString(nameof(LogTracking.LogsPathOverride), LogTracking.LogsPathOverride);
+		config.WriteString(nameof(LogTracking.PositionMapFallback), LogTracking.PositionMapFallback);
 
 		config.Section = nameof(Overlay);
 
