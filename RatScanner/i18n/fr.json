@@ -283,5 +283,12 @@
   "LogTrackingPositionMapHint": "Utilisee si aucun raid n'a ete suivi, afin que le marqueur de position ait une carte.",
   "LogTrackingPositionMapNone": "Aucun",
   "LogTrackingModeSwitch": "Changer",
-  "LogTrackingModeDetected": "Mode de jeu detecte : {0}"
+  "LogTrackingModeDetected": "Mode de jeu detecte : {0}",
+  "LogTrackingRaidMatchFound": "Partie trouvee",
+  "LogTrackingRaidMatchFoundOn": "Partie trouvee sur {0}",
+  "LogTrackingRaidStarting": "Le raid commence",
+  "LogTrackingRaidStartingOn": "Le raid commence sur {0}",
+  "LogTrackingRaidStarted": "Raid started",
+  "LogTrackingRaidEnded": "Raid termine",
+  "LogTrackingRaidMatchingAborted": "Recherche annulee"
 }

@@ -283,5 +283,12 @@
   "LogTrackingPositionMapHint": "Używana, gdy nie śledzono wyprawy, aby znacznik pozycji miał mapę.",
   "LogTrackingPositionMapNone": "Brak",
   "LogTrackingModeSwitch": "Zmień",
-  "LogTrackingModeDetected": "Wykryto tryb gry: {0}"
+  "LogTrackingModeDetected": "Wykryto tryb gry: {0}",
+  "LogTrackingRaidMatchFound": "Znaleziono mecz",
+  "LogTrackingRaidMatchFoundOn": "Znaleziono mecz na {0}",
+  "LogTrackingRaidStarting": "Wyprawa zaczyna się",
+  "LogTrackingRaidStartingOn": "Wyprawa zaczyna się na {0}",
+  "LogTrackingRaidStarted": "Wyprawa rozpoczęta",
+  "LogTrackingRaidEnded": "Wyprawa zakończona",
+  "LogTrackingRaidMatchingAborted": "Wyszukiwanie anulowane"
 }

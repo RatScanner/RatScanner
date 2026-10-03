@@ -283,5 +283,12 @@
   "LogTrackingPositionMapHint": "当没有追踪到突袭时使用，使位置标记仍有对应地图。",
   "LogTrackingPositionMapNone": "无",
   "LogTrackingModeSwitch": "切换",
-  "LogTrackingModeDetected": "检测到游戏模式：{0}"
+  "LogTrackingModeDetected": "检测到游戏模式：{0}",
+  "LogTrackingRaidMatchFound": "已找到对局",
+  "LogTrackingRaidMatchFoundOn": "已在 {0} 找到对局",
+  "LogTrackingRaidStarting": "突袭即将开始",
+  "LogTrackingRaidStartingOn": "突袭即将在 {0} 开始",
+  "LogTrackingRaidStarted": "突袭已开始",
+  "LogTrackingRaidEnded": "突袭已结束",
+  "LogTrackingRaidMatchingAborted": "已取消匹配"
 }

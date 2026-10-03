@@ -283,5 +283,12 @@
   "LogTrackingPositionMapHint": "Usado quando nenhuma incursao foi rastreada, para o marcador de posicao ter um mapa.",
   "LogTrackingPositionMapNone": "Nenhum",
   "LogTrackingModeSwitch": "Mudar",
-  "LogTrackingModeDetected": "Modo de jogo detectado: {0}"
+  "LogTrackingModeDetected": "Modo de jogo detectado: {0}",
+  "LogTrackingRaidMatchFound": "Partida encontrada",
+  "LogTrackingRaidMatchFoundOn": "Partida encontrada em {0}",
+  "LogTrackingRaidStarting": "A incursão está começando",
+  "LogTrackingRaidStartingOn": "A incursão está começando em {0}",
+  "LogTrackingRaidStarted": "Incursão iniciada",
+  "LogTrackingRaidEnded": "Incursão encerrada",
+  "LogTrackingRaidMatchingAborted": "Busca cancelada"
 }

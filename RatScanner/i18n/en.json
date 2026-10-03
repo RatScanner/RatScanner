@@ -283,5 +283,12 @@
   "LogTrackingPositionMapHint": "Used when no raid was tracked, so the position marker still has a map.",
   "LogTrackingPositionMapNone": "None",
   "LogTrackingModeSwitch": "Switch",
-  "LogTrackingModeDetected": "Game mode detected: {0}"
+  "LogTrackingModeDetected": "Game mode detected: {0}",
+  "LogTrackingRaidMatchFound": "Match found",
+  "LogTrackingRaidMatchFoundOn": "Match found on {0}",
+  "LogTrackingRaidStarting": "Raid starting",
+  "LogTrackingRaidStartingOn": "Raid starting on {0}",
+  "LogTrackingRaidStarted": "Raid started",
+  "LogTrackingRaidEnded": "Raid ended",
+  "LogTrackingRaidMatchingAborted": "Matching cancelled"
 }

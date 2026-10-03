@@ -283,5 +283,12 @@
   "LogTrackingPositionMapHint": "Используется, если рейд не отслеживался, чтобы у метки позиции была карта.",
   "LogTrackingPositionMapNone": "Нет",
   "LogTrackingModeSwitch": "Переключить",
-  "LogTrackingModeDetected": "Определён режим игры: {0}"
+  "LogTrackingModeDetected": "Определён режим игры: {0}",
+  "LogTrackingRaidMatchFound": "Матч найден",
+  "LogTrackingRaidMatchFoundOn": "Матч найден на карте {0}",
+  "LogTrackingRaidStarting": "Рейд начинается",
+  "LogTrackingRaidStartingOn": "Рейд начинается на карте {0}",
+  "LogTrackingRaidStarted": "Рейд начался",
+  "LogTrackingRaidEnded": "Рейд закончился",
+  "LogTrackingRaidMatchingAborted": "Поиск отменён"
 }
