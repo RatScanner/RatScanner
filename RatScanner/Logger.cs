@@ -19,6 +19,28 @@ internal static class Logger {
 
 	private static bool Crashed = false;
 
+	/// <summary>
+	/// How prominent a <see cref="Notify"/> message should be shown. Levels are
+	/// ordered so a subscriber can decide its own threshold.
+	/// </summary>
+	internal enum NotifyLevel {
+		Info,
+		Success,
+		Warning,
+	}
+
+	/// <summary>
+	/// Raised for messages sent through <see cref="Notify"/>, so background work
+	/// can surface something in the UI without knowing anything about Blazor.
+	/// </summary>
+	/// <remarks>
+	/// Callers run on whichever thread produced the log line, which for log
+	/// tracking is a file watcher. Subscribers must marshal to the UI thread
+	/// themselves. Handlers that throw are ignored so a broken subscriber cannot
+	/// stop the others or unwind the code that logged.
+	/// </remarks>
+	internal static event Action<NotifyLevel, string>? Notified;
+
 	internal static void LogInfo(string message) {
 		AppendToLog("[Info]  " + message);
 	}
@@ -74,6 +96,35 @@ internal static class Logger {
 	internal static void ShowMessage(string message, string? title = null) {
 		LogInfo(message);
 		_ = MessageBox.Show(message, title ?? ("Rat Scanner " + RatConfig.Version), MessageBoxButton.OK, MessageBoxImage.Information);
+	}
+
+	/// <summary>
+	/// Records a message worth showing in the UI and raises <see cref="Notified"/>.
+	/// Goes to the log like any other line, so nothing is lost if no UI is up.
+	/// </summary>
+	internal static void Notify(NotifyLevel level, string message) {
+		switch (level) {
+			case NotifyLevel.Success:
+				LogInfo(message);
+				break;
+			case NotifyLevel.Warning:
+				LogWarning(message);
+				break;
+			default:
+				LogInfo(message);
+				break;
+		}
+
+		var handlers = Notified;
+		if (handlers == null) return;
+
+		foreach (var handler in handlers.GetInvocationList()) {
+			try {
+				((Action<NotifyLevel, string>)handler)(level, message);
+			} catch (Exception e) {
+				LogWarning("A notification handler threw.", e);
+			}
+		}
 	}
 
 	internal static void ShowWarning(string message, string? title = null) {

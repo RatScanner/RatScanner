@@ -15,6 +15,8 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @inject LocalizationService Localizer
+@inject ISnackbar Snackbar
+@inject ISnackbar Snackbar
 @implements IDisposable
 
 <div class="page">
@@ -401,6 +403,7 @@
         MenuVM.ItemScans.Enqueued += OnItemScanEnqueued;
         RatScannerMain.Instance.HotkeyManager.EscapePressed += OnEscapePressed;
         SettingsVM.GameModeChanged += OnGameModeChanged;
+        Logger.Notified += OnLoggerNotified;
     }
 
     /// <summary>
@@ -531,6 +534,21 @@
         _ = InvokeAsync(StateHasChanged);
     }
 
+    /// <summary>
+    /// Shows a message that was logged from a background thread, such as one read
+    /// out of the game's log files. Marshals to the UI thread because the caller
+    /// is whichever thread produced the log line.
+    /// </summary>
+    private void OnLoggerNotified(Logger.NotifyLevel level, string message) {
+        _ = InvokeAsync(() => {
+            Snackbar.Add(message, level switch {
+                Logger.NotifyLevel.Success => Severity.Success,
+                Logger.NotifyLevel.Warning => Severity.Warning,
+                _ => Severity.Info,
+            });
+        });
+    }
+
     private void PropertyChangeHandler(object? sender, EventArgs e) {
         // Fire and forget: the scan timer fires this ~10x a second, and the
         // dispatcher is torn down when the window closes. Awaited here, the
@@ -544,5 +562,6 @@
         MenuVM.ItemScans.Enqueued -= OnItemScanEnqueued;
         RatScannerMain.Instance.HotkeyManager.EscapePressed -= OnEscapePressed;
         SettingsVM.GameModeChanged -= OnGameModeChanged;
+        Logger.Notified -= OnLoggerNotified;
     }
 }
