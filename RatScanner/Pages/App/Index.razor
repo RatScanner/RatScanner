@@ -335,7 +335,29 @@
         if (_showTransits) Add(map.GetTransitPois(ResolveMapName));
         if (_showHazards) Add(map.GetHazardPois());
 
+        // Only on the map the player is actually on: showing a position on any
+        // other map would put the marker somewhere meaningless.
+        var position = PlayerPosition;
+        if (position is not null && EftRaidLifecycle.CurrentMapId == map.Id) {
+            if (map.GetPlayerPositionPoi(position.Value.Position, position.Value.Rotation) is { } player) {
+                Add([player]);
+            }
+        }
+
         return pois;
+    }
+
+    /// <summary>
+    /// The last position seen from a screenshot, or null when there is none.
+    /// </summary>
+    private (WorldPosition Position, double Rotation)? PlayerPosition {
+        get {
+            var tracker = RatScannerMain.Instance.PlayerPosition;
+            var position = tracker?.CurrentPosition;
+            var rotation = tracker?.CurrentRotation;
+            if (position == null || rotation == null) return null;
+            return (position, rotation.Value);
+        }
     }
 
     /// <summary>
@@ -406,6 +428,7 @@
         SettingsVM.GameModeChanged += OnGameModeChanged;
         Logger.Notified += OnLoggerNotified;
         EftGameModeDetector.ModeDetected += OnModeDetected;
+        RatScannerMain.Instance.PlayerPositionChanged += OnPlayerPositionChanged;
     }
 
     /// <summary>
@@ -582,6 +605,17 @@
         _ => "PvP",
     };
 
+    /// <summary>
+    /// A new position arrived on the watcher's thread. Only redraw when a map is
+    /// actually on screen, since the marker only shows there.
+    /// </summary>
+    private void OnPlayerPositionChanged() {
+        _ = InvokeAsync(() => {
+            if (_viewerMap == null && Selected?.Data is not Map) return;
+            StateHasChanged();
+        });
+    }
+
     private void PropertyChangeHandler(object? sender, EventArgs e) {
         // Fire and forget: the scan timer fires this ~10x a second, and the
         // dispatcher is torn down when the window closes. Awaited here, the
@@ -597,5 +631,6 @@
         SettingsVM.GameModeChanged -= OnGameModeChanged;
         Logger.Notified -= OnLoggerNotified;
         EftGameModeDetector.ModeDetected -= OnModeDetected;
+        RatScannerMain.Instance.PlayerPositionChanged -= OnPlayerPositionChanged;
     }
 }

@@ -44,6 +44,13 @@ public class POI {
     public double Y { get; set; }
 
     /// <summary>
+    /// Clockwise rotation to apply to the icon, in degrees. Zero leaves the icon
+    /// as drawn, which is what every non-directional marker wants. Only markers
+    /// that point somewhere, such as the player's facing, set this.
+    /// </summary>
+    public double RotationDegrees { get; set; }
+
+    /// <summary>
     /// CSS color for the name label, e.g. "#ff9800". Defaults to the app's
     /// primary text color when empty.
     /// </summary>

@@ -49,7 +49,8 @@ internal static class EftLogs {
                 var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 if (string.IsNullOrEmpty(documents)) return "";
 
-                var path = Path.Combine(documents, "EscapeFromTarkov", "Screenshots");
+                // The game puts it under a folder spelled with spaces.
+                var path = Path.Combine(documents, "Escape From Tarkov", "Screenshots");
                 return Directory.Exists(path) ? path : "";
             } catch (Exception e) {
                 Logger.LogWarning($"Could not resolve the EFT screenshots folder: {e.Message}");

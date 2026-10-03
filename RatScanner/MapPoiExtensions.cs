@@ -305,6 +305,26 @@ public static class MapPoiExtensions {
         return pois;
     }
 
+    /// <summary>
+    /// The player's position as a POI, pointing the way they are facing, or null
+    /// when there is no position yet or the map cannot be projected onto.
+    /// </summary>
+    public static POI? GetPlayerPositionPoi(this Map map, WorldPosition position, double rotationDegrees) {
+        var projection = MapDataLoader.GetMapsById().GetValueOrDefault(map.Id);
+        if (projection == null || MapProjection.Create(projection) is not { } frame) return null;
+
+        var (x, y) = frame.ToPercent(position);
+
+        return new POI {
+            IconSvg = PlayerIcon,
+            X = x,
+            Y = y,
+            IconColor = PlayerColor,
+            IconColorHover = PlayerColorHover,
+            RotationDegrees = rotationDegrees,
+        };
+    }
+
     /// <summary>Quest objective zones are cyan, distinct from every other overlay.</summary>
     private const string ZoneColor = "#00838f";
 
@@ -318,6 +338,22 @@ public static class MapPoiExtensions {
 		     stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 			<path d="M9 3H4a1 1 0 0 0-1 1v5M15 3h5a1 1 0 0 1 1 1v5M9 21H4a1 1 0 0 1-1-1v-5M15 21h5a1 1 0 0 0 1-1v-5" />
 			<circle cx="12" cy="12" r="3.2" />
+		</svg>
+		""";
+
+    /// <summary>The player marker is red, so it reads as the one live position.</summary>
+    private const string PlayerColor = "#e53935";
+
+    private const string PlayerColorHover = "#ff5252";
+
+    /// <summary>
+    /// A cone pointing up, so a rotation of 0 degrees means facing north, which
+    /// is what the yaw from the log reports.
+    /// </summary>
+    private const string PlayerIcon = """
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+		     stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+			<path d="M12 3 L19 20 L12 16 L5 20 Z" fill="#fff" />
 		</svg>
 		""";
 }

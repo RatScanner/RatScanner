@@ -400,9 +400,20 @@
     /// the marker's identity rather than always going yellow.
     /// </summary>
     private static string IconStyle(POI poi) {
-        if (string.IsNullOrWhiteSpace(poi.IconColor)) return string.Empty;
-        var hover = string.IsNullOrWhiteSpace(poi.IconColorHover) ? poi.IconColor : poi.IconColorHover;
-        return $"--poi-icon-color: {poi.IconColor};--poi-icon-color-hover: {hover};";
+        var style = string.Empty;
+
+        if (!string.IsNullOrWhiteSpace(poi.IconColor)) {
+            var hover = string.IsNullOrWhiteSpace(poi.IconColorHover) ? poi.IconColor : poi.IconColorHover;
+            style += $"--poi-icon-color: {poi.IconColor};--poi-icon-color-hover: {hover};";
+        }
+
+        // Rotating the disc is safe because it is a circle, and it carries the
+        // icon with it. Only directional markers set this.
+        if (poi.RotationDegrees != 0) {
+            style += $"transform: rotate({poi.RotationDegrees.ToString(CultureInfo.InvariantCulture)}deg);";
+        }
+
+        return style;
     }
 
     /// <summary>

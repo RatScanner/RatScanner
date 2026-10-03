@@ -29,6 +29,14 @@ public class RatScannerMain : INotifyPropertyChanged {
 	private Timer? _scanRefreshTimer;
 	private EftLogMonitor? _eftLogMonitor;
 
+	private EftPlayerPosition? _playerPosition;
+
+	/// <summary>
+	/// The last player position seen from a screenshot, or null when there is
+	/// none. Exposed so views can read it without owning the watcher.
+	/// </summary>
+	internal EftPlayerPosition? PlayerPosition => _playerPosition;
+
 	/// <summary>
 	/// Lock for name scanning
 	/// </summary>
@@ -134,6 +142,8 @@ public class RatScannerMain : INotifyPropertyChanged {
 				_eftLogMonitor.Start();
 			}
 
+			if (RatConfig.LogTracking.TrackPlayerPosition) StartPlayerPositionTracking();
+
 			Logger.LogInfo("Enabling hotkeys...");
 			HotkeyManager.RegisterHotkeys();
 
@@ -149,12 +159,45 @@ public class RatScannerMain : INotifyPropertyChanged {
 		_eftLogMonitor?.Dispose();
 		_eftLogMonitor = null;
 
+		// The position tracker hangs off a folder rather than a log file, so it
+		// follows the setting on its own rather than the monitor's lifetime.
+		StopPlayerPositionTracking();
+
 		if (!RatConfig.LogTracking.Enable) return;
 
 		_eftLogMonitor = new EftLogMonitor();
 		_eftLogMonitor.DataReceived += OnEftLogData;
 		_eftLogMonitor.Start();
+
+		if (RatConfig.LogTracking.TrackPlayerPosition) StartPlayerPositionTracking();
 	}
+
+	/// <summary>
+	/// Starts watching for screenshots. Safe to call when already running.
+	/// </summary>
+	internal void StartPlayerPositionTracking() {
+		if (_playerPosition != null) return;
+
+		_playerPosition = new EftPlayerPosition();
+		_playerPosition.PositionChanged += OnPlayerPositionChanged;
+		_playerPosition.Start();
+	}
+
+	private void StopPlayerPositionTracking() {
+		if (_playerPosition == null) return;
+
+		_playerPosition.PositionChanged -= OnPlayerPositionChanged;
+		_playerPosition.Dispose();
+		_playerPosition = null;
+	}
+
+	/// <summary>
+	/// Raised on a background thread whenever a new position is seen, so views
+	/// showing a map can redraw the marker.
+	/// </summary>
+	internal event Action? PlayerPositionChanged;
+
+	private void OnPlayerPositionChanged() => PlayerPositionChanged?.Invoke();
 
 	private void OnEftLogData(EftLogType type, string data) {
 		switch (type) {
