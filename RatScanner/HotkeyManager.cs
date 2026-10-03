@@ -127,27 +127,61 @@ internal class HotkeyManager {
 		})));
 	}
 
+	/// <summary>
+	/// Opens the wiki page for what is on screen, falling back to the last scan
+	/// when nothing has been picked yet.
+	/// </summary>
 	private void OnOpenWikiHotkey(object? sender, KeyUpEventArgs e) {
 		Wrap(() => {
-			var item = LastScannedItem();
-			if (item is null) return;
-			var link = item.WikiLink;
-			if (string.IsNullOrEmpty(link) || link.Length <= 3) {
-				link = $"https://escapefromtarkov.gamepedia.com/{Uri.EscapeDataString(item.Name.Replace(" ", "_"))}";
-			}
-			OpenURL(link);
-		});
-	}
-
-	private void OnOpenTarkovDevHotkey(object? sender, KeyUpEventArgs e) {
-		Wrap(() => {
-			var item = LastScannedItem();
-			OpenURL(item?.Link);
+			var link = WikiLinkFor(SelectedItem() ?? LastScannedItem());
+			if (link is not null) OpenURL(link);
 		});
 	}
 
 	/// <summary>
+	/// Opens the tarkov.dev page for what is on screen. Quests have their own
+	/// page, so a selected quest opens that rather than an item page.
+	/// </summary>
+	private void OnOpenTarkovDevHotkey(object? sender, KeyUpEventArgs e) {
+		Wrap(() => {
+			var task = SelectedTask();
+			if (task is not null) {
+				OpenURL($"https://tarkov.dev/task/{task.Id}");
+				return;
+			}
+
+			var item = SelectedItem() ?? LastScannedItem();
+			OpenURL(item?.Link ?? (item is null ? null : $"https://tarkov.dev/item/{item.Id}"));
+		});
+	}
+
+	/// <summary>
+	/// The item currently on screen, or null when a quest or map is shown instead.
+	/// </summary>
+	private static Item? SelectedItem() => RatScannerMain.Instance.Selected?.Data as Item;
+
+	/// <summary>
+	/// The quest currently on screen, or null when an item or map is shown instead.
+	/// </summary>
+	private static TarkovTask? SelectedTask() => RatScannerMain.Instance.Selected?.Data as TarkovTask;
+
+	/// <summary>
+	/// Wiki page for an item. Tarkov.dev leaves the link null for items the wiki
+	/// never documented, so those fall back to the old Gamepedia address built
+	/// from the name.
+	/// </summary>
+	private static string? WikiLinkFor(Item? item) {
+		if (item is null) return null;
+
+		var link = item.WikiLink;
+		if (!string.IsNullOrEmpty(link) && link.Length > 3) return link;
+
+		return $"https://escapefromtarkov.gamepedia.com/{Uri.EscapeDataString(item.Name.Replace(" ", "_"))}";
+	}
+
+	/// <summary>
 	/// The most recently scanned item, or null when nothing has been scanned yet.
+	/// Only a fallback for when nothing has been selected on screen.
 	/// </summary>
 	private static Item? LastScannedItem() {
 		var scans = RatScannerMain.Instance.ItemScans;

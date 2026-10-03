@@ -1,4 +1,5 @@
 ﻿using RatEye;
+using RatScanner.Pages.InteractableOverlay.Services;
 using RatScanner.Properties;
 using RatScanner.Scan;
 using RatStash;
@@ -51,6 +52,19 @@ public class RatScannerMain : INotifyPropertyChanged {
 	public event PropertyChangedEventHandler? PropertyChanged;
 
 	internal ItemQueue ItemScans = new();
+
+	/// <summary>
+	/// Items, quests and maps the user has picked, oldest first. Lives here rather
+	/// than on the page so the selection outlives the component being unmounted by
+	/// navigating to settings, and so the wiki and tarkov.dev hotkeys read the same
+	/// answer the display does instead of a separate last-scan lookup.
+	/// </summary>
+	internal FixedSizeQueue<SearchResult> SelectedResults = new(10);
+
+	/// <summary>
+	/// What is on screen, or null when nothing has been picked yet.
+	/// </summary>
+	internal SearchResult? Selected => SelectedResults.Count > 0 ? SelectedResults.Last() : null;
 
 	public RatScannerMain() {
 		Instance = this;

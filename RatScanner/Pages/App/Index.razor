@@ -51,7 +51,7 @@
         </MudItem>
 
         <!-- Selection history -->
-        @if (_selectedResults.Count > 1) {
+        @if (SelectedResults.Count > 1) {
             @* The queue runs oldest first, so it is reversed to put the most
                recent pick on the left. Anything past the row's width is clipped
                rather than scrolled, since the rest is only reachable by picking
@@ -59,7 +59,7 @@
             <MudItem xs="12" Class="flex-none">
                 <MudPaper Class="pa-1" Elevation="1">
                     <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center" Class="history-row">
-                        @foreach (var history in _selectedResults.Reverse()) {
+                        @foreach (var history in SelectedResults.Reverse()) {
                             var entry = history;
                             var activeClass = ReferenceEquals(entry, Selected) ? "history-entry-active" : "";
                             <MudPaper Class="@($"history-entry px-2 py-1 {activeClass}")"
@@ -246,10 +246,12 @@
     private IEnumerable<SearchResult> _searchResults = new List<SearchResult>();
     private int _selectedResultIndex { get; set; } = 0;
 
-    // Static so the selection survives the component being unmounted by navigating to settings.
-    private static FixedSizeQueue<SearchResult> _selectedResults = new FixedSizeQueue<SearchResult>(10);
-    
-    private static SearchResult? Selected => _selectedResults.Count > 0 ? _selectedResults.Last() : null;
+    // Shared with RatScannerMain so the selection survives this component being
+    // unmounted by navigating to settings, and so the wiki and tarkov.dev
+    // hotkeys read the same answer the display does.
+    private static FixedSizeQueue<SearchResult> SelectedResults => RatScannerMain.Instance.SelectedResults;
+
+    private static SearchResult? Selected => RatScannerMain.Instance.Selected;
 
     private Map? _viewerMap;
 
@@ -263,7 +265,7 @@
 
         // Enqueue ignores an entry equal to the current tail, so re-picking what
         // is already showing needs no special case beyond this guard.
-        _selectedResults.Enqueue(entry);
+        SelectedResults.Enqueue(entry);
         StateHasChanged();
     }
 
@@ -416,7 +418,7 @@
         // The queued results hold items deserialized for the old mode, so their
         // prices and trader offers are the old mode's. Swapping in the new mode's
         // entry for the same id refreshes them.
-        var refreshed = _selectedResults.Select(r => r.Data switch {
+        var refreshed = SelectedResults.Select(r => r.Data switch {
             Item item => new SearchResult(
                 TarkovDevAPI.GetItems().FirstOrDefault(i => i.Id == item.Id) ?? item, r.Score),
             TarkovTask task => new SearchResult(
@@ -426,8 +428,8 @@
             _ => r,
         }).ToList();
 
-        _selectedResults.Clear();
-        foreach (var r in refreshed) _selectedResults.Enqueue(r);
+        SelectedResults.Clear();
+        foreach (var r in refreshed) SelectedResults.Enqueue(r);
 
         _ = InvokeAsync(StateHasChanged);
     }
@@ -458,14 +460,10 @@
 
     private void SelectResult(int index) {
         _selectedResultIndex = index;
-        _selectedResults.Enqueue(_searchResults.ElementAt(_selectedResultIndex));
+        SelectedResults.Enqueue(_searchResults.ElementAt(_selectedResultIndex));
         _searchTextField.Clear();
         _searchResults = [];
         StateHasChanged();
-    }
-
-    private void OpenWiki() {
-        OpenURL(MenuVM.LastItem?.WikiLink);
     }
 
     /// <summary>
@@ -518,10 +516,6 @@
         StateHasChanged();
     }
 
-    private void OpenTarkovDev() {
-        OpenURL(MenuVM.LastItem?.Link);
-    }
-
     private void OpenURL(string? url) {
         if (string.IsNullOrEmpty(url)) return;
         var psi = new ProcessStartInfo {
@@ -533,7 +527,7 @@
 
     private void OnItemScanEnqueued(object? sender, ItemScan scan) {
         var result = new SearchResult(scan.Item, 0);
-        _selectedResults.Enqueue(result);
+        SelectedResults.Enqueue(result);
         _ = InvokeAsync(StateHasChanged);
     }
 
