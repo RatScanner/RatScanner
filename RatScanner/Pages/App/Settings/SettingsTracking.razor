@@ -137,6 +137,19 @@
                                     }
                                 </MudSelect>
                             </SettingsRow>
+
+                            @* Shown only once log tracking is on, so a failed detection
+                               is visible here instead of silently doing nothing. *@
+                            @if (SettingsVM.EnableLogTracking) {
+                                <MudText Typo="Typo.caption" Color="@(_logsResolved ? Color.Secondary : Color.Warning)"
+                                         Class="ml-4 mb-2">
+                                    @Localizer["LogTrackingStatus"]:
+                                    <span>@(_logsResolved ? _logsFolder : Localizer["LogTrackingStatusMissing"])</span>
+                                    @if (_logsResolved) {
+                                        <span> (@Localizer["LogTrackingStatusFound"])</span>
+                                    }
+                                </MudText>
+                            }
                         </SettingsCard>
                     </div>
                 </div>
@@ -172,6 +185,21 @@
 
     /// <summary>Maps offered as the position-marker fallback, sorted by name.</summary>
     private List<RatScanner.TarkovDev.Json.Map> AvailableMaps { get; set; } = [];
+
+    /// <summary>Resolved logs folder, so a failed detection is visible rather than silent.</summary>
+    private string _logsFolder = "";
+    private bool _logsResolved;
+
+    private void ResolveLogsFolder() {
+        try {
+            _logsFolder = EftLogs.LogsFolder;
+            _logsResolved = !string.IsNullOrEmpty(_logsFolder);
+        } catch (Exception e) {
+            _logsFolder = "";
+            _logsResolved = false;
+            Logger.LogWarning($"Could not resolve the EFT logs folder: {e.Message}");
+        }
+    }
 
     private string ConnectionLabel => _isConnected
         ? Localizer["ConnectionOkLabel"]
@@ -292,6 +320,8 @@
     protected override async Task OnInitializedAsync() {
         SettingsVM.PropertyChanged += PropertyChangeHandler;
 
+        ResolveLogsFolder();
+
         try {
             AvailableMaps = [.. TarkovDevAPI.GetMaps().OrderBy(m => m.Name)];
         } catch (Exception e) {
@@ -302,6 +332,7 @@
     }
 
     private void PropertyChangeHandler(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
+        ResolveLogsFolder();
         _ = InvokeAsync(() => StateHasChanged());
     }
 

@@ -17,27 +17,10 @@
 @inject IJSRuntime JSRuntime
 @inject LocalizationService Localizer
 @inject ISnackbar Snackbar
+@inject IDialogService DialogService
 @implements IDisposable
 
 <div class="page">
-    @* Offered when the game log reports a different session mode. Switch is
-       explicit because applying it re-fetches the whole tarkov.dev catalogue and
-       shifts every displayed price. *@
-    @if (_detectedMode is { } pendingMode) {
-        <div class="mode-banner">
-            <MudIcon Icon="@Icons.Material.Filled.SwapHoriz" Size="Size.Small" />
-            <MudText Typo="Typo.body2">
-                @LocalizationService.Format("LogTrackingModeDetected", ModeLabel(pendingMode))
-            </MudText>
-            <MudSpacer />
-            <MudButton Size="Size.Small" Variant="Variant.Text" Color="Color.Primary"
-                       OnClick="@(() => ApplyDetectedMode(pendingMode))">
-                @Localizer["LogTrackingModeSwitch"]
-            </MudButton>
-            <MudIconButton Icon="@Icons.Material.Filled.Close" Size="Size.Small"
-                           OnClick="@(() => _detectedMode = null)" />
-        </div>
-    }
     <!-- Main Content -->
     <MudStack Spacing="2" Class="pa-2 main-content">
         <!-- Search Box -->
@@ -195,18 +178,6 @@
 
     .selected-result {
         background-color: rgba(255, 255, 255, 0.1);
-    }
-
-    /* Sits above the content rather than inside the scrolling column, so a mode
-       change prompt stays visible while the results behind it are scrolled. */
-    .mode-banner {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex: 0 0 auto;
-        padding: 4px 8px;
-        background-color: rgba(227, 179, 65, 0.14);
-        border-bottom: 1px solid rgba(227, 179, 65, 0.55);
     }
 
     /* Outlined frame around the inline map, matching the info card and quest
@@ -581,21 +552,28 @@
     }
 
     /// <summary>
-    /// A mode the log reported that is not the one in use, shown as a prompt to
-    /// switch. Null once dismissed or after switching.
+    /// A mode the log reported that is not the one in use is offered as a dialog.
+    /// Switching is never automatic because it re-fetches the tarkov.dev
+    /// catalogue and shifts every displayed price.
     /// </summary>
-    private TarkovDev.Json.GameMode? _detectedMode;
+    private bool _modeDialogOpen;
 
     private void OnModeDetected(TarkovDev.Json.GameMode mode) {
-        _ = InvokeAsync(() => {
-            _detectedMode = mode;
-            StateHasChanged();
-        });
-    }
+        _ = InvokeAsync(async () => {
+            // The log can report the change more than once, so a dialog already up
+            // is left alone rather than stacked.
+            if (_modeDialogOpen) return;
 
-    private async Task ApplyDetectedMode(TarkovDev.Json.GameMode mode) {
-        _detectedMode = null;
-        await SettingsVM.SetGameMode(mode);
+            _modeDialogOpen = true;
+            var confirmed = await DialogService.ShowMessageBox(
+                Localizer["LogTrackingTitle"],
+                LocalizationService.Format("LogTrackingModeDetected", ModeLabel(mode)),
+                yesText: Localizer["LogTrackingModeSwitch"],
+                noText: Localizer["CancelButton"]);
+            _modeDialogOpen = false;
+
+            if (confirmed == true) await SettingsVM.SetGameMode(mode);
+        });
     }
 
     private static string ModeLabel(TarkovDev.Json.GameMode mode) => mode switch {
