@@ -50,6 +50,43 @@
             </MudPaper>
         </MudItem>
 
+        <!-- Selection history -->
+        @if (_selectedResults.Count > 1) {
+            @* The queue runs oldest first, so it is reversed to put the most
+               recent pick on the left. Anything past the row's width is clipped
+               rather than scrolled, since the rest is only reachable by picking
+               something new. *@
+            <MudItem xs="12" Class="flex-none">
+                <MudPaper Class="pa-1" Elevation="1">
+                    <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center" Class="history-row">
+                        @foreach (var history in _selectedResults.Reverse()) {
+                            var entry = history;
+                            var activeClass = ReferenceEquals(entry, Selected) ? "history-entry-active" : "";
+                            <MudPaper Class="@($"history-entry px-2 py-1 {activeClass}")"
+                                      @onclick="@(() => SelectHistory(entry))">
+                                <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                                    @switch (entry.Data) {
+                                        case Item histItem:
+                                            <MudImage Src="@histItem.BaseImageLink" Class="history-thumb" />
+                                            <MudText Typo="Typo.caption" Class="history-label">@histItem.ShortName</MudText>
+                                            break;
+                                        case Map histMap:
+                                            <MudImage Src="@MapBannerUrl(histMap)" Class="history-thumb" />
+                                            <MudText Typo="Typo.caption" Class="history-label">@histMap.Name</MudText>
+                                            break;
+                                        case TarkovTask histTask:
+                                            <MudImage Src="@histTask.TaskImageLink" Class="history-thumb" />
+                                            <MudText Typo="Typo.caption" Class="history-label">@histTask.Name</MudText>
+                                            break;
+                                    }
+                                </MudStack>
+                            </MudPaper>
+                        }
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+        }
+
         <!-- Last Scanned Item -->
         @if (Selected?.Data is Item displayed) {
             <ItemSearchResult Item="@displayed" Detail="DetailLevel.Full" />
@@ -155,6 +192,52 @@
     .map-frame ::deep .map-viewer-container {
         border-radius: 0;
     }
+
+    /* The row stays one line tall and clips whatever runs past its width, rather
+       than wrapping or scrolling. */
+    .history-row {
+        flex-wrap: nowrap;
+        overflow: hidden;
+        --history-border: var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
+        --history-border-hover: var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
+    }
+
+    /* Entries shrink to fit their contents and keep their text on one line, so a
+       long item name truncates instead of stretching the row. The visible border
+       is what separates one entry from the next, since the row itself has no
+       dividers. */
+    .history-entry {
+        flex: 0 0 auto;
+        cursor: pointer;
+        border: 1px solid var(--history-border);
+        transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .history-entry:hover {
+        background-color: rgba(255, 255, 255, 0.06);
+        border-color: var(--history-border-hover);
+    }
+
+    /* The entry on screen, tinted so it stands out from the rest of the
+       history without needing to be the only border on the row. */
+    .history-entry-active {
+        background-color: rgba(227, 179, 65, 0.14);
+        border-color: rgba(227, 179, 65, 0.55);
+    }
+
+    .history-thumb {
+        width: 28px;
+        height: 28px;
+        object-fit: contain;
+        flex: 0 0 auto;
+    }
+
+    .history-label {
+        max-width: 110px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 </style>
 
 @code {
@@ -169,6 +252,31 @@
     private static SearchResult? Selected => _selectedResults.Count > 0 ? _selectedResults.Last() : null;
 
     private Map? _viewerMap;
+
+    /// <summary>
+    /// Brings a history entry back onto the screen. The entry is pushed to the
+    /// end of the queue so it becomes the selected one, rather than being swapped
+    /// into the tail position, since the queue is what the display reads.
+    /// </summary>
+    private void SelectHistory(SearchResult entry) {
+        if (ReferenceEquals(entry, Selected)) return;
+
+        // Enqueue ignores an entry equal to the current tail, so re-picking what
+        // is already showing needs no special case beyond this guard.
+        _selectedResults.Enqueue(entry);
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Banner art for a map, matching what the map card shows. Falls back to the
+    /// shared default banner when the map has none of its own.
+    /// </summary>
+    private static string? MapBannerUrl(Map map) {
+        if (!string.IsNullOrEmpty(map.Id) && MapDataLoader.MapBannerExists(map.Id)) {
+            return $"https://local.data/banner/{map.Id}.png";
+        }
+        return MapDataLoader.DefaultBannerExists ? "https://local.data/banner/default.png" : null;
+    }
 
     /// <summary>
     /// Whether extraction points are overlaid on the maps. Off by default so the

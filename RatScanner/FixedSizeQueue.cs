@@ -1,13 +1,15 @@
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
+/// <summary>
+/// A queue that keeps at most <see cref="Size"/> entries, dropping the oldest once
+/// it is full. Adding something already in the queue moves it to the back rather
+/// than storing a second copy.
+/// </summary>
 public class FixedSizeQueue<T> : IEnumerable<T> {
-    private readonly ConcurrentQueue<T> _queue = new ConcurrentQueue<T>();
-    private readonly object _lock = new object();
-    private T? _last;
-    private bool _hasLast;
+    private readonly LinkedList<T> _list = new();
+    private readonly object _lock = new();
 
     public int Size { get; }
 
@@ -17,48 +19,45 @@ public class FixedSizeQueue<T> : IEnumerable<T> {
 
     public void Enqueue(T obj) {
         lock (_lock) {
-            // Re-selecting what is already showing would fill the history with
-            // duplicates and make back-navigation useless, so it is ignored.
-            if (_hasLast && EqualityComparer<T>.Default.Equals(_last, obj)) return;
+            // Pulled out before the new entry goes in, so picking something twice
+            // leaves it in one place, at the back.
+            var existing = _list.FindLast(obj);
+            if (existing is not null) _list.Remove(existing);
 
-            _queue.Enqueue(obj);
-            _last = obj;
-            _hasLast = true;
+            _list.AddLast(obj);
 
-            // Ensure we don't exceed the designated size limit
-            while (_queue.Count > Size) {
-                _queue.TryDequeue(out _);
-            }
+            while (_list.Count > Size) _list.RemoveFirst();
         }
     }
 
+    /// <summary>Takes the newest entry off the queue.</summary>
     public bool TryDequeue(out T result) {
         lock (_lock) {
-            if (!_queue.TryDequeue(out result)) return false;
+            if (_list.Last is not { } last) {
+                result = default!;
+                return false;
+            }
 
-            // The dequeued entry was the tail whenever the queue is now empty, so
-            // the duplicate check has to start over.
-            if (_queue.Count == 0) _hasLast = false;
-            else _last = _queue.Last();
+            _list.RemoveLast();
+            result = last.Value;
             return true;
         }
     }
 
     /// <summary>Empties the queue, oldest entries first.</summary>
     public void Clear() {
-        lock (_lock) {
-            while (_queue.TryDequeue(out _)) { }
-            _hasLast = false;
-        }
+        lock (_lock) _list.Clear();
     }
 
-    public int Count => _queue.Count;
+    public int Count => _list.Count;
 
     /// <summary>
-    /// Snapshot of the queue, oldest first. ConcurrentQueue already enumerates a
-    /// stable view, so callers get a consistent read without locking.
+    /// Snapshot of the queue, oldest first. The entries are copied out under the
+    /// lock so a concurrent add cannot change the sequence mid-iteration.
     /// </summary>
-    public IEnumerator<T> GetEnumerator() => _queue.GetEnumerator();
+    public IEnumerator<T> GetEnumerator() {
+        lock (_lock) return ((IEnumerable<T>)_list.ToList()).GetEnumerator();
+    }
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
