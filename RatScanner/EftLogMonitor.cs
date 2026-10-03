@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Timer = System.Threading.Timer;
@@ -27,7 +28,18 @@ internal sealed class EftLogMonitor : IDisposable {
 	internal event Action<EftLogType, string>? DataReceived;
 
 	private readonly object _gate = new();
-	private readonly Dictionary<EftLogType, long> _readBytes = [];
+
+	/// <summary>
+	/// Byte offset already consumed, per log file PATH.
+	///
+	/// Keyed by path rather than by <see cref="EftLogType"/> because the game keeps
+	/// every past session in its own folder, each with an application.log and a
+	/// notifications.log. One offset per type made each new folder's file overwrite
+	/// the last one's, and since a shorter file then looked truncated it was read
+	/// from the start again.
+	/// </summary>
+	private readonly Dictionary<string, long> _readBytes = [];
+
 	private readonly HashSet<string> _reportedFailures = [];
 	private FileSystemWatcher? _watcher;
 	private Timer? _pollTimer;
@@ -36,6 +48,16 @@ internal sealed class EftLogMonitor : IDisposable {
 
 	/// <summary>True once a logs folder was found and watching began.</summary>
 	internal bool IsWatching { get; private set; }
+
+	/// <summary>
+	/// False until the first sweep of the logs folder has been done. Files already
+	/// on disk at that point are history and are skipped; anything appearing after
+	/// it is a session the player is having now, and is read from the beginning.
+	/// </summary>
+	private bool _initialScanDone;
+
+	/// <summary>Guards against two sweeps running at the same time.</summary>
+	private bool _polling;
 
 	internal void Start() {
 		var folder = EftLogs.LogsFolder;
@@ -107,16 +129,34 @@ internal sealed class EftLogMonitor : IDisposable {
 	/// </summary>
 	private void Poll() {
 		string folder;
+
 		lock (_gate) {
 			if (_stopped || !IsWatching) return;
+
+			// The timer and the explicit call in Start() can both land here at once.
+			// Letting two sweeps overlap would read the same new bytes twice and
+			// announce every event in it two times.
+			if (_polling) return;
+			_polling = true;
+
 			folder = _logsFolder;
 		}
 
+		try {
+			Sweep(folder);
+		} finally {
+			lock (_gate) {
+				_polling = false;
+			}
+		}
+	}
+
+	private void Sweep(string folder) {
 		if (!Directory.Exists(folder)) return;
 
 		IEnumerable<string> files;
 		try {
-			files = Directory.EnumerateFiles(folder, "*.log", SearchOption.AllDirectories);
+			files = Directory.EnumerateFiles(folder, "*.log", SearchOption.AllDirectories).ToList();
 		} catch (Exception e) {
 			ReportOnce(folder, e.Message);
 			return;
@@ -132,34 +172,51 @@ internal sealed class EftLogMonitor : IDisposable {
 				ReportOnce(file, e.Message);
 			}
 		}
+
+		// Everything already on disk has now been accounted for, so a file seen
+		// from here on belongs to a session that is starting now.
+		lock (_gate) {
+			_initialScanDone = true;
+		}
 	}
 
 	private void Read(string path, EftLogType type) {
-		long alreadyRead;
+		long alreadyRead = 0;
+		bool unseen;
+		bool backlog;
+
 		lock (_gate) {
 			if (_stopped) return;
-			_readBytes.TryGetValue(type, out alreadyRead);
+			unseen = !_readBytes.TryGetValue(path, out alreadyRead);
+
+			// Anything still unaccounted for once the first sweep has finished is
+			// a file written after we started following, i.e. a session the player
+			// is having right now.
+			backlog = !_initialScanDone;
 		}
 
 		using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
 
 		// A file shorter than our mark means it was rotated and truncated, so
 		// start over rather than seeking past the end.
-		if (alreadyRead > stream.Length) alreadyRead = 0;
-		if (stream.Length == alreadyRead) return;
+		if (!unseen && alreadyRead > stream.Length) alreadyRead = 0;
+
+		// A file that predates us is history: the raid that wrote it is over, and
+		// reading it would announce a match found and a raid ended for a session
+		// that happened before the app was launched.
+		if (backlog && unseen) alreadyRead = stream.Length;
+
+		if (stream.Length == alreadyRead) {
+			Remember(path, alreadyRead);
+			return;
+		}
 
 		stream.Seek(alreadyRead, SeekOrigin.Begin);
 
 		using var reader = new StreamReader(stream, Encoding.UTF8, true, 4096, leaveOpen: true);
 		var text = reader.ReadToEnd();
 
-		long position;
-		lock (_gate) {
-			position = stream.Position;
-			// Only advance the mark to what was actually consumed, so a partial
-			// read resumes at the right byte next time.
-			_readBytes[type] = position;
-		}
+		Remember(path, stream.Position);
 
 		if (string.IsNullOrEmpty(text)) return;
 
@@ -168,6 +225,13 @@ internal sealed class EftLogMonitor : IDisposable {
 		} catch (Exception e) {
 			// A listener that trips over an unexpected line must not stop the feed.
 			Logger.LogWarning($"Failed to handle EFT {type} log data: {e.Message}");
+		}
+	}
+
+	/// <summary>Records how much of a file has been consumed.</summary>
+	private void Remember(string path, long position) {
+		lock (_gate) {
+			_readBytes[path] = position;
 		}
 	}
 
