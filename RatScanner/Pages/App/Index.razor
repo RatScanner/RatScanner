@@ -51,30 +51,21 @@
         </MudItem>
 
         <!-- Last Scanned Item -->
-        @if (GetDisplayedItem() is Item displayed) {
+        @if (Selected?.Data is Item displayed) {
             <ItemSearchResult Item="@displayed" Detail="DetailLevel.Full" />
             <ItemQuestTable Item="@displayed" />
-        }
-
-        <!-- Selected Task -->
-        @if (GetDisplayedTask() is TarkovTask selectedTask) {
+        } else if (Selected?.Data is TarkovTask selectedTask) {
             @* Wired so objectives that name a place get a map button. Objectives
                without location data hide it themselves. *@
             <TaskSearchResult Task="@selectedTask" Detail="DetailLevel.Full"
                               OnMapClick="@((tuple) => OpenMapForObjective(tuple.objective))" />
             <TaskDetailsTable Task="@selectedTask" OnMapClick="@((tuple) => OpenMapForObjective(tuple.objective))" />
-        }
-
-        <!-- Selected Map -->
-        @if (GetDisplayedMap() is Map selectedMap) {
+        } else if (Selected?.Data is Map selectedMap) {
             <MapSearchResult Map="@selectedMap" Detail="DetailLevel.Full" ShowExtracts="@_showExtracts"
                              ShowLocks="@_showLocks" ShowTransits="@_showTransits" ShowHazards="@_showHazards"
                              OnShowExtractsChanged="@OnShowExtractsChanged" OnShowLocksChanged="@OnShowLocksChanged"
                              OnShowTransitsChanged="@OnShowTransitsChanged" OnShowHazardsChanged="@OnShowHazardsChanged"
                              OnMapClick="@(() => OpenMapViewer(selectedMap))" />
-            @* The map sits right under its info card, ready to pan and zoom. The
-               border lives here rather than in MapViewer so the component stays
-               reusable in the interactable overlay. *@
             <MudPaper Outlined="true" Class="map-frame">
                 <MapViewer Map="@selectedMap" Inline="true" Pois="@SelectedMapPois" />
             </MudPaper>
@@ -168,37 +159,16 @@
 
 @code {
     private MudTextField<string> _searchTextField = null!;
-    private List<TarkovDev.Json.Item>? _items;
     private string _searchText;
     private IEnumerable<SearchResult> _searchResults = new List<SearchResult>();
     private int _selectedResultIndex { get; set; } = 0;
 
-    private SearchResult _searchResult;
-    private bool _showSearchResult;
-    private Item? _shownScanItem;
-    private TarkovTask? _selectedTask;
-    private Map? _selectedMap;
+    // Static so the selection survives the component being unmounted by navigating to settings.
+    private static FixedSizeQueue<SearchResult> _selectedResults = new FixedSizeQueue<SearchResult>(10);
+    
+    private static SearchResult? Selected => _selectedResults.Count > 0 ? _selectedResults.Last() : null;
+
     private Map? _viewerMap;
-
-    private Item? GetLastScannedItem() {
-        var scans = MenuVM.ItemScans;
-        return scans.Count > 0 ? scans.Last().Item : null;
-    }
-
-    private Item? GetDisplayedItem() {
-        if (_showSearchResult) return _searchResult?.Data as Item;
-        return GetLastScannedItem();
-    }
-
-    private TarkovTask? GetDisplayedTask() {
-        if (_showSearchResult && _searchResult?.Data is TarkovTask searched) return searched;
-        return _selectedTask;
-    }
-
-    private Map? GetDisplayedMap() {
-        if (_showSearchResult) return _searchResult?.Data as Map;
-        return _selectedMap;
-    }
 
     /// <summary>
     /// Whether extraction points are overlaid on the maps. Off by default so the
@@ -259,7 +229,7 @@
     /// Extracts for the map shown inline, or null when the toggle is off or the
     /// map has none.
     /// </summary>
-    private List<POI>? SelectedMapPois => BuildPois(GetDisplayedMap());
+    private List<POI>? SelectedMapPois => BuildPois(Selected?.Data is Map selectedMap ? selectedMap : null);
 
     /// <summary>
     /// Same, for the full-screen viewer. Kept separate from the inline map since
@@ -318,7 +288,40 @@
 
     protected override void OnInitialized() {
         MenuVM.PropertyChanged += PropertyChangeHandler;
+        MenuVM.ItemScans.Enqueued += OnItemScanEnqueued;
         RatScannerMain.Instance.HotkeyManager.EscapePressed += OnEscapePressed;
+        SettingsVM.GameModeChanged += OnGameModeChanged;
+    }
+
+    /// <summary>
+    /// The selected item, quest and map carry over to the new mode untouched. The
+    /// data behind them may be stale, but losing the selection mid-switch is
+    /// worse than showing last mode's prices for a moment.
+    /// </summary>
+    private void OnGameModeChanged(GameMode mode) {
+        _itemNames = null;
+        _mapNames = null;
+        _searchResults = [];
+        _viewerMap = null;
+        _viewerZonePois = null;
+
+        // The queued results hold items deserialized for the old mode, so their
+        // prices and trader offers are the old mode's. Swapping in the new mode's
+        // entry for the same id refreshes them.
+        var refreshed = _selectedResults.Select(r => r.Data switch {
+            Item item => new SearchResult(
+                TarkovDevAPI.GetItems().FirstOrDefault(i => i.Id == item.Id) ?? item, r.Score),
+            TarkovTask task => new SearchResult(
+                TarkovDevAPI.GetTasks().FirstOrDefault(t => t.Id == task.Id) ?? task, r.Score),
+            Map map => new SearchResult(
+                TarkovDevAPI.GetMaps().FirstOrDefault(m => m.Id == map.Id) ?? map, r.Score),
+            _ => r,
+        }).ToList();
+
+        _selectedResults.Clear();
+        foreach (var r in refreshed) _selectedResults.Enqueue(r);
+
+        _ = InvokeAsync(StateHasChanged);
     }
 
     /// <summary>
@@ -347,12 +350,7 @@
 
     private void SelectResult(int index) {
         _selectedResultIndex = index;
-        _searchResult = _searchResults.ElementAt(_selectedResultIndex);
-        _showSearchResult = true;
-        _selectedTask = _searchResult.Data as TarkovTask;
-        // Keep a map selected after the search box clears, so its info and viewer
-        // stay put the same way a selected item or quest does.
-        _selectedMap = _searchResult.Data as Map;
+        _selectedResults.Enqueue(_searchResults.ElementAt(_selectedResultIndex));
         _searchTextField.Clear();
         _searchResults = [];
         StateHasChanged();
@@ -425,20 +423,20 @@
         Process.Start(psi);
     }
 
-    private async void PropertyChangeHandler(object? sender, EventArgs e) {
-        var latest = GetLastScannedItem();
-        if (latest is not null && !ReferenceEquals(latest, _shownScanItem)) {
-            _shownScanItem = latest;
-            _showSearchResult = false;
-            _selectedTask = null;
-            _selectedMap = null;
-        }
+    private void OnItemScanEnqueued(object? sender, ItemScan scan) {
+        var result = new SearchResult(scan.Item, 0);
+        _selectedResults.Enqueue(result);
+        _ = InvokeAsync(StateHasChanged);
+    }
 
+    private async void PropertyChangeHandler(object? sender, EventArgs e) {
         await InvokeAsync(StateHasChanged);
     }
 
     public void Dispose() {
         MenuVM.PropertyChanged -= PropertyChangeHandler;
+        MenuVM.ItemScans.Enqueued -= OnItemScanEnqueued;
         RatScannerMain.Instance.HotkeyManager.EscapePressed -= OnEscapePressed;
+        SettingsVM.GameModeChanged -= OnGameModeChanged;
     }
 }

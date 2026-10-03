@@ -120,7 +120,25 @@ public class SearchService {
 	}
 }
 
-public class SearchResult(object data, float score) {
+public class SearchResult(object data, double score) {
 	public object Data = data;
 	public double Score = score;
+
+	public override bool Equals(object? obj) {
+		if (obj is not SearchResult other) return false;
+		if (ReferenceEquals(this, other)) return true;
+		return Data switch {
+			Item item => other.Data is Item otherItem && otherItem.Id == item.Id,
+			TarkovTask task => other.Data is TarkovTask otherTask && otherTask.Id == task.Id,
+			Map map => other.Data is Map otherMap && otherMap.Id == map.Id,
+			_ => ReferenceEquals(Data, other.Data),
+		};
+	}
+
+	public override int GetHashCode() => Data switch {
+		Item item => item.Id.GetHashCode(),
+		TarkovTask task => task.Id.GetHashCode(),
+		Map map => map.Id.GetHashCode(),
+		_ => Data.GetHashCode(),
+	};
 }

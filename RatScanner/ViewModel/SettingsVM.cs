@@ -1,5 +1,6 @@
 using RatScanner.TarkovDev.Json;
 using RatStash;
+using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -143,6 +144,43 @@ internal class SettingsVM : INotifyPropertyChanged {
 	private void Notify() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(null));
 
 	/// <summary>
+	/// Raised after the game mode actually changes, so open views can re-resolve
+	/// anything they took from the previous mode's catalogue.
+	/// </summary>
+	public static event Action<GameMode>? GameModeChanged;
+
+	/// <summary>
+	/// The single entry point for changing game mode, used by both the title bar
+	/// chip and the settings page. Applies the mode, persists it, refreshes the
+	/// catalogue and tells listeners, so neither surface can end up out of step
+	/// with the other.
+	/// </summary>
+	public async Task SetGameMode(GameMode mode) {
+		if (RatConfig.GameMode == mode) return;
+
+		RatConfig.GameMode = mode;
+		GameMode = mode;
+		RatConfig.SaveConfig();
+		LocalProgressStore.NotifyChanged();
+
+		try {
+			await TarkovDevAPI.InitializeCache();
+		} catch (Exception e) {
+			Logger.LogWarning("Failed to refresh tarkov.dev cache after game mode switch", e);
+		}
+
+		QuestObjectiveEntry.InvalidateItemLookup();
+		RatScanner.TaskExtensions.InvalidateItemLookup();
+
+		// Not routed through MarkDirty: a switch is applied and saved at once, so
+		// the settings page has nothing left to save. Notify still re-renders it so
+		// its dropdown shows the new mode.
+		Notify();
+
+		GameModeChanged?.Invoke(mode);
+	}
+
+	/// <summary>
 	/// Marks the settings as having unsaved changes. Called by the settings pages
 	/// whenever a control is edited.
 	/// </summary>
@@ -218,12 +256,8 @@ internal class SettingsVM : INotifyPropertyChanged {
 			RatConfig.ScreenScale = ScreenScale;
 			RatConfig.OverrideScreenConfig = true;
 		}
-		var previousGameMode = RatConfig.GameMode;
-		RatConfig.GameMode = GameMode;
+		var gameModeChanged = RatConfig.GameMode != GameMode;
 
-		if (previousGameMode != GameMode) {
-			LocalProgressStore.NotifyChanged();
-		}
 		RatConfig.MinimizeToTray = MinimizeToTray;
 		RatConfig.AlwaysOnTop = AlwaysOnTop;
 		RatConfig.LogDebug = LogDebug;
@@ -231,7 +265,6 @@ internal class SettingsVM : INotifyPropertyChanged {
 		// Apply config
 		PageSwitcher.Instance.Topmost = RatConfig.AlwaysOnTop;
 		PageSwitcher.Instance.ResetWindowSize();
-		await TarkovDevAPI.InitializeCache();
 		if (updateTarkovTrackerToken || updateTarkovTrackerBackend) UpdateTarkovTrackerToken();
 		if (updateUiLanguage) LocalizationService.SetLanguage(UiLanguage);
 		if (updateResolution || updateLanguage || updateScreenOverride) RatScannerMain.Instance.SetupRatEye();
@@ -245,7 +278,11 @@ internal class SettingsVM : INotifyPropertyChanged {
 		Logger.LogInfo("Config saved!");
 		IsDirty = false;
 		_suppressDirty = true;
-		Notify();
+
+		// Last, so the rest of the save is already applied. Routed through
+		// SetGameMode so the chip picks the change up like any other listener.
+		if (gameModeChanged) await SetGameMode(GameMode);
+		else Notify();
 	}
 
 	private static void UpdateTarkovTrackerToken() {

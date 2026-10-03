@@ -138,6 +138,15 @@
     protected override void OnInitialized() {
         MenuVM.PropertyChanged += PropertyChangeHandler;
         RatScannerMain.Instance.HotkeyManager.EscapePressed += OnEscapePressed;
+        SettingsVM.GameModeChanged += OnGameModeChanged;
+    }
+
+    private void OnGameModeChanged(GameMode mode) {
+        _selectedMap = _selectedMap is null
+            ? null
+            : TarkovDevAPI.GetMaps().FirstOrDefault(m => m.Id == _selectedMap.Id);
+        _selectedPois = null;
+        _ = InvokeAsync(StateHasChanged);
     }
 
     /// <summary>
@@ -158,5 +167,6 @@
     public void Dispose() {
         MenuVM.PropertyChanged -= PropertyChangeHandler;
         RatScannerMain.Instance.HotkeyManager.EscapePressed -= OnEscapePressed;
+        SettingsVM.GameModeChanged -= OnGameModeChanged;
     }
 }

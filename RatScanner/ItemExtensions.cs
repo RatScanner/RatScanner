@@ -68,6 +68,8 @@ public record QuestObjectiveEntry(
 
 	private static Dictionary<string, Item>? _itemLookup;
 
+	internal static void InvalidateItemLookup() => _itemLookup = null;
+
 	/// <summary>
 	/// Every item the objective accepts, resolved against the tarkov.dev
 	/// catalogue. Cached because the id lookup would otherwise be a linear

@@ -185,6 +185,8 @@ public static class TaskExtensions {
 
     private static Dictionary<string, Item>? _itemLookup;
 
+    internal static void InvalidateItemLookup() => _itemLookup = null;
+
     /// <summary>
     /// Item catalogue keyed by id. Cached because reward lookups would otherwise
     /// be a linear scan over every item on each repaint.

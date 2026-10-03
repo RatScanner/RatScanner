@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace RatScanner;
@@ -36,7 +37,7 @@ public static class TarkovDevAPI {
 	private const string ApiEndpoint = "https://json.tarkov.dev/";
 
 	private static readonly ConcurrentDictionary<string, (long expire, object response)> Cache = new();
-	private static readonly ConcurrentDictionary<string, bool> PendingRequests = new();
+	private static readonly ConcurrentDictionary<string, Lazy<Task>> PendingRequests = new();
 
 	private static readonly HttpClient HttpClient = new(new HttpClientHandler {
 		AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate,
@@ -67,11 +68,11 @@ public static class TarkovDevAPI {
 		using HttpRequestMessage request = new(HttpMethod.Get, url);
 		request.Headers.UserAgent.ParseAdd($"RatScanner-Client/{RatConfig.Version}");
 
-		var responseTask = await HttpClient.SendAsync(request);
+		var responseTask = await HttpClient.SendAsync(request).ConfigureAwait(false);
 
 		return responseTask.StatusCode != HttpStatusCode.OK
 			? throw new Exception($"Tarkov.dev API request failed. {responseTask.ReasonPhrase}")
-			: await responseTask.Content.ReadAsStringAsync();
+			: await responseTask.Content.ReadAsStringAsync().ConfigureAwait(false);
 	}
 
 	/// <summary>
@@ -102,19 +103,21 @@ public static class TarkovDevAPI {
 	/// Fetches a full endpoint, merges translations, and caches the resulting array
 	/// </summary>
 	private static async Task QueueEndpointRequest<T>(string baseQueryKey, string endpoint, Func<Dictionary<string, T>, T[]> transform, long ttl) where T : class {
-		// Check if request is already pending
-		if (!PendingRequests.TryAdd(baseQueryKey, true)) {
-			Logger.LogInfo($"Request already pending for: \"{baseQueryKey}\", skipping");
-			return;
-		}
+		// The factory is run inside Task.Run, so the fetch never inherits the
+		// caller's synchronization context. Callers that block on the returned task
+		// would otherwise deadlock against it.
+		var request = PendingRequests.GetOrAdd(baseQueryKey, _ => new Lazy<Task>(() => Task.Run(() => FetchEndpoint(baseQueryKey, endpoint, transform, ttl))));
+		await request.Value.ConfigureAwait(false);
+	}
 
+	private static async Task FetchEndpoint<T>(string baseQueryKey, string endpoint, Func<Dictionary<string, T>, T[]> transform, long ttl) where T : class {
 		try {
 			var sw = Stopwatch.StartNew();
 			Logger.LogInfo($"Fetching endpoint for: \"{baseQueryKey}\"");
 
 			var gameMode = RatConfig.GameMode.ToApiString();
 			var baseUrl = BuildUrl(gameMode, endpoint);
-			var rawResponse = await Get(baseUrl);
+			var rawResponse = await Get(baseUrl).ConfigureAwait(false);
 			var data = DeserializeKeyedResponse<T>(endpoint, rawResponse);
 
 			// Apply translations by requesting the localized variant when available
@@ -155,7 +158,9 @@ public static class TarkovDevAPI {
 
 			if (!Cache.ContainsKey(baseQueryKey)) throw new Exception("Failed to fetch query response and no cache available.");
 		} finally {
-			// Always remove from pending requests when done
+			// Removed once finished so the next cache miss queues a fresh fetch.
+			// Safe by key alone: GetOrAdd only inserts while the key is absent,
+			// so nothing newer can be sitting here yet.
 			_ = PendingRequests.TryRemove(baseQueryKey, out _);
 		}
 	}
@@ -297,21 +302,36 @@ public static class TarkovDevAPI {
 	}
 
 	private static T[] GetCached<T>(string baseQueryKey, string endpoint, Func<Dictionary<string, T>, T[]> transform, long ttl, bool isRetry = false) where T : class {
-		if (!Cache.TryGetValue(baseQueryKey, out var value)) {
-			if (isRetry) throw new Exception("Retrying to fetch query response failed.");
+		if (Cache.TryGetValue(baseQueryKey, out var value)) {
+			// Queue a background refresh once the cache has expired. Skipped while one is
+			// already in flight, otherwise every render of a page whose cache came from
+			// disk (always loaded as already expired) would queue its own duplicate.
+			var time = DateTimeOffset.Now.ToUnixTimeSeconds();
+			if (time > value.expire && !PendingRequests.ContainsKey(baseQueryKey)) {
+				_ = Task.Run(() => QueueEndpointRequest(baseQueryKey, endpoint, transform, ttl));
+			}
 
-			Logger.LogInfo($"Query not found in cache: \"{baseQueryKey}\"");
-			Task.Run(() => QueueEndpointRequest(baseQueryKey, endpoint, transform, ttl)).Wait();
+			return value.response == null ? [] : [.. ((T[])value.response).Where(i => i != null)];
+		}
+
+		if (isRetry) throw new Exception("Retrying to fetch query response failed.");
+
+		// Someone else may already be fetching this key. Joining their request beats
+		// starting a second one that gets skipped, and beats returning empty while
+		// they finish. Started via Task.Run so the fetch never captures the caller's
+		// synchronization context, since .Wait() below blocks this thread.
+		if (PendingRequests.TryGetValue(baseQueryKey, out var pending)) {
+			try {
+				Task.Run(() => pending.Value).Wait();
+			} catch (Exception e) {
+				Logger.LogWarning($"In-flight fetch failed for: \"{baseQueryKey}\"", e);
+			}
 			return GetCached(baseQueryKey, endpoint, transform, ttl, true);
 		}
 
-		// Queue request if cache is expired and no request is already pending
-		var time = DateTimeOffset.Now.ToUnixTimeSeconds();
-		if (time > value.expire && !PendingRequests.ContainsKey(baseQueryKey)) {
-			_ = Task.Run(() => QueueEndpointRequest(baseQueryKey, endpoint, transform, ttl));
-		}
-
-		return value.response == null ? [] : [.. ((T[])value.response).Where(i => i != null)];
+		Logger.LogInfo($"Query not found in cache: \"{baseQueryKey}\"");
+		Task.Run(() => QueueEndpointRequest(baseQueryKey, endpoint, transform, ttl)).Wait();
+		return GetCached(baseQueryKey, endpoint, transform, ttl, true);
 	}
 
 	/// <summary>
@@ -342,12 +362,15 @@ public static class TarkovDevAPI {
 	/// Full cache initialization - waits for all requests to complete
 	/// </summary>
 	public static async Task InitializeCache() {
+		// Goes through GetCached rather than QueueEndpointRequest directly, so a mode
+		// already held in memory is reused instead of refetched. Each key embeds the
+		// game mode, so switching back to a visited mode is served from its entry.
 		await Task.WhenAll(
-			Task.Run(() => QueueEndpointRequest<Item>(ItemsQueryKey(), EndpointItems, d => [.. d.Values], RatConfig.MediumTTL)),
-			Task.Run(() => QueueEndpointRequest<TarkovTask>(TasksQueryKey(), EndpointTasks, d => [.. d.Values], RatConfig.LongTTL)),
-			Task.Run(() => QueueEndpointRequest<HideoutStation>(HideoutStationsQueryKey(), EndpointHideout, d => [.. d.Values], RatConfig.LongTTL)),
-			Task.Run(() => QueueEndpointRequest<Map>(MapsQueryKey(), EndpointMaps, d => [.. d.Values], RatConfig.LongTTL)),
-			Task.Run(() => QueueEndpointRequest<Trader>(TradersQueryKey(), EndpointTraders, d => [.. d.Values], RatConfig.LongTTL))
+			Task.Run(() => { _ = GetItems(); }),
+			Task.Run(() => { _ = GetTasks(); }),
+			Task.Run(() => { _ = GetHideoutStations(); }),
+			Task.Run(() => { _ = GetMaps(); }),
+			Task.Run(() => { _ = GetTraders(); })
 		).ConfigureAwait(false);
 		System.Runtime.GCSettings.LargeObjectHeapCompactionMode = System.Runtime.GCLargeObjectHeapCompactionMode.CompactOnce;
 	}

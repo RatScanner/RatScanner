@@ -1,0 +1,131 @@
+@using RatScanner.TarkovDev.Json
+@inject LocalizationService Localizer
+@inject SettingsVM SettingsVM
+@implements IDisposable
+
+@* Shows the current game mode and cycles to the next one on click. Changing the
+   mode refetches the tarkov.dev catalogue, so the button shows a spinner for the
+   duration. *@
+
+<div class="mode-chip @ModeClass @(_switching ? "mode-chip-busy" : null)" title="@Localizer["GameModeSelectionHint"]"
+     @onmousedown:stopPropagation="true" @onclick="SwitchAsync">
+    @if (_switching) {
+        <span class="mode-chip-spinner"></span>
+    } else {
+        <span class="mode-chip-dot"></span>
+    }
+    <span class="mode-chip-label">@Label</span>
+</div>
+
+<style>
+    .mode-chip {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 2px 8px 2px 6px;
+        border-radius: 10px;
+        border: 1px solid var(--chip-border);
+        background: var(--chip-bg);
+        cursor: pointer;
+        user-select: none;
+        transition: filter 0.15s ease;
+    }
+
+    .mode-chip:hover {
+        filter: brightness(1.25);
+    }
+
+    .mode-chip-busy {
+        cursor: progress;
+    }
+
+    .mode-chip-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--chip-accent);
+        flex: 0 0 auto;
+    }
+
+    .mode-chip-spinner {
+        width: 9px;
+        height: 9px;
+        flex: 0 0 auto;
+        border-radius: 50%;
+        border: 1.5px solid var(--chip-accent);
+        border-top-color: transparent;
+        animation: mode-chip-spin 0.7s linear infinite;
+    }
+
+    @@keyframes mode-chip-spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .mode-chip-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.6px;
+        color: var(--chip-accent);
+        line-height: 1.4;
+    }
+
+    .mode-chip-pvp {
+        --chip-accent: #e3b341;
+        --chip-bg: rgba(227, 179, 65, 0.12);
+        --chip-border: rgba(227, 179, 65, 0.35);
+    }
+
+    .mode-chip-pve {
+        --chip-accent: #4d9bf0;
+        --chip-bg: rgba(77, 155, 240, 0.12);
+        --chip-border: rgba(77, 155, 240, 0.35);
+    }
+
+    .mode-chip-season {
+        --chip-accent: #56c271;
+        --chip-bg: rgba(86, 194, 113, 0.12);
+        --chip-border: rgba(86, 194, 113, 0.35);
+    }
+</style>
+
+@code {
+    private bool _switching;
+
+    protected override void OnInitialized() => SettingsVM.PropertyChanged += OnSettingsChanged;
+
+    private void OnSettingsChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        => _ = InvokeAsync(StateHasChanged);
+
+    public void Dispose() => SettingsVM.PropertyChanged -= OnSettingsChanged;
+
+    private GameMode Mode => RatConfig.GameMode;
+
+    private string Label => Mode switch {
+        GameMode.Pve => Localizer["GameModeChipPve"],
+        GameMode.PvpSeason => Localizer["GameModeChipSeason"],
+        _ => Localizer["GameModeChipPvp"],
+    };
+
+    private string ModeClass => Mode switch {
+        GameMode.Pve => "mode-chip-pve",
+        GameMode.PvpSeason => "mode-chip-season",
+        _ => "mode-chip-pvp",
+    };
+
+    private async Task SwitchAsync() {
+        if (_switching) return;
+
+        _switching = true;
+        await InvokeAsync(StateHasChanged);
+
+        var next = (GameMode)(((int)Mode + 1) % 3);
+
+        await SettingsVM.SetGameMode(next);
+        await InvokeAsync(StateHasChanged);
+
+        _switching = false;
+        await InvokeAsync(StateHasChanged);
+    }
+}
