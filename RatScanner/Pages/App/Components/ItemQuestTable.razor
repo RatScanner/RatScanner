@@ -160,6 +160,15 @@
     private UserProgress? _builtProgress;
 
     /// <summary>
+    /// Ids of the rows the player has opened. Expansion has to outlive a rebuild:
+    /// editing an objective replaces the progress object, which forces a rebuild,
+    /// and <see cref="QuestItemEntry.IsExpanded"/> is a mutable property on a
+    /// record, so freshly built entries always come back collapsed. Ticking an
+    /// objective therefore folded the row shut under the player's cursor.
+    /// </summary>
+    private readonly HashSet<string> _expandedTasks = [];
+
+    /// <summary>
     /// The parent re-renders on a 100 ms scan timer, so rebuilding the rows
     /// every time would churn the whole table. Only rebuild when the item or
     /// the tracker data actually changed; toggling expansion mutates the entry
@@ -170,10 +179,16 @@
         if (ReferenceEquals(_builtFor, Item) && ReferenceEquals(_builtProgress, progress))
             return;
 
+        // A different item means a different set of quests, so open rows from the
+        // previous item must not carry over.
+        if (!ReferenceEquals(_builtFor, Item)) {
+            _expandedTasks.Clear();
+        }
+
         _builtFor = Item;
         _builtProgress = progress;
-        _requiring = Build(Item.GetQuestsRequiringItem(), progress);
-        _rewarding = Build(Item.GetQuestsRewardingItem(), progress);
+        _requiring = Build(Item.GetQuestsRequiringItem(), progress, _expandedTasks);
+        _rewarding = Build(Item.GetQuestsRewardingItem(), progress, _expandedTasks);
     }
 
     protected override void OnInitialized() => LocalProgressStore.Changed += OnLocalProgressChanged;
@@ -191,11 +206,19 @@
         StateHasChanged();
     });
 
-    private static List<QuestItemEntry> Build(List<QuestItemEntry> entries, UserProgress progress) {
-        return entries.Select(entry => entry with {
-            IsComplete = Item.IsTaskComplete(entry.Task, progress),
-            IsFailed = Item.IsTaskFailed(entry.Task, progress),
-            Objectives = Item.GetObjectiveProgress(entry.Task, progress),
+    private static List<QuestItemEntry> Build(List<QuestItemEntry> entries, UserProgress progress, HashSet<string> expanded) {
+        return entries.Select(entry => {
+            var built = entry with {
+                IsComplete = Item.IsTaskComplete(entry.Task, progress),
+                IsFailed = Item.IsTaskFailed(entry.Task, progress),
+                Objectives = Item.GetObjectiveProgress(entry.Task, progress),
+            };
+
+            // `with` copies IsExpanded from the source entry, but the source is a
+            // throwaway built by GetQuests*Item(), so it is always false. Restore
+            // it from the set of tasks the player has open instead.
+            built.IsExpanded = entry.Task.Id is { Length: > 0 } id && expanded.Contains(id);
+            return built;
         }).ToList();
     }
 
@@ -207,6 +230,16 @@
         }
 
         entry.IsExpanded = !entry.IsExpanded;
+
+        if (entry.Task.Id is not { Length: > 0 } id) {
+            return;
+        }
+
+        if (entry.IsExpanded) {
+            _expandedTasks.Add(id);
+        } else {
+            _expandedTasks.Remove(id);
+        }
     }
 
     private static string ExpandIcon(bool expanded) =>
