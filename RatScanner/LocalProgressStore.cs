@@ -26,7 +26,8 @@ public class LocalProgressStore {
     /// <summary>Per game mode, objective id to what the player has recorded.</summary>
     private readonly Dictionary<GameMode, Dictionary<string, ObjectiveProgress>> _objectives = new();
 
-    private readonly Dictionary<GameMode, Dictionary<string, bool>> _tasks = new();
+    /// <summary>Per game mode, task id to its completion record.</summary>
+    private readonly Dictionary<GameMode, Dictionary<string, TaskProgress>> _tasks = new();
 
     /// <summary>Raised on any change, and on a game mode change since progress is kept per mode.</summary>
     public static event Action? Changed;
@@ -36,6 +37,17 @@ public class LocalProgressStore {
     private sealed class ObjectiveProgress {
         public bool Complete { get; set; }
         public int Count { get; set; }
+        public long Timestamp { get; set; }
+    }
+
+    /// <summary>
+    /// A task's recorded status, in the shape TarkovTracker uses: a failed task
+    /// also carries <see cref="Complete"/>, because failure is a completion of
+    /// sorts, and the reader gives <see cref="Failed"/> precedence.
+    /// </summary>
+    private sealed class TaskProgress {
+        public bool Complete { get; set; }
+        public bool Failed { get; set; }
         public long Timestamp { get; set; }
     }
 
@@ -74,7 +86,8 @@ public class LocalProgressStore {
             if (_tasks.TryGetValue(RatConfig.GameMode, out var tasks)) {
                 progress.Tasks = [.. tasks.Select(t => new Progress {
                     Id = t.Key,
-                    Complete = t.Value,
+                    Complete = t.Value.Complete,
+                    Failed = t.Value.Failed,
                 })];
             }
 
@@ -148,10 +161,39 @@ public class LocalProgressStore {
 
     /// <summary>Records whether a whole task is done.</summary>
     public void SetTaskComplete(string taskId, bool complete) {
+        SetTaskStatus(taskId, complete, false);
+    }
+
+    /// <summary>
+    /// Records a task's status. A failed task is stored as complete and failed,
+    /// matching TarkovTracker, so the two sources read the same.
+    /// </summary>
+    public void SetTaskFailed(string taskId, bool failed) {
+        SetTaskStatus(taskId, failed, failed);
+    }
+
+    private void SetTaskStatus(string taskId, bool complete, bool failed) {
         if (string.IsNullOrEmpty(taskId)) return;
 
         lock (Gate) {
-            MapFor(_tasks)[taskId] = complete;
+            var tasks = MapFor(_tasks);
+            var entry = tasks.GetValueOrDefault(taskId);
+            if (entry == null) {
+                entry = new TaskProgress();
+                tasks[taskId] = entry;
+            }
+
+            // Failure wins over completion, so recording a completion clears a
+            // failure and recording a failure clears nothing else.
+            if (failed) {
+                entry.Complete = true;
+                entry.Failed = true;
+            } else {
+                entry.Complete = complete;
+                entry.Failed = false;
+            }
+
+            entry.Timestamp = Now();
             Invalidate();
             Save();
         }
@@ -170,7 +212,7 @@ public class LocalProgressStore {
         return value;
     }
 
-    private Dictionary<string, bool> MapFor(Dictionary<GameMode, Dictionary<string, bool>> map) {
+    private Dictionary<string, TaskProgress> MapFor(Dictionary<GameMode, Dictionary<string, TaskProgress>> map) {
         if (!map.TryGetValue(RatConfig.GameMode, out var value)) {
             value = [];
             map[RatConfig.GameMode] = value;
@@ -204,7 +246,11 @@ public class LocalProgressStore {
                 if (data["taskCompletions"] is JObject taskNode) {
                     var tasks = MapFor(_tasks);
                     foreach (var (id, node) in taskNode) {
-                        tasks[id] = (bool?)node["complete"] ?? false;
+                        tasks[id] = new TaskProgress {
+                            Complete = (bool?)node["complete"] ?? false,
+                            Failed = (bool?)node["failed"] ?? false,
+                            Timestamp = (long?)node["timestamp"] ?? 0,
+                        };
                     }
                 }
             }
@@ -243,8 +289,14 @@ public class LocalProgressStore {
 
                 if (_tasks.TryGetValue(mode, out var tasks) && tasks.Count > 0) {
                     var node = new JObject();
-                    foreach (var (id, complete) in tasks) {
-                        node[id] = new JObject { ["complete"] = complete };
+                    foreach (var (id, entry) in tasks) {
+                        var record = new JObject {
+                            ["complete"] = entry.Complete,
+                            ["failed"] = entry.Failed,
+                        };
+
+                        if (entry.Timestamp > 0) record["timestamp"] = entry.Timestamp;
+                        node[id] = record;
                     }
 
                     data["taskCompletions"] = node;

@@ -157,10 +157,16 @@ public class RatScannerMain : INotifyPropertyChanged {
 	}
 
 	private void OnEftLogData(EftLogType type, string data) {
-		if (type != EftLogType.Application) return;
+		switch (type) {
+			case EftLogType.Application:
+				if (RatConfig.LogTracking.TrackGameMode) EftGameModeDetector.Consume(data);
+				if (RatConfig.LogTracking.TrackRaidLifecycle) EftRaidLifecycle.Consume(data);
+				break;
 
-		if (RatConfig.LogTracking.TrackGameMode) EftGameModeDetector.Consume(data);
-		if (RatConfig.LogTracking.TrackRaidLifecycle) EftRaidLifecycle.Consume(data);
+			case EftLogType.Notifications:
+				if (RatConfig.LogTracking.TrackQuests) EftQuestTracker.Consume(data);
+				break;
+		}
 	}
 
 	private static void CheckForUpdates() {

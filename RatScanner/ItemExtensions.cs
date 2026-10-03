@@ -174,6 +174,10 @@ public partial class Item {
 	/// </summary>
 	public static bool IsTaskComplete(TarkovTask task, UserProgress progress) {
 		var entry = progress.Tasks?.FirstOrDefault(t => t.Id == task.Id && !t.Invalid);
+
+		// Failure wins over completion, the same way TarkovTracker reads it: a
+		// failed task is stored as complete and must not show as completed.
+		if (entry is { Failed: true }) return false;
 		if (entry is { Complete: true }) return true;
 
 		if (task.Objectives is not { Count: > 0 }) return false;
@@ -236,6 +240,12 @@ public partial class Item {
 	public static void SetLocalTaskComplete(string? taskId, bool complete) {
 		if (!CanEditLocalProgress) return;
 		RatScannerMain.Instance.LocalProgress.SetTaskComplete(taskId ?? "", complete);
+	}
+
+	/// <summary>Records a task's failure in the local store.</summary>
+	public static void SetLocalTaskFailed(string? taskId, bool failed) {
+		if (!CanEditLocalProgress) return;
+		RatScannerMain.Instance.LocalProgress.SetTaskFailed(taskId ?? "", failed);
 	}
 
 	public (int count, int kappaCount) GetTaskRemaining() => GetTaskRemaining(GetUserProgress());
