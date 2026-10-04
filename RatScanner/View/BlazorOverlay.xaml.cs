@@ -13,12 +13,25 @@ namespace RatScanner.View;
 /// Interaction logic for BlazorOverlay.xaml
 /// </summary>
 public partial class BlazorOverlay : Window {
+	private bool _shown;
+
 	public BlazorOverlay(ServiceProvider serviceProvider) {
 		Resources.Add("services", serviceProvider);
 
 		InitializeComponent();
 	}
 
+	internal void SetVisible(bool visible) {
+		if (_shown == visible) return;
+		_shown = visible;
+
+		if (visible) {
+			SetSize();
+			Show();
+		} else {
+			Hide();
+		}
+	}
 	private void BlazorOverlay_Loaded(object? sender, RoutedEventArgs e) {
 		blazorOverlayWebView.WebView.DefaultBackgroundColor = System.Drawing.Color.Transparent;
 		SetSize();

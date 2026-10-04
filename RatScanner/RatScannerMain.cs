@@ -2,6 +2,7 @@
 using RatScanner.Pages.InteractableOverlay.Services;
 using RatScanner.Properties;
 using RatScanner.Scan;
+using RatScanner.View;
 using RatStash;
 using TarkovTask = RatScanner.TarkovDev.Json.TarkovTask;
 using System;
@@ -494,9 +495,37 @@ public class RatScannerMain : INotifyPropertyChanged {
 	}
 
 	private void RefreshOverlay(object? o = null) {
+		SetOverlayVisible(HasLiveScan());
+
 		OnPropertyChanged();
 	}
 
+	// The scan timer is a background thread and a window can only be shown or
+	// hidden on the UI thread. Fire and forget, so the cancellation that comes
+	// with the dispatcher tearing down at close does not escape and break the
+	// debugger.
+	private void SetOverlayVisible(bool visible) {
+		var overlay = BlazorUI.BlazorOverlay;
+		if (overlay == null) return;
+
+		var dispatcher = System.Windows.Application.Current?.Dispatcher;
+		if (dispatcher == null || dispatcher.CheckAccess()) {
+			overlay.SetVisible(visible);
+			return;
+		}
+
+		_ = dispatcher.BeginInvoke(() => overlay.SetVisible(visible));
+	}
+
+	private bool HasLiveScan() {
+		var now = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+
+		foreach (var scan in ItemScans) {
+			if (scan != null && scan.DissapearAt > now) return true;
+		}
+
+		return false;
+	}
 	protected virtual void OnPropertyChanged(string propertyName = null) {
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}

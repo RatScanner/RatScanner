@@ -51,7 +51,6 @@ public partial class BlazorUI : UserControl, ISwitchable {
 		Resources.Add("services", serviceProvider);
 
 		BlazorOverlay ??= new BlazorOverlay(serviceProvider);
-		BlazorOverlay.Show();
 
 		BlazorInteractableOverlay ??= new BlazorInteractableOverlay(serviceProvider);
 
