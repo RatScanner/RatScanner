@@ -104,7 +104,7 @@
                              OnShowTransitsChanged="@OnShowTransitsChanged" OnShowHazardsChanged="@OnShowHazardsChanged"
                              OnMapClick="@(() => OpenMapViewer(selectedMap))" />
             <MudPaper Outlined="true" Class="map-frame">
-                <MapViewer Map="@selectedMap" Inline="true" Pois="@SelectedMapPois" />
+                <MapViewer Map="@selectedMap" Inline="true" Pois="@SelectedMapPois" OnExpand="OpenMapViewerFromCard" />
             </MudPaper>
         }
     </MudStack>
@@ -520,6 +520,14 @@
         // open must not inherit them from a previous objective.
         _viewerZonePois = null;
         StateHasChanged();
+    }
+
+    /// <summary>
+    /// Expands the inline map to the full-screen viewer, keeping the overlay
+    /// toggles currently in force so the map does not lose its markers.
+    /// </summary>
+    private void OpenMapViewerFromCard() {
+        if (Selected?.Data is Map selectedMap) OpenMapViewer(selectedMap);
     }
 
     private void CloseMapViewer() {

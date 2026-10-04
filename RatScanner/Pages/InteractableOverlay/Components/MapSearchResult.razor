@@ -126,11 +126,6 @@
                                 }
                             </MudFlexWrap>
 
-                            <MudButton Variant="Variant.Outlined" Color="Color.Primary"
-                                       StartIcon="@Icons.Material.Filled.OpenInFull" Size="Size.Small" Disabled="@(!HasSvg)"
-                                       OnClick="@(() => OnMapClick.InvokeAsync())">
-                                @Localizer["MapOpen"]
-                            </MudButton>
                             <MudIconButton Icon="@Constants.Icon.TarkovDev" Size="Size.Small"
                                            OnClick="@(() => OpenURL($"https://tarkov.dev/map/{Map.NormalizedName}"))" />
                             <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small"

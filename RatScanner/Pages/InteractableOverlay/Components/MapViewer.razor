@@ -21,6 +21,14 @@
         <div class="map-viewer-close">
             <MudIconButton Icon="@Icons.Material.Filled.Close" Size="Size.Large" Color="Color.Error" OnClick="OnClose" />
         </div>
+    } else if (OnExpand.HasDelegate) {
+        @* Sits outside the pan surface on purpose. The container below handles
+           pointerdown to start a drag, and a button inside it would be dragged
+           along with the map on the first press. *@
+        <div class="map-viewer-expand">
+            <MudIconButton Icon="@Icons.Material.Filled.OpenInFull" Size="Size.Small" Color="Color.Primary"
+                           OnClick="@(() => OnExpand.InvokeAsync())" />
+        </div>
     }
 
     @* The map fills a box of known size, and the image is scaled inside it.
@@ -97,7 +105,13 @@
         /* Size comes from the parent rather than the page flow, so the map
            fills the space left over instead of taking a fixed slice. A
            definite height here is what lets the percentage heights below
-           (container, transform wrapper, svg) resolve all the way down. */
+           (container, transform wrapper, svg) resolve all the way down.
+
+           relative makes this the containing block for the absolutely
+           positioned expand button. Without it the button would anchor to the
+           window instead; map-viewer-full needs no such declaration because
+           position: fixed already establishes one. */
+        position: relative;
         width: 100%;
         height: 100%;
         display: flex;
@@ -119,6 +133,15 @@
         top: 20px;
         right: 20px;
         z-index: 10000;
+    }
+
+    /* Absolute inside the .map-viewer wrapper rather than the pan surface, so
+       the button does not move when the map is dragged. */
+    .map-viewer-expand {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        z-index: 10;
     }
 
     .map-viewer-container {
@@ -324,6 +347,13 @@
 
     [Parameter]
     public EventCallback OnClose { get; set; }
+
+    /// <summary>
+    /// Raised when the inline viewer is expanded to fill the screen. Left
+    /// unwired the button is not rendered, since there would be nothing to do.
+    /// </summary>
+    [Parameter]
+    public EventCallback OnExpand { get; set; }
 
     [Inject]
     public LocalizationService Localizer { get; set; } = null!;
