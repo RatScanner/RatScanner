@@ -86,7 +86,6 @@ internal class ActiveHotkey : Hotkey, IDisposable {
 	private void OnKeyUp(object? sender, KeyUpEventArgs e) {
 		if (!Enabled) return;
 		if (IsPressed(e) && HotkeyPressedEventHandler != null) {
-			Logger.LogDebug("Pressed: " + ToString());
 			e.Handled |= SuppressHotkey;
 			_ = Task.Run(() => HotkeyPressedEventHandler(sender, e));
 		}

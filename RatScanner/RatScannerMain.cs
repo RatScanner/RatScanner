@@ -327,7 +327,6 @@ public class RatScannerMain : INotifyPropertyChanged {
 	/// <param name="position">Position on the screen at which to perform the scan</param>
 	internal void NameScan(Vector2 position) {
 		lock (NameScanLock) {
-			Logger.LogDebug("Name scanning at: " + position);
 			// Wait for game ui to update the click
 			Thread.Sleep(50);
 
