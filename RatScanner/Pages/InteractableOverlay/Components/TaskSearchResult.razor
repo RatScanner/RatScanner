@@ -328,16 +328,10 @@
                                 </MudTooltip>
                             </MudFlexWrap>
 
-                            <MudButton Variant="Variant.Outlined" Color="Color.Primary"
-                                       StartIcon="@Constants.Icon.TarkovDev" Size="Size.Small"
-                                       OnClick="@(() => OpenURL($"https://tarkov.dev/task/{Task.Id}"))">
-                                Tarkov.dev
-                            </MudButton>
-                            <MudButton Variant="Variant.Outlined" Color="Color.Secondary"
-                                       StartIcon="@Icons.Material.Filled.OpenInNew" Size="Size.Small"
-                                       OnClick="@(() => OpenURL(Task.WikiLink))">
-                                Wiki
-                            </MudButton>
+                            <MudIconButton Icon="@Constants.Icon.TarkovDev" Size="Size.Small"
+                                           OnClick="@(() => OpenURL($"https://tarkov.dev/task/{Task.Id}"))" />
+                            <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Size="Size.Small"
+                                           OnClick="@(() => OpenURL(Task.WikiLink))" />
                         </div>
                     </MudPaper>
 
