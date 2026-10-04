@@ -3,6 +3,7 @@ using RatScanner.Pages.InteractableOverlay.Services;
 using RatScanner.Properties;
 using RatScanner.Scan;
 using RatStash;
+using TarkovTask = RatScanner.TarkovDev.Json.TarkovTask;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -75,6 +76,40 @@ public class RatScannerMain : INotifyPropertyChanged {
 	/// </summary>
 	internal SearchResult? Selected => SelectedResults.Count > 0 ? SelectedResults.Last() : null;
 
+	/// <summary>
+	/// Brings a task the game reported onto the screen and says so.
+	///
+	/// The notification and the selection are one step: the message tells the
+	/// player a quest changed without them touching anything, and opening it means
+	/// the UI is already showing the objectives they may want to tick or the
+	/// rewards they may want to claim.
+	/// </summary>
+	internal void ShowTaskFromLog(TarkovTask task, Logger.NotifyLevel level, string message) {
+		Logger.Notify(level, message);
+
+		// Enqueue ignores an entry equal to the current tail, so re-reporting the
+		// task already on screen does not disturb it.
+		SelectedResults.Enqueue(new SearchResult(task, 0));
+
+		// The scan timer already drives the page's redraw, but a log event can
+		// land between two ticks, so make sure the change is on screen now.
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Selected)));
+	}
+
+	/// <summary>
+	/// A task the game reported. The notification always goes out; the task is
+	/// only opened when the catalogue knows it, since there is nothing to show for
+	/// an id RatScanner cannot resolve to a task.
+	/// </summary>
+	private void OnTaskReportedFromLog(TarkovTask? task, string message, Logger.NotifyLevel level) {
+		if (task == null) {
+			Logger.Notify(level, message);
+			return;
+		}
+
+		ShowTaskFromLog(task, level, message);
+	}
+
 	public RatScannerMain() {
 		Instance = this;
 
@@ -108,6 +143,8 @@ public class RatScannerMain : INotifyPropertyChanged {
 
 		Logger.LogInfo("Initializing local progress store");
 		LocalProgress = new LocalProgressStore();
+
+		EftQuestTracker.TaskReported += OnTaskReportedFromLog;
 
 		Logger.LogInfo("Initializing hotkey manager...");
 		HotkeyManager = new HotkeyManager();
@@ -215,9 +252,17 @@ public class RatScannerMain : INotifyPropertyChanged {
 	internal void ReplayPastSession(EftLogHistory.Session session) {
 		if (!RatConfig.LogTracking.TrackQuests) return;
 
-		foreach (var (type, data) in EftLogHistory.Read(session)) {
-			if (type != EftLogType.Notifications) continue;
-			EftQuestTracker.Consume(data);
+		// Progress is recorded, but nothing is announced or opened: a past session
+		// can hold dozens of quests, and popping a notification for each while
+		// dragging the selection around would bury the UI.
+		EftQuestTracker.Replaying = true;
+		try {
+			foreach (var (type, data) in EftLogHistory.Read(session)) {
+				if (type != EftLogType.Notifications) continue;
+				EftQuestTracker.Consume(data);
+			}
+		} finally {
+			EftQuestTracker.Replaying = false;
 		}
 
 		Logger.LogInfo($"Replayed past EFT session {session.Label}.");

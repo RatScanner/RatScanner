@@ -298,5 +298,8 @@
   "LogTrackingHistoryPick": "Choisissez une session à lire.",
   "LogTrackingHistoryNone": "Aucune session précédente trouvée dans {0}.",
   "LogTrackingHistoryDone": "{0} a été lu.",
-  "LogTrackingHistoryFailed": "Impossible de lire les anciens journaux : {0}"
+  "LogTrackingHistoryFailed": "Impossible de lire les anciens journaux : {0}",
+  "LogTrackingQuestAccepted": "Quete acceptee : {0}",
+  "LogTrackingQuestFinished": "Quete terminee : {0}",
+  "LogTrackingQuestFailed": "Quete echouee : {0}"
 }

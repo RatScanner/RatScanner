@@ -298,5 +298,8 @@
   "LogTrackingHistoryPick": "Выберите сеанс для чтения.",
   "LogTrackingHistoryNone": "В папке {0} прошлых сеансов не найдено.",
   "LogTrackingHistoryDone": "Прочитан {0}.",
-  "LogTrackingHistoryFailed": "Не удалось прочитать прошлые журналы: {0}"
+  "LogTrackingHistoryFailed": "Не удалось прочитать прошлые журналы: {0}",
+  "LogTrackingQuestAccepted": "Задание принято: {0}",
+  "LogTrackingQuestFinished": "Задание выполнено: {0}",
+  "LogTrackingQuestFailed": "Задание провалено: {0}"
 }

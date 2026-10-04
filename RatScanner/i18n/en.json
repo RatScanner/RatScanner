@@ -298,5 +298,8 @@
   "LogTrackingHistoryPick": "Choose a session to read.",
   "LogTrackingHistoryNone": "No past sessions found in {0}.",
   "LogTrackingHistoryDone": "Read {0}.",
-  "LogTrackingHistoryFailed": "Could not read past logs: {0}"
+  "LogTrackingHistoryFailed": "Could not read past logs: {0}",
+  "LogTrackingQuestAccepted": "Task accepted: {0}",
+  "LogTrackingQuestFinished": "Task completed: {0}",
+  "LogTrackingQuestFailed": "Task failed: {0}"
 }

@@ -298,5 +298,8 @@
   "LogTrackingHistoryPick": "Elige una sesión para leer.",
   "LogTrackingHistoryNone": "No se encontraron sesiones anteriores en {0}.",
   "LogTrackingHistoryDone": "Se leyó {0}.",
-  "LogTrackingHistoryFailed": "No se pudieron leer los registros anteriores: {0}"
+  "LogTrackingHistoryFailed": "No se pudieron leer los registros anteriores: {0}",
+  "LogTrackingQuestAccepted": "Tarea aceptada: {0}",
+  "LogTrackingQuestFinished": "Tarea completada: {0}",
+  "LogTrackingQuestFailed": "Tarea fallida: {0}"
 }

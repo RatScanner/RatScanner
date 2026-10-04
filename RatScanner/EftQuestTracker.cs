@@ -19,6 +19,19 @@ internal static class EftQuestTracker {
 	private const int TaskFailed = 11;
 	private const int TaskFinished = 12;
 
+	/// <summary>
+	/// Raised on a background thread for every task the game reports, so the UI
+	/// can notify and open it. The <see cref="TarkovTask"/> is null when the
+	/// catalogue does not know the id, in which case only progress was recorded.
+	/// </summary>
+	internal static event Action<TarkovTask?, string, Logger.NotifyLevel>? TaskReported;
+
+	/// <summary>
+	/// Set while reading a past session's logs. Progress is still recorded, but
+	/// nothing is announced or opened: history is not news.
+	/// </summary>
+	internal static bool Replaying { get; set; }
+
 	internal static void Consume(string chunk) {
 		if (string.IsNullOrEmpty(chunk)) return;
 
@@ -59,53 +72,102 @@ internal static class EftQuestTracker {
 		var taskId = templateId.Split(' ')[0].Trim();
 		if (string.IsNullOrEmpty(taskId)) return;
 
-		if (type == TaskFinished) {
-			CompleteTask(taskId);
-		} else if (type == TaskFailed) {
-			FailTask(taskId);
+		switch (type) {
+			case TaskStarted:
+				StartTask(taskId);
+				break;
+			case TaskFinished:
+				CompleteTask(taskId);
+				break;
+			case TaskFailed:
+				FailTask(taskId);
+				break;
 		}
 	}
 
+	/// <summary>
+	/// Announces an accepted task. Nothing is written to progress: accepting a
+	/// task says nothing about its objectives.
+	/// </summary>
+	private static void StartTask(string taskId) {
+		var task = TaskFor(taskId);
+
+		Announce(task,
+			LocalizationService.Format("LogTrackingQuestAccepted", NameOf(task, taskId)),
+			Logger.NotifyLevel.Info);
+	}
+
 	private static void CompleteTask(string taskId) {
+		var task = TaskFor(taskId);
+
 		// The objectives are completed as well, because a task being done implies
 		// them, and the UI counts objectives separately from the task.
-		foreach (var objective in ObjectivesFor(taskId)) {
+		foreach (var objective in task?.Objectives ?? []) {
 			if (string.IsNullOrEmpty(objective.Id)) continue;
 			Item.SetLocalObjectiveComplete(objective.Id, true, objective.Count);
 		}
 
 		Item.SetLocalTaskComplete(taskId, true);
-		Logger.LogInfo($"EFT reported task {NameFor(taskId)} finished.");
+
+		Announce(task,
+			LocalizationService.Format("LogTrackingQuestFinished", NameOf(task, taskId)),
+			Logger.NotifyLevel.Success);
 	}
 
 	private static void FailTask(string taskId) {
+		var task = TaskFor(taskId);
+
 		// A failed task's objectives are not necessarily all reset, so only the
 		// task flag is set here.
 		Item.SetLocalTaskFailed(taskId, true);
-		Logger.LogInfo($"EFT reported task {NameFor(taskId)} failed.");
+
+		Announce(task,
+			LocalizationService.Format("LogTrackingQuestFailed", NameOf(task, taskId)),
+			Logger.NotifyLevel.Warning);
 	}
 
 	/// <summary>
-	/// Objectives of a task, or nothing when the catalogue does not know the task.
-	/// The task itself is still recorded in that case, since the completion is
-	/// what matters and an unknown id may just be a task the catalogue lacks.
+	/// Reports a task to whoever is listening, and to the log either way so a
+	/// tracked event is never silent.
 	/// </summary>
-	private static TaskObjective[] ObjectivesFor(string taskId) {
+	private static void Announce(TarkovTask? task, string message, Logger.NotifyLevel level) {
+		// A replayed session still writes progress, but stays quiet and leaves the
+		// selection alone.
+		if (Replaying) {
+			Logger.LogInfo(message);
+			return;
+		}
+
+		var handlers = TaskReported;
+		if (handlers != null) {
+			foreach (var handler in handlers.GetInvocationList()) {
+				try {
+					((Action<TarkovTask?, string, Logger.NotifyLevel>)handler)(task, message, level);
+				} catch (Exception e) {
+					Logger.LogWarning($"A quest listener threw: {e.Message}");
+				}
+			}
+			return;
+		}
+
+		Logger.Notify(level, message);
+	}
+
+	/// <summary>
+	/// The task for an id, or null when the catalogue does not carry it. The task
+	/// is still recorded in that case, since the completion is what matters and an
+	/// unknown id may just be a task the catalogue lacks.
+	/// </summary>
+	private static TarkovTask? TaskFor(string taskId) {
 		try {
-			return TarkovDevAPI.GetTasks().FirstOrDefault(t => t.Id == taskId)?.Objectives?.ToArray() ?? [];
+			return TarkovDevAPI.GetTasks().FirstOrDefault(t => t.Id == taskId);
 		} catch (Exception e) {
-			Logger.LogWarning($"Could not look up the objectives of task {taskId}: {e.Message}");
-			return [];
+			Logger.LogWarning($"Could not look up task {taskId}: {e.Message}");
+			return null;
 		}
 	}
 
-	private static string NameFor(string taskId) {
-		try {
-			return TarkovDevAPI.GetTasks().FirstOrDefault(t => t.Id == taskId)?.Name ?? taskId;
-		} catch {
-			return taskId;
-		}
-	}
+	private static string NameOf(TarkovTask? task, string taskId) => task?.Name ?? taskId;
 
 	private static int ReadInt(JToken? token) {
 		if (token == null) return 0;
