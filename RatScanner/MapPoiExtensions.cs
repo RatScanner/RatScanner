@@ -321,7 +321,7 @@ public static class MapPoiExtensions {
             Y = y,
             IconColor = PlayerColor,
             IconColorHover = PlayerColorHover,
-            RotationDegrees = rotationDegrees,
+            RotationDegrees = rotationDegrees - (projection.CoordinateRotation ?? 0),
         };
     }
 
