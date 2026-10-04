@@ -151,28 +151,59 @@
 
     private List<QuestObjectiveEntry> Objectives => Task.GetObjectives();
 
-    private Task OnProgressEdited(bool _) {
-        StateHasChanged();
-        return System.Threading.Tasks.Task.CompletedTask;
-    }
-
-    private void OnLocalProgressChanged() => InvokeAsync(StateHasChanged);
-
     /// <summary>
-    /// Objectives to list. The interactive overlay only wants the ones still
-    /// outstanding, so finished objectives drop off as the player works through
-    /// the task.
+    /// The progress the cached objectives were built from. The store hands out a
+    /// new instance once an edit invalidates its cache, which is exactly when the
+    /// objectives need rebuilding.
     /// </summary>
-    private List<QuestObjectiveEntry> VisibleObjectives =>
-        OutstandingOnly
-            ? [.. Objectives.Where(o => !IsComplete && !o.IsComplete)]
-            : Objectives;
+    private List<QuestObjectiveEntry>? _builtObjectives;
+
+    private UserProgress? _builtProgress;
+
+    private List<QuestObjectiveEntry> VisibleObjectives {
+        get {
+            var progress = Progress;
+
+            if (_builtObjectives is not null && ReferenceEquals(_builtProgress, progress)) return _builtObjectives;
+
+            _builtProgress = progress;
+            _builtObjectives = OutstandingOnly
+                ? [.. Objectives.Where(o => !IsComplete && !o.IsComplete)]
+                : Objectives;
+
+            return _builtObjectives;
+        }
+    }
 
     private List<TaskRewardEntry> Rewards => Task.GetFinishRewards();
 
     private List<TaskStandingEntry> Standing => Task.GetTraderStandingRewards();
 
+    protected override void OnParametersSet() {
+        if (!ReferenceEquals(_builtFor, Task)) {
+            _builtFor = Task;
+            _builtObjectives = null;
+            _builtProgress = null;
+        }
+    }
+
+    private TarkovTask? _builtFor;
+
     protected override void OnInitialized() => LocalProgressStore.Changed += OnLocalProgressChanged;
 
     public void Dispose() => LocalProgressStore.Changed -= OnLocalProgressChanged;
+
+    /// <summary>An objective was edited, so the cached ones no longer describe it.</summary>
+    private Task OnProgressEdited(bool _) {
+        _builtProgress = null;
+        _builtObjectives = null;
+        StateHasChanged();
+        return System.Threading.Tasks.Task.CompletedTask;
+    }
+
+    private void OnLocalProgressChanged() => InvokeAsync(() => {
+        _builtProgress = null;
+        _builtObjectives = null;
+        StateHasChanged();
+    });
 }

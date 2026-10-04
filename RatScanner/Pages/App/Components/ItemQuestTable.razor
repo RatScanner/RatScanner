@@ -153,9 +153,6 @@
     private List<QuestItemEntry> _requiring = [];
     private List<QuestItemEntry> _rewarding = [];
 
-    private List<QuestItemEntry> Requiring => _requiring;
-    private List<QuestItemEntry> Rewarding => _rewarding;
-
     private Item? _builtFor;
     private UserProgress? _builtProgress;
 
@@ -169,18 +166,20 @@
     private readonly HashSet<string> _expandedTasks = [];
 
     /// <summary>
-    /// The parent re-renders on a 100 ms scan timer, so rebuilding the rows
-    /// every time would churn the whole table. Only rebuild when the item or
-    /// the tracker data actually changed; toggling expansion mutates the entry
-    /// in place instead, which is what MudTable's ChildRowContent expects.
+    /// Rebuilds the rows when the item or the progress behind them changed.
+    ///
+    /// Called from the render path, not OnParametersSet: that only runs when the
+    /// parent supplies new parameters, so a self-repaint after an edit would
+    /// leave the stale rows in place. Both tables build together because they
+    /// share the cache marker.
     /// </summary>
-    protected override void OnParametersSet() {
+    private void EnsureBuilt() {
         var progress = Item.SelfProgress;
-        if (ReferenceEquals(_builtFor, Item) && ReferenceEquals(_builtProgress, progress))
-            return;
 
-        // A different item means a different set of quests, so open rows from the
-        // previous item must not carry over.
+        if (ReferenceEquals(_builtFor, Item) && ReferenceEquals(_builtProgress, progress)) return;
+
+        // A different item means a different set of quests, so open rows from
+        // the previous item must not carry over.
         if (!ReferenceEquals(_builtFor, Item)) {
             _expandedTasks.Clear();
         }
@@ -189,6 +188,20 @@
         _builtProgress = progress;
         _requiring = Build(Item.GetQuestsRequiringItem(), progress, _expandedTasks);
         _rewarding = Build(Item.GetQuestsRewardingItem(), progress, _expandedTasks);
+    }
+
+    private List<QuestItemEntry> Requiring {
+        get {
+            EnsureBuilt();
+            return _requiring;
+        }
+    }
+
+    private List<QuestItemEntry> Rewarding {
+        get {
+            EnsureBuilt();
+            return _rewarding;
+        }
     }
 
     protected override void OnInitialized() => LocalProgressStore.Changed += OnLocalProgressChanged;

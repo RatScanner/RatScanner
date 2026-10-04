@@ -28,7 +28,7 @@ public class RatScannerMain : INotifyPropertyChanged {
 
 	internal readonly HotkeyManager HotkeyManager;
 	private Timer? _tarkovTrackerDBRefreshTimer;
-	private Timer? _scanRefreshTimer;
+	private Timer? _scanExpiryTimer;
 	private EftLogMonitor? _eftLogMonitor;
 
 	private EftPlayerPosition? _playerPosition;
@@ -139,6 +139,9 @@ public class RatScannerMain : INotifyPropertyChanged {
 		var items = TarkovDevAPI.GetItems();
 		ItemScans.Enqueue(new DefaultItemScan(items[new Random().Next(items.Length)]));
 
+		// Every scan path funnels through the queue, so this covers them all.
+		ItemScans.Enqueued += OnItemScanEnqueued;
+
 		Logger.LogInfo("Initializing tarkov tracker database");
 		TarkovTrackerDB = new TarkovTrackerDB();
 
@@ -171,7 +174,6 @@ public class RatScannerMain : INotifyPropertyChanged {
 
 			Logger.LogInfo("Setting up timer routines...");
 			_tarkovTrackerDBRefreshTimer = new Timer(RefreshTarkovTrackerDB, null, RatConfig.Tracking.TarkovTracker.RefreshTime, Timeout.Infinite);
-			_scanRefreshTimer = new Timer(RefreshOverlay, null, 1000, 100);
 
 			if (RatConfig.LogTracking.Enable) {
 				Logger.LogInfo("Starting EFT log tracking...");
@@ -499,6 +501,45 @@ public class RatScannerMain : INotifyPropertyChanged {
 
 		OnPropertyChanged();
 	}
+
+	/// <summary>
+	/// Arms a one-shot refresh for when the newest scan expires, so the overlay
+	/// hides itself without polling. A scan's lifetime is already known, so the
+	/// expiry can be scheduled rather than polled for.
+	/// </summary>
+	private void ScheduleScanExpiry() {
+		var latest = 0L;
+		foreach (var scan in ItemScans) {
+			if (scan != null && scan.DissapearAt > latest) latest = scan.DissapearAt;
+		}
+
+		// A non-positive dueTime is not schedulable: Change rejects anything under
+		// -1 and treats 0 as immediate, which would spin this method.
+		if (latest != 0 && latest <= DateTimeOffset.Now.ToUnixTimeMilliseconds()) {
+			RefreshOverlay();
+			return;
+		}
+
+		lock (ScanExpiryLock) {
+			_scanExpiryTimer ??= new Timer(_ => OnScanExpired(), null, Timeout.Infinite, Timeout.Infinite);
+			_scanExpiryTimer.Change(latest == 0 ? Timeout.Infinite : latest - DateTimeOffset.Now.ToUnixTimeMilliseconds(),
+				Timeout.Infinite);
+		}
+	}
+
+	/// <summary>
+	/// Re-arms if a scan arrived while this was pending, which can happen when it
+	/// was enqueued from another thread after that enqueue's own re-arm.
+	/// </summary>
+	private void OnScanExpired() {
+		RefreshOverlay();
+
+		if (HasLiveScan()) ScheduleScanExpiry();
+	}
+
+	private void OnItemScanEnqueued(object? sender, ItemScan scan) => ScheduleScanExpiry();
+
+	private readonly object ScanExpiryLock = new();
 
 	// The scan timer is a background thread and a window can only be shown or
 	// hidden on the UI thread. Fire and forget, so the cancellation that comes
