@@ -11,7 +11,7 @@
 
 <MudPaper Class="pa-2 overflow-hidden" Elevation="3" Style="cursor: pointer;">
     @if (Detail == DetailLevel.SearchRow) {
-        <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" Style="height: 6vh;" @onclick="OnMapClick">
+        <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" Style="height: 48px;" @onclick="OnMapClick">
             <MudStack Justify="Justify.Center" Class="flex-shrink-0">
                 <MudPaper Outlined="true" Style="height: 100%; aspect-ratio: 1 / 1; overflow: hidden;">
                     @if (BannerUrl is not null) {
@@ -34,7 +34,7 @@
 
                    Sized inline rather than via a style block: MudChip's
                    stylesheet sets margin:4px and a fixed height:24px, and
-                   together those overran the row's fixed 6vh and clipped the
+                   together those overran the row's height and clipped the
                    name. An inline style outranks a class rule, so this needs no
                    !important and no extra css. *@
                 <MudChip T="string" Variant="Variant.Text" Color="Color.Success" Size="Size.Small"

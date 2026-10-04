@@ -27,7 +27,7 @@
     }
 
     @if (Detail == DetailLevel.SearchRow) {
-        <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" Style="height: 6vh;">
+        <MudStack Row="true" Justify="Justify.FlexStart" Class="flex-1" Style="height: 48px;">
             <MudStack Justify="Justify.Center" Class="flex-shrink-0">
                 <MudPaper Outlined="true" Style="height: 100%; aspect-ratio: 1 / 1; overflow: hidden;">
                     <MudImage Src="@Item.BaseImageLink" Style="width: 100%; height: 100%; object-fit: contain;" />
@@ -37,7 +37,7 @@
             <MudStack Justify="Justify.SpaceAround" AlignItems="AlignItems.Start" Spacing="0" Class="flex-1"
                       Style="min-width: 0;">
                 <MudText Typo="Typo.body1" Class="ellipsis"
-                         Style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 16vw; min-width: 0; line-height: 1.15;">
+                         Style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; min-width: 0; line-height: 1.15;">
                     @Item.Name
                 </MudText>
 
@@ -47,9 +47,9 @@
 
                    Sized inline rather than via a style block: MudChip's
                    stylesheet sets margin:4px and a fixed height:24px, and
-                   together those overran the row's fixed 6vh and clipped
-                   the name. An inline style outranks a class rule, so this
-                   needs no !important and no extra css. *@
+                   together those overran the row's height and clipped the
+                   name. An inline style outranks a class rule, so this needs
+                   no !important and no extra css. *@
                 <MudChip T="string" Variant="Variant.Text" Color="Color.Warning" Size="Size.Small"
                          Icon="@Icons.Material.Outlined.Inventory2"
                          Style="height:18px;min-height:18px;margin:1px 0 0 0;font-size:11px;">

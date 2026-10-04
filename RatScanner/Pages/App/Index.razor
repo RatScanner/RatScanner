@@ -35,7 +35,7 @@
                 </MudTextField>
 
                 @if (_searchResults.Any()) {
-                    <MudStack Spacing="2" Class="pt-2" Style="max-height:50vh; overflow-y: auto;">
+                    <MudStack Spacing="2" Class="pt-2" Style="max-height: 320px; overflow-y: auto;">
                         @for (int _i = 0; _i < _searchResults.Count(); _i++) {
                             int i = _i;
                             SearchResult searchResult = _searchResults.ElementAt(i);
