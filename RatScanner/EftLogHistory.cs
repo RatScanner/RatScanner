@@ -18,13 +18,14 @@ namespace RatScanner;
 /// interpreted again here.
 /// </summary>
 public static class EftLogHistory {
-	private static readonly Regex FolderRegex = new(@"^log_(?<timestamp>\d{4}\.\d{2}\.\d{2}_\d{2}-\d{2}-\d{2})$");
-
 	/// <summary>One past session's logs, newest first.</summary>
 	public sealed record Session(DateTime StartedAt, string Folder) {
 		/// <summary>Short label for the session, e.g. "2024-05-01 12:34".</summary>
 		public string Label => StartedAt.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
 	}
+
+	private static readonly Regex FolderRegex = new(
+		@"^log_(?<timestamp>\d{4}\.\d{2}\.\d{2}_\d{1,2}-\d{2}-\d{2})");
 
 	/// <summary>
 	/// The past sessions found in the logs folder, newest first. Empty when the
@@ -36,20 +37,27 @@ public static class EftLogHistory {
 
 		try {
 			var sessions = new List<Session>();
+			var skipped = 0;
 
 			foreach (var folder in Directory.GetDirectories(logsFolder)) {
 				var name = Path.GetFileName(folder);
-				var match = FolderRegex.Match(name);
-				if (!match.Success) continue;
 
-				if (!DateTime.TryParseExact(match.Groups["timestamp"].Value,
-					"yyyy.MM.dd_H-mm-ss", CultureInfo.InvariantCulture,
-					DateTimeStyles.None, out var startedAt)) {
+				if (!name.StartsWith("log_", StringComparison.OrdinalIgnoreCase)) continue;
+
+				var match = FolderRegex.Match(name);
+				if (!match.Success
+					|| !DateTime.TryParseExact(match.Groups["timestamp"].Value,
+						"yyyy.MM.dd_H-mm-ss", CultureInfo.InvariantCulture,
+						DateTimeStyles.None, out var startedAt)) {
+					skipped++;
+					Logger.LogDebug($"Skipped unrecognised EFT log session folder: {name}");
 					continue;
 				}
 
 				sessions.Add(new Session(startedAt, folder));
 			}
+
+			if (skipped > 0) Logger.LogInfo($"Skipped {skipped} EFT log folder(s) that could not be read as a session");
 
 			return [.. sessions.OrderByDescending(s => s.StartedAt)];
 		} catch (Exception e) {
