@@ -73,16 +73,28 @@
     private Map? _selectedMap = null;
     private List<POI>? _selectedPois = null;
 
+    /// <summary>Bumped per search so one that finishes late discards its result.</summary>
+    private int _searchGeneration;
+
     private async void ExecuteSearch(string value) {
         var sanitizedValue = SearchService.SanitizeSearch(value);
+        var generation = ++_searchGeneration;
+
         var results = Enumerable.Empty<SearchResult>();
         results = results.Concat(await SearchService.SearchItemsAsync(sanitizedValue));
         results = results.Concat(await SearchService.SearchTasksAsync(sanitizedValue));
         results = results.Concat(await SearchService.SearchMapsAsync(sanitizedValue));
         results = results.Where(result => result != null && result.Data != null);
         results = results.OrderBy(result => result.Score).Take(4);
+
+        if (generation != _searchGeneration) return;
+
         _searchResults = results;
         _selectedResultIndex = 0;
+
+        // The debounce fires from a timer, not the render loop, so assigning
+        // the results does not schedule a repaint on its own.
+        StateHasChanged();
     }
 
     private void SelectResult(int index) {
