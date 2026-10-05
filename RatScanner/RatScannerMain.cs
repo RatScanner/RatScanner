@@ -512,6 +512,13 @@ public class RatScannerMain : INotifyPropertyChanged {
 		_ = _tarkovTrackerDBRefreshTimer.Change(RatConfig.Tracking.TarkovTracker.RefreshTime, Timeout.Infinite);
 	}
 
+	/// <summary>
+	/// Re-applies the scanning overlay setting, so toggling it off in the settings
+	/// takes effect on an overlay that is currently on screen rather than waiting
+	/// for the next scan.
+	/// </summary>
+	internal void ApplyScanningOverlaySetting() => RefreshOverlay();
+
 	private void RefreshOverlay(object? o = null) {
 		SetOverlayVisible(HasLiveScan());
 
@@ -562,6 +569,15 @@ public class RatScannerMain : INotifyPropertyChanged {
 	// with the dispatcher tearing down at close does not escape and break the
 	// debugger.
 	private void SetOverlayVisible(bool visible) {
+		if (!RatConfig.Overlay.Scanning.Enable) {
+			SetOverlayVisibleRaw(false);
+			return;
+		}
+
+		SetOverlayVisibleRaw(visible);
+	}
+
+	private void SetOverlayVisibleRaw(bool visible) {
 		var overlay = BlazorUI.BlazorOverlay;
 		if (overlay == null) return;
 

@@ -60,6 +60,8 @@ internal class SettingsVM : INotifyPropertyChanged {
 	public Hotkey InteractableOverlayHotkey { get; set; }
 	public Hotkey CloseOverlayHotkey { get; set; }
 
+	public bool EnableScanningOverlay { get; set; }
+
 	// EFT log tracking
 	public bool EnableLogTracking { get; set; }
 	public bool LogTrackQuests { get; set; }
@@ -125,6 +127,8 @@ internal class SettingsVM : INotifyPropertyChanged {
 		BlurBehindSearch = RatConfig.Overlay.Search.BlurBehind;
 		InteractableOverlayHotkey = new Hotkey(RatConfig.Overlay.Search.Hotkey);
 		CloseOverlayHotkey = new Hotkey(RatConfig.Overlay.Search.CloseHotkey);
+
+		EnableScanningOverlay = RatConfig.Overlay.Scanning.Enable;
 
 		EnableLogTracking = RatConfig.LogTracking.Enable;
 		LogTrackQuests = RatConfig.LogTracking.TrackQuests;
@@ -264,6 +268,8 @@ internal class SettingsVM : INotifyPropertyChanged {
 		RatConfig.Overlay.Search.Hotkey = InteractableOverlayHotkey;
 		RatConfig.Overlay.Search.CloseHotkey = CloseOverlayHotkey;
 
+		RatConfig.Overlay.Scanning.Enable = EnableScanningOverlay;
+
 		RatConfig.LogTracking.Enable = EnableLogTracking;
 		RatConfig.LogTracking.TrackQuests = LogTrackQuests;
 		RatConfig.LogTracking.TrackRaidLifecycle = LogTrackRaidLifecycle;
@@ -293,6 +299,10 @@ internal class SettingsVM : INotifyPropertyChanged {
 		if (updateTarkovTrackerToken || updateTarkovTrackerBackend) UpdateTarkovTrackerToken();
 		if (updateUiLanguage) LocalizationService.SetLanguage(UiLanguage);
 		if (updateResolution || updateLanguage || updateScreenOverride) RatScannerMain.Instance.SetupRatEye();
+
+		// The scanning overlay may have just been switched off while it was on
+		// screen, so the new setting is applied rather than waiting for the next scan.
+		RatScannerMain.Instance.ApplyScanningOverlaySetting();
 
 		RatEye.Config.LogDebug = RatConfig.LogDebug;
 		RatScannerMain.Instance.HotkeyManager.RegisterHotkeys();

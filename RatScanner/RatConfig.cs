@@ -173,6 +173,10 @@ internal static partial class RatConfig {
 			internal static Hotkey Hotkey = new([Key.N, Key.M]);
 			internal static Hotkey CloseHotkey = new([Key.Escape]);
 		}
+
+		internal static class Scanning {
+			internal static bool Enable = true;
+		}
 	}
 
 	// Application hotkeys
@@ -306,6 +310,9 @@ internal static partial class RatConfig {
 		Overlay.Search.Hotkey = config.ReadHotkey(nameof(Overlay.Search.Hotkey), Overlay.Search.Hotkey);
 		Overlay.Search.CloseHotkey = config.ReadHotkey(nameof(Overlay.Search.CloseHotkey), Overlay.Search.CloseHotkey);
 
+		config.Section = nameof(Overlay.Scanning);
+		Overlay.Scanning.Enable = config.ReadBool(nameof(Overlay.Scanning.Enable), Overlay.Scanning.Enable);
+
 		config.Section = nameof(Hotkeys);
 		Hotkeys.OpenWiki = config.ReadHotkey(nameof(Hotkeys.OpenWiki), Hotkeys.OpenWiki);
 		Hotkeys.OpenTarkovDev = config.ReadHotkey(nameof(Hotkeys.OpenTarkovDev), Hotkeys.OpenTarkovDev);
@@ -393,6 +400,9 @@ internal static partial class RatConfig {
 		config.WriteBool(nameof(Overlay.Search.BlurBehind), Overlay.Search.BlurBehind);
 		config.WriteHotkey(nameof(Overlay.Search.Hotkey), Overlay.Search.Hotkey);
 		config.WriteHotkey(nameof(Overlay.Search.CloseHotkey), Overlay.Search.CloseHotkey);
+
+		config.Section = nameof(Overlay.Scanning);
+		config.WriteBool(nameof(Overlay.Scanning.Enable), Overlay.Scanning.Enable);
 
 		config.Section = nameof(Hotkeys);
 		config.WriteHotkey(nameof(Hotkeys.OpenWiki), Hotkeys.OpenWiki);
