@@ -6,6 +6,7 @@
 @using MudBlazor
 @using RatScanner
 @using RatScanner.Pages.App.Components
+@using GameMode = RatScanner.TarkovDev.Json.GameMode
 @using static RatScanner.RatConfig
 @inject SettingsVM SettingsVM
 @inject RatScanner.TarkovTrackerDB TarkovTrackerDB
@@ -25,6 +26,14 @@
                         <MudSelectItem T="ProgressSource" Value="@ProgressSource.TarkovTracker">
                             @Localizer["ProgressSourceTarkovTracker"]</MudSelectItem>
                         </MudSelect>
+                    </SettingsRow>
+
+                    <SettingsRow Label="@Localizer["ProgressResetAction"]" SubLabel="@Localizer["ProgressResetActionHint"]"
+                                 Disabled="@(!HasResettableProgress)">
+                        <MudButton Variant="Variant.Outlined" Color="Color.Warning" Disabled="@(!HasResettableProgress)"
+                                   StartIcon="@Icons.Material.Filled.RestartAlt" OnClick="@ResetProgressAsync">
+                            @Localizer["ProgressResetAction"]
+                        </MudButton>
                     </SettingsRow>
                 </SettingsCard>
 
@@ -235,8 +244,8 @@
 
                 <style>
                     /* One row per trader: the name on the left, the two standing fields on the
-                       right. Laid out like SettingsRow but without the per-row hover tint, since
-                       a full list of hoverable rows reads as noise next to the actual settings. */
+                                                                       right. Laid out like SettingsRow but without the per-row hover tint, since
+                                                                       a full list of hoverable rows reads as noise next to the actual settings. */
                     .profile-traders {
                         display: flex;
                         flex-direction: column;
@@ -350,6 +359,51 @@
         SettingsVM.PlayerFaction = "";
         SettingsVM.ManualTraders.Clear();
         SettingsVM.MarkDirty();
+    }
+
+    private static readonly (GameMode Mode, string Label)[] ProgressModes = [
+        (GameMode.Regular, "GameModeRegular"),
+        (GameMode.Pve, "GameModePve"),
+        (GameMode.PvpSeason, "GameModePvpSeason"),
+    ];
+
+    private bool HasResettableProgress {
+        get {
+            var store = RatScannerMain.Instance?.LocalProgress;
+            if (store == null) return false;
+            return ProgressModes.Any(m => store.GetCounts(m.Mode).HasRecorded);
+        }
+    }
+
+    /// <summary>
+    /// Opens the picker, then erases whatever came back. The dialog decides which
+    /// modes are involved; nothing is erased until it returns a choice.
+    /// </summary>
+    private async Task ResetProgressAsync() {
+        var store = RatScannerMain.Instance?.LocalProgress;
+        if (store == null) return;
+
+        var entries = ProgressModes.Select(m => {
+            var counts = store.GetCounts(m.Mode);
+            return new ProgressResetDialog.ModeEntry(m.Mode, m.Label, counts.Objectives, counts.Tasks);
+        }).ToList();
+
+        if (!entries.Any(e => e.HasRecorded)) return;
+
+        var dialog = await DialogService.ShowAsync<ProgressResetDialog>(
+            Localizer["ProgressResetAction"],
+            options: new DialogOptions { MaxWidth = MaxWidth.ExtraSmall, FullWidth = true },
+            parameters: new DialogParameters {
+                { nameof(ProgressResetDialog.Modes), entries },
+            });
+
+        // In MudBlazor 6 the typed result comes off the reference, not the call.
+        var result = await dialog.Result;
+        if (result is null || result.Canceled) return;
+        if (result.Data is not GameMode[] modes || modes.Length == 0) return;
+
+        store.ResetProgress(modes);
+        StateHasChanged();
     }
 
     /// <summary>Resolved logs folder, so a failed detection is visible rather than silent.</summary>

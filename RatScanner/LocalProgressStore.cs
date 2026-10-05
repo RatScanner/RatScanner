@@ -195,6 +195,58 @@ public class LocalProgressStore {
         RaiseChanged();
     }
 
+    /// <summary>
+    /// What a game mode holds, for the settings screen to report before wiping it.
+    ///
+    /// Only the objectives and task completions are counted, which is exactly
+    /// what a progress reset erases. Profile fields (level, faction, trader
+    /// standing) are deliberately left out: a mode can hold those alone, and
+    /// clearing quests would not touch them, so counting them would offer the
+    /// player a reset that does nothing.
+    /// </summary>
+    public readonly record struct ProgressCounts(int Objectives, int Tasks) {
+        /// <summary>Whether the mode holds recorded objectives or task completions.</summary>
+        public bool HasRecorded => Objectives > 0 || Tasks > 0;
+    }
+
+    /// <summary>
+    /// How much is recorded for a game mode. Used to warn before a reset and to
+    /// grey out a mode with nothing to erase.
+    /// </summary>
+    public ProgressCounts GetCounts(GameMode mode) {
+        lock (Gate) {
+            var objectives = _objectives.TryGetValue(mode, out var o) ? o.Count : 0;
+            var tasks = _tasks.TryGetValue(mode, out var t) ? t.Count : 0;
+
+            return new ProgressCounts(objectives, tasks);
+        }
+    }
+
+    /// <summary>
+    /// Erases the recorded objectives and task completions for the given game
+    /// modes, leaving the other modes untouched.
+    ///
+    /// Deliberately does not touch the profile fields (level, faction, trader
+    /// standing). Those are settings the player typed in rather than progress
+    /// the game reported, and wiping a level because a quest list was cleared
+    /// would quietly change which quests the gates consider available. The
+    /// profile has its own reset on the same screen for that.
+    /// </summary>
+    public void ResetProgress(IEnumerable<GameMode> modes) {
+        var removed = false;
+
+        lock (Gate) {
+            foreach (var mode in modes) {
+                removed |= _objectives.Remove(mode);
+                removed |= _tasks.Remove(mode);
+            }
+
+            if (removed) Persist();
+        }
+
+        if (removed) RaiseChanged();
+    }
+
     private UserProgress? _cached;
     private GameMode? _cachedMode;
 
@@ -313,19 +365,25 @@ public class LocalProgressStore {
 
     private static void RaiseChanged() => NotifyChanged();
 
-    private Dictionary<string, ObjectiveProgress> MapFor(Dictionary<GameMode, Dictionary<string, ObjectiveProgress>> map) {
-        if (!map.TryGetValue(RatConfig.GameMode, out var value)) {
+    private Dictionary<string, ObjectiveProgress> MapFor(Dictionary<GameMode, Dictionary<string, ObjectiveProgress>> map) =>
+        MapFor(map, RatConfig.GameMode);
+
+    private Dictionary<string, ObjectiveProgress> MapFor(Dictionary<GameMode, Dictionary<string, ObjectiveProgress>> map, GameMode mode) {
+        if (!map.TryGetValue(mode, out var value)) {
             value = [];
-            map[RatConfig.GameMode] = value;
+            map[mode] = value;
         }
 
         return value;
     }
 
-    private Dictionary<string, TaskProgress> MapFor(Dictionary<GameMode, Dictionary<string, TaskProgress>> map) {
-        if (!map.TryGetValue(RatConfig.GameMode, out var value)) {
+    private Dictionary<string, TaskProgress> MapFor(Dictionary<GameMode, Dictionary<string, TaskProgress>> map) =>
+        MapFor(map, RatConfig.GameMode);
+
+    private Dictionary<string, TaskProgress> MapFor(Dictionary<GameMode, Dictionary<string, TaskProgress>> map, GameMode mode) {
+        if (!map.TryGetValue(mode, out var value)) {
             value = [];
-            map[RatConfig.GameMode] = value;
+            map[mode] = value;
         }
 
         return value;
@@ -362,7 +420,7 @@ public class LocalProgressStore {
                 }
 
                 if (data["taskObjectives"] is JObject objectiveNode) {
-                    var objectives = MapFor(_objectives);
+                    var objectives = MapFor(_objectives, mode);
                     foreach (var (id, node) in objectiveNode) {
                         objectives[id] = new ObjectiveProgress {
                             Complete = (bool?)node["complete"] ?? false,
@@ -373,7 +431,7 @@ public class LocalProgressStore {
                 }
 
                 if (data["taskCompletions"] is JObject taskNode) {
-                    var tasks = MapFor(_tasks);
+                    var tasks = MapFor(_tasks, mode);
                     foreach (var (id, node) in taskNode) {
                         tasks[id] = new TaskProgress {
                             Complete = (bool?)node["complete"] ?? false,

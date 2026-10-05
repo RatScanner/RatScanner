@@ -1,0 +1,154 @@
+@using Microsoft.AspNetCore.Components
+@using GameMode = RatScanner.TarkovDev.Json.GameMode
+@using MudBlazor
+@using MudBlazor.Dialog
+@inject LocalizationService Localizer
+
+@* Picks which game modes to erase recorded progress from. MudBlazor's message
+   box only offers yes/no/cancel, so choosing between N modes needs a real
+   dialog. *@
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.body1">@Localizer["ProgressResetPick"]</MudText>
+
+        @if (!Modes.Any(m => m.HasRecorded)) {
+            <MudText Typo="Typo.body2" Color="Color.Warning" Class="mt-2">
+                @Localizer["ProgressResetNothing"]
+            </MudText>
+        } else {
+            <div class="reset-mode-list">
+                @foreach (var mode in Modes) {
+                    var entry = mode;
+                    <label class="reset-mode @(entry.HasRecorded ? null : "reset-mode-empty")">
+                        <MudCheckBox T="bool" Checked="@_selected.Contains(entry.Mode)" Dense="true" Color="Color.Error"
+                                     Disabled="@(!entry.HasRecorded)" CheckedChanged="@((bool v) => Toggle(entry.Mode, v))" />
+                        <div class="reset-mode-text">
+                            <div class="reset-mode-name">@Localizer[entry.Label]</div>
+                            <div class="reset-mode-count">
+                                @if (entry.HasRecorded) {
+                                    @LocalizationService.Format("ProgressResetCount", entry.Objectives, entry.Tasks)
+                                } else {
+                                    @Localizer["ProgressResetEmpty"]
+                                }
+                            </div>
+                        </div>
+                    </label>
+                }
+            </div>
+
+            <MudText Typo="Typo.caption" Color="Color.Secondary" Class="mt-2">
+                @Localizer["ProgressResetKeepsProfile"]
+            </MudText>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@Cancel">@Localizer["CancelButton"]</MudButton>
+        <MudButton Color="Color.Error" Variant="Variant.Filled" Disabled="@(!HasSelection)" OnClick="@Confirm">
+            @Localizer["ProgressResetAction"]
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+<style>
+    .reset-mode-list {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-top: 8px;
+    }
+
+    /* A label rather than a div, so the row itself is a click target for the
+       checkbox and does not need its own handler. */
+    .reset-mode {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 12px;
+        border: 1px solid var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .reset-mode:hover {
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .reset-mode-empty {
+        opacity: 0.45;
+        cursor: default;
+    }
+
+    .reset-mode-empty:hover {
+        background: none;
+    }
+
+    .reset-mode-text {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .reset-mode-name {
+        font-size: 14px;
+        line-height: 1.35;
+    }
+
+    .reset-mode-count {
+        margin-top: 2px;
+        font-size: 12px;
+        line-height: 1.35;
+        color: var(--mud-palette-text-secondary, rgba(255, 255, 255, 0.5));
+    }
+</style>
+
+@code {
+    [CascadingParameter]
+    private MudDialogInstance? MudDialog { get; set; }
+
+    /// <summary>
+    /// The modes offered, each with what it holds. Computed by the caller so the
+    /// dialog stays a plain view over data it was handed.
+    /// </summary>
+    [Parameter]
+    public List<ModeEntry> Modes { get; set; } = [];
+
+    private readonly HashSet<GameMode> _selected = [];
+
+    private bool HasSelection => _selected.Count > 0;
+
+    private void Toggle(GameMode mode, bool value) {
+        if (value) {
+            _ = _selected.Add(mode);
+        } else {
+            _ = _selected.Remove(mode);
+        }
+
+        // The checkbox renders from _selected, so the dialog has to repaint for
+        // both the tick itself and the confirm button's enabled state to follow.
+        // CheckedChanged alone does not re-render the component that owns the
+        // selection, only the checkbox.
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Only returns what the player ticked, so a mode can never be erased by
+    /// being merely listed. A null <see cref="MudDialog"/> is treated as cancel.
+    /// </summary>
+    private void Confirm() {
+        if (_selected.Count == 0) return;
+        MudDialog?.Close(DialogResult.Ok(_selected.ToArray()));
+    }
+
+    private void Cancel() => MudDialog?.Cancel();
+
+    /// <summary>One game mode and what the store holds for it.</summary>
+    /// <param name="Mode">The mode itself.</param>
+    /// <param name="Label">Localization key for its display name.</param>
+    /// <param name="Objectives">Recorded objectives.</param>
+    /// <param name="Tasks">Recorded task completions.</param>
+    public sealed record ModeEntry(GameMode Mode, string Label, int Objectives, int Tasks) {
+        /// <summary>Whether ticking this mode would actually erase anything.</summary>
+        public bool HasRecorded => Objectives > 0 || Tasks > 0;
+    }
+}
