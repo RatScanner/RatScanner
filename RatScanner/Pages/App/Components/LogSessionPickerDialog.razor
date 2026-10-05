@@ -9,16 +9,34 @@
 <MudDialog>
     <DialogContent>
         <MudText Typo="Typo.body1">@Localizer["LogTrackingHistoryPick"]</MudText>
+        @if (Sessions.Count > 0) {
+            <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mb-2">
+                @Localizer["LogTrackingHistoryPickHint"]
+            </MudText>
+        }
 
         @if (Sessions.Count == 0) {
             <MudText Typo="Typo.body2" Color="Color.Warning" Class="mt-2">
                 @LocalizationService.Format("LogTrackingHistoryNone", LogsFolder)
             </MudText>
         } else {
-            <MudList T="string" Class="mt-2" Dense="true" Style="max-height: 320px; overflow-y: auto;">
-                @foreach (var session in Sessions) {
-                    <MudListItem T="string" Value="@session.Label" OnClick="@(() => Pick(session))">
-                        <MudText Typo="Typo.body2">@session.Label</MudText>
+            <MudList T="string" Class="mt-2 pa-0 session-list">
+                @foreach (var row in Rows) {
+                    <MudListItem T="string" Value="@row.Session.Label" Class="session-row" ActiveClass="session-row-active"
+                                 OnClick="@(() => Pick(row))">
+                        <div class="d-flex align-center justify-space-between" style="gap: 8px;">
+                            <MudText Typo="Typo.body1">@row.Session.Label</MudText>
+                            @if (row.Recovered > 0) {
+                                <MudChip T="string" Size="Size.Small" Variant="Variant.Filled" Color="Color.Success"
+                                         Icon="@Icons.Material.Filled.TaskAlt">
+                                    @LocalizationService.Format("LogTrackingHistoryRecovers", row.Recovered)
+                                </MudChip>
+                            } else {
+                                <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Color="Color.Default">
+                                    @Localizer["LogTrackingHistoryNothing"]
+                                </MudChip>
+                            }
+                        </div>
                     </MudListItem>
                 }
             </MudList>
@@ -28,6 +46,35 @@
         <MudButton OnClick="@Cancel">@Localizer["CancelButton"]</MudButton>
     </DialogActions>
 </MudDialog>
+
+<style>
+    .session-list {
+        max-height: 420px;
+        overflow-y: auto;
+    }
+
+    /* MudListItem's own hover tint is too faint to read as clickable, and these
+       rows are the only affordance here, so they get a border and a clear hover.
+       The style block is unscoped, so these stay plain descendant selectors. */
+    .session-row {
+        border: 1px solid var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
+        border-radius: 6px;
+        margin-bottom: 4px;
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+
+    .session-row:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+        border-color: var(--mud-palette-primary, #594AE2);
+    }
+
+    .session-row-active {
+        background-color: rgba(255, 255, 255, 0.08);
+        border-color: var(--mud-palette-primary, #594AE2);
+    }
+</style>
 
 @code {
     [CascadingParameter]
@@ -41,7 +88,38 @@
     [Parameter]
     public string LogsFolder { get; set; } = "";
 
-    private void Pick(EftLogHistory.Session session) => MudDialog?.Close(DialogResult.Ok(session));
+    /// <summary>
+    /// The sessions with the running total each one would recover, computed once
+    /// so every row reads its own value rather than a shared counter still being
+    /// added up as the list renders.
+    /// </summary>
+    private List<Row> Rows {
+        get {
+            var rows = new List<Row>(Sessions.Count);
+            var cumulative = 0;
+
+            foreach (var session in Sessions) {
+                cumulative += session.Recovered.Total;
+                rows.Add(new Row(session, cumulative));
+            }
+
+            return rows;
+        }
+    }
+
+    private sealed record Row(EftLogHistory.Session Session, int Recovered);
+
+    /// <summary>
+    /// Returns the chosen session plus every newer one, and the number of tasks
+    /// that read would recover.
+    /// </summary>
+    private void Pick(Row row) =>
+        MudDialog?.Close(DialogResult.Ok(new Selection(row.Session, row.Recovered)));
 
     private void Cancel() => MudDialog?.Cancel();
+
+    /// <summary>What the dialog was closed with.</summary>
+    /// <param name="Session">Oldest session chosen.</param>
+    /// <param name="Recovered">Tasks that reading it and everything newer recovers.</param>
+    public sealed record Selection(EftLogHistory.Session Session, int Recovered);
 }

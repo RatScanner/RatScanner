@@ -1,6 +1,7 @@
 using Newtonsoft.Json.Linq;
 using RatScanner.TarkovDev.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -32,57 +33,84 @@ internal static class EftQuestTracker {
 	/// </summary>
 	internal static bool Replaying { get; set; }
 
+	/// <summary>
+	/// How many tasks a chunk would add to progress: finished and failed ones.
+	/// Failed counts separately because it is stored as complete plus a flag, and
+	/// the UI reads them as different outcomes.
+	/// </summary>
+	internal static EftLogHistory.RecoveredProgress CountProgress(string chunk) {
+		var finished = 0;
+		var failed = 0;
+
+		foreach (var (type, _) in Events(chunk)) {
+			if (type == TaskFinished) finished++;
+			else if (type == TaskFailed) failed++;
+		}
+
+		return new EftLogHistory.RecoveredProgress(finished, failed);
+	}
+
 	internal static void Consume(string chunk) {
-		if (string.IsNullOrEmpty(chunk)) return;
+		foreach (var (type, taskId) in Events(chunk)) {
+			switch (type) {
+				case TaskStarted:
+					StartTask(taskId);
+					break;
+				case TaskFinished:
+					CompleteTask(taskId);
+					break;
+				case TaskFailed:
+					FailTask(taskId);
+					break;
+			}
+		}
+	}
+
+	private static IEnumerable<(int Type, string TaskId)> Events(string chunk) {
+		if (string.IsNullOrEmpty(chunk)) yield break;
 
 		MatchCollection lines;
 		try {
 			lines = EftLogLine.Matches(chunk);
 		} catch (Exception e) {
 			Logger.LogWarning($"Could not parse the EFT notifications log: {e.Message}");
-			return;
+			yield break;
 		}
 
 		foreach (Match line in lines) {
+			(int Type, string TaskId)? found = null;
+
 			try {
 				var message = line.Groups["message"].Value;
-				if (!message.Contains("ChatMessageReceived", StringComparison.OrdinalIgnoreCase)) continue;
-				if (!line.Groups["json"].Success) continue;
-
-				Handle(line.Groups["json"].Value);
+				if (message.Contains("ChatMessageReceived", StringComparison.OrdinalIgnoreCase)
+					&& line.Groups["json"].Success) {
+					found = ReadEvent(line.Groups["json"].Value);
+				}
 			} catch (Exception e) {
 				Logger.LogWarning($"Skipped an unreadable quest log line: {e.Message}");
 			}
+
+			if (found is { } result) yield return (result.Type, result.TaskId);
 		}
 	}
 
-	private static void Handle(string json) {
+	private static (int Type, string TaskId)? ReadEvent(string json) {
 		var node = JObject.Parse(json);
 		var payload = node["message"];
-		if (payload == null) return;
+		if (payload == null) return null;
 
 		var type = ReadInt(payload["type"]);
-		if (type == PlayerMessage) return;
-		if (type < TaskStarted || type > TaskFinished) return;
+		if (type == PlayerMessage) return null;
+		if (type < TaskStarted || type > TaskFinished) return null;
 
 		var templateId = ReadString(payload["templateId"]);
-		if (string.IsNullOrEmpty(templateId)) return;
+		if (string.IsNullOrEmpty(templateId)) return null;
 
 		// The template is "<task id> <something>"; the id is what we key on.
 		var taskId = templateId.Split(' ')[0].Trim();
-		if (string.IsNullOrEmpty(taskId)) return;
+		if (string.IsNullOrEmpty(taskId)) return null;
 
-		switch (type) {
-			case TaskStarted:
-				StartTask(taskId);
-				break;
-			case TaskFinished:
-				CompleteTask(taskId);
-				break;
-			case TaskFailed:
-				FailTask(taskId);
-				break;
-		}
+		return (type, taskId);
 	}
 
 	/// <summary>

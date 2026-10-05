@@ -18,10 +18,22 @@ namespace RatScanner;
 /// interpreted again here.
 /// </summary>
 public static class EftLogHistory {
+	/// <summary>
+	/// How many tasks replaying a session would add to progress. Failed counts
+	/// separately because it is stored as complete plus a flag, and the UI reads
+	/// the two as different outcomes.
+	/// </summary>
+	public readonly record struct RecoveredProgress(int Finished, int Failed) {
+		public int Total => Finished + Failed;
+	}
+
 	/// <summary>One past session's logs, newest first.</summary>
 	public sealed record Session(DateTime StartedAt, string Folder) {
 		/// <summary>Short label for the session, e.g. "2024-05-01 12:34".</summary>
 		public string Label => StartedAt.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
+
+		/// <summary>What replaying this session would add to quest progress.</summary>
+		public RecoveredProgress Recovered { get; init; }
 	}
 
 	private static readonly Regex FolderRegex = new(
@@ -54,7 +66,8 @@ public static class EftLogHistory {
 					continue;
 				}
 
-				sessions.Add(new Session(startedAt, folder));
+				var session = new Session(startedAt, folder);
+				sessions.Add(session with { Recovered = Preview(session) });
 			}
 
 			if (skipped > 0) Logger.LogInfo($"Skipped {skipped} EFT log folder(s) that could not be read as a session");
@@ -73,32 +86,53 @@ public static class EftLogHistory {
 		var result = new Dictionary<EftLogType, string>();
 		if (session == null || !Directory.Exists(session.Folder)) return result;
 
-		// Read the small logs only. output.log repeats the other two and can run
-		// to hundreds of megabytes over a long session, so reading it would cost
-		// a lot of time and memory for text nothing consumes.
-		foreach (var (type, name) in new (EftLogType Type, string Name)[] {
-			(EftLogType.Application, "application.log"),
-			(EftLogType.Application, "application_000.log"),
-			(EftLogType.Notifications, "notifications.log"),
-			(EftLogType.Notifications, "notifications_000.log"),
-		}) {
-			var path = Path.Combine(session.Folder, name);
-			if (!File.Exists(path)) continue;
+		// output.log repeats the other logs and can run to hundreds of megabytes
+		// over a long session, so it is skipped: quest events are read from the
+		// push-notifications log, which carries them in a far smaller file.
+		var wanted = new (EftLogType Type, string Keyword)[] {
+			(EftLogType.Application, "application"),
+			(EftLogType.Notifications, "push-notifications"),
+		};
+
+		foreach (var file in Directory.GetFiles(session.Folder, "*.log")) {
+			var name = Path.GetFileName(file);
+
+			// Past sessions prefix the log name with the session timestamp, e.g.
+			// "2026.10.04_21-57-57_1.1.5.1.47510 application_000.log", so the log
+			// kind is identified by a keyword rather than the whole name.
+			var kind = wanted.FirstOrDefault(w =>
+				name.IndexOf(w.Keyword, StringComparison.OrdinalIgnoreCase) >= 0);
+			if (kind.Keyword == null) continue;
 
 			try {
-				// ReadWrite so a log the game still holds open for the current
-				// session is not locked out.
-				using var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+				// ReadWrite so a log the game still holds open is not locked out.
+				using var stream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 				using var reader = new StreamReader(stream);
 
 				var text = reader.ReadToEnd();
-				if (result.TryGetValue(type, out var existing)) result[type] = existing + text;
-				else result[type] = text;
+				if (result.TryGetValue(kind.Type, out var existing)) result[kind.Type] = existing + text;
+				else result[kind.Type] = text;
 			} catch (Exception e) {
 				Logger.LogWarning($"Could not read past log {name} from {session.Folder}: {e.Message}");
 			}
 		}
 
 		return result;
+	}
+
+	/// <summary>
+	/// What replaying a session would recover, without recording any of it.
+	/// </summary>
+	internal static RecoveredProgress Preview(Session session) {
+		var recovered = new RecoveredProgress(0, 0);
+
+		foreach (var (type, data) in Read(session)) {
+			if (type != EftLogType.Notifications) continue;
+			var found = EftQuestTracker.CountProgress(data);
+			recovered = new RecoveredProgress(
+				recovered.Finished + found.Finished, recovered.Failed + found.Failed);
+		}
+
+		return recovered;
 	}
 }

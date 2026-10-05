@@ -252,23 +252,39 @@ public class RatScannerMain : INotifyPropertyChanged {
 	/// Only quest tracking is replayed: the raid lifecycle would announce a raid
 	/// that finished long ago, and the position marker has no timestamps to place.
 	/// </summary>
-	internal void ReplayPastSession(EftLogHistory.Session session) {
+	/// <param name="session">Oldest session to read.</param>
+	/// <param name="includeNewer">
+	/// Whether to also read everything more recent than
+	/// <paramref name="session"/>.
+	/// </param>
+	internal void ReplayPastSession(EftLogHistory.Session session, bool includeNewer = true) {
 		if (!RatConfig.LogTracking.TrackQuests) return;
+
+		var sessions = EftLogHistory.Sessions();
+
+		var last = sessions.FindIndex(s => s.Equals(session));
+		if (last < 0) return;
+
+		// Newest first. The sessions to read are those at or newer than the chosen
+		// one, which are the entries at the head of the list down to it.
+		var first = includeNewer ? 0 : last;
 
 		// Progress is recorded, but nothing is announced or opened: a past session
 		// can hold dozens of quests, and popping a notification for each while
 		// dragging the selection around would bury the UI.
 		EftQuestTracker.Replaying = true;
 		try {
-			foreach (var (type, data) in EftLogHistory.Read(session)) {
-				if (type != EftLogType.Notifications) continue;
-				EftQuestTracker.Consume(data);
+			for (var i = first; i <= last; i++) {
+				foreach (var (type, data) in EftLogHistory.Read(sessions[i])) {
+					if (type != EftLogType.Notifications) continue;
+					EftQuestTracker.Consume(data);
+				}
 			}
 		} finally {
 			EftQuestTracker.Replaying = false;
 		}
 
-		Logger.LogInfo($"Replayed past EFT session {session.Label}.");
+		Logger.LogInfo($"Replayed {last - first + 1} past EFT session(s) up to and including {session.Label}.");
 	}
 
 	private void OnEftLogData(EftLogType type, string data) {

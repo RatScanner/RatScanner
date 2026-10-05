@@ -145,8 +145,7 @@
                             @* Shown only once log tracking is on, so a failed detection
                                is visible here instead of silently doing nothing. *@
                             @if (SettingsVM.EnableLogTracking) {
-                                <MudText Typo="Typo.caption" Color="@(_logsResolved ? Color.Secondary : Color.Warning)"
-                                         Class="ml-4 mb-2">
+                                <MudText Typo="Typo.caption" Color="@(_logsResolved ? Color.Secondary : Color.Warning)" Class="ml-4 mb-2">
                                     @Localizer["LogTrackingStatus"]:
                                     <span>@(_logsResolved ? _logsFolder : Localizer["LogTrackingStatusMissing"])</span>
                                     @if (_logsResolved) {
@@ -157,12 +156,10 @@
 
                             @* Reading past logs is a manual action: it rewrites quest
                                progress, so it never runs on its own. *@
-                            <SettingsRow Label="@Localizer["LogTrackingHistory"]"
-                                         SubLabel="@Localizer["LogTrackingHistoryHint"]"
+                            <SettingsRow Label="@Localizer["LogTrackingHistory"]" SubLabel="@Localizer["LogTrackingHistoryHint"]"
                                          Disabled="@(!SettingsVM.EnableLogTracking || !SettingsVM.LogTrackQuests || _replaying)">
                                 <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@_replaying"
-                                           OnClick="@ReadPastLogsAsync"
-                                           StartIcon="@Icons.Material.Filled.History">
+                                           OnClick="@ReadPastLogsAsync" StartIcon="@Icons.Material.Filled.History">
                                     @(_replaying ? Localizer["LogTrackingHistoryReading"] : Localizer["LogTrackingHistoryAction"])
                                 </MudButton>
                             </SettingsRow>
@@ -220,14 +217,11 @@
         try {
             // Listing walks the disk, so it stays off the UI thread.
             var sessions = await Task.Run(RatScannerMain.Instance.PastLogSessions);
-
-            // Only the most recent are worth offering; anything older is already
-            // covered by whatever was read before it.
-            var options = sessions.Take(20).ToList();
+            var options = sessions.ToList();
 
             var dialog = await DialogService.ShowAsync<LogSessionPickerDialog>(
                 Localizer["LogTrackingHistory"],
-                options: new DialogOptions { MaxWidth = MaxWidth.ExtraSmall },
+                options: new DialogOptions { MaxWidth = MaxWidth.Medium, FullWidth = true },
                 parameters: new DialogParameters {
                     { nameof(LogSessionPickerDialog.Sessions), options },
                     { nameof(LogSessionPickerDialog.LogsFolder), _logsFolder },
@@ -237,13 +231,14 @@
             // call itself.
             var result = await dialog.Result;
             if (result is null || result.Canceled) return;
-            if (result.Data is not EftLogHistory.Session session) return;
+            if (result.Data is not LogSessionPickerDialog.Selection selection) return;
 
-            await Task.Run(() => RatScannerMain.Instance.ReplayPastSession(session));
+            var session = selection.Session;
+            await Task.Run(() => RatScannerMain.Instance.ReplayPastSession(session, includeNewer: true));
 
             await DialogService.ShowMessageBox(
                 Localizer["LogTrackingTitle"],
-                LocalizationService.Format("LogTrackingHistoryDone", session.Label));
+                LocalizationService.Format("LogTrackingHistoryDoneFrom", session.Label, selection.Recovered));
         } catch (Exception e) {
             Logger.LogWarning($"Could not read past EFT logs: {e.Message}");
             await DialogService.ShowMessageBox(
