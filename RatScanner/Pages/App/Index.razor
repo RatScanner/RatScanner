@@ -31,11 +31,12 @@
             <div class="d-flex flex-column">
                 <MudTextField @ref="_searchTextField" T="string" Variant="Variant.Outlined" Adornment="Adornment.End"
                               AdornmentIcon="@Icons.Material.Filled.Search" DebounceInterval="20"
-                              OnDebounceIntervalElapsed="ExecuteSearch" @bind-Value="@_searchText">
+                              OnDebounceIntervalElapsed="ExecuteSearch" OnBlur="ResetSearch" @bind-Value="@_searchText">
                 </MudTextField>
 
                 @if (_searchResults.Any()) {
-                    <MudStack Spacing="2" Class="pt-2" Style="max-height: 320px; overflow-y: auto;">
+                    <MudStack Spacing="2" Class="pt-2" Style="max-height: 320px; overflow-y: auto;"
+                              @onmousedown:preventDefault="true">
                         @for (int _i = 0; _i < _searchResults.Count(); _i++) {
                             int i = _i;
                             SearchResult searchResult = _searchResults.ElementAt(i);
@@ -452,7 +453,7 @@
     private void OnGameModeChanged(GameMode mode) {
         _itemNames = null;
         _mapNames = null;
-        _searchResults = [];
+        ResetSearch();
         _viewerMap = null;
         _viewerZonePois = null;
 
@@ -521,8 +522,21 @@
     private void SelectResult(int index) {
         _selectedResultIndex = index;
         SelectedResults.Enqueue(_searchResults.ElementAt(_selectedResultIndex));
+
+        ResetSearch();
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Empties the query and its results and invalidates any search still in
+    /// flight, so results for a superseded query cannot land after they are gone.
+    /// Does not repaint; callers that need one say so.
+    /// </summary>
+    private void ResetSearch() {
         _searchTextField.Clear();
         _searchResults = [];
+        _selectedResultIndex = 0;
+        _searchGeneration++;
         StateHasChanged();
     }
 
