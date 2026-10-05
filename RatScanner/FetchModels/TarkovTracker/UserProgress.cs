@@ -51,7 +51,12 @@ public class UserProgress {
 		/// Trader reputation on the same negative-to-positive scale tarkov.dev gates
 		/// on, so -1 is "below zero" and 4 is a high standing.
 		/// </summary>
+		/// <remarks>
+		/// Fractional, not an integer: the loyalty levels tarkov.dev publishes need
+		/// real reputation like 0.5, 2.5 and 6.5, and the quest gates compare
+		/// against whole numbers, so both have to be representable in one field.
+		/// </remarks>
 		[JsonProperty("reputation")]
-		public int? Reputation { get; set; }
+		public double? Reputation { get; set; }
 	}
 }

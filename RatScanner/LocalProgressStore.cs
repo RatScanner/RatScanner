@@ -68,7 +68,13 @@ public class LocalProgressStore {
 
     private sealed class TraderProgress {
         public int? Level { get; set; }
-        public int? Reputation { get; set; }
+
+        /// <summary>
+        /// Standing on the trader's own scale, which is fractional: tarkov.dev
+        /// publishes loyalty thresholds like 0.5, 2.5 and 6.5, so a whole number
+        /// cannot describe a real position on the track.
+        /// </summary>
+        public double? Reputation { get; set; }
     }
 
     public LocalProgressStore() {
@@ -93,37 +99,7 @@ public class LocalProgressStore {
         lock (Gate) {
             if (_cached is not null && _cachedMode == RatConfig.GameMode) return _cached;
 
-            var progress = new UserProgress { UserId = "local", DisplayName = "Local" };
-
-            _profiles.TryGetValue(RatConfig.GameMode, out var profile);
-            if (profile is not null) {
-                if (profile.Level is int level) progress.PlayerLevel = level;
-                if (!string.IsNullOrWhiteSpace(profile.Faction)) progress.PmcFaction = profile.Faction;
-
-                progress.Traders = [.. profile.Traders
-                    .Where(t => t.Value.Level is not null || t.Value.Reputation is not null)
-                    .Select(t => new UserProgress.TraderProgress {
-                        Id = t.Key,
-                        Level = t.Value.Level,
-                        Reputation = t.Value.Reputation,
-                    })];
-            }
-
-            if (_objectives.TryGetValue(RatConfig.GameMode, out var objectives)) {
-                progress.TaskObjectives = [.. objectives.Select(o => new Progress {
-                    Id = o.Key,
-                    Complete = o.Value.Complete,
-                    Count = o.Value.Count,
-                })];
-            }
-
-            if (_tasks.TryGetValue(RatConfig.GameMode, out var tasks)) {
-                progress.Tasks = [.. tasks.Select(t => new Progress {
-                    Id = t.Key,
-                    Complete = t.Value.Complete,
-                    Failed = t.Value.Failed,
-                })];
-            }
+            var progress = BuildProgress(RatConfig.GameMode);
 
             _cached = progress;
             _cachedMode = RatConfig.GameMode;
@@ -132,64 +108,80 @@ public class LocalProgressStore {
     }
 
     /// <summary>
-    /// Sets the PMC level for the current game mode, or clears it when null so
-    /// the quest gates fall back to treating the level as unknown.
+    /// The recorded progress for a specific mode, uncached. Used by the settings
+    /// screen to show every mode's profile at once, which a single-entry cache
+    /// cannot serve.
     /// </summary>
-    public void SetLevel(int? level) {
+    public UserProgress GetProgress(GameMode mode) {
         lock (Gate) {
-            ProfileFor(RatConfig.GameMode).Level = level is int value && value > 0 ? value : null;
-            Persist();
+            return BuildProgress(mode);
+        }
+    }
+
+    private UserProgress BuildProgress(GameMode mode) {
+        var progress = new UserProgress { UserId = "local", DisplayName = "Local" };
+
+        _profiles.TryGetValue(mode, out var profile);
+        if (profile is not null) {
+            if (profile.Level is int level) progress.PlayerLevel = level;
+            if (!string.IsNullOrWhiteSpace(profile.Faction)) progress.PmcFaction = profile.Faction;
+
+            progress.Traders = [.. profile.Traders
+                .Where(t => t.Value.Level is not null || t.Value.Reputation is not null)
+                .Select(t => new UserProgress.TraderProgress {
+                    Id = t.Key,
+                    Level = t.Value.Level,
+                    Reputation = t.Value.Reputation,
+                })];
         }
 
-        RaiseChanged();
+        if (_objectives.TryGetValue(mode, out var objectives)) {
+            progress.TaskObjectives = [.. objectives.Select(o => new Progress {
+                Id = o.Key,
+                Complete = o.Value.Complete,
+                Count = o.Value.Count,
+            })];
+        }
+
+        if (_tasks.TryGetValue(mode, out var tasks)) {
+            progress.Tasks = [.. tasks.Select(t => new Progress {
+                Id = t.Key,
+                Complete = t.Value.Complete,
+                Failed = t.Value.Failed,
+            })];
+        }
+
+        return progress;
     }
 
     /// <summary>
-    /// Sets which side the player fights for. Null or empty clears it, which the
-    /// faction gate reads as unknown rather than as a mismatch.
+    /// Replaces a game mode's whole profile in one go.
+    ///
+    /// Wholesale rather than field-by-field so a trader the player has just
+    /// cleared is actually removed: writing only the entries that still hold a
+    /// value would leave the cleared ones behind in the file, which is what made
+    /// a profile reset appear to do nothing.
+    ///
+    /// Null level or reputation means that half is unset, and a trader with
+    /// neither set is dropped entirely so the file does not fill up with empty
+    /// records.
     /// </summary>
-    public void SetFaction(string? faction) {
-        lock (Gate) {
-            var trimmed = faction?.Trim();
-            ProfileFor(RatConfig.GameMode).Faction =
-                string.IsNullOrEmpty(trimmed) ? null : trimmed.ToUpperInvariant();
-            Persist();
+    public void SetProfile(GameMode mode, int? level, string? faction, IEnumerable<(string Id, int? Level, double? Reputation)> traders) {
+        var profile = new Profile {
+            Level = level is int value && value > 0 ? value : null,
+            Faction = string.IsNullOrEmpty(faction?.Trim()) ? null : faction.Trim().ToUpperInvariant(),
+        };
+
+        foreach (var (id, traderLevel, reputation) in traders) {
+            if (string.IsNullOrWhiteSpace(id)) continue;
+            if (traderLevel is null && reputation is null) continue;
+
+            profile.Traders[id] = new TraderProgress { Level = traderLevel, Reputation = reputation };
         }
 
-        RaiseChanged();
-    }
-
-    /// <summary>
-    /// Sets a trader's standing. Either part may be null to leave it unset, and
-    /// an entry with nothing left set is dropped so the file does not fill up with
-    /// empty records.
-    /// </summary>
-    public void SetTrader(string traderId, int? level, int? reputation) {
-        if (string.IsNullOrWhiteSpace(traderId)) return;
-
         lock (Gate) {
-            var traders = ProfileFor(RatConfig.GameMode).Traders;
-
-            if (level is null && reputation is null) {
-                traders.Remove(traderId);
-            } else {
-                traders[traderId] = new TraderProgress { Level = level, Reputation = reputation };
-            }
-
+            _profiles[mode] = profile;
             Persist();
-        }
-
-        RaiseChanged();
-    }
-
-    /// <summary>
-    /// Drops every manually set profile field for the current game mode, so the
-    /// quest gates go back to treating level, faction and standing as unknown.
-    /// Recorded objectives and tasks are left alone.
-    /// </summary>
-    public void ClearProfile() {
-        lock (Gate) {
-            if (_profiles.Remove(RatConfig.GameMode)) Persist();
         }
 
         RaiseChanged();
@@ -414,7 +406,7 @@ public class LocalProgressStore {
                     foreach (var (id, node) in traderNode) {
                         profile.Traders[id] = new TraderProgress {
                             Level = (int?)node["level"],
-                            Reputation = (int?)node["reputation"],
+                            Reputation = (double?)node["reputation"],
                         };
                     }
                 }

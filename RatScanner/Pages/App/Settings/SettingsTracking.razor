@@ -5,7 +5,9 @@
 @using System.Threading.Tasks
 @using MudBlazor
 @using RatScanner
+@using RatScanner.FetchModels.TarkovTracker
 @using RatScanner.Pages.App.Components
+@using RatScanner.TarkovDev.Json
 @using GameMode = RatScanner.TarkovDev.Json.GameMode
 @using static RatScanner.RatConfig
 @inject SettingsVM SettingsVM
@@ -107,67 +109,70 @@
                         </SettingsCard>
 
                         @* Manual profile overrides. Only shown for the local source, since
-                           the tracker reports level and faction itself and always wins. *@
+                           the tracker reports level and faction itself and always wins.
+                           One tab per game mode, because the standing a player has in
+                           one mode says nothing about the others. *@
                         @if (!UsesTarkovTracker) {
                             <SettingsCard Title="@Localizer["ProfileTitle"]" Subtitle="@Localizer["ProfileDesc"]">
-                                <SettingsRow Label="@Localizer["ProfileLevel"]" SubLabel="@Localizer["ProfileLevelHint"]">
-                                    <MudNumericField T="int" Value="@SettingsVM.PlayerLevel"
-                                                     ValueChanged="@((int v) => { SettingsVM.PlayerLevel = Math.Max(v, 0); SettingsVM.MarkDirty(); })"
-                                                     Variant="Variant.Outlined" Margin="Margin.Dense" HideSpinButtons="true" Min="0" Max="79"
-                                                     Style="min-width: 140px;" />
-                                </SettingsRow>
+                                <MudTabs Centered="true" @bind-ActivePanelIndex="_profileTab">
+                                    <MudDivider></MudDivider>
+                                    @foreach (var mode in ProfileModes) {
+                                        var entry = mode;
+                                        <MudTabPanel Text="@Localizer[entry.Label]">
+                                            <div class="profile-grid">
+                                                <div class="profile-field">
+                                                    <div class="profile-field-label">@Localizer["ProfileLevel"]</div>
+                                                    <MudNumericField T="int" Value="@Profile(entry.Mode).PlayerLevel"
+                                                                     ValueChanged="@((int v) => SetLevel(entry.Mode, v))" Variant="Variant.Outlined"
+                                                                     Margin="Margin.Dense" HideSpinButtons="true" Min="0" Max="79"
+                                                                     Style="min-width: 110px;" />
+                                                </div>
 
-                                <SettingsRow Label="@Localizer["ProfileFaction"]" SubLabel="@Localizer["ProfileFactionHint"]">
-                                    <MudSelect T="string" Value="@SettingsVM.PlayerFaction"
-                                               ValueChanged="@((string v) => { SettingsVM.PlayerFaction = v ?? ""; SettingsVM.MarkDirty(); })"
-                                               Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Style="min-width: 140px;">
-                                        <MudSelectItem T="string" Value="@("")">@Localizer["ProfileFactionUnset"]</MudSelectItem>
-                                        <MudSelectItem T="string" Value="@(nameof(PmcFaction.Usec))">@Localizer["ProfileFactionUsec"]
-                                        </MudSelectItem>
-                                        <MudSelectItem T="string" Value="@(nameof(PmcFaction.Bear))">@Localizer["ProfileFactionBear"]
-                                        </MudSelectItem>
-                                    </MudSelect>
-                                </SettingsRow>
-
-                                <MudDivider Class="my-2" />
-
-                                <MudText Typo="Typo.subtitle2" Class="px-4 pb-1">@Localizer["ProfileTraders"]</MudText>
-
-                                <div class="profile-traders">
-                                    @foreach (var trader in Traders) {
-                                        var id = trader.Id;
-                                        var standing = GetStanding(id);
-                                        <div class="profile-trader">
-                                            <div class="profile-trader-text">
-                                                <div class="settings-row-label">@trader.Name</div>
+                                                <div class="profile-field">
+                                                    <div class="profile-field-label">@Localizer["ProfileFaction"]</div>
+                                                    @* A joined button group rather than a dropdown, matching the
+                                                       loyalty tier buttons on the trader cards. USEC is preselected,
+                                                       so there is no third "not set" state to choose. *@
+                                                    <div class="profile-faction" role="group" aria-label="@Localizer["ProfileFaction"]">
+                                                        @foreach (var faction in PmcFaction.All) {
+                                                            var value = faction;
+                                                            <button type="button" class="profile-faction-option @FactionClass(entry.Mode, value)"
+                                                                    aria-pressed="@((Profile(entry.Mode).PlayerFaction == value).ToString().ToLowerInvariant())"
+                                                                    @onclick="@(() => SetFaction(entry.Mode, value))">
+                                                                @Localizer[FactionLabel(value)]
+                                                            </button>
+                                                        }
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="profile-trader-control">
-                                                <MudNumericField T="int" Value="@standing.Level" ValueChanged="@((int v) => SetLevel(id, v))"
-                                                                 Variant="Variant.Outlined" Margin="Margin.Dense" HideSpinButtons="true" Min="0" Max="4"
-                                                                 Style="min-width: 90px;" />
-                                                @* Reputation is selectable rather than typed because it runs
-                                                   from negative to positive, and a nullable numeric field
-                                                   would need an empty state of its own. *@
-                                                <MudSelect T="string" Value="@standing.Reputation.ToString()"
-                                                           ValueChanged="@((string v) => SetReputation(id, v))" Variant="Variant.Outlined"
-                                                           Margin="Margin.Dense" Dense="true" Style="min-width: 110px;">
-                                                    <MudSelectItem T="string" Value="@("")">@Localizer["ProfileReputationUnset"]</MudSelectItem>
-                                                    @foreach (var value in ReputationValues) {
-                                                        <MudSelectItem T="string" Value="@value.ToString(CultureInfo.InvariantCulture)">@value
-                                                        </MudSelectItem>
-                                                    }
-                                                </MudSelect>
+
+                                            @* <MudDivider DividerType="DividerType.Middle" Class="my-3 mx-3" /> *@
+
+                                            @* One card per trader rather than a row per trader: the
+                                                       card carries the task completion, the tier buttons and
+                                                       the standing together, so a bare name and two dropdowns
+                                                       cannot show how far along the player actually is. *@
+                                            <div class="profile-traders">
+                                                @foreach (var trader in Traders) {
+                                                    var id = trader.Id;
+                                                    var standing = GetStanding(entry.Mode, id);
+                                                    var tasks = TraderTaskProgress(entry.Mode, id);
+                                                    <TraderStandingCard Trader="@trader" Level="@standing.Level" Reputation="@standing.Reputation"
+                                                                        CompleteTasks="@tasks.Complete" TotalTasks="@tasks.Total"
+                                                                        LevelChanged="@((int v) => SetLevel(entry.Mode, id, v))"
+                                                                        ReputationChanged="@((double? v) => SetReputation(entry.Mode, id, v))" />
+                                                }
                                             </div>
-                                        </div>
+
+                                            <div class="profile-actions">
+                                                <MudButton Variant="Variant.Outlined" Color="Color.Warning" Size="Size.Small"
+                                                           StartIcon="@Icons.Material.Filled.RestartAlt" OnClick="@(() => ResetProfile(entry.Mode))">
+                                                    @Localizer["ProfileResetAction"]
+                                                </MudButton>
+                                            </div>
+                                        </MudTabPanel>
                                     }
-                                </div>
-
-                                <SettingsRow Label="@Localizer["ProfileReset"]" SubLabel="@Localizer["ProfileResetHint"]">
-                                    <MudButton Variant="Variant.Outlined" Color="Color.Warning"
-                                               StartIcon="@Icons.Material.Filled.RestartAlt" OnClick="@ResetProfile">
-                                        @Localizer["ProfileResetAction"]
-                                    </MudButton>
-                                </SettingsRow>
+                                </MudTabs>
                             </SettingsCard>
                         }
 
@@ -243,47 +248,105 @@
                 </div>
 
                 <style>
-                    /* One row per trader: the name on the left, the two standing fields on the
-                                                                       right. Laid out like SettingsRow but without the per-row hover tint, since
-                                                                       a full list of hoverable rows reads as noise next to the actual settings. */
-                    .profile-traders {
+                    /* Level and faction sit side by side rather than as two full-width
+                                                                                                                                                                                                                                                                                       SettingsRows, which pushed the trader list a long way down.
+
+                                                                                                                                                                                                                                                                                       The 16px horizontal inset is the card's own content inset, matching
+                                                                                                                                                                                                                                                                                       .settings-row and .settings-card-title, so every settings section
+                                                                                                                                                                                                                                                                                       starts its text at the same x. It was 4px, which left this section
+                                                                                                                                                                                                                                                                                       visibly hugging the card edge next to the sections around it. */
+                    .profile-grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                        gap: 16px;
+                        padding: 8px 16px 0;
+                        margin-bottom: 8px;
+                    }
+
+                    .profile-field {
                         display: flex;
                         flex-direction: column;
-                    }
-
-                    .profile-trader {
-                        display: flex;
-                        align-items: center;
-                        justify-content: space-between;
-                        gap: 16px;
-                        min-height: 44px;
-                        padding: 4px 16px;
-                    }
-
-                    .profile-trader-text {
+                        gap: 4px;
                         min-width: 0;
-                        flex: 1;
+                    }
+
+                    .profile-field-label {
                         font-size: 14px;
                         line-height: 1.35;
                     }
 
-                    .profile-trader-control {
-                        flex: 0 0 auto;
+                    /* Faction as a joined button group, deliberately matching
+                                                                                                                                                                                                                                                                                       the loyalty tier buttons on the trader cards so the two
+                                                                                                                                                                                                                                                                                       controls read as the same kind of choice. */
+                    .profile-faction {
                         display: flex;
-                        align-items: center;
-                        gap: 8px;
+                        width: 100%;
+                        align-self: flex-start;
+                        min-width: 0;
+                        overflow: hidden;
+                        border: 1px solid var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
+                        border-radius: 6px;
                     }
 
-                    .profile-trader-control .mud-input-control {
-                        margin: 0;
+                    .profile-faction-option {
+                        flex: 1 1 0;
+                        min-width: 0;
+                        min-height: 40px;
+                        padding: 6px 16px;
+                        border: 0;
+                        border-left: 1px solid var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
+                        background: transparent;
+                        color: var(--mud-palette-text-secondary, rgba(255, 255, 255, 0.6));
+                        font: inherit;
+                        font-size: 13px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: background-color 120ms ease-in-out, color 120ms ease-in-out;
                     }
 
-                    @@media (max-width: 700px) {
-                        .profile-trader {
-                            flex-direction: column;
-                            align-items: stretch;
-                            gap: 8px;
+                    .profile-faction-option:first-child {
+                        border-left: 0;
+                    }
+
+                    .profile-faction-option:hover {
+                        background: var(--mud-palette-action-default-hover, rgba(255, 255, 255, 0.06));
+                        color: var(--mud-palette-text-primary, rgba(255, 255, 255, 0.95));
+                    }
+
+                    .profile-faction-option.profile-faction-option-active {
+                        background: var(--mud-palette-primary, #594AE2);
+                        color: #fff;
+                    }
+
+                    .profile-faction-option:focus-visible {
+                        outline: 2px solid var(--mud-palette-primary, #594AE2);
+                        outline-offset: -2px;
+                    }
+
+                    /* Two cards per row, so the eight traders take four rows
+                                                                                                                                                                                                                                                                                       instead of eight. A fixed count rather than auto-fill because
+                                                                                                                                                                                                                                                                                       auto-fill would reach three on a wide window and the cards are
+                                                                                                                                                                                                                                                                                       narrow enough already: each one has to hold a four-button group
+                                                                                                                                                                                                                                                                                       AND the reputation box side by side. */
+                    .profile-traders {
+                        display: grid;
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                        gap: 10px;
+                        padding: 0 16px;
+                    }
+
+                    /* Below this the two cards cannot hold the tier buttons and the
+                                                                                                                                                                                                                                                                                       reputation box side by side, so fall back to one. */
+                    @@media (max-width: 540px) {
+                        .profile-traders {
+                            grid-template-columns: minmax(0, 1fr);
                         }
+                    }
+
+                    .profile-actions {
+                        display: flex;
+                        justify-content: flex-end;
+                        padding: 12px 16px 0;
                     }
                 </style>
 
@@ -320,47 +383,180 @@
     private List<RatScanner.TarkovDev.Json.Map> AvailableMaps { get; set; } = [];
 
     /// <summary>
-    /// Traders offered a standing row, resolved from the tarkov.dev catalogue so
+    /// Traders offered a standing card. Narrowed to the eight real ones by
+    /// <see cref="StandardTraders"/>; resolved from the tarkov.dev catalogue so
     /// the user picks by name rather than by id.
     /// </summary>
     private List<Trader> Traders { get; set; } = [];
 
+    private static readonly (GameMode Mode, string Label)[] ProfileModes = [
+        (GameMode.Regular, "GameModeRegular"),
+        (GameMode.Pve, "GameModePve"),
+        (GameMode.PvpSeason, "GameModePvpSeason"),
+    ];
+
     /// <summary>
-    /// Reputation values offered per trader. The scale runs negative to positive
-    /// in whole steps, and the gates tarkov.dev sends compare against exactly
-    /// these, so anything outside them cannot change a gate.
+    /// Which mode's profile tab is open. Starts on the mode actually in play, so
+    /// the values on screen are the ones the quest gates are reading. Set in
+    /// OnInitialized because SettingsVM is injected and cannot be read from a
+    /// field initializer.
     /// </summary>
-    private static readonly int[] ReputationValues = [-4, -3, -2, -1, 0, 1, 2, 3, 4];
+    private int _profileTab;
 
-    private static int? ParseReputation(string? value) =>
-        int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed) ? parsed : null;
-
-    private ManualTraderStanding GetStanding(string traderId) {
-        if (!SettingsVM.ManualTraders.TryGetValue(traderId, out var standing)) {
+    private ManualTraderStanding GetStanding(GameMode mode, string traderId) {
+        var profile = Profile(mode);
+        if (!profile.ManualTraders.TryGetValue(traderId, out var standing)) {
             standing = new ManualTraderStanding();
-            SettingsVM.ManualTraders[traderId] = standing;
+            profile.ManualTraders[traderId] = standing;
         }
 
         return standing;
     }
 
-    private void SetLevel(string traderId, int level) {
-        GetStanding(traderId).Level = Math.Clamp(level, 0, 4);
+    /// <summary>
+    /// The staged profile for a mode. Always returns an instance so the controls
+    /// have something to bind to even for a mode with nothing entered yet.
+    /// </summary>
+    private ManualProfile Profile(GameMode mode) {
+        if (!SettingsVM.ManualProfiles.TryGetValue(mode, out var profile)) {
+            profile = new ManualProfile();
+            SettingsVM.ManualProfiles[mode] = profile;
+        }
+
+        return profile;
+    }
+
+    private void SetLevel(GameMode mode, int level) {
+        Profile(mode).PlayerLevel = Math.Clamp(level, 0, 79);
         SettingsVM.MarkDirty();
     }
 
-    private void SetReputation(string traderId, string? value) {
-        GetStanding(traderId).Reputation = ParseReputation(value);
+    private void SetFaction(GameMode mode, string? faction) {
+        Profile(mode).PlayerFaction = faction ?? "";
         SettingsVM.MarkDirty();
     }
 
-    private void ResetProfile() {
-        SettingsVM.PlayerLevel = 0;
-        SettingsVM.PlayerFaction = "";
-        SettingsVM.ManualTraders.Clear();
+    /// <summary>
+    /// The button class for a faction, marking the one currently held.
+    /// </summary>
+    /// <remarks>
+    /// Anything other than BEAR reads as USEC, so a mode whose faction was never
+    /// entered still shows USEC selected rather than leaving the group with
+    /// neither option pressed.
+    /// </remarks>
+    private string FactionClass(GameMode mode, string faction) =>
+        CurrentFaction(mode) == faction ? "profile-faction-option-active" : "";
+
+    /// <summary>
+    /// The faction the mode is set to, defaulting to USEC.
+    ///
+    /// USEC is the default rather than a third "not set" option because the
+    /// buttons have no empty state to click back into, and leaving a group with
+    /// nothing selected reads as a control that failed to load.
+    /// </summary>
+    private string CurrentFaction(GameMode mode) {
+        var faction = Profile(mode).PlayerFaction;
+        return string.IsNullOrEmpty(faction) ? PmcFaction.Usec : faction;
+    }
+
+    /// <summary>
+    /// The i18n key for a faction's button, since the stored value is the
+    /// bare upper-case name the gates compare on.
+    /// </summary>
+    private static string FactionLabel(string faction) =>
+        faction == PmcFaction.Bear ? "ProfileFactionBear" : "ProfileFactionUsec";
+
+    private void SetLevel(GameMode mode, string traderId, int level) {
+        GetStanding(mode, traderId).Level = Math.Clamp(level, 0, 4);
         SettingsVM.MarkDirty();
     }
 
+    /// <summary>
+    /// Records a trader's reported standing. The value is kept as typed rather
+    /// than rounded, because tarkov.dev's own loyalty thresholds are fractional
+    /// (0.5, 2.5, 6.5) and rounding here would put a player at 6.5 on a level
+    /// that really needs 6.5 somewhere the gates read as short.
+    /// </summary>
+    private void SetReputation(GameMode mode, string traderId, double? value) {
+        GetStanding(mode, traderId).Reputation = value;
+        SettingsVM.MarkDirty();
+    }
+
+    /// <summary>
+    /// How many of a trader's tasks are done in the mode whose tab is open,
+    /// out of all the tasks they hand out. Cached per mode, since the same
+    /// counts are re-read on every repaint of the tab.
+    ///
+    /// Counted per mode because progress is kept per mode: a card must report
+    /// the tab it sits on, not the mode the game happens to be in.
+    /// </summary>
+    private (int Complete, int Total) TraderTaskProgress(GameMode mode, string traderId) {
+        var key = (mode, traderId);
+        if (_traderTaskCounts.TryGetValue(key, out var cached)) return cached;
+
+        (int Complete, int Total) counts = (0, 0);
+        try {
+            counts = RatScanner.TaskExtensions.GetTraderTaskProgress(TraderTasks(traderId), ProgressFor(mode));
+        } catch (Exception e) {
+            Logger.LogWarning($"Could not count completed tasks for trader {traderId}: {e.Message}");
+        }
+
+        _traderTaskCounts[key] = counts;
+        return counts;
+    }
+
+    /// <summary>
+    /// Recorded progress for one mode. Read through the store per mode, since
+    /// its single-entry cache only ever serves the mode actually in play and the
+    /// tabs show the others too.
+    /// </summary>
+    private UserProgress ProgressFor(GameMode mode) {
+        var store = RatScannerMain.Instance?.LocalProgress;
+        if (store is null) return Item.SelfProgress;
+        return store.GetProgress(mode);
+    }
+
+    /// <summary>
+    /// A trader's tasks, grouped once and cached, so the per-card completion
+    /// counts are a lookup rather than a rescan of the whole catalogue.
+    /// </summary>
+    private IReadOnlyList<TarkovTask> TraderTasks(string traderId) {
+        if (!_traderTasks.TryGetValue(traderId, out var tasks)) {
+            tasks = [];
+            try {
+                tasks = [.. TarkovDevAPI.GetTasks().Where(t =>
+                    string.Equals(t.TraderId, traderId, StringComparison.Ordinal))];
+            } catch (Exception e) {
+                Logger.LogWarning($"Could not group tasks by trader: {e.Message}");
+            }
+
+            _traderTasks[traderId] = tasks;
+        }
+
+        return tasks;
+    }
+
+    private readonly Dictionary<string, IReadOnlyList<TarkovTask>> _traderTasks = new(StringComparer.Ordinal);
+    private readonly Dictionary<(GameMode Mode, string TraderId), (int Complete, int Total)> _traderTaskCounts = [];
+
+    /// <summary>
+    /// Drops the cached completion counts, which go stale as soon as a task is
+    /// ticked, a counter is stepped or the mode changes. The task grouping itself
+    /// is left alone: it comes from the catalogue, which does not change while
+    /// the page is open.
+    /// </summary>
+    private void InvalidateTaskCounts() => _traderTaskCounts.Clear();
+
+    /// <summary>
+    /// Clears one mode's profile, leaving the other tabs alone.
+    /// </summary>
+    private void ResetProfile(GameMode mode) {
+        var profile = Profile(mode);
+        profile.PlayerLevel = 0;
+        profile.PlayerFaction = "";
+        profile.ManualTraders.Clear();
+        SettingsVM.MarkDirty();
+    }
     private static readonly (GameMode Mode, string Label)[] ProgressModes = [
         (GameMode.Regular, "GameModeRegular"),
         (GameMode.Pve, "GameModePve"),
@@ -585,6 +781,7 @@
 
     protected override async Task OnInitializedAsync() {
         SettingsVM.PropertyChanged += PropertyChangeHandler;
+        LocalProgressStore.Changed += ProgressChangeHandler;
 
         ResolveLogsFolder();
 
@@ -595,9 +792,21 @@
         }
 
         try {
-            Traders = [.. TarkovDevAPI.GetTraders().OrderBy(t => t.Name)];
+            // Only the eight real traders: the endpoint also returns story NPCs
+            // and raider contacts, which have no loyalty to set.
+            Traders = StandardTraders.Resolve(TarkovDevAPI.GetTraders());
         } catch (Exception e) {
             Logger.LogWarning($"Could not load traders for the standing overrides: {e.Message}");
+        }
+
+        // Open on the mode actually in play, so the profile on screen is the one
+        // the quest gates are reading rather than an unrelated one.
+        _profileTab = 0;
+        for (var i = 0; i < ProfileModes.Length; i++) {
+            if (ProfileModes[i].Mode == SettingsVM.GameMode) {
+                _profileTab = i;
+                break;
+            }
         }
 
         await RunConnectionCheckAsync();
@@ -608,8 +817,19 @@
         _ = InvokeAsync(() => StateHasChanged());
     }
 
+    /// <summary>
+    /// Repaints the cards when recorded progress changes, so a task ticked
+    /// elsewhere in the app is reflected here without reopening the page. The
+    /// cached counts are dropped first, since they are what went stale.
+    /// </summary>
+    private void ProgressChangeHandler() {
+        InvalidateTaskCounts();
+        _ = InvokeAsync(() => StateHasChanged());
+    }
+
     public void Dispose() {
         SettingsVM.PropertyChanged -= PropertyChangeHandler;
+        LocalProgressStore.Changed -= ProgressChangeHandler;
         _debounce?.Dispose();
     }
 }

@@ -1,0 +1,353 @@
+@using System.Globalization
+@using RatScanner.TarkovDev.Json
+@inject LocalizationService Localizer
+
+@*
+    One trader's standing, as a self-contained card: how far through that
+    trader's tasks the player is, the loyalty tier buttons, and the reputation
+    standing that decides the tier.
+
+    The component owns no state. Everything it shows is passed in, and every edit
+    is raised as a callback, so the page holding the settings keeps the single
+    source of truth and the Save/Discard footer stays in step.
+*@
+
+<div class="trader-card">
+    @* Header: portrait and name on the left, task completion on the right. *@
+    <div class="trader-card-head">
+        <div class="trader-card-identity">
+            <img class="trader-card-avatar" src="@Trader.ImageLink" alt="@Trader.Name" loading="lazy" />
+            <div class="trader-card-name" title="@Trader.Name">@Trader.Name</div>
+        </div>
+        <div class="trader-card-percent" title="@PercentTitle">@PercentText</div>
+    </div>
+
+    @if (TotalTasks > 0) {
+        <div class="trader-card-tasks">@TaskCountText</div>
+        <div class="trader-card-bar" role="progressbar" aria-valuenow="@Percent" aria-valuemin="0" aria-valuemax="100"
+             aria-label="@PercentTitle">
+            <div class="trader-card-bar-fill" style="@BarStyle"></div>
+        </div>
+    }
+
+    <div class="trader-card-standing">
+        <div class="trader-card-standing-labels">
+            <span>@Localizer["ProfileLoyaltyLevel"]</span>
+            <span>@Localizer["ProfileReputation"]</span>
+        </div>
+
+        <div class="trader-card-standing-row">
+            @* The four loyalty tiers as a joined button group rather than four
+               separate controls, so the tiers read as one 1-of-4 choice. *@
+            <div class="trader-card-levels" role="group" aria-label="@LevelGroupLabel">
+                @for (var level = 1; level <= 4; level++) {
+                    var value = level;
+                    <button type="button" class="trader-card-level @LevelClass(value)"
+                            aria-pressed="@((Level == value).ToString().ToLowerInvariant())" title="@LevelTitle(value)"
+                            @onclick="@(() => LevelChanged.InvokeAsync(value))">
+                        @value
+                    </button>
+                }
+            </div>
+
+            <input class="trader-card-reputation" type="text" inputmode="decimal" placeholder="0.00" value="@InputText"
+                   title="@Localizer["ProfileReputationHint"]"
+                   aria-label="@($"{Localizer["ProfileReputation"]} ({Trader.Name})")" @onchange="@OnReputationChanged"
+                   @onfocus="@OnReputationFocus" @onblur="@OnReputationBlur" />
+        </div>
+    </div>
+</div>
+
+<style>
+    .trader-card {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        height: 100%;
+        /* min-width:0 is load-bearing. As a grid item the default is
+           min-width:auto, which refuses to shrink below the content's own
+           minimum width. Without it the card bursts out of its column and the
+           header, bar and standing row all end up wider than the cell. */
+        min-width: 0;
+        padding: 12px 14px;
+        border: 1px solid var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
+        border-radius: 8px;
+        background: var(--mud-palette-surface, #1e1e1e);
+        transition: border-color 120ms ease-in-out, box-shadow 120ms ease-in-out;
+    }
+
+    .trader-card:hover {
+        border-color: var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    .trader-card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    /* min-width:0 on the identity block is what lets the name truncate instead
+       of pushing the percentage off the right edge. */
+    .trader-card-identity {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+    }
+
+    .trader-card-avatar {
+        width: 36px;
+        height: 36px;
+        flex: 0 0 36px;
+        border-radius: 50%;
+        border: 1px solid var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
+        background: var(--mud-palette-background-grey, rgba(255, 255, 255, 0.05));
+        object-fit: cover;
+    }
+
+    .trader-card-name {
+        min-width: 0;
+        font-size: 14px;
+        font-weight: 600;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* tabular-nums stops the number jittering as the digit count changes. */
+    .trader-card-percent {
+        flex: 0 0 auto;
+        font-size: 14px;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        color: var(--mud-palette-text-secondary, rgba(255, 255, 255, 0.6));
+    }
+
+    .trader-card-tasks {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--mud-palette-text-secondary, rgba(255, 255, 255, 0.6));
+    }
+
+    .trader-card-bar {
+        position: relative;
+        height: 8px;
+        margin-bottom: 4px;
+        border-radius: 999px;
+        overflow: hidden;
+        background: var(--mud-palette-background-grey, rgba(255, 255, 255, 0.07));
+    }
+
+    .trader-card-bar-fill {
+        position: absolute;
+        inset-block: 0;
+        left: 0;
+        border-radius: 999px;
+        background: var(--mud-palette-primary, #594AE2);
+        transition: width 300ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+
+    .trader-card-standing {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+    }
+
+    .trader-card-standing-labels {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--mud-palette-text-secondary, rgba(255, 255, 255, 0.6));
+    }
+
+    .trader-card-standing-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 0;
+    }
+
+    /* The tiers share one border and collapse into each other, so the group
+       reads as a single 1-of-4 choice rather than four unrelated buttons. */
+    .trader-card-levels {
+        display: flex;
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        border: 1px solid var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
+        border-radius: 6px;
+    }
+
+    /* min-width:0 is what lets the group shrink with the card instead of
+       forcing the row wider. The reputation box beside it keeps its own
+       width, so the buttons absorb the whole squeeze. */
+    .trader-card-level {
+        flex: 1 1 0;
+        min-width: 0;
+        min-height: 34px;
+        padding: 6px 2px;
+        border: 0;
+        border-left: 1px solid var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
+        background: transparent;
+        color: var(--mud-palette-text-secondary, rgba(255, 255, 255, 0.6));
+        font: inherit;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 120ms ease-in-out, color 120ms ease-in-out;
+    }
+
+    .trader-card-level:first-child {
+        border-left: 0;
+    }
+
+    .trader-card-level:hover {
+        background: var(--mud-palette-action-default-hover, rgba(255, 255, 255, 0.06));
+        color: var(--mud-palette-text-primary, rgba(255, 255, 255, 0.95));
+    }
+
+    .trader-card-level.trader-card-level-active {
+        background: var(--mud-palette-primary, #594AE2);
+        color: #fff;
+    }
+
+    .trader-card-level:focus-visible {
+        outline: 2px solid var(--mud-palette-primary, #594AE2);
+        outline-offset: -2px;
+    }
+
+    /* Flexible rather than a fixed 68px: at two cards per row the box has to
+       give way, and it is the buttons beside it that can shrink harmlessly.
+       The min-width keeps "0.00" and a negative standing like "-2.50" from
+       being clipped. */
+    .trader-card-reputation {
+        flex: 0 1 64px;
+        min-width: 52px;
+        height: 34px;
+        padding: 0 4px;
+        border: 1px solid var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
+        border-radius: 6px;
+        background: var(--mud-palette-background-grey, rgba(255, 255, 255, 0.05));
+        color: inherit;
+        font: inherit;
+        font-size: 13px;
+        text-align: center;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .trader-card-reputation::placeholder {
+        color: var(--mud-palette-text-disabled, rgba(255, 255, 255, 0.35));
+    }
+
+    .trader-card-reputation:focus {
+        outline: none;
+        border-color: var(--mud-palette-primary, #594AE2);
+    }
+</style>
+
+@code {
+    /// <summary>The trader this card edits. Required.</summary>
+    [Parameter, EditorRequired]
+    public Trader Trader { get; set; } = default!;
+
+    /// <summary>Reported loyalty tier, 0 when unknown.</summary>
+    [Parameter]
+    public int Level { get; set; }
+
+    /// <summary>Reported standing, or null when unknown.</summary>
+    [Parameter]
+    public double? Reputation { get; set; }
+
+    /// <summary>How many of the trader's tasks are done.</summary>
+    [Parameter]
+    public int CompleteTasks { get; set; }
+
+    /// <summary>How many tasks the trader hands out in total.</summary>
+    [Parameter]
+    public int TotalTasks { get; set; }
+
+    [Parameter]
+    public EventCallback<int> LevelChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<double?> ReputationChanged { get; set; }
+
+    /// <summary>Share of the trader's tasks that are done, 0 to 100.</summary>
+    private double Percent => TotalTasks > 0 ? Math.Clamp(CompleteTasks * 100.0 / TotalTasks, 0, 100) : 0;
+
+    private string PercentText => $"{Percent:0}%";
+
+    private string TaskCountText => LocalizationService.Format("ProfileTaskCount", CompleteTasks, TotalTasks);
+
+    private string PercentTitle => LocalizationService.Format("ProfileTaskPercentTitle", Trader.Name, PercentText);
+
+    private string LevelGroupLabel => LocalizationService.Format("ProfileLoyaltyLevelOf", Trader.Name);
+
+    private string ReputationText => Reputation is double value ? value.ToString("0.00", CultureInfo.InvariantCulture) : "";
+
+    /// <summary>
+    /// What the reputation box shows.
+    ///
+    /// While the box has focus this is the text as typed, not the value
+    /// formatted back from the model. The setting page repaints on every
+    /// recorded-progress change, and the scan timer raises those constantly, so
+    /// rendering straight from the model would wipe a half-typed value several
+    /// times a second. Rebuilt from the model the moment the box loses focus.
+    /// </summary>
+    private string InputText => _editingReputation ? _typedReputation : ReputationText;
+
+    private bool _editingReputation;
+    private string _typedReputation = "";
+
+    private void OnReputationFocus(FocusEventArgs args) {
+        _editingReputation = true;
+        _typedReputation = ReputationText;
+    }
+
+    /// <summary>
+    /// Commit on the way out. The change event alone is not enough: a box
+    /// cleared back to empty and then abandoned reports no change, and the empty
+    /// value would never reach the model.
+    /// </summary>
+    private void OnReputationBlur(FocusEventArgs args) {
+        _editingReputation = false;
+    }
+
+    private string BarStyle => $"width: {Percent.ToString("0.##", CultureInfo.InvariantCulture)}%;";
+
+    private string LevelClass(int value) => Level == value ? "trader-card-level-active" : "";
+
+    private string LevelTitle(int value) => LocalizationService.Format("ProfileSetLoyaltyLevel", value, Trader.Name);
+
+    /// <summary>
+    /// Reads the reputation box when its value is committed, ignoring anything
+    /// that is not a number rather than rejecting it, so a half-typed value is
+    /// never thrown away mid-edit. An empty box means "not set", which is a real
+    /// state the quest gates read as unknown.
+    /// </summary>
+    /// <remarks>
+    /// Bound to <c>change</c>, which browsers fire when the value is committed
+    /// rather than per keystroke, so the model is not rewritten on every
+    /// character typed.
+    /// </remarks>
+    private async Task OnReputationChanged(ChangeEventArgs args) {
+        var text = args.Value?.ToString();
+        if (_editingReputation) _typedReputation = text ?? "";
+
+        if (string.IsNullOrWhiteSpace(text)) {
+            await ReputationChanged.InvokeAsync(null);
+            return;
+        }
+
+        if (!double.TryParse(text.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed)) {
+            return;
+        }
+
+        await ReputationChanged.InvokeAsync(parsed);
+    }
+}

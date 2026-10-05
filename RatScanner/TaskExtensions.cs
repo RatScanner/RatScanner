@@ -1,3 +1,4 @@
+using RatScanner.FetchModels.TarkovTracker;
 using RatScanner.TarkovDev.Json;
 using System;
 using System.Collections.Generic;
@@ -98,6 +99,26 @@ public static class TaskExtensions {
 
     /// <summary>Player level from the tracker, or 0 when it is unknown.</summary>
     private static int PlayerLevel => Item.SelfProgress.PlayerLevel ?? 0;
+
+    /// <summary>
+    /// How many of a trader's tasks are done, out of all the tasks they hand out.
+    /// </summary>
+    /// <remarks>
+    /// Takes the trader's tasks already grouped rather than filtering the whole
+    /// catalogue itself, because the settings screen shows every trader at once
+    /// and a per-trader scan of 500-odd tasks each would repaint far more work
+    /// than the reading it saves.
+    ///
+    /// Reads the same <see cref="Item.IsTaskComplete"/> the quest tables do, so a
+    /// failed task counts as unfinished here too rather than as done.
+    /// </remarks>
+    public static (int complete, int total) GetTraderTaskProgress(IReadOnlyList<TarkovTask> tasks, UserProgress progress) {
+        if (tasks is null || tasks.Count == 0) {
+            return (0, 0);
+        }
+
+        return (tasks.Count(t => Item.IsTaskComplete(t, progress)), tasks.Count);
+    }
 
     /// <summary>
     /// Whether the map carries an objective location worth drawing, ignoring

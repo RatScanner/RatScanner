@@ -315,20 +315,37 @@ internal static class QuestNeedClassifier {
 		var standing = progress.Traders?.FirstOrDefault(t =>
 			string.Equals(t.Id, requirement.TraderId, StringComparison.OrdinalIgnoreCase));
 
-		int? reported = isLevel ? standing?.Level : standing?.Reputation;
-		if (reported is not int value) {
+		// Level is a whole loyalty tier, reputation is a fractional standing, so
+		// the two are compared on their own scales rather than through one cast.
+		if (isLevel) {
+			if (standing?.Level is not int level) {
+				// Not reported for this trader, so the gate stays uncertain.
+				return true;
+			}
+
+			return Compare(level, requirement.CompareMethod, requirement.Value);
+		}
+
+		if (standing?.Reputation is not double reputation) {
 			// Not reported for this trader, so the gate stays uncertain.
 			return true;
 		}
 
-		return Compare(value, requirement.CompareMethod, requirement.Value);
+		return Compare(reputation, requirement.CompareMethod, requirement.Value);
 	}
 
 	/// <summary>
 	/// Applies a requirement's comparison, treating an unrecognised method as
 	/// unsatisfiable rather than as a pass.
 	/// </summary>
-	private static bool Compare(int value, string? compareMethod, int target) => compareMethod switch {
+	private static bool Compare(int value, string? compareMethod, int target) => Compare((double)value, compareMethod, target);
+
+	/// <summary>
+	/// The fractional form, used for reputation. A whole-number value compared
+	/// here works out the same as the integer path, since the quest gates are
+	/// themselves whole numbers.
+	/// </summary>
+	private static bool Compare(double value, string? compareMethod, int target) => compareMethod switch {
 		">=" => value >= target,
 		">" => value > target,
 		"<=" => value <= target,

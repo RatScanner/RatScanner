@@ -10,8 +10,16 @@ public class Levels {
 	[JsonProperty("requiredPlayerLevel")]
 	public int RequiredPlayerLevel { get; set; }
 
+	/// <summary>
+	/// Reputation needed to reach this loyalty level.
+	/// </summary>
+	/// <remarks>
+	/// Fractional, not an integer. The real values are things like 0.5, 2.5 and
+	/// 6.5, and an <c>int</c> here would silently round a trader's LL4 threshold
+	/// down, so a player at 6.0 would be shown as two thirds of the way there.
+	/// </remarks>
 	[JsonProperty("requiredReputation")]
-	public int RequiredReputation { get; set; }
+	public double RequiredReputation { get; set; }
 
 	[JsonProperty("requiredCommerce")]
 	public int RequiredCommerce { get; set; }

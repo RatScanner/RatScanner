@@ -16,7 +16,31 @@ namespace RatScanner.ViewModel;
 internal sealed class ManualTraderStanding {
 	public int Level { get; set; }
 
-	public int? Reputation { get; set; }
+	/// <summary>
+	/// Standing on the trader's own scale. Fractional, because tarkov.dev publishes
+	/// loyalty thresholds like 0.5, 2.5 and 6.5, so a whole number cannot describe
+	/// where the player actually sits on the track.
+	/// </summary>
+	public double? Reputation { get; set; }
+}
+
+/// <summary>
+/// One game mode's manually entered player profile, held while the tracking
+/// settings page is open. The values are staged here and written to the progress
+/// store on Save, so an unsaved edit does not change what the quest gates read.
+/// </summary>
+internal sealed class ManualProfile {
+	/// <summary>PMC level the player reports by hand. Zero means "not set".</summary>
+	public int PlayerLevel { get; set; }
+
+	/// <summary>Which side the player fights for: "USEC", "BEAR" or empty.</summary>
+	public string PlayerFaction { get; set; } = "";
+
+	/// <summary>
+	/// Per-trader standing the player reports by hand, keyed by trader id. Null
+	/// members mean "not set" and leave that half of the gate unknown.
+	/// </summary>
+	public Dictionary<string, ManualTraderStanding> ManualTraders { get; set; } = new(StringComparer.Ordinal);
 }
 
 internal class SettingsVM : INotifyPropertyChanged {
@@ -59,17 +83,16 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 	public RatConfig.ProgressSource ProgressSource { get; set; }
 
-	/// <summary>PMC level the player reports by hand. Zero means "not set".</summary>
-	public int PlayerLevel { get; set; }
-
-	/// <summary>Which side the player fights for: "USEC", "BEAR" or empty.</summary>
-	public string PlayerFaction { get; set; } = "";
-
 	/// <summary>
-	/// Per-trader standing the player reports by hand, keyed by trader id. Null
-	/// members mean "not set" and leave that half of the gate unknown.
+	/// The manually entered profile for each game mode, staged until Save. Level,
+	/// faction and trader standing differ per mode, so they cannot be a single
+	/// shared value the way the config settings are.
 	/// </summary>
-	public Dictionary<string, ManualTraderStanding> ManualTraders { get; set; } = new(StringComparer.Ordinal);
+	public Dictionary<GameMode, ManualProfile> ManualProfiles { get; set; } = new() {
+		[GameMode.Regular] = new(),
+		[GameMode.Pve] = new(),
+		[GameMode.PvpSeason] = new(),
+	};
 
 	// TarkovTracker Specific Tracking Settings
 	public string TarkovTrackerToken { get; set; }
@@ -145,15 +168,21 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 		// The manual overrides live in the progress store rather than in the INI
 		// config, since they are per game mode and belong with the rest of the
-		// progress. Reading through GetProgress gives the same view the quest
-		// gates read, so the two cannot disagree.
-		ManualTraders = [];
-		var local = RatScannerMain.Instance?.LocalProgress?.GetProgress();
-		if (local is not null) {
-			PlayerLevel = local.PlayerLevel ?? 0;
-			PlayerFaction = local.PmcFaction ?? "";
+		// progress. Every mode is read, not just the active one, so the settings
+		// tabs can show all of them at once and none gets overwritten on Save.
+		ManualProfiles = new Dictionary<GameMode, ManualProfile>();
+		var store = RatScannerMain.Instance?.LocalProgress;
+		foreach (var mode in Enum.GetValues<GameMode>()) {
+			var profile = new ManualProfile();
+			ManualProfiles[mode] = profile;
+
+			var local = store?.GetProgress(mode);
+			if (local is null) continue;
+
+			profile.PlayerLevel = local.PlayerLevel ?? 0;
+			profile.PlayerFaction = local.PmcFaction ?? "";
 			foreach (var trader in local.Traders) {
-				ManualTraders[trader.Id] = new ManualTraderStanding {
+				profile.ManualTraders[trader.Id] = new ManualTraderStanding {
 					Level = trader.Level ?? 0,
 					Reputation = trader.Reputation,
 				};
@@ -302,14 +331,17 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 		// Written straight to the progress store instead of being staged on the
 		// config, because they are per game mode and are read back through it.
-		// Each write notifies, so the quest views repaint as one batch below
-		// rather than once per field.
+		// Every mode is written, not just the active one, so saving from any tab
+		// does not discard the others, and each mode is written whole so a
+		// trader cleared in the UI is removed rather than left behind.
 		var progress = RatScannerMain.Instance?.LocalProgress;
 		if (progress is not null) {
-			progress.SetLevel(PlayerLevel > 0 ? PlayerLevel : null);
-			progress.SetFaction(PlayerFaction);
-			foreach (var (id, trader) in ManualTraders) {
-				progress.SetTrader(id, trader.Level > 0 ? trader.Level : null, trader.Reputation);
+			foreach (var (mode, profile) in ManualProfiles) {
+				progress.SetProfile(
+					mode,
+					profile.PlayerLevel > 0 ? profile.PlayerLevel : null,
+					profile.PlayerFaction,
+					ToStoreStanding(profile));
 			}
 		}
 
@@ -376,6 +408,14 @@ internal class SettingsVM : INotifyPropertyChanged {
 		// SetGameMode so the chip picks the change up like any other listener.
 		if (gameModeChanged) await SetGameMode(GameMode);
 		else Notify();
+	}
+
+	// A zero level and a null reputation both mean "not set", so they are handed
+	// over as nulls rather than as the placeholder values the UI holds.
+	private static IEnumerable<(string Id, int? Level, double? Reputation)> ToStoreStanding(ManualProfile profile) {
+		foreach (var (id, trader) in profile.ManualTraders) {
+			yield return (id, trader.Level > 0 ? trader.Level : null, trader.Reputation);
+		}
 	}
 
 	private static void UpdateTarkovTrackerToken() {
