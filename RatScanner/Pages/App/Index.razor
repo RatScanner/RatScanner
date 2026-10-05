@@ -480,8 +480,15 @@
     /// the key was consumed, so the hotkey manager only falls through to closing
     /// the interactive overlay when there is no map to dismiss.
     /// </summary>
+    /// <remarks>
+    /// Gated on the window being active. Escape is a global hotkey, so it also
+    /// fires while the game or the interactive overlay has focus, and dismissing
+    /// this window's map then would close something the user cannot even see.
+    /// Returning false lets the overlay's own handler take the key instead.
+    /// </remarks>
     private bool OnEscapePressed() {
         if (_viewerMap == null) return false;
+        if (!PageSwitcher.Instance.IsActive) return false;
 
         _ = InvokeAsync(CloseMapViewer);
         return true;
