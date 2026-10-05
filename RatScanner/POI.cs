@@ -71,6 +71,17 @@ public class POI {
     public string IconColorHover { get; set; } = string.Empty;
 
     /// <summary>
+    /// Id of the task this marker is an objective of, or empty when the marker
+    /// is not a quest objective.
+    ///
+    /// This is what makes a marker clickable: the viewer has no way to know on
+    /// its own which task an objective belongs to, so it reads this and hands
+    /// the id back to whoever listens. Empty means the marker is decoration
+    /// only, which is the case for extracts, doors, hazards and the player.
+    /// </summary>
+    public string TaskId { get; set; } = string.Empty;
+
+    /// <summary>
     /// Outline of the area this POI covers, as a series of vertices in the same
     /// percentage space as <see cref="X"/> and <see cref="Y"/>. Empty for the
     /// common case of a POI that is just a single spot.

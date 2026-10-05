@@ -1,11 +1,23 @@
 using RatScanner.TarkovDev.Json;
 using RatStash;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace RatScanner.ViewModel;
+
+/// <summary>
+/// Trader standing the player reported by hand. A zero level means "not set",
+/// and a null reputation means "not set", so each half of the gate can be left
+/// unknown on its own.
+/// </summary>
+internal sealed class ManualTraderStanding {
+	public int Level { get; set; }
+
+	public int? Reputation { get; set; }
+}
 
 internal class SettingsVM : INotifyPropertyChanged {
 	public bool EnableNameScan { get; set; }
@@ -46,6 +58,18 @@ internal class SettingsVM : INotifyPropertyChanged {
 	public bool ShowKappaNeeds { get; set; }
 
 	public RatConfig.ProgressSource ProgressSource { get; set; }
+
+	/// <summary>PMC level the player reports by hand. Zero means "not set".</summary>
+	public int PlayerLevel { get; set; }
+
+	/// <summary>Which side the player fights for: "USEC", "BEAR" or empty.</summary>
+	public string PlayerFaction { get; set; } = "";
+
+	/// <summary>
+	/// Per-trader standing the player reports by hand, keyed by trader id. Null
+	/// members mean "not set" and leave that half of the gate unknown.
+	/// </summary>
+	public Dictionary<string, ManualTraderStanding> ManualTraders { get; set; } = new(StringComparer.Ordinal);
 
 	// TarkovTracker Specific Tracking Settings
 	public string TarkovTrackerToken { get; set; }
@@ -118,6 +142,23 @@ internal class SettingsVM : INotifyPropertyChanged {
 		ShowNonFIRNeeds = RatConfig.Tracking.ShowNonFIRNeeds;
 		ShowKappaNeeds = RatConfig.Tracking.ShowKappaNeeds;
 		ProgressSource = RatConfig.Tracking.Source;
+
+		// The manual overrides live in the progress store rather than in the INI
+		// config, since they are per game mode and belong with the rest of the
+		// progress. Reading through GetProgress gives the same view the quest
+		// gates read, so the two cannot disagree.
+		ManualTraders = [];
+		var local = RatScannerMain.Instance?.LocalProgress?.GetProgress();
+		if (local is not null) {
+			PlayerLevel = local.PlayerLevel ?? 0;
+			PlayerFaction = local.PmcFaction ?? "";
+			foreach (var trader in local.Traders) {
+				ManualTraders[trader.Id] = new ManualTraderStanding {
+					Level = trader.Level ?? 0,
+					Reputation = trader.Reputation,
+				};
+			}
+		}
 
 		TarkovTrackerToken = RatConfig.Tracking.TarkovTracker.Token;
 		ShowTarkovTrackerTeam = RatConfig.Tracking.TarkovTracker.ShowTeam;
@@ -258,6 +299,19 @@ internal class SettingsVM : INotifyPropertyChanged {
 		RatConfig.Tracking.ShowNonFIRNeeds = ShowNonFIRNeeds;
 		RatConfig.Tracking.ShowKappaNeeds = ShowKappaNeeds;
 		RatConfig.Tracking.Source = ProgressSource;
+
+		// Written straight to the progress store instead of being staged on the
+		// config, because they are per game mode and are read back through it.
+		// Each write notifies, so the quest views repaint as one batch below
+		// rather than once per field.
+		var progress = RatScannerMain.Instance?.LocalProgress;
+		if (progress is not null) {
+			progress.SetLevel(PlayerLevel > 0 ? PlayerLevel : null);
+			progress.SetFaction(PlayerFaction);
+			foreach (var (id, trader) in ManualTraders) {
+				progress.SetTrader(id, trader.Level > 0 ? trader.Level : null, trader.Reputation);
+			}
+		}
 
 		RatConfig.Tracking.TarkovTracker.Token = TarkovTrackerToken.Trim();
 		RatConfig.Tracking.TarkovTracker.ShowTeam = ShowTarkovTrackerTeam;

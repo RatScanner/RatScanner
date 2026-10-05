@@ -98,6 +98,98 @@ public static class TaskExtensions {
 
     /// <summary>Player level from the tracker, or 0 when it is unknown.</summary>
     private static int PlayerLevel => Item.SelfProgress.PlayerLevel ?? 0;
+
+    /// <summary>
+    /// Whether the map carries an objective location worth drawing, ignoring
+    /// whether the player can reach it.
+    ///
+    /// Separate from <see cref="GetAvailableTasksForMap"/> on purpose: an
+    /// objective can name a map through its own <c>maps</c> list while having no
+    /// <c>zones</c> at all, and <c>possibleLocations</c> is not modelled. Those
+    /// tasks would make the toggle look useful while drawing nothing, so the
+    /// button is gated on zones existing rather than on task count.
+    /// </summary>
+    public static bool HasQuestObjectiveZones(string mapId) {
+        if (string.IsNullOrWhiteSpace(mapId)) {
+            return false;
+        }
+
+        foreach (var task in TarkovDevAPI.GetTasks()) {
+            foreach (var objective in task.Objectives ?? []) {
+                if (objective?.Zones == null) continue;
+
+                if (objective.Zones.Any(z => z?.Map != null
+                    && string.Equals(z.Map, mapId, StringComparison.OrdinalIgnoreCase))) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Tasks that happen on the given map and that the player can actually take
+    /// on or is already part-way through: gates open, or started.
+    ///
+    /// Used to decide which quest locations to put on a map. This is deliberately
+    /// the three OPEN gates only. Counting <see cref="QuestGate.FutureKnown"/> or
+    /// <see cref="QuestGate.ConditionalUnknown"/> as well was what made the overlay
+    /// show nearly every task on the map: a task 40 levels away, or one waiting on
+    /// a trader whose standing was never reported, is not somewhere the player can
+    /// go yet.
+    ///
+    /// One consequence worth knowing: a task is only shown when its gates can be
+    /// settled. Until the profile settings carry a level and trader standing, the
+    /// gated tasks are unknown rather than available, so they stay off the map
+    /// instead of flooding it.
+    /// </summary>
+    public static List<TarkovTask> GetAvailableTasksForMap(string mapId) {
+        if (string.IsNullOrWhiteSpace(mapId)) {
+            return [];
+        }
+
+        var progress = Item.SelfProgress;
+        var tasksById = TarkovDevAPI.GetTasks().ToDictionary(t => t.Id, t => t);
+
+        return
+        [
+            .. TarkovDevAPI.GetTasks().Where(task => {
+                if (task.Objectives is not { Count: > 0 }) return false;
+                if (!TaskHappensOnMap(task, mapId)) return false;
+
+                // Finished or failed objectives are history, not somewhere to go.
+                if (Item.IsTaskComplete(task, progress) || Item.IsTaskFailed(task, progress)) return false;
+
+                var gate = QuestNeedClassifier.ClassifyGate(task, tasksById, progress, out _);
+                return gate is QuestGate.ApplicableNow or QuestGate.AvailableNow or QuestGate.ActiveNow;
+            })
+        ];
+    }
+
+    /// <summary>
+    /// Whether any of the task's objectives name the given map, either through a
+    /// zone or the objective's own map list.
+    /// </summary>
+    private static bool TaskHappensOnMap(TarkovTask task, string mapId) {
+        if (task.Map != null && string.Equals(task.Map, mapId, StringComparison.OrdinalIgnoreCase)) return true;
+
+        foreach (var objective in task.Objectives ?? []) {
+            if (objective == null) continue;
+
+            if (objective.Maps != null && objective.Maps.Any(m => string.Equals(m, mapId, StringComparison.OrdinalIgnoreCase))) {
+                return true;
+            }
+
+            if (objective.Zones != null && objective.Zones.Any(z =>
+                z?.Map != null && string.Equals(z.Map, mapId, StringComparison.OrdinalIgnoreCase))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private static TaskStatus GetStatus(List<string>? reported, bool isComplete, bool isFailed, TarkovTask task,
         TarkovTask prereq) {
         if (isComplete) {
@@ -121,10 +213,14 @@ public static class TaskExtensions {
     }
 
     /// <summary>
-    /// Trader level at which the giving trader starts handing out the task, or
-    /// null when there is no such gate. This is the trader's own loyalty level,
-    /// distinct from <see cref="TarkovTask.MinPlayerLevel"/>, which is the player
-    /// level the task needs.
+    /// Trader loyalty level at which the giving trader starts handing out the task,
+    /// or null when there is no such gate. This is the trader's own tier, distinct
+    /// from <see cref="TarkovTask.MinPlayerLevel"/>, which is the player level the
+    /// task needs.
+    ///
+    /// Only the giving trader's own requirement counts. A task may also carry
+    /// requirements on other traders (Thirsty - Hounds needs three), and those say
+    /// nothing about when this trader offers it.
     /// </summary>
     public static int? GetTraderOfferLevel(this TarkovTask task) {
         var traderId = task.TraderId;
@@ -133,12 +229,10 @@ public static class TaskExtensions {
         }
 
         var requirement = task.TraderRequirements?.FirstOrDefault(r =>
-            string.Equals(r.TraderId, traderId, StringComparison.Ordinal));
+            string.Equals(r.TraderId, traderId, StringComparison.Ordinal)
+            && string.Equals(r.RequirementType, "level", StringComparison.OrdinalIgnoreCase));
 
-        // Only a loyalty level gates when the task becomes offered; the other
-        // requirement types are not a level.
-        if (requirement is null
-            || !string.Equals(requirement.RequirementType, "loyaltyLevel", StringComparison.OrdinalIgnoreCase)) {
+        if (requirement is null) {
             return null;
         }
 

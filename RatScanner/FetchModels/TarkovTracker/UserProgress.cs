@@ -19,6 +19,10 @@ public class UserProgress {
 	[JsonProperty("pmcFaction")]
 	public string? PmcFaction { get; set; }
 
+	/// <summary>Per-trader standing, keyed by trader id.</summary>
+	[JsonProperty("tradersProgress", NullValueHandling = NullValueHandling.Ignore)]
+	public List<TraderProgress> Traders { get; set; } = [];
+
 	[JsonProperty("tasksProgress", NullValueHandling = NullValueHandling.Ignore)]
 	public List<Progress> Tasks { get; set; } = [];
 
@@ -30,4 +34,24 @@ public class UserProgress {
 
 	[JsonProperty("hideoutPartsProgress", NullValueHandling = NullValueHandling.Ignore)]
 	public List<Progress> HideoutParts { get; set; } = [];
+
+	/// <summary>
+	/// Trader standing recorded for one trader. Both fields are optional because
+	/// the API and a manual override only ever populate the ones the user knows.
+	/// </summary>
+	public class TraderProgress {
+		[JsonProperty("id")]
+		public string Id { get; set; } = "";
+
+		/// <summary>Trader loyalty level (1-4).</summary>
+		[JsonProperty("level")]
+		public int? Level { get; set; }
+
+		/// <summary>
+		/// Trader reputation on the same negative-to-positive scale tarkov.dev gates
+		/// on, so -1 is "below zero" and 4 is a high standing.
+		/// </summary>
+		[JsonProperty("reputation")]
+		public int? Reputation { get; set; }
+	}
 }

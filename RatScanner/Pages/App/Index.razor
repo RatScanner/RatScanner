@@ -96,16 +96,19 @@
             @* Wired so objectives that name a place get a map button. Objectives
                without location data hide it themselves. *@
             <TaskSearchResult Task="@selectedTask" Detail="DetailLevel.Full"
-                              OnMapClick="@((tuple) => OpenMapForObjective(tuple.objective))" />
-            <TaskDetailsTable Task="@selectedTask" OnMapClick="@((tuple) => OpenMapForObjective(tuple.objective))" />
+                              OnMapClick="@((tuple) => OpenMapForObjective(tuple.task, tuple.objective))" />
+            <TaskDetailsTable Task="@selectedTask"
+                              OnMapClick="@((tuple) => OpenMapForObjective(tuple.task, tuple.objective))" />
         } else if (Selected?.Data is Map selectedMap) {
             <MapSearchResult Map="@selectedMap" Detail="DetailLevel.Full" ShowExtracts="@_showExtracts"
                              ShowLocks="@_showLocks" ShowTransits="@_showTransits" ShowHazards="@_showHazards"
-                             OnShowExtractsChanged="@OnShowExtractsChanged" OnShowLocksChanged="@OnShowLocksChanged"
-                             OnShowTransitsChanged="@OnShowTransitsChanged" OnShowHazardsChanged="@OnShowHazardsChanged"
+                             ShowQuestLocations="@_showQuestLocations" OnShowExtractsChanged="@OnShowExtractsChanged"
+                             OnShowLocksChanged="@OnShowLocksChanged" OnShowTransitsChanged="@OnShowTransitsChanged"
+                             OnShowHazardsChanged="@OnShowHazardsChanged" OnShowQuestLocationsChanged="@OnShowQuestLocationsChanged"
                              OnMapClick="@(() => OpenMapViewer(selectedMap))" />
             <MudPaper Outlined="true" Class="map-frame">
-                <MapViewer Map="@selectedMap" Inline="true" Pois="@SelectedMapPois" OnExpand="OpenMapViewerFromCard" />
+                <MapViewer Map="@selectedMap" Inline="true" Pois="@SelectedMapPois" OnExpand="OpenMapViewerFromCard"
+                           OnPoiTaskClick="@OpenTaskById" />
             </MudPaper>
         }
     </MudStack>
@@ -114,7 +117,8 @@
 @* Full-screen map viewer, opened from the selected map's info card. Kept
    separate from the selected map so closing it leaves the info card in place. *@
 @if (_viewerMap != null) {
-    <MapViewer Map="@_viewerMap" Pois="@ViewerPois" FocusPois="@ViewerFocusPois" OnClose="CloseMapViewer" />
+    <MapViewer Map="@_viewerMap" Pois="@ViewerPois" FocusPois="@ViewerFocusPois" OnClose="CloseMapViewer"
+               OnPoiTaskClick="@OpenTaskById" />
 }
 
 <style>
@@ -312,6 +316,9 @@
     /// <summary>Whether environmental hazards are overlaid on the maps.</summary>
     private bool _showHazards;
 
+    /// <summary>Whether quest objective locations are overlaid on the maps.</summary>
+    private bool _showQuestLocations;
+
     /// <summary>
     /// Lazily-built name lookups, shared by every map the viewer shows. Building
     /// these eagerly would pull the whole items and maps cache in just to resolve
@@ -348,6 +355,7 @@
         if (_showLocks) Add(map.GetLockPois(ResolveItemName));
         if (_showTransits) Add(map.GetTransitPois(ResolveMapName));
         if (_showHazards) Add(map.GetHazardPois());
+        if (_showQuestLocations) Add(map.GetQuestObjectivePois(RatScanner.TaskExtensions.GetAvailableTasksForMap(map.Id)));
 
         // Only on the map the player is actually on: showing a position on any
         // other map would put the marker somewhere meaningless.
@@ -433,6 +441,10 @@
 
     private void OnShowHazardsChanged(bool value) {
         _showHazards = value;
+    }
+
+    private void OnShowQuestLocationsChanged(bool value) {
+        _showQuestLocations = value;
     }
 
     protected override void OnInitialized() {
@@ -570,10 +582,35 @@
     }
 
     /// <summary>
+    /// Opens the quest an objective marker belongs to, given the task id the
+    /// marker carries.
+    ///
+    /// The full-screen viewer is closed first: the quest is shown in the panel
+    /// below the search bar, which the viewer is covering, so leaving it open
+    /// would hide the thing the click was asking for.
+    ///
+    /// Selection goes through the shared queue rather than a local field, so
+    /// the quest lands in the history strip and the display, the wiki and
+    /// tarkov.dev hotkeys all agree on what is on screen.
+    /// </summary>
+    private void OpenTaskById(string taskId) {
+        if (string.IsNullOrEmpty(taskId)) return;
+
+        var task = TarkovDevAPI.GetTasks().FirstOrDefault(t => t.Id == taskId);
+        if (task == null) return;
+
+        _viewerMap = null;
+        _viewerZonePois = null;
+
+        SelectedResults.Enqueue(new SearchResult(task, 0));
+        StateHasChanged();
+    }
+
+    /// <summary>
     /// Opens the full-screen viewer on the map a quest objective happens in,
     /// with the objective's zones drawn as areas.
     /// </summary>
-    private void OpenMapForObjective(TaskObjective objective) {
+    private void OpenMapForObjective(TarkovTask task, TaskObjective objective) {
         if (objective?.Zones == null || objective.Zones.Count == 0) return;
 
         // Zones are per-map. The first one picks the map to open, so an
@@ -592,7 +629,7 @@
         // Keep the overlay toggles as they were; the zones are extra markers,
         // not a replacement.
         _viewerMap = map;
-        _viewerZonePois = map.GetZonePois(objective.Zones);
+        _viewerZonePois = map.GetZonePois(objective.Zones, taskId: task?.Id);
         if (_viewerZonePois.Count == 0) return;
 
         StateHasChanged();

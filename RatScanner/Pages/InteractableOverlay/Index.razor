@@ -60,7 +60,8 @@
 @* The full-screen map viewer, opened from a map result or a quest objective.
    Centred on the objective's zones when it was opened from one. *@
 @if (_selectedMap != null) {
-    <MapViewer Map="@_selectedMap" Pois="@_selectedPois" FocusPois="@_selectedPois" OnClose="@CloseMapViewer" />
+    <MapViewer Map="@_selectedMap" Pois="@_selectedPois" FocusPois="@_selectedPois" OnClose="@CloseMapViewer"
+               OnPoiTaskClick="@OpenTaskInMainUi" />
 }
 
 @code {
@@ -118,11 +119,35 @@
         if (map == null) return;
 
         // Every zone becomes a marker with its outline drawn as an area.
-        _selectedPois = map.GetZonePois(objective.Zones);
+        _selectedPois = map.GetZonePois(objective.Zones, taskId: task?.Id);
         if (_selectedPois.Count == 0) return;
 
         _selectedMap = map;
         StateHasChanged();
+    }
+
+    /// <summary>
+    /// Opens the quest an objective marker belongs to in the main window, then
+    /// gets that window in front of the game.
+    ///
+    /// The overlay sits on top of the game and this overlay's own results list is
+    /// only a search box, so there is nowhere here to show a full quest. The main
+    /// window can, so the click is treated as "show me this quest" rather than as
+    /// something to answer in place.
+    /// </summary>
+    private void OpenTaskInMainUi(string taskId) {
+        if (string.IsNullOrEmpty(taskId)) return;
+
+        var task = TarkovDevAPI.GetTasks().FirstOrDefault(t => t.Id == taskId);
+        if (task == null) return;
+
+        // Selected through the shared queue, so the main window picks it up the
+        // same way it picks up a scan.
+        RatScannerMain.Instance.SelectedResults.Enqueue(new SearchResult(task, 0));
+
+        CloseMapViewer();
+        JSHideOverlay();
+        PageSwitcher.Instance.ShowUI();
     }
 
     private void OpenMapViewer(Map map) {

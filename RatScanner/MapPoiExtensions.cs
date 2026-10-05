@@ -233,6 +233,57 @@ public static class MapPoiExtensions {
 		""";
 
     /// <summary>
+    /// Every quest objective zone on this map, across the tasks the player can
+    /// take on, as POIs ready to hand to MapViewer.
+    ///
+    /// Tasks come pre-filtered by <paramref name="tasks"/> so the caller decides
+    /// what "available" means: only tasks with a map entry for this map are
+    /// touched, and each zone's label is the objective's own text so a marker
+    /// says what it is for rather than just that something is there.
+    ///
+    /// Objectives are keyed by id so a zone shared between several objectives of
+    /// the same task is drawn once, and the same objective appearing in two tasks
+    /// does not stack markers on the same spot.
+    /// </summary>
+    public static List<POI> GetQuestObjectivePois(this Map map, IEnumerable<TarkovTask> tasks) {
+        ArgumentNullException.ThrowIfNull(tasks);
+
+        var projection = MapDataLoader.GetMapsById().GetValueOrDefault(map.Id);
+        if (projection == null || MapProjection.Create(projection) is not { } frame) return [];
+
+        var pois = new List<POI>();
+        var drawnZones = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var task in tasks) {
+            if (task?.Objectives is not { Count: > 0 }) continue;
+
+            foreach (var objective in task.Objectives) {
+                if (objective?.Zones is not { Count: > 0 }) continue;
+
+                // A zone belongs to exactly one map, so anything tagged for another
+                // map cannot be placed here. Objectives spanning several maps still
+                // contribute their part to each.
+                var onThisMap = objective.Zones.Where(z => z?.Map is not null
+                    && string.Equals(z.Map, map.Id, StringComparison.OrdinalIgnoreCase)).ToList();
+
+                if (onThisMap.Count == 0) continue;
+
+                var label = string.IsNullOrWhiteSpace(objective.Description) ? task.Name : objective.Description;
+
+                // Zones carry an id and the same area is commonly listed by more than
+                // one objective, so it is drawn once no matter how often it appears.
+                // Zones with no id cannot be told apart and are always drawn.
+                var fresh = onThisMap.Where(z => string.IsNullOrEmpty(z.Id) || drawnZones.Add(z.Id)).ToList();
+                if (fresh.Count == 0) continue;
+
+                pois.AddRange(map.GetZonePois(fresh, label, task.Id));
+            }
+        }
+
+        return pois;
+    }
+
+    /// <summary>
     /// A quest objective's zones as POIs, ready to hand to MapViewer.
     ///
     /// Zones are only returned for the map the projection belongs to, so an
@@ -241,10 +292,14 @@ public static class MapPoiExtensions {
     /// becomes the polygon's vertices and the centre anchors the icon, which
     /// keeps the icon sitting inside its own area.
     ///
+    /// <paramref name="taskId"/> is stamped onto every marker so clicking one
+    /// can name the task it belongs to; the markers are otherwise identical to
+    /// any other zone.
+    ///
     /// Returns an empty list when the map has no projection, since world
     /// coordinates mean nothing without one.
     /// </summary>
-    public static List<POI> GetZonePois(this Map map, IEnumerable<TaskZone> zones, string? label = null) {
+    public static List<POI> GetZonePois(this Map map, IEnumerable<TaskZone> zones, string? label = null, string? taskId = null) {
         var projection = MapDataLoader.GetMapsById().GetValueOrDefault(map.Id);
         if (projection == null || MapProjection.Create(projection) is not { } frame) return [];
 
@@ -288,6 +343,7 @@ public static class MapPoiExtensions {
                 NameColor = ZoneNameColor,
                 IconColor = ZoneColor,
                 IconColorHover = ZoneColorHover,
+                TaskId = taskId ?? string.Empty,
             };
 
             if (hasOutline) {

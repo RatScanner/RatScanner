@@ -70,8 +70,14 @@
                        scales with the zoom, so they track the map when it moves. *@
                     @if (Pois is { Count: > 0 }) {
                         foreach (var poi in Pois) {
-                            <div class="poi"
-                                 style="left: @(poi.X.ToString(CultureInfo.InvariantCulture))%; top: @(poi.Y.ToString(CultureInfo.InvariantCulture))%;">
+                            var isQuestObjective = !string.IsNullOrEmpty(poi.TaskId);
+                            var cssClass = isQuestObjective
+                                ? "poi poi-clickable"
+                                : "poi";
+                            <div class="@cssClass"
+                                 style="left: @(poi.X.ToString(CultureInfo.InvariantCulture))%; top: @(poi.Y.ToString(CultureInfo.InvariantCulture))%;"
+                                 @onpointerdown:stopPropagation="true" @onpointerdown:preventDefault="true"
+                                 @onclick="@(() => HandlePoiClick(poi))">
                                 <div class="poi-icon" style="@IconStyle(poi)">
                                     @if (!string.IsNullOrWhiteSpace(poi.IconSvg)) {
                                         @((MarkupString)poi.IconSvg)
@@ -300,6 +306,13 @@
         box-shadow: 0 0 30px var(--poi-icon-color-hover, rgba(255, 193, 7, 1));
     }
 
+    /* An objective marker that can be clicked to open its quest. The cursor is
+       the only cue: the markers carry no other affordance, and the shapes layer
+       below has pointer-events off, so only the icon itself is a target. */
+    .poi-clickable {
+        cursor: pointer;
+    }
+
     /* The polygon layer. Stretched over the whole canvas box with a 0-100
        viewBox, which is why it needs no positioning of its own, and it must
        not eat pointer events meant for dragging the map. */
@@ -344,6 +357,15 @@
     /// </summary>
     [Parameter]
     public List<POI>? FocusPois { get; set; }
+
+    /// <summary>
+    /// Raised when a marker carrying a task id is clicked. Left unwired the
+    /// markers are still drawn, but clicking one does nothing, so a map that
+    /// has objectives on it but nowhere to send the click stays inert rather
+    /// than opening something unexpected.
+    /// </summary>
+    [Parameter]
+    public EventCallback<string> OnPoiTaskClick { get; set; }
 
     [Parameter]
     public EventCallback OnClose { get; set; }
@@ -693,5 +715,18 @@
 
     private void HandlePointerUp(PointerEventArgs e) {
         _isDragging = false;
+    }
+
+    /// <summary>
+    /// Forwards a click on a marker, but only for markers that name a task.
+    /// Anything else (an extract, a door, the player) is decoration, so the
+    /// click is ignored and the map is left where it is.
+    /// </summary>
+    private Task HandlePoiClick(POI poi) {
+        if (string.IsNullOrEmpty(poi.TaskId) || !OnPoiTaskClick.HasDelegate) {
+            return Task.CompletedTask;
+        }
+
+        return OnPoiTaskClick.InvokeAsync(poi.TaskId);
     }
 }

@@ -28,8 +28,9 @@ internal enum QuestGate {
 	FutureKnown,
 
 	/// <summary>
-	/// Gated by a condition RatScanner cannot evaluate (trader reputation/loyalty,
-	/// faction when unknown, dialogue/timed/Lightkeeper unlocks).
+	/// Gated by a condition RatScanner cannot evaluate (trader loyalty level,
+	/// trader standing the player has not reported, faction when unknown,
+	/// dialogue/timed/Lightkeeper unlocks).
 	/// </summary>
 	ConditionalUnknown,
 }
@@ -77,9 +78,12 @@ internal readonly record struct ObjectiveNeedBreakdown(
 /// Classifies quest item requirements using only data sources RatScanner actually has:
 /// entity progress (tasks + objectives + player level + faction from TarkovTracker) and
 /// json.tarkov.dev task gates (prerequisite tasks, player level, faction, trader gates).
-/// Trader standing/scav karma is NOT exposed by the tracker API, so reputation-gated
-/// tasks (e.g. the Fence "Compensation for Damage" series) stay conditional instead of
-/// inflating "needed now" counts.
+/// Player level, faction and trader standing can also come from the manual overrides in
+/// the tracking settings. Every trader requirement the API sends is measured against
+/// reported standing — "level" is the trader's loyalty tier, "reputation" the player's
+/// standing with them — so both are settled rather than left open. Standing the player
+/// has not reported, and gate kinds the API never spells out (dialogue, timed unlocks,
+/// Lightkeeper), stay conditional rather than inflating "needed now" counts.
 /// </summary>
 internal static class QuestNeedClassifier {
 	private const string StatusActive = "active";
@@ -259,9 +263,18 @@ internal static class QuestNeedClassifier {
 			}
 		}
 
-		// Trader standing / loyalty gates: not exposed by the tracker API.
-		if (task.TraderRequirements is { Count: > 0 })
-			conditional = true;
+		// Trader gates. Both shapes the API sends are settled against reported
+		// standing: "level" is the trader's loyalty tier, "reputation" is the
+		// player's standing with them. Anything the player has not reported stays
+		// uncertain rather than counting the need as current.
+		if (task.TraderRequirements is { Count: > 0 } requirements) {
+			foreach (var requirement in requirements) {
+				if (!IsTraderRequirementMet(requirement, progress)) {
+					conditional = true;
+					break;
+				}
+			}
+		}
 
 		if (task.HasUnmodeledRequirements)
 			conditional = true;
@@ -274,6 +287,55 @@ internal static class QuestNeedClassifier {
 			return QuestGate.ApplicableNow;
 		}
 	}
+
+	/// <summary>Whether the requirement measures the trader's loyalty tier.</summary>
+	private const string TraderLevelRequirement = "level";
+
+	/// <summary>Whether the requirement measures the player's standing.</summary>
+	private const string TraderReputationRequirement = "reputation";
+
+	/// <summary>
+	/// Whether a trader requirement the player's reported standing can settle
+	/// actually passes. Returns true when it cannot be settled, so unknown standing
+	/// never turns a need into a definite one.
+	///
+	/// A requirement names the trader whose standing it measures, which is not
+	/// necessarily the trader handing the task out, so the lookup is by that field
+	/// alone.
+	/// </summary>
+	private static bool IsTraderRequirementMet(TaskTraderRequirement requirement, UserProgress progress) {
+		var isLevel = string.Equals(requirement.RequirementType, TraderLevelRequirement, StringComparison.OrdinalIgnoreCase);
+		var isReputation = string.Equals(requirement.RequirementType, TraderReputationRequirement, StringComparison.OrdinalIgnoreCase);
+
+		// A requirement type we do not model cannot be settled either way.
+		if (!isLevel && !isReputation) {
+			return false;
+		}
+
+		var standing = progress.Traders?.FirstOrDefault(t =>
+			string.Equals(t.Id, requirement.TraderId, StringComparison.OrdinalIgnoreCase));
+
+		int? reported = isLevel ? standing?.Level : standing?.Reputation;
+		if (reported is not int value) {
+			// Not reported for this trader, so the gate stays uncertain.
+			return true;
+		}
+
+		return Compare(value, requirement.CompareMethod, requirement.Value);
+	}
+
+	/// <summary>
+	/// Applies a requirement's comparison, treating an unrecognised method as
+	/// unsatisfiable rather than as a pass.
+	/// </summary>
+	private static bool Compare(int value, string? compareMethod, int target) => compareMethod switch {
+		">=" => value >= target,
+		">" => value > target,
+		"<=" => value <= target,
+		"<" => value < target,
+		"==" or "=" => value == target,
+		_ => false,
+	};
 
 	private enum PrerequisiteGate {
 		Satisfied,

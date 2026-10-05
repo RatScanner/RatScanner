@@ -136,7 +136,8 @@
                     @* Overlay toggles for the map below. Each control is hidden entirely when
                        the map has nothing to show for it, rather than shown
                        disabled, so the card stays uncluttered. *@
-                    @if (Map.Extracts.Count > 0 || Map.Locks.Count > 0 || Map.Transits.Count > 0 || Map.Hazards.Count > 0) {
+                    @if (Map.Extracts.Count > 0 || Map.Locks.Count > 0 || Map.Transits.Count > 0 || Map.Hazards.Count > 0 ||
+                HasQuestLocations) {
                         @* Overlay toggles as one joined row of buttons. Four stacked
                            labelled switches took four lines and squeezed the map
                            out of the card, and icon-only buttons lost the labels
@@ -188,6 +189,15 @@
                                                Variant="@(ShowHazards ? Variant.Filled : Variant.Outlined)" Color="Color.Error"
                                                OnClick="@(() => OnShowHazardsChanged.InvokeAsync(!ShowHazards))">
                                         @Localizer["MapOverlayHazardsShort"]
+                                    </MudButton>
+                                }
+                                @* Only offered when something is actually on this map, so the
+                                   button never opens onto a map with nothing on it. *@
+                                @if (HasQuestLocations) {
+                                    <MudButton StartIcon="@Icons.Material.Filled.Assignment"
+                                               Variant="@(ShowQuestLocations ? Variant.Filled : Variant.Outlined)" Color="Color.Tertiary"
+                                               OnClick="@(() => OnShowQuestLocationsChanged.InvokeAsync(!ShowQuestLocations))">
+                                        @Localizer["MapOverlayQuestsShort"]
                                     </MudButton>
                                 }
                             </MudButtonGroup>
@@ -261,6 +271,28 @@
     /// <summary>Raised when the hazards switch is toggled.</summary>
     [Parameter]
     public EventCallback<bool> OnShowHazardsChanged { get; set; }
+
+    /// <summary>
+    /// Whether the quest objective locations for this map are overlaid on it.
+    /// </summary>
+    [Parameter]
+    public bool ShowQuestLocations { get; set; }
+
+    /// <summary>Raised when the quest locations switch is toggled.</summary>
+    [Parameter]
+    public EventCallback<bool> OnShowQuestLocationsChanged { get; set; }
+
+    /// <summary>
+    /// Whether this map has objective locations that could be drawn at all. Gates
+    /// the toggle so it is never offered for a map that would draw nothing, which
+    /// is cheaper than asking whether any of them are reachable.
+    /// </summary>
+    private bool HasQuestLocations {
+        get {
+            if (!HasSvg || string.IsNullOrEmpty(Map.Id)) return false;
+            return RatScanner.TaskExtensions.HasQuestObjectiveZones(Map.Id);
+        }
+    }
 
     [Inject]
     public LocalizationService Localizer { get; set; } = null!;

@@ -1,5 +1,6 @@
 @page "/app/settings/tracking"
 @layout SettingsLayout
+@using System.Globalization
 @using System.Threading;
 @using System.Threading.Tasks
 @using MudBlazor
@@ -96,6 +97,71 @@
                                                ValueChanged="@((bool v) => { SettingsVM.ShowKappaNeeds = v; SettingsVM.MarkDirty(); })" />
                         </SettingsCard>
 
+                        @* Manual profile overrides. Only shown for the local source, since
+                           the tracker reports level and faction itself and always wins. *@
+                        @if (!UsesTarkovTracker) {
+                            <SettingsCard Title="@Localizer["ProfileTitle"]" Subtitle="@Localizer["ProfileDesc"]">
+                                <SettingsRow Label="@Localizer["ProfileLevel"]" SubLabel="@Localizer["ProfileLevelHint"]">
+                                    <MudNumericField T="int" Value="@SettingsVM.PlayerLevel"
+                                                     ValueChanged="@((int v) => { SettingsVM.PlayerLevel = Math.Max(v, 0); SettingsVM.MarkDirty(); })"
+                                                     Variant="Variant.Outlined" Margin="Margin.Dense" HideSpinButtons="true" Min="0" Max="79"
+                                                     Style="min-width: 140px;" />
+                                </SettingsRow>
+
+                                <SettingsRow Label="@Localizer["ProfileFaction"]" SubLabel="@Localizer["ProfileFactionHint"]">
+                                    <MudSelect T="string" Value="@SettingsVM.PlayerFaction"
+                                               ValueChanged="@((string v) => { SettingsVM.PlayerFaction = v ?? ""; SettingsVM.MarkDirty(); })"
+                                               Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Style="min-width: 140px;">
+                                        <MudSelectItem T="string" Value="@("")">@Localizer["ProfileFactionUnset"]</MudSelectItem>
+                                        <MudSelectItem T="string" Value="@(nameof(PmcFaction.Usec))">@Localizer["ProfileFactionUsec"]
+                                        </MudSelectItem>
+                                        <MudSelectItem T="string" Value="@(nameof(PmcFaction.Bear))">@Localizer["ProfileFactionBear"]
+                                        </MudSelectItem>
+                                    </MudSelect>
+                                </SettingsRow>
+
+                                <MudDivider Class="my-2" />
+
+                                <MudText Typo="Typo.subtitle2" Class="px-4 pb-1">@Localizer["ProfileTraders"]</MudText>
+
+                                <div class="profile-traders">
+                                    @foreach (var trader in Traders) {
+                                        var id = trader.Id;
+                                        var standing = GetStanding(id);
+                                        <div class="profile-trader">
+                                            <div class="profile-trader-text">
+                                                <div class="settings-row-label">@trader.Name</div>
+                                            </div>
+                                            <div class="profile-trader-control">
+                                                <MudNumericField T="int" Value="@standing.Level" ValueChanged="@((int v) => SetLevel(id, v))"
+                                                                 Variant="Variant.Outlined" Margin="Margin.Dense" HideSpinButtons="true" Min="0" Max="4"
+                                                                 Style="min-width: 90px;" />
+                                                @* Reputation is selectable rather than typed because it runs
+                                                   from negative to positive, and a nullable numeric field
+                                                   would need an empty state of its own. *@
+                                                <MudSelect T="string" Value="@standing.Reputation.ToString()"
+                                                           ValueChanged="@((string v) => SetReputation(id, v))" Variant="Variant.Outlined"
+                                                           Margin="Margin.Dense" Dense="true" Style="min-width: 110px;">
+                                                    <MudSelectItem T="string" Value="@("")">@Localizer["ProfileReputationUnset"]</MudSelectItem>
+                                                    @foreach (var value in ReputationValues) {
+                                                        <MudSelectItem T="string" Value="@value.ToString(CultureInfo.InvariantCulture)">@value
+                                                        </MudSelectItem>
+                                                    }
+                                                </MudSelect>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+
+                                <SettingsRow Label="@Localizer["ProfileReset"]" SubLabel="@Localizer["ProfileResetHint"]">
+                                    <MudButton Variant="Variant.Outlined" Color="Color.Warning"
+                                               StartIcon="@Icons.Material.Filled.RestartAlt" OnClick="@ResetProfile">
+                                        @Localizer["ProfileResetAction"]
+                                    </MudButton>
+                                </SettingsRow>
+                            </SettingsCard>
+                        }
+
                         <SettingsCard Title="@Localizer["LogTrackingTitle"]" Subtitle="@Localizer["LogTrackingDesc"]">
                             <SettingsSwitchRow Label="@Localizer["LogTrackingEnable"]" SubLabel="@Localizer["LogTrackingEnableHint"]"
                                                Value="@SettingsVM.EnableLogTracking"
@@ -167,6 +233,51 @@
                     </div>
                 </div>
 
+                <style>
+                    /* One row per trader: the name on the left, the two standing fields on the
+                       right. Laid out like SettingsRow but without the per-row hover tint, since
+                       a full list of hoverable rows reads as noise next to the actual settings. */
+                    .profile-traders {
+                        display: flex;
+                        flex-direction: column;
+                    }
+
+                    .profile-trader {
+                        display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                        gap: 16px;
+                        min-height: 44px;
+                        padding: 4px 16px;
+                    }
+
+                    .profile-trader-text {
+                        min-width: 0;
+                        flex: 1;
+                        font-size: 14px;
+                        line-height: 1.35;
+                    }
+
+                    .profile-trader-control {
+                        flex: 0 0 auto;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    }
+
+                    .profile-trader-control .mud-input-control {
+                        margin: 0;
+                    }
+
+                    @@media (max-width: 700px) {
+                        .profile-trader {
+                            flex-direction: column;
+                            align-items: stretch;
+                            gap: 8px;
+                        }
+                    }
+                </style>
+
 @code {
     private const int DebounceMs = 600;
 
@@ -198,6 +309,48 @@
 
     /// <summary>Maps offered as the position-marker fallback, sorted by name.</summary>
     private List<RatScanner.TarkovDev.Json.Map> AvailableMaps { get; set; } = [];
+
+    /// <summary>
+    /// Traders offered a standing row, resolved from the tarkov.dev catalogue so
+    /// the user picks by name rather than by id.
+    /// </summary>
+    private List<Trader> Traders { get; set; } = [];
+
+    /// <summary>
+    /// Reputation values offered per trader. The scale runs negative to positive
+    /// in whole steps, and the gates tarkov.dev sends compare against exactly
+    /// these, so anything outside them cannot change a gate.
+    /// </summary>
+    private static readonly int[] ReputationValues = [-4, -3, -2, -1, 0, 1, 2, 3, 4];
+
+    private static int? ParseReputation(string? value) =>
+        int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsed) ? parsed : null;
+
+    private ManualTraderStanding GetStanding(string traderId) {
+        if (!SettingsVM.ManualTraders.TryGetValue(traderId, out var standing)) {
+            standing = new ManualTraderStanding();
+            SettingsVM.ManualTraders[traderId] = standing;
+        }
+
+        return standing;
+    }
+
+    private void SetLevel(string traderId, int level) {
+        GetStanding(traderId).Level = Math.Clamp(level, 0, 4);
+        SettingsVM.MarkDirty();
+    }
+
+    private void SetReputation(string traderId, string? value) {
+        GetStanding(traderId).Reputation = ParseReputation(value);
+        SettingsVM.MarkDirty();
+    }
+
+    private void ResetProfile() {
+        SettingsVM.PlayerLevel = 0;
+        SettingsVM.PlayerFaction = "";
+        SettingsVM.ManualTraders.Clear();
+        SettingsVM.MarkDirty();
+    }
 
     /// <summary>Resolved logs folder, so a failed detection is visible rather than silent.</summary>
     private string _logsFolder = "";
@@ -385,6 +538,12 @@
             AvailableMaps = [.. TarkovDevAPI.GetMaps().OrderBy(m => m.Name)];
         } catch (Exception e) {
             Logger.LogWarning($"Could not load maps for the position map picker: {e.Message}");
+        }
+
+        try {
+            Traders = [.. TarkovDevAPI.GetTraders().OrderBy(t => t.Name)];
+        } catch (Exception e) {
+            Logger.LogWarning($"Could not load traders for the standing overrides: {e.Message}");
         }
 
         await RunConnectionCheckAsync();
