@@ -14,6 +14,7 @@ public enum UiLanguage {
 	Portuguese = 4,
 	Russian = 5,
 	Chinese = 6,
+	German = 7,
 }
 
 public static class UiLanguageExtensions {
@@ -26,6 +27,7 @@ public static class UiLanguageExtensions {
 			UiLanguage.Portuguese => "Português",
 			UiLanguage.Russian => "Русский",
 			UiLanguage.Chinese => "中文",
+			UiLanguage.German => "Deutsch",
 			_ => "Unknown",
 		};
 	}
@@ -39,6 +41,7 @@ public static class UiLanguageExtensions {
 			UiLanguage.Portuguese => "pt",
 			UiLanguage.Russian => "ru",
 			UiLanguage.Chinese => "zh",
+			UiLanguage.German => "de",
 			_ => "en",
 		};
 	}
