@@ -1,4 +1,5 @@
-﻿@using System.Windows.Input;
+@using System.Windows.Input;
+@using System.Threading;
 @inject LocalizationService Localizer;
 @implements IDisposable;
 
@@ -6,21 +7,16 @@
            Variant="Variant.Filled" DisableElevation="true" Class="px-1 py-1" @attributes="InputAttributes"
            Disabled="@_listening">
     <MudStack Spacing="0" AlignItems="AlignItems.Stretch" Justify="Justify.Center">
-        @if (string.IsNullOrEmpty(_tmpHotkey.HotkeyString))
-        {
+        @if (string.IsNullOrEmpty(_tmpHotkey.HotkeyString)) {
             <div>@Localizer["NoneLabel"]</div>
-        }
-        else
-        {
+        } else {
             <MudStack Spacing="1" Row="true" Justify="Justify.SpaceBetween">
-                @foreach (var key in _tmpHotkey.KeyboardKeys)
-                {
+                @foreach (var key in _tmpHotkey.KeyboardKeys) {
                     <MudChip Variant="Variant.Outlined" Label="true" Size="Size.Small" Color="Color.Default" Class="px-2 ma-0">
                         @key.ToString().ToLower().Replace("left", "l-").Replace("right", "r-")
                     </MudChip>
                 }
-                @foreach (var button in _tmpHotkey.MouseButtons)
-                {
+                @foreach (var button in _tmpHotkey.MouseButtons) {
                     <MudChip Variant="Variant.Outlined" Label="true" Size="Size.Small" Color="Color.Default" Class="px-2 ma-0">
                         @((button.ToString().ToLower().Replace("left", "l-").Replace("right", "r-") + "-mouse")
                             .Replace("--", "-").Replace("button", ""))
@@ -29,8 +25,7 @@
             </MudStack>
         }
 
-        @if (_listening)
-        {
+        @if (_listening) {
             <MudProgressLinear Class="mb-n1" Style="Width: 100%;" Indeterminate="true" />
         }
     </MudStack>
@@ -56,21 +51,42 @@
 
     private bool _listening = false;
 
-    private async void StartListening()
-    {
+    private CancellationTokenSource? _timeoutCts;
+
+    private async void StartListening() {
         if (_listening) return;
         _listening = true;
         _tmpHotkey = new Hotkey();
         await InvokeAsync(() => StateHasChanged());
+
+        _timeoutCts?.Cancel();
+        _timeoutCts?.Dispose();
+        _timeoutCts = new CancellationTokenSource();
+        var token = _timeoutCts.Token;
+        _ = Task.Delay(4000, token).ContinueWith(t => {
+            if (!t.IsCanceled) ResetToNone();
+        }, TaskScheduler.Default);
     }
 
-    private async void StopListening(bool discard = false)
-    {
+    private async void ResetToNone() {
+        await InvokeAsync(async () => {
+            if (!_listening) return;
+            _timeoutCts?.Cancel();
+            _tmpHotkey = new Hotkey();
+            Hotkey.Set(_tmpHotkey);
+            await OnHotkeyChanged.InvokeAsync(Hotkey);
+            _listening = false;
+            StateHasChanged();
+        });
+    }
+
+    private async void StopListening(bool discard = false) {
         if (!_listening) return;
 
+        _timeoutCts?.Cancel();
+
         if (discard) _tmpHotkey = Hotkey;
-        else
-        {
+        else {
             Hotkey.Set(_tmpHotkey);
             await OnHotkeyChanged.InvokeAsync(Hotkey);
         }
@@ -79,8 +95,7 @@
         await InvokeAsync(() => StateHasChanged());
     }
 
-    protected override void OnInitialized()
-    {
+    protected override void OnInitialized() {
         _tmpHotkey = new Hotkey(Hotkey);
         UserActivityHelper.OnKeyboardKeyUp += OnKeyUp;
         UserActivityHelper.OnMouseButtonUp += OnKeyUp;
@@ -88,28 +103,29 @@
         UserActivityHelper.OnMouseButtonDown += OnKeyDown;
     }
 
-    private void OnKeyUp(object? sender, KeyUpEventArgs e)
-    {
+    private void OnKeyUp(object? sender, KeyUpEventArgs e) {
         StopListening();
     }
 
-    private async void OnKeyDown(object? sender, KeyDownEventArgs e)
-    {
+    private async void OnKeyDown(object? sender, KeyDownEventArgs e) {
         if (!_listening) return;
 
-        if (e.Device == Device.Keyboard && e.Key == Key.Escape)
-        {
+        if (e.Device == Device.Keyboard && e.Key == Key.Escape) {
             StopListening(true);
             return;
         }
+
+        // Remove the idle timer if a key was pressed
+        _timeoutCts?.Cancel();
 
         if (e.Device == Device.Keyboard) _tmpHotkey.KeyboardKeys.Add(e.Key);
         else if (e.Device == Device.Mouse) _tmpHotkey.MouseButtons.Add(e.MouseButton);
         await InvokeAsync(() => StateHasChanged());
     }
 
-    public void Dispose()
-    {
+    public void Dispose() {
+        _timeoutCts?.Cancel();
+        _timeoutCts?.Dispose();
         UserActivityHelper.OnKeyboardKeyUp -= OnKeyUp;
         UserActivityHelper.OnMouseButtonUp -= OnKeyUp;
         UserActivityHelper.OnKeyboardKeyDown -= OnKeyDown;
