@@ -181,8 +181,8 @@ internal static partial class RatConfig {
 
 	// Application hotkeys
 	internal static class Hotkeys {
-		internal static Hotkey OpenWiki = new([Key.F1]);
-		internal static Hotkey OpenTarkovDev = new([Key.F2]);
+		internal static Hotkey OpenWiki = new();
+		internal static Hotkey OpenTarkovDev = new();
 	}
 
 	// OAuth2 refresh tokens
