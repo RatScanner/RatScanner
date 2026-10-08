@@ -168,12 +168,10 @@ public class RatScannerMain : INotifyPropertyChanged {
 			Thread.Sleep(1000);
 			Logger.LogInfo("Loading TarkovTracker data...");
 			if (RatConfig.Tracking.TarkovTracker.Enable) {
-				TarkovTrackerDB.Token = RatConfig.Tracking.TarkovTracker.Token;
+				TarkovTrackerDB.SetGameMode(RatConfig.GameMode);
 				Logger.LogInfo("Loading TarkovTracker...");
 				if (!TarkovTrackerDB.Init()) {
 					Logger.ShowWarning("TarkovTracker API Token invalid!\n\nPlease provide a new token.");
-					RatConfig.Tracking.TarkovTracker.Token = "";
-					RatConfig.SaveConfig();
 				}
 			}
 

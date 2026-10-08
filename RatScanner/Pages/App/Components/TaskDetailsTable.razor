@@ -189,9 +189,15 @@
 
     private TarkovTask? _builtFor;
 
-    protected override void OnInitialized() => LocalProgressStore.Changed += OnLocalProgressChanged;
+    protected override void OnInitialized() {
+        LocalProgressStore.Changed += OnLocalProgressChanged;
+        RatScannerMain.Instance.TarkovTrackerDB.Changed += OnLocalProgressChanged;
+    }
 
-    public void Dispose() => LocalProgressStore.Changed -= OnLocalProgressChanged;
+    public void Dispose() {
+        LocalProgressStore.Changed -= OnLocalProgressChanged;
+        RatScannerMain.Instance.TarkovTrackerDB.Changed -= OnLocalProgressChanged;
+    }
 
     /// <summary>An objective was edited, so the cached ones no longer describe it.</summary>
     private Task OnProgressEdited(bool _) {

@@ -95,11 +95,12 @@ internal class SettingsVM : INotifyPropertyChanged {
 	};
 
 	// TarkovTracker Specific Tracking Settings
-	public string TarkovTrackerToken { get; set; }
+	public string TarkovTrackerPvpToken { get; set; }
+	public string TarkovTrackerPveToken { get; set; }
+	public string TarkovTrackerSeasonalToken { get; set; }
 
 	public bool ShowTarkovTrackerTeam { get; set; }
 
-	public RatConfig.TarkovTrackerBackend TarkovTrackerBackend { get; set; }
 
 	// Interactable Overlay
 	public bool EnableIneractableOverlay { get; set; }
@@ -190,9 +191,10 @@ internal class SettingsVM : INotifyPropertyChanged {
 			}
 		}
 
-		TarkovTrackerToken = RatConfig.Tracking.TarkovTracker.Token;
+		TarkovTrackerPvpToken = RatConfig.Tracking.TarkovTracker.PvpToken;
+		TarkovTrackerPveToken = RatConfig.Tracking.TarkovTracker.PveToken;
+		TarkovTrackerSeasonalToken = RatConfig.Tracking.TarkovTracker.SeasonalToken;
 		ShowTarkovTrackerTeam = RatConfig.Tracking.TarkovTracker.ShowTeam;
-		TarkovTrackerBackend = RatConfig.Tracking.TarkovTracker.Backend;
 
 		EnableIneractableOverlay = RatConfig.Overlay.Search.Enable;
 		BlurBehindSearch = RatConfig.Overlay.Search.BlurBehind;
@@ -254,6 +256,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 		RatConfig.GameMode = mode;
 		GameMode = mode;
 		RatConfig.SaveConfig();
+		RatScannerMain.Instance.TarkovTrackerDB.SetGameMode(mode);
 		LocalProgressStore.NotifyChanged();
 
 		try {
@@ -264,6 +267,13 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 		QuestObjectiveEntry.InvalidateItemLookup();
 		RatScanner.TaskExtensions.InvalidateItemLookup();
+		if (RatConfig.Tracking.TarkovTracker.Enable) {
+			try {
+				RatScannerMain.Instance.TarkovTrackerDB.Init();
+			} catch (Exception e) {
+				Logger.LogWarning($"Failed to refresh TarkovTracker progress after game mode switch: {e.Message}");
+			}
+		}
 
 		// Not routed through MarkDirty: a switch is applied and saved at once, so
 		// the settings page has nothing left to save. Notify still re-renders it so
@@ -296,8 +306,6 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 	public async Task SaveSettings() {
 		_ = NameScanLanguage != (int)RatConfig.NameScan.Language;
-		var updateTarkovTrackerToken = TarkovTrackerToken != RatConfig.Tracking.TarkovTracker.Token;
-		var updateTarkovTrackerBackend = TarkovTrackerBackend != RatConfig.Tracking.TarkovTracker.Backend;
 		var updateResolution = ScreenWidth != RatConfig.ScreenWidth || ScreenHeight != RatConfig.ScreenHeight;
 		var updateScreenOverride = OverrideScreenConfig != RatConfig.OverrideScreenConfig || ScreenScale != RatConfig.ScreenScale;
 		var updateLanguage = RatConfig.NameScan.Language != (Language)NameScanLanguage;
@@ -347,9 +355,18 @@ internal class SettingsVM : INotifyPropertyChanged {
 			}
 		}
 
-		RatConfig.Tracking.TarkovTracker.Token = TarkovTrackerToken.Trim();
+		RatConfig.Tracking.TarkovTracker.PvpToken = TarkovTrackerPvpToken.Trim();
+		RatConfig.Tracking.TarkovTracker.PveToken = TarkovTrackerPveToken.Trim();
+		RatConfig.Tracking.TarkovTracker.SeasonalToken = TarkovTrackerSeasonalToken.Trim();
 		RatConfig.Tracking.TarkovTracker.ShowTeam = ShowTarkovTrackerTeam;
-		RatConfig.Tracking.TarkovTracker.Backend = TarkovTrackerBackend;
+		RatScannerMain.Instance.TarkovTrackerDB.SetGameMode(RatConfig.GameMode);
+		if (RatConfig.Tracking.Source == RatConfig.ProgressSource.TarkovTracker) {
+			try {
+				RatScannerMain.Instance.TarkovTrackerDB.Init();
+			} catch (Exception e) {
+				Logger.LogWarning($"Failed to load TarkovTracker progress after saving settings: {e.Message}");
+			}
+		}
 
 		RatConfig.Overlay.Search.Enable = EnableIneractableOverlay;
 		RatConfig.Overlay.Search.BlurBehind = BlurBehindSearch;
@@ -385,7 +402,6 @@ internal class SettingsVM : INotifyPropertyChanged {
 		// Apply config
 		PageSwitcher.Instance.Topmost = RatConfig.AlwaysOnTop;
 		PageSwitcher.Instance.ResetWindowSize();
-		if (updateTarkovTrackerToken || updateTarkovTrackerBackend) UpdateTarkovTrackerToken();
 		if (updateUiLanguage) LocalizationService.SetLanguage(UiLanguage);
 		if (updateResolution || updateLanguage || updateScreenOverride) RatScannerMain.Instance.SetupRatEye();
 
@@ -419,23 +435,6 @@ internal class SettingsVM : INotifyPropertyChanged {
 		foreach (var (id, trader) in profile.ManualTraders) {
 			yield return (id, trader.Level > 0 ? trader.Level : null, trader.Reputation);
 		}
-	}
-
-	private static void UpdateTarkovTrackerToken() {
-		var token = RatConfig.Tracking.TarkovTracker.Token;
-		if (token == "") return;
-		RatScannerMain.Instance.TarkovTrackerDB.Token = RatConfig.Tracking.TarkovTracker.Token;
-		var db = RatScannerMain.Instance.TarkovTrackerDB;
-		if (db.TestToken(token)) {
-			db.UpdateToken();
-			return;
-		}
-
-		var visibleLength = (int)(token.Length * 0.25);
-		token = token[..visibleLength] + string.Concat(Enumerable.Repeat(" *", token.Length - visibleLength));
-		Logger.ShowWarning($"The TarkovTracker API Token does not seem to work.\n\n{token}");
-
-		RatConfig.Tracking.TarkovTracker.Token = "";
 	}
 
 	public event PropertyChangedEventHandler? PropertyChanged;

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using RatScanner.FetchModels.TarkovTracker;
+using RatScanner.TarkovDev.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,26 +12,28 @@ namespace RatScanner;
 public class TarkovTrackerDB {
 	private TokenResponse? _token;
 	private bool _badToken;
+	private GameMode _mode;
 
 	// Last token validation result, kept across page instances so revisiting the
 	// settings does not re-issue a network request for a token we already checked.
 	// Both outcomes are cached; only a changed token or backend invalidates it.
 	private static string _lastValidatedToken = "";
-	private static RatConfig.TarkovTrackerBackend _lastValidatedBackend;
 	private static bool _lastValidationResult;
 
 	public List<UserProgress> Progress = [];
 	public string Self = "";
 	public string? Token;
 
+	internal event Action? Changed;
+
 	/// <summary>
 	/// Returns the cached validation result for the given token and backend,
 	/// or null when that pair has not been checked yet.
 	/// </summary>
-	internal static bool? GetCachedValidation(string token, RatConfig.TarkovTrackerBackend backend) {
+	internal static bool? GetCachedValidation(string token) {
 		if (string.IsNullOrEmpty(token)) {
 			return false;
-		} else if (token != _lastValidatedToken || backend != _lastValidatedBackend) {
+		} else if (token != _lastValidatedToken) {
 			return null;
 		} else {
 			return _lastValidationResult;
@@ -40,9 +43,8 @@ public class TarkovTrackerDB {
 	/// <summary>
 	/// Records the outcome of a token validation for later reuse.
 	/// </summary>
-	internal static void CacheValidation(string token, RatConfig.TarkovTrackerBackend backend, bool result) {
+	internal static void CacheValidation(string token, bool result) {
 		_lastValidatedToken = token;
-		_lastValidatedBackend = backend;
 		_lastValidationResult = result;
 	}
 
@@ -56,9 +58,75 @@ public class TarkovTrackerDB {
 
 	// Set up the TarkovTracker DB
 	public bool Init() {
+		SetGameMode(RatConfig.GameMode);
 		if (!ValidToken()) return false;
 		UpdateProgression();
+		Changed?.Invoke();
 		return true;
+	}
+
+	internal void SetGameMode(GameMode mode) {
+		if (_mode == mode && Token == RatConfig.Tracking.TarkovTracker.TokenFor(mode)) return;
+
+		_mode = mode;
+		Token = RatConfig.Tracking.TarkovTracker.TokenFor(mode);
+		_token = null;
+		_badToken = false;
+		Progress = [];
+		Self = "";
+	}
+
+	internal void SetTaskState(string taskId, string state) {
+		if (string.IsNullOrWhiteSpace(taskId)) return;
+		EnsureWritableToken();
+
+		_ = APIClient.Post(
+			$"{RatConfig.Tracking.TarkovTracker.Endpoint}/progress/task/{Uri.EscapeDataString(taskId)}",
+			new { state },
+			Token!);
+		RefreshAfterWrite();
+	}
+
+	internal void SetObjectiveState(string objectiveId, bool complete, int? count = null) {
+		if (string.IsNullOrWhiteSpace(objectiveId)) return;
+		EnsureWritableToken();
+
+		var state = complete ? "completed" : "uncompleted";
+		object body = count.HasValue ? new { state, count } : new { state };
+		_ = APIClient.Post(
+			$"{RatConfig.Tracking.TarkovTracker.Endpoint}/progress/task/objective/{Uri.EscapeDataString(objectiveId)}",
+			body,
+			Token!);
+		RefreshAfterWrite();
+	}
+
+	internal void SetObjectiveCount(string objectiveId, int count) {
+		if (string.IsNullOrWhiteSpace(objectiveId)) return;
+		EnsureWritableToken();
+
+		_ = APIClient.Post(
+			$"{RatConfig.Tracking.TarkovTracker.Endpoint}/progress/task/objective/{Uri.EscapeDataString(objectiveId)}",
+			new { count },
+			Token!);
+		RefreshAfterWrite();
+	}
+
+	private void EnsureWritableToken() {
+		SetGameMode(RatConfig.GameMode);
+		if (string.IsNullOrWhiteSpace(Token))
+			throw new UnauthorizedTokenException($"No TarkovTracker token is configured for {RatConfig.GameMode}");
+		if (_token?.Permissions.Contains("WP") != true) UpdateToken();
+		if (_token?.Permissions.Contains("WP") != true)
+			throw new TrackerApiException(HttpStatusCode.Forbidden, "TarkovTracker token lacks write permission");
+	}
+
+	internal void RaiseChanged() => Changed?.Invoke();
+
+	private void RefreshAfterWrite() {
+		// A write-only token cannot read progress back, so the refresh only runs when
+		// the token can read it. The change event always fires so the views repaint.
+		if (SoloProgressAvailable == true || TeamProgressAvailable == true) UpdateProgression();
+		Changed?.Invoke();
 	}
 
 	private bool ValidToken() {

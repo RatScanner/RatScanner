@@ -8,9 +8,9 @@ using System.Text.RegularExpressions;
 namespace RatScanner;
 
 /// <summary>
-/// Reads quest state out of the notifications log and records it in
-/// <see cref="LocalProgressStore"/>, so a task the player finished is already
-/// marked without being ticked by hand.
+/// Reads quest state out of the notifications log and records it through the
+/// selected progress source, so a task the player finished is already marked
+/// without being ticked by hand.
 /// </summary>
 internal static class EftQuestTracker {
 	// Numeric message types from the game's chat message shape. Only the task

@@ -127,21 +127,21 @@ internal static partial class RatConfig {
 		internal static ProgressSource Source = ProgressSource.Local;
 
 		internal static class TarkovTracker {
-			internal static TarkovTrackerBackend Backend = TarkovTrackerBackend.TarkovTrackerIO;
-			internal static string Endpoint => Backend == TarkovTrackerBackend.TarkovTrackerIO
-				? "https://tarkovtracker.io/api/v2"
-				: "https://api.tarkovtracker.org";
-			internal static bool Enable => Token.Length > 0;
+			internal static string Endpoint => "https://api.tarkovtracker.org";
+			internal static bool Enable => PvpToken.Length > 0 || PveToken.Length > 0 || SeasonalToken.Length > 0;
 
-			internal static string Token = "";
+			internal static string PvpToken = "";
+			internal static string PveToken = "";
+			internal static string SeasonalToken = "";
 			internal static bool ShowTeam = true;
 			internal static int RefreshTime = 5 * 60 * 1000; // 5 minutes
-		}
-	}
 
-	public enum TarkovTrackerBackend {
-		TarkovTrackerIO,
-		TarkovTrackerORG,
+			internal static string TokenFor(GameMode mode) => mode switch {
+				GameMode.Pve => PveToken,
+				GameMode.PvpSeason => SeasonalToken,
+				_ => PvpToken,
+			};
+		}
 	}
 
 	/// <summary>Reads the game's own log files to track quests, raids and position.</summary>
@@ -290,8 +290,9 @@ internal static partial class RatConfig {
 		Tracking.ShowKappaNeeds = config.ReadBool(nameof(Tracking.ShowKappaNeeds), Tracking.ShowKappaNeeds);
 
 		config.Section = nameof(Tracking.TarkovTracker);
-		Tracking.TarkovTracker.Backend = (TarkovTrackerBackend)config.ReadInt(nameof(Tracking.TarkovTracker.Backend), (int)Tracking.TarkovTracker.Backend);
-		Tracking.TarkovTracker.Token = config.ReadSecureString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);
+		Tracking.TarkovTracker.PvpToken = config.ReadSecureString(nameof(Tracking.TarkovTracker.PvpToken), Tracking.TarkovTracker.PvpToken);
+		Tracking.TarkovTracker.PveToken = config.ReadSecureString(nameof(Tracking.TarkovTracker.PveToken), Tracking.TarkovTracker.PveToken);
+		Tracking.TarkovTracker.SeasonalToken = config.ReadSecureString(nameof(Tracking.TarkovTracker.SeasonalToken), Tracking.TarkovTracker.SeasonalToken);
 		Tracking.TarkovTracker.ShowTeam = config.ReadBool(nameof(Tracking.TarkovTracker.ShowTeam), Tracking.TarkovTracker.ShowTeam);
 
 		config.Section = nameof(LogTracking);
@@ -382,8 +383,9 @@ internal static partial class RatConfig {
 		config.WriteBool(nameof(Tracking.ShowKappaNeeds), Tracking.ShowKappaNeeds);
 
 		config.Section = nameof(Tracking.TarkovTracker);
-		config.WriteInt(nameof(Tracking.TarkovTracker.Backend), (int)Tracking.TarkovTracker.Backend);
-		config.WriteSecureString(nameof(Tracking.TarkovTracker.Token), Tracking.TarkovTracker.Token);
+		config.WriteSecureString(nameof(Tracking.TarkovTracker.PvpToken), Tracking.TarkovTracker.PvpToken);
+		config.WriteSecureString(nameof(Tracking.TarkovTracker.PveToken), Tracking.TarkovTracker.PveToken);
+		config.WriteSecureString(nameof(Tracking.TarkovTracker.SeasonalToken), Tracking.TarkovTracker.SeasonalToken);
 		config.WriteBool(nameof(Tracking.TarkovTracker.ShowTeam), Tracking.TarkovTracker.ShowTeam);
 
 		config.Section = nameof(LogTracking);

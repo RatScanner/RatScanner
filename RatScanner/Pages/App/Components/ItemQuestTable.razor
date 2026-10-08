@@ -204,9 +204,15 @@
         }
     }
 
-    protected override void OnInitialized() => LocalProgressStore.Changed += OnLocalProgressChanged;
+    protected override void OnInitialized() {
+        LocalProgressStore.Changed += OnLocalProgressChanged;
+        RatScannerMain.Instance.TarkovTrackerDB.Changed += OnLocalProgressChanged;
+    }
 
-    public void Dispose() => LocalProgressStore.Changed -= OnLocalProgressChanged;
+    public void Dispose() {
+        LocalProgressStore.Changed -= OnLocalProgressChanged;
+        RatScannerMain.Instance.TarkovTrackerDB.Changed -= OnLocalProgressChanged;
+    }
 
     private Task OnProgressEdited(bool _) {
         _builtProgress = null;

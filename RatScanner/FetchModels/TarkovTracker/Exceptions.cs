@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 
 namespace RatScanner.FetchModels.TarkovTracker;
 
@@ -22,4 +23,13 @@ public class UnauthorizedTokenException : Exception {
 
 	public UnauthorizedTokenException(string message, Exception inner)
 		: base(message, inner) { }
+}
+
+public class TrackerApiException : Exception {
+	public HttpStatusCode StatusCode { get; }
+
+	public TrackerApiException(HttpStatusCode statusCode, string message)
+		: base(message) {
+		StatusCode = statusCode;
+	}
 }

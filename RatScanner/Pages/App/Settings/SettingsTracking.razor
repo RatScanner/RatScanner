@@ -69,284 +69,294 @@
 
                         <MudDivider Class="my-2" />
 
-                        <SettingsRow Label="@Localizer["BackendLabel"]" SubLabel="@Localizer["BackendLabelHint"]">
-                            <MudSelect T="TarkovTrackerBackend" Value="@SettingsVM.TarkovTrackerBackend"
-                                       ValueChanged="@((TarkovTrackerBackend v) => { SettingsVM.TarkovTrackerBackend = v; SettingsVM.MarkDirty(); ScheduleConnectionCheck(); })"
-                                       Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Style="min-width: 220px;">
-                                <MudSelectItem T="TarkovTrackerBackend" Value="@TarkovTrackerBackend.TarkovTrackerIO">
-                                    TarkovTracker.io</MudSelectItem>
-                                    <MudSelectItem T="TarkovTrackerBackend" Value="@TarkovTrackerBackend.TarkovTrackerORG">
-                                        TarkovTracker.org</MudSelectItem>
-                                    </MudSelect>
-                                </SettingsRow>
+                        <SettingsRow Label="@Localizer["ApiTokenPvp"]" SubLabel="@Localizer["ApiTokenPvpHint"]">
+                            <MudTextField T="string" Value="@SettingsVM.TarkovTrackerPvpToken"
+                                          ValueChanged="@((string v) => { SettingsVM.TarkovTrackerPvpToken = v; SettingsVM.MarkDirty(); ScheduleConnectionCheck(); })"
+                                          Validation="@(new Func<string, IEnumerable<string>>(v => CheckToken(v, GameMode.Regular)))"
+                                          InputType="@TokenInputType" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                          Adornment="Adornment.End"
+                                          AdornmentIcon="@(_showToken ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
+                                          OnAdornmentClick="@(() => _showToken = !_showToken)" Immediate="true" Style="min-width: 260px;" />
+                        </SettingsRow>
 
-                                <SettingsRow Label="@Localizer["ApiToken"]" SubLabel="@Localizer["ApiTokenHint"]">
-                                    <MudTextField T="string" Value="@SettingsVM.TarkovTrackerToken"
-                                                  ValueChanged="@((string v) => { SettingsVM.TarkovTrackerToken = v; SettingsVM.MarkDirty(); ScheduleConnectionCheck(); })"
-                                                  Validation="@(new Func<string, IEnumerable<string>>(CheckToken))" InputType="@TokenInputType"
-                                                  Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.End"
-                                                  AdornmentIcon="@(_showToken ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
-                                                  OnAdornmentClick="@(() => _showToken = !_showToken)" Immediate="true" Style="min-width: 260px;" />
-                                </SettingsRow>
+                        <SettingsRow Label="@Localizer["ApiTokenPve"]" SubLabel="@Localizer["ApiTokenPveHint"]">
+                            <MudTextField T="string" Value="@SettingsVM.TarkovTrackerPveToken"
+                                          ValueChanged="@((string v) => { SettingsVM.TarkovTrackerPveToken = v; SettingsVM.MarkDirty(); ScheduleConnectionCheck(); })"
+                                          Validation="@(new Func<string, IEnumerable<string>>(v => CheckToken(v, GameMode.Pve)))"
+                                          InputType="@TokenInputType" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                          Adornment="Adornment.End"
+                                          AdornmentIcon="@(_showToken ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
+                                          OnAdornmentClick="@(() => _showToken = !_showToken)" Immediate="true" Style="min-width: 260px;" />
+                        </SettingsRow>
 
-                                <SettingsRow Label="@Localizer["ShowTeammates"]" SubLabel="@Localizer["ShowTeammatesHint"]"
-                                             Disabled="@(!IsConnected)">
-                                    <MudSwitch T="bool" Checked="@SettingsVM.ShowTarkovTrackerTeam"
-                                               CheckedChanged="@((bool v) => { SettingsVM.ShowTarkovTrackerTeam = v; SettingsVM.MarkDirty(); })"
-                                               Color="Color.Primary" Dense="true" />
-                                </SettingsRow>
-                            }
-                        </SettingsCard>
+                        <SettingsRow Label="@Localizer["ApiTokenSeasonal"]" SubLabel="@Localizer["ApiTokenSeasonalHint"]">
+                            <MudTextField T="string" Value="@SettingsVM.TarkovTrackerSeasonalToken"
+                                          ValueChanged="@((string v) => { SettingsVM.TarkovTrackerSeasonalToken = v; SettingsVM.MarkDirty(); ScheduleConnectionCheck(); })"
+                                          Validation="@(new Func<string, IEnumerable<string>>(v => CheckToken(v, GameMode.PvpSeason)))"
+                                          InputType="@TokenInputType" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                          Adornment="Adornment.End"
+                                          AdornmentIcon="@(_showToken ? Icons.Material.Filled.VisibilityOff : Icons.Material.Filled.Visibility)"
+                                          OnAdornmentClick="@(() => _showToken = !_showToken)" Immediate="true" Style="min-width: 260px;" />
+                        </SettingsRow>
 
-                        <SettingsCard Title="@Localizer["TrackingGroup"]" Subtitle="@Localizer["TrackingGroupDesc"]">
-                            <SettingsSwitchRow Label="@Localizer["ShowNonFirNeeds"]" SubLabel="@Localizer["ShowNonFirNeedsHint"]"
-                                               Value="@SettingsVM.ShowNonFIRNeeds"
-                                               ValueChanged="@((bool v) => { SettingsVM.ShowNonFIRNeeds = v; SettingsVM.MarkDirty(); })" />
+                        <SettingsRow Label="@Localizer["ShowTeammates"]" SubLabel="@Localizer["ShowTeammatesHint"]"
+                                     Disabled="@(!IsConnected)">
+                            <MudSwitch T="bool" Checked="@SettingsVM.ShowTarkovTrackerTeam"
+                                       CheckedChanged="@((bool v) => { SettingsVM.ShowTarkovTrackerTeam = v; SettingsVM.MarkDirty(); })"
+                                       Color="Color.Primary" Dense="true" />
+                        </SettingsRow>
+                    }
+                </SettingsCard>
 
-                            <SettingsSwitchRow Label="@Localizer["ShowKappaNeeds"]" SubLabel="@Localizer["ShowKappaNeedsHint"]"
-                                               Value="@SettingsVM.ShowKappaNeeds"
-                                               ValueChanged="@((bool v) => { SettingsVM.ShowKappaNeeds = v; SettingsVM.MarkDirty(); })" />
-                        </SettingsCard>
+                <SettingsCard Title="@Localizer["TrackingGroup"]" Subtitle="@Localizer["TrackingGroupDesc"]">
+                    <SettingsSwitchRow Label="@Localizer["ShowNonFirNeeds"]" SubLabel="@Localizer["ShowNonFirNeedsHint"]"
+                                       Value="@SettingsVM.ShowNonFIRNeeds"
+                                       ValueChanged="@((bool v) => { SettingsVM.ShowNonFIRNeeds = v; SettingsVM.MarkDirty(); })" />
 
-                        @* Manual profile overrides. Only shown for the local source, since
+                    <SettingsSwitchRow Label="@Localizer["ShowKappaNeeds"]" SubLabel="@Localizer["ShowKappaNeedsHint"]"
+                                       Value="@SettingsVM.ShowKappaNeeds"
+                                       ValueChanged="@((bool v) => { SettingsVM.ShowKappaNeeds = v; SettingsVM.MarkDirty(); })" />
+                </SettingsCard>
+
+                @* Manual profile overrides. Only shown for the local source, since
                            the tracker reports level and faction itself and always wins.
                            One tab per game mode, because the standing a player has in
                            one mode says nothing about the others. *@
-                        @if (!UsesTarkovTracker) {
-                            <SettingsCard Title="@Localizer["ProfileTitle"]" Subtitle="@Localizer["ProfileDesc"]">
-                                <MudTabs Centered="true" @bind-ActivePanelIndex="_profileTab">
-                                    <MudDivider></MudDivider>
-                                    @foreach (var mode in ProfileModes) {
-                                        var entry = mode;
-                                        <MudTabPanel Text="@Localizer[entry.Label]">
-                                            <div class="profile-grid">
-                                                <div class="profile-field">
-                                                    <div class="profile-field-label">@Localizer["ProfileLevel"]</div>
-                                                    <MudNumericField T="int" Value="@Profile(entry.Mode).PlayerLevel"
-                                                                     ValueChanged="@((int v) => SetLevel(entry.Mode, v))" Variant="Variant.Outlined"
-                                                                     Margin="Margin.Dense" HideSpinButtons="true" Min="0" Max="79"
-                                                                     Style="min-width: 110px;" />
-                                                </div>
+                @if (!UsesTarkovTracker) {
+                    <SettingsCard Title="@Localizer["ProfileTitle"]" Subtitle="@Localizer["ProfileDesc"]">
+                        <MudTabs Centered="true" @bind-ActivePanelIndex="_profileTab">
+                            <MudDivider></MudDivider>
+                            @foreach (var mode in ProfileModes) {
+                                var entry = mode;
+                                <MudTabPanel Text="@Localizer[entry.Label]">
+                                    <div class="profile-grid">
+                                        <div class="profile-field">
+                                            <div class="profile-field-label">@Localizer["ProfileLevel"]</div>
+                                            <MudNumericField T="int" Value="@Profile(entry.Mode).PlayerLevel"
+                                                             ValueChanged="@((int v) => SetLevel(entry.Mode, v))" Variant="Variant.Outlined"
+                                                             Margin="Margin.Dense" HideSpinButtons="true" Min="0" Max="79"
+                                                             Style="min-width: 110px;" />
+                                        </div>
 
-                                                <div class="profile-field">
-                                                    <div class="profile-field-label">@Localizer["ProfileFaction"]</div>
-                                                    @* A joined button group rather than a dropdown, matching the
+                                        <div class="profile-field">
+                                            <div class="profile-field-label">@Localizer["ProfileFaction"]</div>
+                                            @* A joined button group rather than a dropdown, matching the
                                                        loyalty tier buttons on the trader cards. USEC is preselected,
                                                        so there is no third "not set" state to choose. *@
-                                                    <div class="profile-faction" role="group" aria-label="@Localizer["ProfileFaction"]">
-                                                        @foreach (var faction in PmcFaction.All) {
-                                                            var value = faction;
-                                                            <button type="button" class="profile-faction-option @FactionClass(entry.Mode, value)"
-                                                                    aria-pressed="@((Profile(entry.Mode).PlayerFaction == value).ToString().ToLowerInvariant())"
-                                                                    @onclick="@(() => SetFaction(entry.Mode, value))">
-                                                                @Localizer[FactionLabel(value)]
-                                                            </button>
-                                                        }
-                                                    </div>
-                                                </div>
+                                            <div class="profile-faction" role="group" aria-label="@Localizer["ProfileFaction"]">
+                                                @foreach (var faction in PmcFaction.All) {
+                                                    var value = faction;
+                                                    <button type="button" class="profile-faction-option @FactionClass(entry.Mode, value)"
+                                                            aria-pressed="@((Profile(entry.Mode).PlayerFaction == value).ToString().ToLowerInvariant())"
+                                                            @onclick="@(() => SetFaction(entry.Mode, value))">
+                                                        @Localizer[FactionLabel(value)]
+                                                    </button>
+                                                }
                                             </div>
+                                        </div>
+                                    </div>
 
-                                            @* <MudDivider DividerType="DividerType.Middle" Class="my-3 mx-3" /> *@
+                                    @* <MudDivider DividerType="DividerType.Middle" Class="my-3 mx-3" /> *@
 
-                                            @* One card per trader rather than a row per trader: the
+                                    @* One card per trader rather than a row per trader: the
                                                        card carries the task completion, the tier buttons and
                                                        the standing together, so a bare name and two dropdowns
                                                        cannot show how far along the player actually is. *@
-                                            <div class="profile-traders">
-                                                @foreach (var trader in Traders) {
-                                                    var id = trader.Id;
-                                                    var standing = GetStanding(entry.Mode, id);
-                                                    var tasks = TraderTaskProgress(entry.Mode, id);
-                                                    <TraderStandingCard Trader="@trader" Level="@standing.Level" Reputation="@standing.Reputation"
-                                                                        CompleteTasks="@tasks.Complete" TotalTasks="@tasks.Total"
-                                                                        LevelChanged="@((int v) => SetLevel(entry.Mode, id, v))"
-                                                                        ReputationChanged="@((double? v) => SetReputation(entry.Mode, id, v))" />
-                                                }
-                                            </div>
+                                    <div class="profile-traders">
+                                        @foreach (var trader in Traders) {
+                                            var id = trader.Id;
+                                            var standing = GetStanding(entry.Mode, id);
+                                            var tasks = TraderTaskProgress(entry.Mode, id);
+                                            <TraderStandingCard Trader="@trader" Level="@standing.Level" Reputation="@standing.Reputation"
+                                                                CompleteTasks="@tasks.Complete" TotalTasks="@tasks.Total"
+                                                                LevelChanged="@((int v) => SetLevel(entry.Mode, id, v))"
+                                                                ReputationChanged="@((double? v) => SetReputation(entry.Mode, id, v))" />
+                                        }
+                                    </div>
 
-                                            <div class="profile-actions">
-                                                <MudButton Variant="Variant.Outlined" Color="Color.Warning" Size="Size.Small"
-                                                           StartIcon="@Icons.Material.Filled.RestartAlt" OnClick="@(() => ResetProfile(entry.Mode))">
-                                                    @Localizer["ProfileResetAction"]
-                                                </MudButton>
-                                            </div>
-                                        </MudTabPanel>
-                                    }
-                                </MudTabs>
-                            </SettingsCard>
-                        }
-
-                        <SettingsCard Title="@Localizer["LogTrackingTitle"]" Subtitle="@Localizer["LogTrackingDesc"]">
-                            <SettingsSwitchRow Label="@Localizer["LogTrackingEnable"]" SubLabel="@Localizer["LogTrackingEnableHint"]"
-                                               Value="@SettingsVM.EnableLogTracking"
-                                               ValueChanged="@((bool v) => { SettingsVM.EnableLogTracking = v; SettingsVM.MarkDirty(); })" />
-
-                            <SettingsSwitchRow Label="@Localizer["LogTrackingQuests"]" SubLabel="@Localizer["LogTrackingQuestsHint"]"
-                                               Value="@SettingsVM.LogTrackQuests"
-                                               ValueChanged="@((bool v) => { SettingsVM.LogTrackQuests = v; SettingsVM.MarkDirty(); })"
-                                               Disabled="@(!SettingsVM.EnableLogTracking)" />
-
-                            <SettingsSwitchRow Label="@Localizer["LogTrackingRaid"]" SubLabel="@Localizer["LogTrackingRaidHint"]"
-                                               Value="@SettingsVM.LogTrackRaidLifecycle"
-                                               ValueChanged="@((bool v) => { SettingsVM.LogTrackRaidLifecycle = v; SettingsVM.MarkDirty(); })"
-                                               Disabled="@(!SettingsVM.EnableLogTracking)" />
-
-                            <SettingsSwitchRow Label="@Localizer["LogTrackingMode"]" SubLabel="@Localizer["LogTrackingModeHint"]"
-                                               Value="@SettingsVM.LogTrackGameMode"
-                                               ValueChanged="@((bool v) => { SettingsVM.LogTrackGameMode = v; SettingsVM.MarkDirty(); })"
-                                               Disabled="@(!SettingsVM.EnableLogTracking)" />
-
-                            <SettingsSwitchRow Label="@Localizer["LogTrackingPosition"]"
-                                               SubLabel="@Localizer["LogTrackingPositionHint"]" Value="@SettingsVM.LogTrackPlayerPosition"
-                                               ValueChanged="@((bool v) => { SettingsVM.LogTrackPlayerPosition = v; SettingsVM.MarkDirty(); })"
-                                               Disabled="@(!SettingsVM.EnableLogTracking)" />
-
-                            <SettingsRow Label="@Localizer["LogTrackingPath"]" SubLabel="@Localizer["LogTrackingPathHint"]"
-                                         Disabled="@(!SettingsVM.EnableLogTracking)">
-                                <MudTextField T="string" Value="@SettingsVM.LogPathOverride"
-                                              ValueChanged="@((string v) => { SettingsVM.LogPathOverride = v; SettingsVM.MarkDirty(); })"
-                                              Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Immediate="true"
-                                              Style="min-width: 320px;" />
-                            </SettingsRow>
-
-                            <SettingsRow Label="@Localizer["LogTrackingPositionMap"]"
-                                         SubLabel="@Localizer["LogTrackingPositionMapHint"]" Disabled="@(!SettingsVM.EnableLogTracking)">
-                                <MudSelect T="string" Value="@SettingsVM.PositionMapFallback"
-                                           ValueChanged="@((string v) => { SettingsVM.PositionMapFallback = v; SettingsVM.MarkDirty(); })"
-                                           Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Style="min-width: 220px;">
-                                    @foreach (var map in AvailableMaps) {
-                                        <MudSelectItem T="string" Value="@map.Id">@map.Name</MudSelectItem>
-                                    }
-                                </MudSelect>
-                            </SettingsRow>
-
-                            @* Shown only once log tracking is on, so a failed detection
-                               is visible here instead of silently doing nothing. *@
-                            @if (SettingsVM.EnableLogTracking) {
-                                <MudText Typo="Typo.caption" Color="@(_logsResolved ? Color.Secondary : Color.Warning)" Class="ml-4 mb-2">
-                                    @Localizer["LogTrackingStatus"]:
-                                    <span>@(_logsResolved ? _logsFolder : Localizer["LogTrackingStatusMissing"])</span>
-                                    @if (_logsResolved) {
-                                        <span> (@Localizer["LogTrackingStatusFound"])</span>
-                                    }
-                                </MudText>
+                                    <div class="profile-actions">
+                                        <MudButton Variant="Variant.Outlined" Color="Color.Warning" Size="Size.Small"
+                                                   StartIcon="@Icons.Material.Filled.RestartAlt" OnClick="@(() => ResetProfile(entry.Mode))">
+                                            @Localizer["ProfileResetAction"]
+                                        </MudButton>
+                                    </div>
+                                </MudTabPanel>
                             }
+                        </MudTabs>
+                    </SettingsCard>
+                }
 
-                            @* Reading past logs is a manual action: it rewrites quest
+                <SettingsCard Title="@Localizer["LogTrackingTitle"]" Subtitle="@Localizer["LogTrackingDesc"]">
+                    <SettingsSwitchRow Label="@Localizer["LogTrackingEnable"]" SubLabel="@Localizer["LogTrackingEnableHint"]"
+                                       Value="@SettingsVM.EnableLogTracking"
+                                       ValueChanged="@((bool v) => { SettingsVM.EnableLogTracking = v; SettingsVM.MarkDirty(); })" />
+
+                    <SettingsSwitchRow Label="@Localizer["LogTrackingQuests"]" SubLabel="@Localizer["LogTrackingQuestsHint"]"
+                                       Value="@SettingsVM.LogTrackQuests"
+                                       ValueChanged="@((bool v) => { SettingsVM.LogTrackQuests = v; SettingsVM.MarkDirty(); })"
+                                       Disabled="@(!SettingsVM.EnableLogTracking)" />
+
+                    <SettingsSwitchRow Label="@Localizer["LogTrackingRaid"]" SubLabel="@Localizer["LogTrackingRaidHint"]"
+                                       Value="@SettingsVM.LogTrackRaidLifecycle"
+                                       ValueChanged="@((bool v) => { SettingsVM.LogTrackRaidLifecycle = v; SettingsVM.MarkDirty(); })"
+                                       Disabled="@(!SettingsVM.EnableLogTracking)" />
+
+                    <SettingsSwitchRow Label="@Localizer["LogTrackingMode"]" SubLabel="@Localizer["LogTrackingModeHint"]"
+                                       Value="@SettingsVM.LogTrackGameMode"
+                                       ValueChanged="@((bool v) => { SettingsVM.LogTrackGameMode = v; SettingsVM.MarkDirty(); })"
+                                       Disabled="@(!SettingsVM.EnableLogTracking)" />
+
+                    <SettingsSwitchRow Label="@Localizer["LogTrackingPosition"]"
+                                       SubLabel="@Localizer["LogTrackingPositionHint"]" Value="@SettingsVM.LogTrackPlayerPosition"
+                                       ValueChanged="@((bool v) => { SettingsVM.LogTrackPlayerPosition = v; SettingsVM.MarkDirty(); })"
+                                       Disabled="@(!SettingsVM.EnableLogTracking)" />
+
+                    <SettingsRow Label="@Localizer["LogTrackingPath"]" SubLabel="@Localizer["LogTrackingPathHint"]"
+                                 Disabled="@(!SettingsVM.EnableLogTracking)">
+                        <MudTextField T="string" Value="@SettingsVM.LogPathOverride"
+                                      ValueChanged="@((string v) => { SettingsVM.LogPathOverride = v; SettingsVM.MarkDirty(); })"
+                                      Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Immediate="true"
+                                      Style="min-width: 320px;" />
+                    </SettingsRow>
+
+                    <SettingsRow Label="@Localizer["LogTrackingPositionMap"]"
+                                 SubLabel="@Localizer["LogTrackingPositionMapHint"]" Disabled="@(!SettingsVM.EnableLogTracking)">
+                        <MudSelect T="string" Value="@SettingsVM.PositionMapFallback"
+                                   ValueChanged="@((string v) => { SettingsVM.PositionMapFallback = v; SettingsVM.MarkDirty(); })"
+                                   Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Style="min-width: 220px;">
+                            @foreach (var map in AvailableMaps) {
+                                <MudSelectItem T="string" Value="@map.Id">@map.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </SettingsRow>
+
+                    @* Shown only once log tracking is on, so a failed detection
+                               is visible here instead of silently doing nothing. *@
+                    @if (SettingsVM.EnableLogTracking) {
+                        <MudText Typo="Typo.caption" Color="@(_logsResolved ? Color.Secondary : Color.Warning)" Class="ml-4 mb-2">
+                            @Localizer["LogTrackingStatus"]:
+                            <span>@(_logsResolved ? _logsFolder : Localizer["LogTrackingStatusMissing"])</span>
+                            @if (_logsResolved) {
+                                <span> (@Localizer["LogTrackingStatusFound"])</span>
+                            }
+                        </MudText>
+                    }
+
+                    @* Reading past logs is a manual action: it rewrites quest
                                progress, so it never runs on its own. *@
-                            <SettingsRow Label="@Localizer["LogTrackingHistory"]" SubLabel="@Localizer["LogTrackingHistoryHint"]"
-                                         Disabled="@(!SettingsVM.EnableLogTracking || !SettingsVM.LogTrackQuests || _replaying)">
-                                <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@_replaying"
-                                           OnClick="@ReadPastLogsAsync" StartIcon="@Icons.Material.Filled.History">
-                                    @(_replaying ? Localizer["LogTrackingHistoryReading"] : Localizer["LogTrackingHistoryAction"])
-                                </MudButton>
-                            </SettingsRow>
-                        </SettingsCard>
-                    </div>
-                </div>
+                    <SettingsRow Label="@Localizer["LogTrackingHistory"]" SubLabel="@Localizer["LogTrackingHistoryHint"]"
+                                 Disabled="@(!SettingsVM.EnableLogTracking || !SettingsVM.LogTrackQuests || _replaying)">
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@_replaying"
+                                   OnClick="@ReadPastLogsAsync" StartIcon="@Icons.Material.Filled.History">
+                            @(_replaying ? Localizer["LogTrackingHistoryReading"] : Localizer["LogTrackingHistoryAction"])
+                        </MudButton>
+                    </SettingsRow>
+                </SettingsCard>
+            </div>
+        </div>
 
-                <style>
-                    /* Level and faction sit side by side rather than as two full-width
-                                                                                                                                                                                                                                                                                                       SettingsRows, which pushed the trader list a long way down.
+        <style>
+            /* Level and faction sit side by side rather than as two full-width
+                                                                                                                                                                                                                                                                                                               SettingsRows, which pushed the trader list a long way down.
 
-                                                                                                                                                                                                                                                                                                       The 16px horizontal inset is the card's own content inset, matching
-                                                                                                                                                                                                                                                                                                       .settings-row and .settings-card-title, so every settings section
-                                                                                                                                                                                                                                                                                                       starts its text at the same x. It was 4px, which left this section
-                                                                                                                                                                                                                                                                                                       visibly hugging the card edge next to the sections around it. */
-                    .profile-grid {
-                        display: grid;
-                        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-                        gap: 16px;
-                        padding: 8px 16px 0;
-                        margin-bottom: 8px;
-                    }
+                                                                                                                                                                                                                                                                                                               The 16px horizontal inset is the card's own content inset, matching
+                                                                                                                                                                                                                                                                                                               .settings-row and .settings-card-title, so every settings section
+                                                                                                                                                                                                                                                                                                               starts its text at the same x. It was 4px, which left this section
+                                                                                                                                                                                                                                                                                                               visibly hugging the card edge next to the sections around it. */
+            .profile-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+                gap: 16px;
+                padding: 8px 16px 0;
+                margin-bottom: 8px;
+            }
 
-                    .profile-field {
-                        display: flex;
-                        flex-direction: column;
-                        gap: 4px;
-                        min-width: 0;
-                    }
+            .profile-field {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                min-width: 0;
+            }
 
-                    .profile-field-label {
-                        font-size: 14px;
-                        line-height: 1.35;
-                    }
+            .profile-field-label {
+                font-size: 14px;
+                line-height: 1.35;
+            }
 
-                    /* Faction as a joined button group, deliberately matching
-                                                                                                                                                                                                                                                                                                       the loyalty tier buttons on the trader cards so the two
-                                                                                                                                                                                                                                                                                                       controls read as the same kind of choice. */
-                    .profile-faction {
-                        display: flex;
-                        width: 100%;
-                        align-self: flex-start;
-                        min-width: 0;
-                        overflow: hidden;
-                        border: 1px solid var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
-                        border-radius: 6px;
-                    }
+            /* Faction as a joined button group, deliberately matching
+                                                                                                                                                                                                                                                                                                               the loyalty tier buttons on the trader cards so the two
+                                                                                                                                                                                                                                                                                                               controls read as the same kind of choice. */
+            .profile-faction {
+                display: flex;
+                width: 100%;
+                align-self: flex-start;
+                min-width: 0;
+                overflow: hidden;
+                border: 1px solid var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
+                border-radius: 6px;
+            }
 
-                    .profile-faction-option {
-                        flex: 1 1 0;
-                        min-width: 0;
-                        min-height: 40px;
-                        padding: 6px 16px;
-                        border: 0;
-                        border-left: 1px solid var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
-                        background: transparent;
-                        color: var(--mud-palette-text-secondary, rgba(255, 255, 255, 0.6));
-                        font: inherit;
-                        font-size: 13px;
-                        font-weight: 600;
-                        cursor: pointer;
-                        transition: background-color 120ms ease-in-out, color 120ms ease-in-out;
-                    }
+            .profile-faction-option {
+                flex: 1 1 0;
+                min-width: 0;
+                min-height: 40px;
+                padding: 6px 16px;
+                border: 0;
+                border-left: 1px solid var(--mud-palette-lines-default, rgba(255, 255, 255, 0.12));
+                background: transparent;
+                color: var(--mud-palette-text-secondary, rgba(255, 255, 255, 0.6));
+                font: inherit;
+                font-size: 13px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: background-color 120ms ease-in-out, color 120ms ease-in-out;
+            }
 
-                    .profile-faction-option:first-child {
-                        border-left: 0;
-                    }
+            .profile-faction-option:first-child {
+                border-left: 0;
+            }
 
-                    .profile-faction-option:hover {
-                        background: var(--mud-palette-action-default-hover, rgba(255, 255, 255, 0.06));
-                        color: var(--mud-palette-text-primary, rgba(255, 255, 255, 0.95));
-                    }
+            .profile-faction-option:hover {
+                background: var(--mud-palette-action-default-hover, rgba(255, 255, 255, 0.06));
+                color: var(--mud-palette-text-primary, rgba(255, 255, 255, 0.95));
+            }
 
-                    .profile-faction-option.profile-faction-option-active {
-                        background: var(--mud-palette-primary, #594AE2);
-                        color: #fff;
-                    }
+            .profile-faction-option.profile-faction-option-active {
+                background: var(--mud-palette-primary, #594AE2);
+                color: #fff;
+            }
 
-                    .profile-faction-option:focus-visible {
-                        outline: 2px solid var(--mud-palette-primary, #594AE2);
-                        outline-offset: -2px;
-                    }
+            .profile-faction-option:focus-visible {
+                outline: 2px solid var(--mud-palette-primary, #594AE2);
+                outline-offset: -2px;
+            }
 
-                    /* Two cards per row, so the eight traders take four rows
-                                                                                                                                                                                                                                                                                                       instead of eight. A fixed count rather than auto-fill because
-                                                                                                                                                                                                                                                                                                       auto-fill would reach three on a wide window and the cards are
-                                                                                                                                                                                                                                                                                                       narrow enough already: each one has to hold a four-button group
-                                                                                                                                                                                                                                                                                                       AND the reputation box side by side. */
-                    .profile-traders {
-                        display: grid;
-                        grid-template-columns: repeat(2, minmax(0, 1fr));
-                        gap: 10px;
-                        padding: 0 16px;
-                    }
+            /* Two cards per row, so the eight traders take four rows
+                                                                                                                                                                                                                                                                                                               instead of eight. A fixed count rather than auto-fill because
+                                                                                                                                                                                                                                                                                                               auto-fill would reach three on a wide window and the cards are
+                                                                                                                                                                                                                                                                                                               narrow enough already: each one has to hold a four-button group
+                                                                                                                                                                                                                                                                                                               AND the reputation box side by side. */
+            .profile-traders {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+                padding: 0 16px;
+            }
 
-                    /* Below this the two cards cannot hold the tier buttons and the
-                                                                                                                                                                                                                                                                                                       reputation box side by side, so fall back to one. */
-                    @@media (max-width: 540px) {
-                        .profile-traders {
-                            grid-template-columns: minmax(0, 1fr);
-                        }
-                    }
+            /* Below this the two cards cannot hold the tier buttons and the
+                                                                                                                                                                                                                                                                                                               reputation box side by side, so fall back to one. */
+            @@media (max-width: 540px) {
+                .profile-traders {
+                    grid-template-columns: minmax(0, 1fr);
+                }
+            }
 
-                    .profile-actions {
-                        display: flex;
-                        justify-content: flex-end;
-                        padding: 12px 16px 0;
-                    }
-                </style>
+            .profile-actions {
+                display: flex;
+                justify-content: flex-end;
+                padding: 12px 16px 0;
+            }
+        </style>
 
 @code {
     private const int DebounceMs = 600;
@@ -355,7 +365,7 @@
     private bool _checkingToken;
     private bool _isConnected;
     private string _checkedToken = "";
-    private RatConfig.TarkovTrackerBackend _checkedBackend;
+    private GameMode _checkedMode;
     private Timer? _debounce;
 
     private InputType TokenInputType => _showToken ? InputType.Text : InputType.Password;
@@ -367,15 +377,21 @@
     /// its validity is unknown rather than false.
     /// </summary>
     private bool TokenChecked => !string.IsNullOrEmpty(_checkedToken)
-        && _checkedToken == (SettingsVM.TarkovTrackerToken?.Trim() ?? "")
-        && _checkedBackend == SettingsVM.TarkovTrackerBackend;
+        && _checkedToken == TokenFor(SettingsVM.GameMode)
+        && _checkedMode == SettingsVM.GameMode;
 
     /// <summary>
     /// Whether TarkovTracker is the selected source. Its card shows a prompt instead of
     /// the credentials while this is false.
     /// </summary>
     private bool UsesTarkovTracker => SettingsVM.ProgressSource == ProgressSource.TarkovTracker;
-    private bool HasToken => !string.IsNullOrWhiteSpace(SettingsVM.TarkovTrackerToken);
+    private bool HasToken => !string.IsNullOrWhiteSpace(TokenFor(SettingsVM.GameMode));
+
+    private string TokenFor(GameMode mode) => mode switch {
+        GameMode.Pve => SettingsVM.TarkovTrackerPveToken?.Trim() ?? "",
+        GameMode.PvpSeason => SettingsVM.TarkovTrackerSeasonalToken?.Trim() ?? "",
+        _ => SettingsVM.TarkovTrackerPvpToken?.Trim() ?? "",
+    };
 
     /// <summary>Maps offered as the position-marker fallback, sorted by name.</summary>
     private List<RatScanner.TarkovDev.Json.Map> AvailableMaps { get; set; } = [];
@@ -686,7 +702,7 @@
             : Color.Default;
 
     /// <summary>
-    /// Validates the token once per token/backend pair, after typing settles.
+    /// Validates the token for the active game mode once typing settles.
     /// </summary>
     /// <remarks>
     /// TestToken performs a blocking HTTP request, so it must not run during
@@ -700,8 +716,8 @@
     }
 
     private async Task RunConnectionCheckAsync() {
-        string token = SettingsVM.TarkovTrackerToken?.Trim() ?? "";
-        var backend = SettingsVM.TarkovTrackerBackend;
+        var mode = SettingsVM.GameMode;
+        var token = TokenFor(mode);
 
         // Nothing is checked while another source is selected, since the credentials are
         // not on screen. Clears the verdict so re-selecting re-checks.
@@ -710,6 +726,7 @@
                 _isConnected = false;
                 _checkingToken = false;
                 _checkedToken = "";
+                _checkedMode = mode;
                 StateHasChanged();
             });
             return;
@@ -719,7 +736,7 @@
             await InvokeAsync(() => {
                 _isConnected = false;
                 _checkedToken = token;
-                _checkedBackend = backend;
+                _checkedMode = mode;
                 _checkingToken = false;
                 StateHasChanged();
             });
@@ -729,30 +746,30 @@
         // Reuse a verdict from a previous visit instead of asking the server
         // again. Both outcomes are cached, so a known-bad token is not re-tested
         // on every visit either. Only a changed token or backend reaches the network.
-        var cached = TarkovTrackerDB.GetCachedValidation(token, backend);
+        var cached = TarkovTrackerDB.GetCachedValidation(token);
 
         if (cached.HasValue) {
             await InvokeAsync(() => {
                 _isConnected = cached.Value;
                 _checkedToken = token;
-                _checkedBackend = backend;
+                _checkedMode = mode;
                 _checkingToken = false;
                 StateHasChanged();
             });
             return;
         }
 
-        if (token == _checkedToken && backend == _checkedBackend) return;
+        if (token == _checkedToken && mode == _checkedMode) return;
 
         _checkingToken = true;
         await InvokeAsync(StateHasChanged);
 
         bool result = await Task.Run(() => TarkovTrackerDB.TestToken(token));
 
-        TarkovTrackerDB.CacheValidation(token, backend, result);
+        TarkovTrackerDB.CacheValidation(token, result);
 
         // Discard the answer if the token changed while the request was in flight.
-        if (token != (SettingsVM.TarkovTrackerToken?.Trim() ?? "")) {
+        if (token != TokenFor(mode) || mode != SettingsVM.GameMode) {
             ScheduleConnectionCheck();
             return;
         }
@@ -760,19 +777,19 @@
         await InvokeAsync(() => {
             _isConnected = result;
             _checkedToken = token;
-            _checkedBackend = backend;
+            _checkedMode = mode;
             _checkingToken = false;
             StateHasChanged();
         });
     }
 
-    private IEnumerable<string> CheckToken(string token) {
+    private IEnumerable<string> CheckToken(string token, GameMode mode) {
         if (string.IsNullOrEmpty(token)) yield break;
 
         // Only report a verdict for a token we have actually finished checking;
         // while the user is still typing, or a check is in flight, stay quiet
         // rather than flagging an unfinished value as invalid.
-        if (_checkingToken || token != _checkedToken) yield break;
+        if (_checkingToken || token.Trim() != _checkedToken || mode != _checkedMode) yield break;
 
         if (!_isConnected) yield return Localizer["InvalidToken"];
     }

@@ -496,9 +496,15 @@
         OnClick.InvokeAsync();
     }
 
-    protected override void OnInitialized() => LocalProgressStore.Changed += OnLocalProgressChanged;
+    protected override void OnInitialized() {
+        LocalProgressStore.Changed += OnLocalProgressChanged;
+        RatScannerMain.Instance.TarkovTrackerDB.Changed += OnLocalProgressChanged;
+    }
 
-    public void Dispose() => LocalProgressStore.Changed -= OnLocalProgressChanged;
+    public void Dispose() {
+        LocalProgressStore.Changed -= OnLocalProgressChanged;
+        RatScannerMain.Instance.TarkovTrackerDB.Changed -= OnLocalProgressChanged;
+    }
 
     private static string StatusText(TaskRequirementEntry entry) => entry.Status switch {
         TaskState.Complete => LocalizationService.Translate("QuestCompleted"),
