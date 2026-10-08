@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 
 namespace RatScanner;
 
@@ -50,4 +52,11 @@ public static class Extensions {
 		RatStash.Language.Turkish => "tr",
 		_ => "en"
 	};
+
+	public static T Random<T>(this IEnumerable<T> source) {
+		ArgumentNullException.ThrowIfNull(source);
+		var list = source as IList<T> ?? source.ToList();
+		if (list.Count == 0) throw new InvalidOperationException("Sequence contains no elements.");
+		return list[System.Random.Shared.Next(list.Count)];
+	}
 }

@@ -70,7 +70,13 @@ public class RatScannerMain : INotifyPropertyChanged {
 	/// navigating to settings, and so the wiki and tarkov.dev hotkeys read the same
 	/// answer the display does instead of a separate last-scan lookup.
 	/// </summary>
-	internal FixedSizeQueue<SearchResult> SelectedResults = new(10);
+	internal FixedSizeQueue<SearchResult> SelectedResults = new(10) {
+		new SearchResult(new object[] {
+			TarkovDevAPI.GetTasks().Random(),
+			TarkovDevAPI.GetItems().Random(),
+			TarkovDevAPI.GetMaps().Random(),
+		}.Random(), 0)
+	};
 
 	/// <summary>
 	/// What is on screen, or null when nothing has been picked yet.

@@ -30,6 +30,8 @@ public class FixedSizeQueue<T> : IEnumerable<T> {
         }
     }
 
+    public void Add(T obj) => Enqueue(obj);
+
     /// <summary>Takes the newest entry off the queue.</summary>
     public bool TryDequeue(out T result) {
         lock (_lock) {
