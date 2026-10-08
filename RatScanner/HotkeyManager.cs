@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows;
 using static RatScanner.RatConfig;
@@ -11,7 +12,7 @@ using OverlayC = RatScanner.RatConfig.Overlay;
 
 namespace RatScanner;
 
-internal class HotkeyManager {
+internal partial class HotkeyManager {
 	private long _last_mouse_click = 0;
 
 	internal ActiveHotkey NameScanHotkey;
@@ -114,6 +115,8 @@ internal class HotkeyManager {
 	}
 
 	private void OnOpenInteractableOverlayHotkey(object? sender, KeyUpEventArgs e) {
+		if (!CanOpenInteractableOverlay()) return;
+
 		Wrap(() => Application.Current.Dispatcher.Invoke(() => Wrap(() => BlazorUI.BlazorInteractableOverlay.ShowOverlay())));
 	}
 
@@ -170,10 +173,28 @@ internal class HotkeyManager {
 	/// so the overlay page can show the map viewer.
 	/// </summary>
 	private void OnOpenMapHotkey(object? sender, KeyUpEventArgs e) {
+		if (!CanOpenInteractableOverlay()) return;
+
 		Wrap(() => Application.Current.Dispatcher.Invoke(() => Wrap(() => {
 			BlazorUI.BlazorInteractableOverlay.ShowOverlay();
 			OpenMapPressed?.Invoke();
 		})));
+	}
+
+	private static bool CanOpenInteractableOverlay() {
+		var gameProcesses = Process.GetProcessesByName("EscapeFromTarkov");
+		try {
+			if (gameProcesses.Length == 0) return true;
+			if (BlazorUI.BlazorInteractableOverlay.IsVisible) return true;
+
+			var foregroundWindow = NativeMethods.GetForegroundWindow();
+			if (foregroundWindow == IntPtr.Zero) return false;
+
+			_ = NativeMethods.GetWindowThreadProcessId(foregroundWindow, out var foregroundProcessId);
+			return gameProcesses.Any(process => process.Id == foregroundProcessId);
+		} finally {
+			foreach (var process in gameProcesses) process.Dispose();
+		}
 	}
 
 	/// <summary>
@@ -216,5 +237,13 @@ internal class HotkeyManager {
 	private static void OpenURL(string? url) {
 		if (string.IsNullOrEmpty(url)) return;
 		_ = Process.Start(new ProcessStartInfo { FileName = url, UseShellExecute = true });
+	}
+
+	private static partial class NativeMethods {
+		[LibraryImport("user32.dll", EntryPoint = "GetForegroundWindow")]
+		public static partial IntPtr GetForegroundWindow();
+
+		[LibraryImport("user32.dll", EntryPoint = "GetWindowThreadProcessId")]
+		public static partial uint GetWindowThreadProcessId(IntPtr hWnd, out uint processId);
 	}
 }
