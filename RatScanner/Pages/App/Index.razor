@@ -102,9 +102,8 @@
         } else if (Selected?.Data is Map selectedMap) {
             <MapSearchResult Map="@selectedMap" Detail="DetailLevel.Full" ShowExtracts="@_showExtracts"
                              ShowLocks="@_showLocks" ShowTransits="@_showTransits" ShowHazards="@_showHazards"
-                             ShowQuestLocations="@_showQuestLocations" OnShowExtractsChanged="@OnShowExtractsChanged"
-                             OnShowLocksChanged="@OnShowLocksChanged" OnShowTransitsChanged="@OnShowTransitsChanged"
-                             OnShowHazardsChanged="@OnShowHazardsChanged" OnShowQuestLocationsChanged="@OnShowQuestLocationsChanged"
+                             OnShowExtractsChanged="@OnShowExtractsChanged" OnShowLocksChanged="@OnShowLocksChanged"
+                             OnShowTransitsChanged="@OnShowTransitsChanged" OnShowHazardsChanged="@OnShowHazardsChanged"
                              OnMapClick="@(() => OpenMapViewer(selectedMap))" />
             <MudPaper Outlined="true" Class="map-frame">
                 <MapViewer Map="@selectedMap" Inline="true" Pois="@SelectedMapPois" OnExpand="OpenMapViewerFromCard"
@@ -317,8 +316,6 @@
     private bool _showHazards;
 
     /// <summary>Whether quest objective locations are overlaid on the maps.</summary>
-    private bool _showQuestLocations;
-
     /// <summary>
     /// Lazily-built name lookups, shared by every map the viewer shows. Building
     /// these eagerly would pull the whole items and maps cache in just to resolve
@@ -355,31 +352,7 @@
         if (_showLocks) Add(map.GetLockPois(ResolveItemName));
         if (_showTransits) Add(map.GetTransitPois(ResolveMapName));
         if (_showHazards) Add(map.GetHazardPois());
-        if (_showQuestLocations) Add(map.GetQuestObjectivePois(RatScanner.TaskExtensions.GetAvailableTasksForMap(map.Id)));
-
-        // Only on the map the player is actually on: showing a position on any
-        // other map would put the marker somewhere meaningless.
-        var position = PlayerPosition;
-        if (position is not null && EftRaidLifecycle.CurrentMapId == map.Id) {
-            if (map.GetPlayerPositionPoi(position.Value.Position, position.Value.Rotation) is { } player) {
-                Add([player]);
-            }
-        }
-
         return pois;
-    }
-
-    /// <summary>
-    /// The last position seen from a screenshot, or null when there is none.
-    /// </summary>
-    private (WorldPosition Position, double Rotation)? PlayerPosition {
-        get {
-            var tracker = RatScannerMain.Instance.PlayerPosition;
-            var position = tracker?.CurrentPosition;
-            var rotation = tracker?.CurrentRotation;
-            if (position == null || rotation == null) return null;
-            return (position, rotation.Value);
-        }
     }
 
     /// <summary>
@@ -443,10 +416,6 @@
         _showHazards = value;
     }
 
-    private void OnShowQuestLocationsChanged(bool value) {
-        _showQuestLocations = value;
-    }
-
     protected override void OnInitialized() {
         MenuVM.PropertyChanged += PropertyChangeHandler;
         MenuVM.ItemScans.Enqueued += OnItemScanEnqueued;
@@ -454,7 +423,6 @@
         SettingsVM.GameModeChanged += OnGameModeChanged;
         Logger.Notified += OnLoggerNotified;
         EftGameModeDetector.ModeDetected += OnModeDetected;
-        RatScannerMain.Instance.PlayerPositionChanged += OnPlayerPositionChanged;
     }
 
     /// <summary>
@@ -602,7 +570,6 @@
         _viewerMap = null;
         _viewerZonePois = null;
 
-        SelectedResults.Enqueue(new SearchResult(task, 0));
         StateHasChanged();
     }
 
@@ -696,17 +663,6 @@
         _ => "PvP",
     };
 
-    /// <summary>
-    /// A new position arrived on the watcher's thread. Only redraw when a map is
-    /// actually on screen, since the marker only shows there.
-    /// </summary>
-    private void OnPlayerPositionChanged() {
-        _ = InvokeAsync(() => {
-            if (_viewerMap == null && Selected?.Data is not Map) return;
-            StateHasChanged();
-        });
-    }
-
     private void PropertyChangeHandler(object? sender, EventArgs e) {
         // Fire and forget: the scan timer fires this ~10x a second, and the
         // dispatcher is torn down when the window closes. Awaited here, the
@@ -722,6 +678,5 @@
         SettingsVM.GameModeChanged -= OnGameModeChanged;
         Logger.Notified -= OnLoggerNotified;
         EftGameModeDetector.ModeDetected -= OnModeDetected;
-        RatScannerMain.Instance.PlayerPositionChanged -= OnPlayerPositionChanged;
     }
 }

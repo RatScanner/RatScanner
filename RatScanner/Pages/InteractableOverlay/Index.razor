@@ -143,10 +143,6 @@
         var task = TarkovDevAPI.GetTasks().FirstOrDefault(t => t.Id == taskId);
         if (task == null) return;
 
-        // Selected through the shared queue, so the main window picks it up the
-        // same way it picks up a scan.
-        RatScannerMain.Instance.SelectedResults.Enqueue(new SearchResult(task, 0));
-
         CloseMapViewer();
         JSHideOverlay();
         PageSwitcher.Instance.ShowUI();
@@ -211,6 +207,11 @@
     /// is shown rather than re-focusing a previous objective.
     /// </summary>
     private void OnOpenMapPressed() {
+        if (_selectedMap != null && _mapOpenedByHotkey) {
+            _ = InvokeAsync(CloseMapViewer);
+            return;
+        }
+
         var map = TarkovDevAPI.GetMaps().Where(m => m.Id == EftRaidLifecycle.CurrentMapId).FirstOrDefault();
         if (map is null) return;
 

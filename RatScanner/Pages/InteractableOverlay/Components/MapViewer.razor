@@ -1,6 +1,7 @@
 @using RatScanner.TarkovDev.Json
 @using Microsoft.JSInterop
 @using System.Globalization
+@implements IDisposable
 
 @*
     A zoomable, draggable map.
@@ -59,7 +60,7 @@
                        percentages feed straight into it without conversion. *@
                     @if (HasPolygons) {
                         <svg class="poi-shapes" viewBox="0 0 100 100" preserveAspectRatio="none">
-                            @foreach (var poi in Pois!) {
+                            @foreach (var poi in DisplayedPois!) {
                                 if (poi.Points == null || poi.Points.Count < 3) continue;
                                 <polygon points="@PointsAttribute(poi)" style="@ShapeStyle(poi)" />
                             }
@@ -68,8 +69,8 @@
 
                     @* Markers. Positioned in percentages of the canvas, which
                        scales with the zoom, so they track the map when it moves. *@
-                    @if (Pois is { Count: > 0 }) {
-                        foreach (var poi in Pois) {
+                    @if (DisplayedPois is { Count: > 0 }) {
+                        foreach (var poi in DisplayedPois) {
                             var isQuestObjective = !string.IsNullOrEmpty(poi.TaskId);
                             var cssClass = isQuestObjective
                                 ? "poi poi-clickable"
@@ -403,6 +404,12 @@
     private List<POI>? _shownFocusPois;
 
     /// <summary>
+    /// The caller's markers plus the current player marker when this map is the
+    /// active raid map. Kept local so every viewer gets the same behaviour.
+    /// </summary>
+    private List<POI>? DisplayedPois { get; set; }
+
+    /// <summary>
     /// Whether a pan is still owed. Set when the focus changes and cleared once
     /// the container has been measured.
     /// </summary>
@@ -472,7 +479,23 @@
     /// Whether any POI carries a polygon. Avoids emitting the SVG layer at all
     /// for the common all-point case.
     /// </summary>
-    private bool HasPolygons => Pois is { Count: > 0 } && Pois.Any(p => p.Points is { Count: >= 3 });
+    private bool HasPolygons => DisplayedPois is { Count: > 0 } && DisplayedPois.Any(p => p.Points is { Count: >= 3 });
+
+    private List<POI>? BuildDisplayedPois() {
+        var displayed = Pois?.ToList() ?? [];
+        displayed.AddRange(Map.GetQuestObjectivePois(RatScanner.TaskExtensions.GetAvailableTasksForMap(Map.Id)));
+
+        var tracker = RatScannerMain.Instance.PlayerPosition;
+        var position = tracker?.CurrentPosition;
+        var rotation = tracker?.CurrentRotation;
+
+        if (position is not null && rotation is not null && EftRaidLifecycle.CurrentMapId == Map.Id &&
+            Map.GetPlayerPositionPoi(position, rotation.Value) is { } player) {
+            displayed.Add(player);
+        }
+
+        return displayed.Count > 0 ? displayed : null;
+    }
 
     /// <summary>
     /// The polygon vertices as an SVG "points" list. Culture is forced so a
@@ -509,6 +532,8 @@
     }
 
     protected override void OnParametersSet() {
+        DisplayedPois = BuildDisplayedPois();
+
         // Reset the view when a different map is shown, so a previous map's pan
         // and zoom do not carry over.
         var mapChanged = !ReferenceEquals(_shownMap, Map);
@@ -531,6 +556,17 @@
             _shownFocusPois = FocusPois;
             _focusPending = true;
         }
+    }
+
+    protected override void OnInitialized() {
+        RatScannerMain.Instance.PlayerPositionChanged += OnPlayerPositionChanged;
+    }
+
+    private void OnPlayerPositionChanged() {
+        _ = InvokeAsync(() => {
+            DisplayedPois = BuildDisplayedPois();
+            StateHasChanged();
+        });
     }
 
     /// <summary>
@@ -723,10 +759,22 @@
     /// click is ignored and the map is left where it is.
     /// </summary>
     private Task HandlePoiClick(POI poi) {
-        if (string.IsNullOrEmpty(poi.TaskId) || !OnPoiTaskClick.HasDelegate) {
+        if (string.IsNullOrEmpty(poi.TaskId)) {
             return Task.CompletedTask;
         }
 
-        return OnPoiTaskClick.InvokeAsync(poi.TaskId);
+        var task = TarkovDevAPI.GetTasks().FirstOrDefault(candidate => candidate.Id == poi.TaskId);
+        if (task == null) return Task.CompletedTask;
+
+        RatScannerMain.Instance.SelectedResults.Enqueue(
+            new RatScanner.Pages.InteractableOverlay.Services.SearchResult(task, 0));
+
+        return OnPoiTaskClick.HasDelegate
+            ? OnPoiTaskClick.InvokeAsync(poi.TaskId)
+            : Task.CompletedTask;
+    }
+
+    public void Dispose() {
+        RatScannerMain.Instance.PlayerPositionChanged -= OnPlayerPositionChanged;
     }
 }

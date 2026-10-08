@@ -97,11 +97,9 @@ public class RatScannerMain : INotifyPropertyChanged {
 		// Enqueue ignores an entry equal to the current tail, so re-reporting the
 		// task already on screen does not disturb it.
 		SelectedResults.Enqueue(new SearchResult(task, 0));
-
-		// The scan timer already drives the page's redraw, but a log event can
-		// land between two ticks, so make sure the change is on screen now.
-		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Selected)));
 	}
+
+	private void OnSelectedResultsChanged() => OnPropertyChanged(nameof(Selected));
 
 	/// <summary>
 	/// A task the game reported. The notification always goes out; the task is
@@ -147,6 +145,7 @@ public class RatScannerMain : INotifyPropertyChanged {
 
 		// Every scan path funnels through the queue, so this covers them all.
 		ItemScans.Enqueued += OnItemScanEnqueued;
+		SelectedResults.OnChange += OnSelectedResultsChanged;
 
 		Logger.LogInfo("Initializing tarkov tracker database");
 		TarkovTrackerDB = new TarkovTrackerDB();

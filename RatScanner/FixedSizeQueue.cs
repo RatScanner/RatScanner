@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,8 @@ public class FixedSizeQueue<T> : IEnumerable<T> {
     private readonly object _lock = new();
 
     public int Size { get; }
+
+    public event Action? OnChange;
 
     public FixedSizeQueue(int size) {
         Size = size;
@@ -28,6 +31,8 @@ public class FixedSizeQueue<T> : IEnumerable<T> {
 
             while (_list.Count > Size) _list.RemoveFirst();
         }
+
+        OnChange?.Invoke();
     }
 
     public void Add(T obj) => Enqueue(obj);
@@ -42,13 +47,16 @@ public class FixedSizeQueue<T> : IEnumerable<T> {
 
             _list.RemoveLast();
             result = last.Value;
-            return true;
         }
+
+        OnChange?.Invoke();
+        return true;
     }
 
     /// <summary>Empties the queue, oldest entries first.</summary>
     public void Clear() {
         lock (_lock) _list.Clear();
+        OnChange?.Invoke();
     }
 
     public int Count => _list.Count;
