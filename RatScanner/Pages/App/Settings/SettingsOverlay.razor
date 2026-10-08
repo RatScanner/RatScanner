@@ -7,6 +7,14 @@
 @implements IDisposable
 
 <div class="settings-stack">
+    <SettingsCard Title="@Localizer["ScanningOverlayGroup"]" Subtitle="@Localizer["ScanningOverlayGroupDesc"]">
+        <SettingsRow Label="@Localizer["EnableScanningOverlay"]" SubLabel="@Localizer["EnableScanningOverlayHint"]">
+            <MudSwitch T="bool" Checked="@SettingsVM.EnableScanningOverlay"
+                       CheckedChanged="@((bool v) => { SettingsVM.EnableScanningOverlay = v; SettingsVM.MarkDirty(); })"
+                       Color="Color.Primary" Dense="true" />
+        </SettingsRow>
+    </SettingsCard>
+    
     <SettingsCard Title="@Localizer["OverlayGroup"]" Subtitle="@Localizer["OverlayGroupDesc"]">
         <SettingsRow Label="@Localizer["EnableSearchOverlay"]" SubLabel="@Localizer["EnableSearchOverlayHint"]">
             <MudSwitch T="bool" Checked="@SettingsVM.EnableIneractableOverlay"
@@ -29,24 +37,10 @@
                             OnHotkeyChanged="@(() => SettingsVM.MarkDirty())" />
         </SettingsRow>
 
-        <SettingsRow Label="@Localizer["CloseSearchOverlay"]" SubLabel="@Localizer["CloseSearchOverlayHint"]"
-                     Disabled="@(!SettingsVM.EnableIneractableOverlay)">
-            <HotkeySelector Hotkey="@SettingsVM.CloseOverlayHotkey" @key="SettingsVM.CloseOverlayHotkey"
-                            OnHotkeyChanged="@(() => SettingsVM.MarkDirty())" />
-        </SettingsRow>
-
         <SettingsRow Label="@Localizer["OpenMapViewer"]" SubLabel="@Localizer["OpenMapViewerHint"]"
                      Disabled="@(!SettingsVM.EnableIneractableOverlay)">
             <HotkeySelector Hotkey="@SettingsVM.OpenMapHotkey" @key="SettingsVM.OpenMapHotkey"
                             OnHotkeyChanged="@(() => SettingsVM.MarkDirty())" />
-        </SettingsRow>
-    </SettingsCard>
-
-    <SettingsCard Title="@Localizer["ScanningOverlayGroup"]" Subtitle="@Localizer["ScanningOverlayGroupDesc"]">
-        <SettingsRow Label="@Localizer["EnableScanningOverlay"]" SubLabel="@Localizer["EnableScanningOverlayHint"]">
-            <MudSwitch T="bool" Checked="@SettingsVM.EnableScanningOverlay"
-                       CheckedChanged="@((bool v) => { SettingsVM.EnableScanningOverlay = v; SettingsVM.MarkDirty(); })"
-                       Color="Color.Primary" Dense="true" />
         </SettingsRow>
     </SettingsCard>
 </div>

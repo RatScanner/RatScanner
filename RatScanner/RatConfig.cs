@@ -170,7 +170,7 @@ internal static partial class RatConfig {
 		internal static class Search {
 			internal static bool Enable = true;
 			internal static bool BlurBehind = true;
-			internal static Hotkey Hotkey = new([Key.N, Key.M]);
+			internal static Hotkey Hotkey = new([Key.N]);
 			internal static Hotkey CloseHotkey = new([Key.Escape]);
 		}
 
@@ -183,7 +183,7 @@ internal static partial class RatConfig {
 	internal static class Hotkeys {
 		internal static Hotkey OpenWiki = new();
 		internal static Hotkey OpenTarkovDev = new();
-		internal static Hotkey OpenMap = new([Key.P, Key.O]);
+		internal static Hotkey OpenMap = new([Key.M]);
 	}
 
 	// OAuth2 refresh tokens

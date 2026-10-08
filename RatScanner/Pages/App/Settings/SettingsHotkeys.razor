@@ -29,12 +29,6 @@
                             OnHotkeyChanged="@(() => SettingsVM.MarkDirty())" />
         </SettingsRow>
 
-        <SettingsRow Label="@Localizer["CloseSearchOverlay"]" SubLabel="@Localizer["CloseSearchOverlayHint"]"
-                     Disabled="@(!SettingsVM.EnableIneractableOverlay)">
-            <HotkeySelector Hotkey="@SettingsVM.CloseOverlayHotkey" @key="SettingsVM.CloseOverlayHotkey"
-                            OnHotkeyChanged="@(() => SettingsVM.MarkDirty())" />
-        </SettingsRow>
-
         <SettingsRow Label="@Localizer["OpenMapViewer"]" SubLabel="@Localizer["OpenMapViewerHint"]"
                      Disabled="@(!SettingsVM.EnableIneractableOverlay)">
             <HotkeySelector Hotkey="@SettingsVM.OpenMapHotkey" @key="SettingsVM.OpenMapHotkey"
