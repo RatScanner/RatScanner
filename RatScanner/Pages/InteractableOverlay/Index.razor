@@ -73,6 +73,7 @@
     // Map viewer state
     private Map? _selectedMap = null;
     private List<POI>? _selectedPois = null;
+    private bool _mapOpenedByHotkey;
 
     /// <summary>Bumped per search so one that finishes late discards its result.</summary>
     private int _searchGeneration;
@@ -122,6 +123,7 @@
         _selectedPois = map.GetZonePois(objective.Zones, taskId: task?.Id);
         if (_selectedPois.Count == 0) return;
 
+        _mapOpenedByHotkey = false;
         _selectedMap = map;
         StateHasChanged();
     }
@@ -151,14 +153,19 @@
     }
 
     private void OpenMapViewer(Map map) {
+        _mapOpenedByHotkey = false;
         _selectedMap = map;
         StateHasChanged();
     }
 
     private void CloseMapViewer() {
+        var hideOverlay = _mapOpenedByHotkey;
+        _mapOpenedByHotkey = false;
         _selectedMap = null;
         _selectedPois = null;
         StateHasChanged();
+
+        if (hideOverlay) JSHideOverlay();
     }
 
     [JSInvokable]
@@ -175,6 +182,7 @@
     protected override void OnInitialized() {
         MenuVM.PropertyChanged += PropertyChangeHandler;
         RatScannerMain.Instance.HotkeyManager.EscapePressed += OnEscapePressed;
+        RatScannerMain.Instance.HotkeyManager.OpenMapPressed += OnOpenMapPressed;
         SettingsVM.GameModeChanged += OnGameModeChanged;
     }
 
@@ -197,6 +205,23 @@
         return true;
     }
 
+    /// <summary>
+    /// Opens the map viewer with the first available map when the open-map
+    /// hotkey is pressed. Clears any previous POI selection so the full map
+    /// is shown rather than re-focusing a previous objective.
+    /// </summary>
+    private void OnOpenMapPressed() {
+        var map = TarkovDevAPI.GetMaps().Where(m => m.Id == EftRaidLifecycle.CurrentMapId).FirstOrDefault();
+        if (map is null) return;
+
+        _ = InvokeAsync(() => {
+            _selectedPois = null;
+            _mapOpenedByHotkey = true;
+            _selectedMap = map;
+            StateHasChanged();
+        });
+    }
+
     private void PropertyChangeHandler(object? sender, EventArgs e) {
         _ = InvokeAsync(() => StateHasChanged());
     }
@@ -204,6 +229,7 @@
     public void Dispose() {
         MenuVM.PropertyChanged -= PropertyChangeHandler;
         RatScannerMain.Instance.HotkeyManager.EscapePressed -= OnEscapePressed;
+        RatScannerMain.Instance.HotkeyManager.OpenMapPressed -= OnOpenMapPressed;
         SettingsVM.GameModeChanged -= OnGameModeChanged;
     }
 }

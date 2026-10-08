@@ -116,11 +116,12 @@ internal class SettingsVM : INotifyPropertyChanged {
 	public bool LogTrackGameMode { get; set; }
 	public bool LogTrackPlayerPosition { get; set; }
 	public string LogPathOverride { get; set; } = "";
-	public string PositionMapFallback { get; set; } = "";
+	public string PositionMapFallback { get; set; } = "56f40101d2720b2a4d8b45d6";
 
 	// Application hotkeys
 	public Hotkey OpenWikiHotkey { get; set; }
 	public Hotkey OpenTarkovDevHotkey { get; set; }
+	public Hotkey OpenMapHotkey { get; set; }
 
 	private readonly LocalizationService _localizationService;
 
@@ -210,6 +211,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 		OpenWikiHotkey = new Hotkey(RatConfig.Hotkeys.OpenWiki);
 		OpenTarkovDevHotkey = new Hotkey(RatConfig.Hotkeys.OpenTarkovDev);
+		OpenMapHotkey = new Hotkey(RatConfig.Hotkeys.OpenMap);
 
 		IsDirty = false;
 		_suppressDirty = true;
@@ -366,6 +368,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 		RatConfig.Hotkeys.OpenWiki = OpenWikiHotkey;
 		RatConfig.Hotkeys.OpenTarkovDev = OpenTarkovDevHotkey;
+		RatConfig.Hotkeys.OpenMap = OpenMapHotkey;
 
 		if (OverrideScreenConfig) {
 			RatConfig.ScreenWidth = ScreenWidth;

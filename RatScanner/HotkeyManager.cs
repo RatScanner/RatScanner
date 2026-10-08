@@ -1,4 +1,4 @@
-﻿using RatScanner.View;
+using RatScanner.View;
 using RatScanner.TarkovDev.Json;
 using System;
 using System.Diagnostics;
@@ -20,6 +20,13 @@ internal class HotkeyManager {
 	internal ActiveHotkey EscapeKeyHotkey;
 	internal ActiveHotkey OpenWikiHotkey;
 	internal ActiveHotkey OpenTarkovDevHotkey;
+	internal ActiveHotkey OpenMapHotkey;
+
+	/// <summary>
+	/// Raised when the open-map hotkey fires. The interactable overlay subscribes
+	/// to this and shows the map viewer when it does.
+	/// </summary>
+	internal event Action? OpenMapPressed;
 
 	/// <summary>
 	/// Raised when the Escape hotkey fires, letting an open view consume the key
@@ -54,7 +61,8 @@ internal class HotkeyManager {
 		nameof(OpenInteractableOverlayHotkey),
 		nameof(EscapeKeyHotkey),
 		nameof(OpenWikiHotkey),
-		nameof(OpenTarkovDevHotkey))
+		nameof(OpenTarkovDevHotkey),
+		nameof(OpenMapHotkey))
 	]
 	internal void RegisterHotkeys() {
 		// Unregister hotkeys to prevent multiple listeners for the same hotkey
@@ -66,6 +74,7 @@ internal class HotkeyManager {
 		EscapeKeyHotkey = new ActiveHotkey(OverlayC.Search.CloseHotkey, OnEscapeKey);
 		OpenWikiHotkey = new ActiveHotkey(Hotkeys.OpenWiki, OnOpenWikiHotkey);
 		OpenTarkovDevHotkey = new ActiveHotkey(Hotkeys.OpenTarkovDev, OnOpenTarkovDevHotkey);
+		OpenMapHotkey = new ActiveHotkey(Hotkeys.OpenMap, OnOpenMapHotkey);
 	}
 
 	/// <summary>
@@ -78,6 +87,7 @@ internal class HotkeyManager {
 		EscapeKeyHotkey?.Dispose();
 		OpenWikiHotkey?.Dispose();
 		OpenTarkovDevHotkey?.Dispose();
+		OpenMapHotkey?.Dispose();
 	}
 
 	private static void Wrap(Action action) {
@@ -153,6 +163,17 @@ internal class HotkeyManager {
 			var item = SelectedItem() ?? LastScannedItem();
 			OpenURL(item?.Link ?? (item is null ? null : $"https://tarkov.dev/item/{item.Id}"));
 		});
+	}
+
+	/// <summary>
+	/// Opens the interactable overlay and then raises <see cref="OpenMapPressed"/>
+	/// so the overlay page can show the map viewer.
+	/// </summary>
+	private void OnOpenMapHotkey(object? sender, KeyUpEventArgs e) {
+		Wrap(() => Application.Current.Dispatcher.Invoke(() => Wrap(() => {
+			BlazorUI.BlazorInteractableOverlay.ShowOverlay();
+			OpenMapPressed?.Invoke();
+		})));
 	}
 
 	/// <summary>

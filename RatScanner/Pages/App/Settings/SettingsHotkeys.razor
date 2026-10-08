@@ -34,6 +34,12 @@
             <HotkeySelector Hotkey="@SettingsVM.CloseOverlayHotkey" @key="SettingsVM.CloseOverlayHotkey"
                             OnHotkeyChanged="@(() => SettingsVM.MarkDirty())" />
         </SettingsRow>
+
+        <SettingsRow Label="@Localizer["OpenMapViewer"]" SubLabel="@Localizer["OpenMapViewerHint"]"
+                     Disabled="@(!SettingsVM.EnableIneractableOverlay)">
+            <HotkeySelector Hotkey="@SettingsVM.OpenMapHotkey" @key="SettingsVM.OpenMapHotkey"
+                            OnHotkeyChanged="@(() => SettingsVM.MarkDirty())" />
+        </SettingsRow>
     </SettingsCard>
 
     <SettingsCard Title="@Localizer["AppHotkeysGroup"]" Subtitle="@Localizer["AppHotkeysGroupDesc"]">

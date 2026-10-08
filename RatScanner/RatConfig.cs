@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Linq;
 using RatScanner.TarkovDev.Json;
 using RatStash;
 using System;
@@ -183,6 +183,7 @@ internal static partial class RatConfig {
 	internal static class Hotkeys {
 		internal static Hotkey OpenWiki = new();
 		internal static Hotkey OpenTarkovDev = new();
+		internal static Hotkey OpenMap = new([Key.P, Key.O]);
 	}
 
 	// OAuth2 refresh tokens
@@ -316,6 +317,7 @@ internal static partial class RatConfig {
 		config.Section = nameof(Hotkeys);
 		Hotkeys.OpenWiki = config.ReadHotkey(nameof(Hotkeys.OpenWiki), Hotkeys.OpenWiki);
 		Hotkeys.OpenTarkovDev = config.ReadHotkey(nameof(Hotkeys.OpenTarkovDev), Hotkeys.OpenTarkovDev);
+		Hotkeys.OpenMap = config.ReadHotkey(nameof(Hotkeys.OpenMap), Hotkeys.OpenMap);
 
 		config.Section = nameof(OAuthRefreshToken);
 		OAuthRefreshToken.Discord = config.ReadSecureString(nameof(OAuthRefreshToken.Discord), OAuthRefreshToken.Discord);
@@ -407,6 +409,7 @@ internal static partial class RatConfig {
 		config.Section = nameof(Hotkeys);
 		config.WriteHotkey(nameof(Hotkeys.OpenWiki), Hotkeys.OpenWiki);
 		config.WriteHotkey(nameof(Hotkeys.OpenTarkovDev), Hotkeys.OpenTarkovDev);
+		config.WriteHotkey(nameof(Hotkeys.OpenMap), Hotkeys.OpenMap);
 
 		config.Section = nameof(OAuthRefreshToken);
 		config.WriteSecureString(nameof(OAuthRefreshToken.Discord), OAuthRefreshToken.Discord);

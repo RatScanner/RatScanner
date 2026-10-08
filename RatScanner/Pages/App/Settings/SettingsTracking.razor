@@ -214,8 +214,6 @@
                                 <MudSelect T="string" Value="@SettingsVM.PositionMapFallback"
                                            ValueChanged="@((string v) => { SettingsVM.PositionMapFallback = v; SettingsVM.MarkDirty(); })"
                                            Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Style="min-width: 220px;">
-                                    <MudSelectItem T="string" Value="@(string.Empty)">@Localizer["LogTrackingPositionMapNone"]
-                                    </MudSelectItem>
                                     @foreach (var map in AvailableMaps) {
                                         <MudSelectItem T="string" Value="@map.Id">@map.Name</MudSelectItem>
                                     }
@@ -249,12 +247,12 @@
 
                 <style>
                     /* Level and faction sit side by side rather than as two full-width
-                                                                                                                                                                                                                                                                                       SettingsRows, which pushed the trader list a long way down.
+                                                                                                                                                                                                                                                                                                       SettingsRows, which pushed the trader list a long way down.
 
-                                                                                                                                                                                                                                                                                       The 16px horizontal inset is the card's own content inset, matching
-                                                                                                                                                                                                                                                                                       .settings-row and .settings-card-title, so every settings section
-                                                                                                                                                                                                                                                                                       starts its text at the same x. It was 4px, which left this section
-                                                                                                                                                                                                                                                                                       visibly hugging the card edge next to the sections around it. */
+                                                                                                                                                                                                                                                                                                       The 16px horizontal inset is the card's own content inset, matching
+                                                                                                                                                                                                                                                                                                       .settings-row and .settings-card-title, so every settings section
+                                                                                                                                                                                                                                                                                                       starts its text at the same x. It was 4px, which left this section
+                                                                                                                                                                                                                                                                                                       visibly hugging the card edge next to the sections around it. */
                     .profile-grid {
                         display: grid;
                         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -276,8 +274,8 @@
                     }
 
                     /* Faction as a joined button group, deliberately matching
-                                                                                                                                                                                                                                                                                       the loyalty tier buttons on the trader cards so the two
-                                                                                                                                                                                                                                                                                       controls read as the same kind of choice. */
+                                                                                                                                                                                                                                                                                                       the loyalty tier buttons on the trader cards so the two
+                                                                                                                                                                                                                                                                                                       controls read as the same kind of choice. */
                     .profile-faction {
                         display: flex;
                         width: 100%;
@@ -324,10 +322,10 @@
                     }
 
                     /* Two cards per row, so the eight traders take four rows
-                                                                                                                                                                                                                                                                                       instead of eight. A fixed count rather than auto-fill because
-                                                                                                                                                                                                                                                                                       auto-fill would reach three on a wide window and the cards are
-                                                                                                                                                                                                                                                                                       narrow enough already: each one has to hold a four-button group
-                                                                                                                                                                                                                                                                                       AND the reputation box side by side. */
+                                                                                                                                                                                                                                                                                                       instead of eight. A fixed count rather than auto-fill because
+                                                                                                                                                                                                                                                                                                       auto-fill would reach three on a wide window and the cards are
+                                                                                                                                                                                                                                                                                                       narrow enough already: each one has to hold a four-button group
+                                                                                                                                                                                                                                                                                                       AND the reputation box side by side. */
                     .profile-traders {
                         display: grid;
                         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -336,7 +334,7 @@
                     }
 
                     /* Below this the two cards cannot hold the tier buttons and the
-                                                                                                                                                                                                                                                                                       reputation box side by side, so fall back to one. */
+                                                                                                                                                                                                                                                                                                       reputation box side by side, so fall back to one. */
                     @@media (max-width: 540px) {
                         .profile-traders {
                             grid-template-columns: minmax(0, 1fr);
