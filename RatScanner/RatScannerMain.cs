@@ -305,7 +305,7 @@ public class RatScannerMain : INotifyPropertyChanged {
 
 	private static void CheckForUpdates() {
 		var mostRecentVersion = ApiManager.GetResource(ApiManager.ResourceType.ClientVersion);
-		if (RatConfig.Version == mostRecentVersion) return;
+		if (!IsNewerVersion(mostRecentVersion, RatConfig.Version)) return;
 		Logger.LogInfo("A new version is available: " + mostRecentVersion);
 
 		var forceVersions = ApiManager.GetResource(ApiManager.ResourceType.ClientForceUpdateVersions);
@@ -321,6 +321,32 @@ public class RatScannerMain : INotifyPropertyChanged {
 		temp.Show();
 		var result = MessageBox.Show(temp, message, "Rat Scanner Updater", MessageBoxButton.YesNo);
 		if (result == MessageBoxResult.Yes) UpdateRatScanner();
+	}
+
+	private static bool IsNewerVersion(string? candidate, string? current) {
+		if (!TryParseVersion(candidate, out var candidateVersion)) {
+			Logger.LogWarning($"Could not parse the reported version '{candidate}'; skipping the update prompt.");
+			return false;
+		}
+
+		if (!TryParseVersion(current, out var currentVersion)) {
+			Logger.LogWarning($"Could not parse the current version '{current}'; skipping the update prompt.");
+			return false;
+		}
+
+		return candidateVersion > currentVersion;
+	}
+
+	private static bool TryParseVersion(string? value, out System.Version version) {
+		version = null!;
+		if (string.IsNullOrWhiteSpace(value)) return false;
+
+		var trimmed = value.Trim();
+		if (trimmed.Length > 1 && (trimmed[0] == 'v' || trimmed[0] == 'V') && char.IsDigit(trimmed[1])) {
+			trimmed = trimmed[1..];
+		}
+
+		return System.Version.TryParse(trimmed, out version!);
 	}
 
 	private static void UpdateRatScanner() {
