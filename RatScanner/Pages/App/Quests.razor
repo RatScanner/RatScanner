@@ -1,0 +1,285 @@
+@page "/app/quests"
+@layout AppLayout
+@using RatScanner.TarkovDev.Json
+@using RatScanner.FetchModels.TarkovTracker
+@using RatScanner.Pages.InteractableOverlay.Components
+@using RatScanner.Pages.App.Components
+@using Color = MudBlazor.Color
+@using TaskExtensions = RatScanner.TaskExtensions
+@implements IDisposable
+
+@*
+    Quest overview: every task the player can take on or is already working on,
+    grouped by trader or by map.
+
+    Rows reuse the search-row rendering of TaskSearchResult and expand in place
+    to the full detail card plus the objectives/rewards tables, so the quest
+    overview and the main page show a quest the same way.
+*@
+
+<div class="page">
+    <MudStack Spacing="1" Class="pa-2 main-content">
+        @* ── Header: back button, title, filters ── *@
+        <MudItem xs="12" Class="flex-none">
+            <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Variant="Variant.Text"
+                               OnClick="@(() => NavigationManager.NavigateTo("/app"))"
+                               Title="@Localizer["BackButton"]" />
+                <MudText Typo="Typo.h6" Class="flex-grow-1">@Localizer["QuestsTitle"]</MudText>
+
+                <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center" Class="flex-none">
+                    @* Availability scope: the default shows what the player can act
+                       on now. The toggle adds what is still out of reach. *@
+                    <MudChip T="string" Size="Size.Small"
+                             Variant="@(ShowLocked ? Variant.Filled : Variant.Outlined)"
+                             Color="@(ShowLocked ? Color.Primary : Color.Default)"
+                             Icon="@Icons.Material.Filled.Lock"
+                             OnClick="@(() => ShowLocked = !ShowLocked)">
+                        @Localizer["QuestsShowLocked"]
+                    </MudChip>
+
+                    @* Grouping: by trader (default) or by map. *@
+                    <MudChip T="string" Size="Size.Small"
+                             Variant="@(GroupByMap ? Variant.Outlined : Variant.Filled)"
+                             Color="@(GroupByMap ? Color.Default : Color.Primary)"
+                             Icon="@Icons.Material.Filled.Person"
+                             OnClick="@(() => GroupByMap = false)">
+                        @Localizer["QuestsGroupTrader"]
+                    </MudChip>
+                    <MudChip T="string" Size="Size.Small"
+                             Variant="@(GroupByMap ? Variant.Filled : Variant.Outlined)"
+                             Color="@(GroupByMap ? Color.Primary : Color.Default)"
+                             Icon="@Icons.Material.Filled.Map"
+                             OnClick="@(() => GroupByMap = true)">
+                        @Localizer["QuestsGroupMap"]
+                    </MudChip>
+                </MudStack>
+            </MudStack>
+        </MudItem>
+
+        @* ── Grouped quest list ── *@
+        @if (Groups.Count == 0) {
+            <MudItem xs="12">
+                <MudPaper Outlined="true" Elevation="0" Class="pa-4">
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">@Localizer["QuestsEmpty"]</MudText>
+                </MudPaper>
+            </MudItem>
+        } else {
+            @foreach (var group in Groups) {
+                <MudItem xs="12">
+                    <MudPaper Outlined="true" Elevation="0" Class="quest-group">
+                        <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Center" Class="pa-2 pb-1">
+                            @if (group.ImageLink is not null) {
+                                <MudAvatar Image="@group.ImageLink" Size="Size.Small" Square="true"
+                                           Variant="Variant.Outlined" />
+                            }
+                            <MudText Typo="Typo.subtitle1" Class="font-weight-bold flex-grow-1">
+                                @group.Title
+                            </MudText>
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">@group.Tasks.Count</MudText>
+                        </MudStack>
+                        <MudDivider />
+
+                        <MudStack Spacing="1" Class="pa-2">
+                            @foreach (var task in group.Tasks) {
+                                var taskId = task.Id;
+                                <div class="quest-row">
+                                    <TaskSearchResult Task="@task" Detail="DetailLevel.SearchRow"
+                                                      OnClick="@(() => Toggle(taskId))" />
+                                    @if (_expanded.Contains(taskId)) {
+                                        <div class="quest-row-expanded" @onclick:stopPropagation="true">
+                                            <TaskSearchResult Task="@task" Detail="DetailLevel.Full" />
+                                            <TaskDetailsTable Task="@task" />
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </MudStack>
+                    </MudPaper>
+                </MudItem>
+            }
+        }
+    </MudStack>
+</div>
+
+<style>
+    .page {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .main-content {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+    }
+
+    /* Groups keep their natural height; the list scrolls as a whole. */
+    .main-content > .mud-item {
+        flex: 0 0 auto;
+    }
+
+    .quest-group {
+        overflow: hidden;
+    }
+
+    /* The expanded detail sits inside the row so the click target stays the
+       row itself. stopPropagation keeps clicks on the detail from folding it. */
+    .quest-row-expanded {
+        margin-top: 4px;
+        padding-left: 8px;
+        border-left: 2px solid var(--mud-palette-primary);
+    }
+
+    /* TaskSearchResult's SearchRow is a MudPaper with its own elevation; inside
+       a group it reads as a list entry rather than a floating card. */
+    .quest-row ::deep .mud-paper {
+        box-shadow: none;
+    }
+</style>
+
+@code {
+    [Inject]
+    public NavigationManager NavigationManager { get; set; } = null!;
+
+    [Inject]
+    public LocalizationService Localizer { get; set; } = null!;
+
+    /// <summary>Whether tasks out of reach are listed as well.</summary>
+    private bool ShowLocked { get; set; }
+
+    /// <summary>Whether groups are keyed by map instead of by trader.</summary>
+    private bool GroupByMap { get; set; }
+
+    /// <summary>Ids of the tasks the player has expanded.</summary>
+    private readonly HashSet<string> _expanded = [];
+
+    private List<QuestGroup> _groups = [];
+    private UserProgress? _builtProgress;
+    private bool _builtShowLocked;
+    private bool _builtGroupByMap;
+
+    /// <summary>
+    /// Rebuilds the groups when the progress behind them changed, or when a
+    /// filter or grouping toggle moved. Called from the render path, not
+    /// OnInitialized: the tracker can report new progress while the page is
+    /// open, and the render-path check is what keeps the list in sync without a
+    /// rebuild per repaint.
+    /// </summary>
+    private void EnsureBuilt() {
+        var progress = Item.SelfProgress;
+
+        if (ReferenceEquals(_builtProgress, progress)
+            && _builtShowLocked == ShowLocked
+            && _builtGroupByMap == GroupByMap) return;
+
+        _builtProgress = progress;
+        _builtShowLocked = ShowLocked;
+        _builtGroupByMap = GroupByMap;
+        _groups = BuildGroups(progress);
+    }
+
+    private List<QuestGroup> Groups {
+        get {
+            EnsureBuilt();
+            return _groups;
+        }
+    }
+
+    /// <summary>
+    /// Groups the tasks the player can act on, by trader or by map.
+    ///
+    /// Completed and failed tasks are always left out: this page is a to-do list,
+    /// not a history. The locked toggle decides whether tasks out of reach join
+    /// them.
+    /// </summary>
+    private List<QuestGroup> BuildGroups(UserProgress progress) {
+        var tasksById = TaskExtensions.GetTaskLookup();
+        var chains = TaskExtensions.GetChainIndex();
+        var maps = TarkovDevAPI.GetMaps();
+
+        var visible = TarkovDevAPI.GetTasks().Where(task => {
+            var availability = TaskExtensions.AvailabilityFor(task, tasksById, chains, progress);
+            return availability switch {
+                QuestAvailability.Available or QuestAvailability.InProgress => true,
+                QuestAvailability.Locked or QuestAvailability.Unknown => ShowLocked,
+                _ => false,
+            };
+        });
+
+        IEnumerable<IGrouping<string, TarkovTask>> grouped;
+        if (GroupByMap) {
+            // A task can happen on several maps, so it appears under each of them.
+            // Tasks that name no map at all go under the "any map" group.
+            grouped = visible
+                .SelectMany(task => {
+                    var taskMaps = task.GetMapsForTask();
+                    return taskMaps.Count > 0
+                        ? taskMaps.Select(mapId => (mapId, task))
+                        : [(QuestsAnyMapKey, task)];
+                })
+                .GroupBy(entry => entry.mapId, entry => entry.task);
+        } else {
+            grouped = visible.GroupBy(task => task.TraderId ?? "");
+        }
+
+        return grouped
+            .Select(g => BuildGroup(g.Key, g.ToList(), maps))
+            .OrderBy(g => g.Title, StringComparer.CurrentCultureIgnoreCase)
+            .ToList();
+    }
+
+    /// <summary>
+    /// Builds one group from a trader id or a map id. The key decides which
+    /// catalogue the title and image come from; anything unresolvable falls back
+    /// to a plain label rather than a blank header.
+    /// </summary>
+    private QuestGroup BuildGroup(string key, List<TarkovTask> tasks, IReadOnlyList<Map> maps) {
+        if (GroupByMap) {
+            if (key == QuestsAnyMapKey) {
+                return new QuestGroup(Localizer["QuestsAnyMap"], null, tasks);
+            }
+
+            var map = maps.FirstOrDefault(m => string.Equals(m.Id, key, StringComparison.Ordinal));
+            return new QuestGroup(map?.Name ?? key, null, tasks);
+        }
+
+        var trader = tasks.FirstOrDefault()?.Trader;
+        var title = trader?.Name ?? (key.Length > 0 ? key : Localizer["QuestsNoTrader"]);
+        return new QuestGroup(title, trader?.ImageLink, tasks);
+    }
+
+    private void Toggle(string? taskId) {
+        if (taskId is not { Length: > 0 }) return;
+
+        if (!_expanded.Add(taskId)) {
+            _expanded.Remove(taskId);
+        }
+    }
+
+    protected override void OnInitialized() {
+        LocalProgressStore.Changed += OnLocalProgressChanged;
+        RatScannerMain.Instance.TarkovTrackerDB.Changed += OnLocalProgressChanged;
+    }
+
+    private void OnLocalProgressChanged() => InvokeAsync(() => {
+        _builtProgress = null;
+        StateHasChanged();
+    });
+
+    public void Dispose() {
+        LocalProgressStore.Changed -= OnLocalProgressChanged;
+        RatScannerMain.Instance.TarkovTrackerDB.Changed -= OnLocalProgressChanged;
+    }
+
+    /// <summary>Key under which map-independent tasks are grouped.</summary>
+    private const string QuestsAnyMapKey = "__any__";
+
+    /// <summary>One trader or map with the tasks that belong to it.</summary>
+    private sealed record QuestGroup(string Title, string? ImageLink, List<TarkovTask> Tasks);
+}

@@ -252,6 +252,43 @@ public static class TaskExtensions {
         return false;
     }
 
+    /// <summary>
+    /// The maps the task takes place on, as map ids.
+    ///
+    /// A task can name a map in three places: the task's own <c>map</c> field,
+    /// an objective's <c>maps</c> list, and a zone's <c>map</c>. All three are
+    /// collected so map grouping shows a task under every map it can be played
+    /// on. An empty result means the task names no map at all — those go under
+    /// the "any map" group rather than being dropped.
+    /// </summary>
+    public static List<string> GetMapsForTask(this TarkovTask task) {
+        var maps = new List<string>();
+
+        if (task.Map is { Length: > 0 }) {
+            maps.Add(task.Map);
+        }
+
+        foreach (var objective in task.Objectives ?? []) {
+            if (objective == null) continue;
+
+            if (objective.Maps != null) {
+                foreach (var map in objective.Maps) {
+                    if (map is { Length: > 0 }) maps.Add(map);
+                }
+            }
+
+            if (objective.Zones != null) {
+                foreach (var zone in objective.Zones) {
+                    if (zone?.Map is { Length: > 0 }) maps.Add(zone.Map);
+                }
+            }
+        }
+
+        // Distinct with ordinal comparison: map ids are stable identifiers, and
+        // the same id can arrive through several objectives.
+        return maps.Distinct(StringComparer.Ordinal).ToList();
+    }
+
     private static TaskStatus GetStatus(List<string>? reported, bool isComplete, bool isFailed, TarkovTask task,
         TarkovTask prereq) {
         if (isComplete) {

@@ -82,10 +82,10 @@ internal readonly record struct ObjectiveNeedBreakdown(
 /// the tracking settings. Every trader requirement the API sends is measured against
 /// reported standing — "level" is the trader's loyalty tier, "reputation" the player's
 /// standing with them — so both are settled rather than left open. Standing the player
-	/// has not reported, and gate kinds the API never spells out (dialogue, Lightkeeper,
-	/// story-chain counters), stay conditional rather than inflating "needed now" counts.
-	/// Timed unlocks are not a gate: a task whose prerequisites are met becomes available
-	/// when its delay elapses, so it is counted as available rather than uncertain.
+/// has not reported, and gate kinds the API never spells out (dialogue, Lightkeeper,
+/// story-chain counters), stay conditional rather than inflating "needed now" counts.
+/// Timed unlocks are not a gate: a task whose prerequisites are met becomes available
+/// when its delay elapses, so it is counted as available rather than uncertain.
 /// </summary>
 internal static class QuestNeedClassifier {
 	private const string StatusActive = "active";

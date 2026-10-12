@@ -29,10 +29,15 @@
            the full height and shove everything else off the bottom. *@
         <MudItem xs="12" Class="search-box">
             <div class="d-flex flex-column">
-                <MudTextField @ref="_searchTextField" T="string" Variant="Variant.Outlined" Adornment="Adornment.End"
-                              AdornmentIcon="@Icons.Material.Filled.Search" DebounceInterval="20"
-                              OnDebounceIntervalElapsed="ExecuteSearch" OnBlur="ResetSearch" @bind-Value="@_searchText">
-                </MudTextField>
+                <div class="d-flex align-center" Style="gap: 8px;">
+                    <MudTextField @ref="_searchTextField" T="string" Variant="Variant.Outlined" Adornment="Adornment.End"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" DebounceInterval="20"
+                                  OnDebounceIntervalElapsed="ExecuteSearch" OnBlur="ResetSearch" @bind-Value="@_searchText">
+                    </MudTextField>
+                    <MudIconButton Icon="@Icons.Material.Filled.Checklist" Variant="Variant.Outlined"
+                                   Color="Color.Primary" Title="@Localizer["QuestsTitle"]"
+                                   Href="/app/quests" />
+                </div>
 
                 @if (_searchResults.Any()) {
                     <MudStack Spacing="2" Class="pt-2" Style="max-height: 320px; overflow-y: auto;"
