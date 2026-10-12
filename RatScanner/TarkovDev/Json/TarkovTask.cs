@@ -258,6 +258,22 @@ public class TaskOtherRequirement {
 
 	[JsonProperty("traders")]
 	public List<string> Traders { get; set; }
+
+	/// <summary>
+	/// Counter this requirement measures, for <c>type: "globalVariable"</c>.
+	/// Tasks sharing a variable id are stages of one trader's story chain, which
+	/// is what lets a reached stage settle a later gate.
+	/// </summary>
+	[JsonProperty("variableId")]
+	public string VariableId { get; set; }
+
+	/// <summary>How <see cref="Value"/> is compared against the counter.</summary>
+	[JsonProperty("compareMethod")]
+	public string CompareMethod { get; set; }
+
+	/// <summary>Chain stage the requirement asks for.</summary>
+	[JsonProperty("value")]
+	public int Value { get; set; }
 }
 
 public class TarkovTask {
@@ -333,8 +349,6 @@ public class TarkovTask {
 
 	[JsonProperty("map")]
 	public string Map { get; set; }
-
-	public bool HasUnmodeledRequirements => OtherRequirements is { Count: > 0 } || AvailableDelaySecondsMax is > 0 || LightkeeperRequired == true;
 }
 
 public class TaskTraderRequirement {

@@ -29,8 +29,8 @@ internal enum QuestGate {
 
 	/// <summary>
 	/// Gated by a condition RatScanner cannot evaluate (trader loyalty level,
-	/// trader standing the player has not reported, faction when unknown,
-	/// dialogue/timed/Lightkeeper unlocks).
+	/// faction when unknown, dialogue/Lightkeeper unlocks, story-chain counters
+	/// the player has not reached).
 	/// </summary>
 	ConditionalUnknown,
 }
@@ -82,8 +82,10 @@ internal readonly record struct ObjectiveNeedBreakdown(
 /// the tracking settings. Every trader requirement the API sends is measured against
 /// reported standing — "level" is the trader's loyalty tier, "reputation" the player's
 /// standing with them — so both are settled rather than left open. Standing the player
-/// has not reported, and gate kinds the API never spells out (dialogue, timed unlocks,
-/// Lightkeeper), stay conditional rather than inflating "needed now" counts.
+	/// has not reported, and gate kinds the API never spells out (dialogue, Lightkeeper,
+	/// story-chain counters), stay conditional rather than inflating "needed now" counts.
+	/// Timed unlocks are not a gate: a task whose prerequisites are met becomes available
+	/// when its delay elapses, so it is counted as available rather than uncertain.
 /// </summary>
 internal static class QuestNeedClassifier {
 	private const string StatusActive = "active";
@@ -106,7 +108,8 @@ internal static class QuestNeedClassifier {
 		ArgumentNullException.ThrowIfNull(item);
 		ArgumentNullException.ThrowIfNull(progress);
 
-		var tasksById = TarkovDevAPI.GetTasks().ToDictionary(t => t.Id, t => t);
+		var tasksById = TaskExtensions.GetTaskLookup();
+		var chains = QuestChainIndex.Build(tasksById.Values);
 
 		int active = 0,
 			available = 0,
@@ -128,11 +131,11 @@ internal static class QuestNeedClassifier {
 				continue;
 
 			// Recorded, non-invalid objective progress proves the player already
-			// started this task. Unlock gates (trader standing, delays,
-			// Lightkeeper dialogue, active-only prerequisites) have therefore
-			// already been crossed and must not demote a live need to uncertain.
+			// started this task. Unlock gates (trader standing, Lightkeeper
+			// dialogue, active-only prerequisites) have therefore already been
+			// crossed and must not demote a live need to uncertain.
 			var taskShowsProgress = TaskShowsProgress(task, progress);
-			var gate = ClassifyGate(task, tasksById, progress, out var taskUnlockLevel);
+			var gate = ClassifyGate(task, tasksById, chains, progress, out var taskUnlockLevel);
 			if (gate != QuestGate.NotApplicable && taskShowsProgress)
 				gate = QuestGate.ActiveNow;
 			if (gate == QuestGate.NotApplicable)
@@ -207,6 +210,7 @@ internal static class QuestNeedClassifier {
 	internal static QuestGate ClassifyGate(
 		TarkovTask task,
 		IReadOnlyDictionary<string, TarkovTask> tasksById,
+		QuestChainIndex chains,
 		UserProgress progress,
 		out int? unlockLevel
 	) {
@@ -265,24 +269,48 @@ internal static class QuestNeedClassifier {
 
 		// Trader gates. Both shapes the API sends are settled against reported
 		// standing: "level" is the trader's loyalty tier, "reputation" is the
-		// player's standing with them. Anything the player has not reported stays
-		// uncertain rather than counting the need as current.
+		// player's standing with them. Standing the player has reported decides
+		// the gate either way — a requirement it fails is a closed gate, which is
+		// knowledge, so it locks the task instead of leaving it uncertain.
 		if (task.TraderRequirements is { Count: > 0 } requirements) {
 			foreach (var requirement in requirements) {
-				if (!IsTraderRequirementMet(requirement, progress)) {
-					conditional = true;
-					break;
+				switch (TraderRequirementState(requirement, progress)) {
+					case RequirementState.Met:
+						continue;
+					case RequirementState.Unmet:
+						future = true;
+						continue;
+					default:
+						conditional = true;
+						continue;
 				}
 			}
 		}
 
-		if (task.HasUnmodeledRequirements)
+		// Requirements the API does not spell out. Chain counters are the one
+		// channel that can be settled rather than guessed; a Lightkeeper flag
+		// stays uncertain. Timed unlocks are not a gate: a task whose other
+		// gates are open becomes available once its delay elapses, so it is
+		// counted as available rather than uncertain.
+		if (task.OtherRequirements is { Count: > 0 } others) {
+			foreach (var requirement in others) {
+				if (chains.Met(requirement, progress)) continue;
+				conditional = true;
+			}
+		}
+
+		if (task.LightkeeperRequired)
 			conditional = true;
 
-		if (conditional) {
-			return QuestGate.ConditionalUnknown;
-		} else if (future) {
+		// The known unmet gate is tested first on purpose. A task held back by a
+		// level or a prerequisite is definitely out of reach right now, and that
+		// is worth more to the player than "unknown" — which is what testing the
+		// uncertainty first turned every partly-unmodelled task into, hiding
+		// gates that could have been shown as locked.
+		if (future) {
 			return QuestGate.FutureKnown;
+		} else if (conditional) {
+			return QuestGate.ConditionalUnknown;
 		} else {
 			return QuestGate.ApplicableNow;
 		}
@@ -294,22 +322,49 @@ internal static class QuestNeedClassifier {
 	/// <summary>Whether the requirement measures the player's standing.</summary>
 	private const string TraderReputationRequirement = "reputation";
 
+	/// <summary>An unnamed requirement measuring a per-trader story-chain counter.</summary>
+	private const string ChainCounterRequirement = "globalVariable";
+
+	/// <summary>Whether an unnamed requirement measures a story-chain counter.</summary>
+	internal static bool IsChainCounter(TaskOtherRequirement requirement) =>
+		string.Equals(requirement.Type, ChainCounterRequirement, StringComparison.OrdinalIgnoreCase);
+
+	/// <summary>
+	/// Where a trader requirement stands against the player's reported standing.
+	/// </summary>
+	internal enum RequirementState {
+		/// <summary>The gate passes, or nothing contradicts it passing.</summary>
+		Met,
+
+		/// <summary>Reported standing fails the comparison, so the gate is closed.</summary>
+		Unmet,
+
+		/// <summary>Cannot be settled either way.</summary>
+		Unknown,
+	}
+
 	/// <summary>
 	/// Whether a trader requirement the player's reported standing can settle
-	/// actually passes. Returns true when it cannot be settled, so unknown standing
-	/// never turns a need into a definite one.
+	/// actually passes.
+	///
+	/// Standing the player never reported counts as met rather than unknown: an
+	/// unreported trader is not evidence that the gate is shut, and deciding
+	/// "shut" would lock tasks the player can take. Reported standing settles it
+	/// both ways, including as <see cref="RequirementState.Unmet"/> — that is the
+	/// case worth keeping, because a gate the player is measurably short of is
+	/// knowledge, not uncertainty.
 	///
 	/// A requirement names the trader whose standing it measures, which is not
 	/// necessarily the trader handing the task out, so the lookup is by that field
 	/// alone.
 	/// </summary>
-	private static bool IsTraderRequirementMet(TaskTraderRequirement requirement, UserProgress progress) {
+	private static RequirementState TraderRequirementState(TaskTraderRequirement requirement, UserProgress progress) {
 		var isLevel = string.Equals(requirement.RequirementType, TraderLevelRequirement, StringComparison.OrdinalIgnoreCase);
 		var isReputation = string.Equals(requirement.RequirementType, TraderReputationRequirement, StringComparison.OrdinalIgnoreCase);
 
 		// A requirement type we do not model cannot be settled either way.
 		if (!isLevel && !isReputation) {
-			return false;
+			return RequirementState.Unknown;
 		}
 
 		var standing = progress.Traders?.FirstOrDefault(t =>
@@ -319,19 +374,21 @@ internal static class QuestNeedClassifier {
 		// the two are compared on their own scales rather than through one cast.
 		if (isLevel) {
 			if (standing?.Level is not int level) {
-				// Not reported for this trader, so the gate stays uncertain.
-				return true;
+				return RequirementState.Met;
 			}
 
-			return Compare(level, requirement.CompareMethod, requirement.Value);
+			return Compare(level, requirement.CompareMethod, requirement.Value)
+				? RequirementState.Met
+				: RequirementState.Unmet;
 		}
 
 		if (standing?.Reputation is not double reputation) {
-			// Not reported for this trader, so the gate stays uncertain.
-			return true;
+			return RequirementState.Met;
 		}
 
-		return Compare(reputation, requirement.CompareMethod, requirement.Value);
+		return Compare(reputation, requirement.CompareMethod, requirement.Value)
+			? RequirementState.Met
+			: RequirementState.Unmet;
 	}
 
 	/// <summary>
@@ -416,11 +473,73 @@ internal static class QuestNeedClassifier {
 	/// The tracker only records completed/failed tasks; started-but-unfinished tasks
 	/// are observable through objective progress entries.
 	/// </summary>
-	private static bool TaskShowsProgress(TarkovTask task, UserProgress progress) {
+	internal static bool TaskShowsProgress(TarkovTask task, UserProgress progress) {
 		var taskEntry = progress.Tasks.FirstOrDefault(p => p.Id == task.Id);
 		return taskEntry is not { Complete: true } and not { Failed: true } and not { Invalid: true } && task.Objectives is { Count: > 0 }
 			&& task.Objectives.Any(o =>
 				o.Id is not null && progress.TaskObjectives.Any(p => p.Id == o.Id && !p.Invalid)
 			);
+	}
+}
+
+/// <summary>
+/// Tasks gated by a story-chain counter, grouped by the counter they measure.
+///
+/// Built once per catalogue so a chain gate can be settled while a search list
+/// paints, rather than rescanning every task for every row that renders one.
+/// </summary>
+internal sealed class QuestChainIndex {
+	private readonly Dictionary<string, List<(int Value, TarkovTask Task)>> _chains = new(StringComparer.Ordinal);
+
+	/// <summary>Indexes every chain-gated task in the catalogue.</summary>
+	public static QuestChainIndex Build(IEnumerable<TarkovTask> tasks) {
+		var index = new QuestChainIndex();
+
+		foreach (var task in tasks) {
+			foreach (var requirement in task.OtherRequirements ?? []) {
+				if (requirement.VariableId is not { Length: > 0 }) continue;
+				if (!QuestNeedClassifier.IsChainCounter(requirement)) continue;
+
+				if (!index._chains.TryGetValue(requirement.VariableId, out var stages)) {
+					index._chains[requirement.VariableId] = stages = [];
+				}
+
+				stages.Add((requirement.Value, task));
+			}
+		}
+
+		return index;
+	}
+
+	/// <summary>
+	/// Whether a chain counter gate can be shown to hold.
+	///
+	/// Reaching stage M of a chain proves the counter is at least M, and a story
+	/// counter only advances, so a gate asking for M or less is settled. Nothing
+	/// in the data bounds the counter from above, so a gate asking for more stays
+	/// unknown rather than being guessed as locked.
+	/// </summary>
+	public bool Met(TaskOtherRequirement requirement, UserProgress progress) {
+		if (!QuestNeedClassifier.IsChainCounter(requirement)) return false;
+		if (!string.Equals(requirement.CompareMethod, ">=", StringComparison.Ordinal)) return false;
+
+		return ReachedStage(requirement.VariableId, progress) is int reached && reached >= requirement.Value;
+	}
+
+	/// <summary>
+	/// Highest chain stage the player has demonstrably reached, or null when no
+	/// task in the chain shows any progress. A task that is complete or under way
+	/// is itself proof its own gate was crossed.
+	/// </summary>
+	private int? ReachedStage(string variableId, UserProgress progress) {
+		if (variableId is not { Length: > 0 } || !_chains.TryGetValue(variableId, out var stages)) return null;
+
+		int? reached = null;
+		foreach (var (value, task) in stages) {
+			if (!Item.IsTaskComplete(task, progress) && !QuestNeedClassifier.TaskShowsProgress(task, progress)) continue;
+			if (reached is null || value > reached) reached = value;
+		}
+
+		return reached;
 	}
 }

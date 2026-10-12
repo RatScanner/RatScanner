@@ -41,27 +41,29 @@
                     @Task.Name
                 </MudText>
 
-                @* Type badge under the name, colour-coded so a mixed list can be
-                   scanned without reading every row. Each type gets its own hue:
-                   items amber, quests blue, maps green.
+                @* Type badge and availability badge under the name, colour-coded so
+                   a mixed list can be scanned without reading every row. Each type
+                   gets its own hue: items amber, quests blue, maps green.
 
                    Sized inline rather than via a style block: MudChip's
                    stylesheet sets margin:4px and a fixed height:24px, and
                    together those overran the row's height and clipped the
                    name. An inline style outranks a class rule, so this needs no
                    !important and no extra css. *@
-                <MudChip T="string" Variant="Variant.Text" Color="Color.Info" Size="Size.Small"
-                         Icon="@Icons.Material.Outlined.Assignment"
-                         Style="height:18px;min-height:18px;margin:1px 0 0 0;font-size:11px;">
-                    @Localizer["ResultTypeQuest"]
-                </MudChip>
+                <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center">
+                    <MudChip T="string" Variant="Variant.Text" Color="Color.Info" Size="Size.Small"
+                             Icon="@Icons.Material.Outlined.Assignment"
+                             Style="height:18px;min-height:18px;margin:1px 0 0 0;font-size:11px;">
+                        @Localizer["ResultTypeQuest"]
+                    </MudChip>
+                    @AvailabilityBadge(inline: true)
+                </MudStack>
             </MudStack>
         </MudStack>
     }
 
     @if (isCompact) {
         var objectives = ObjectiveProgress;
-        var complete = IsComplete;
 
         <MudStack Row="true" Justify="Justify.SpaceBetween">
             <!-- Left side: task image, name and quick links -->
@@ -96,12 +98,7 @@
                         @Localizer["QuestKappa"]
                     </MudChip>
                 }
-                @if (complete) {
-                    <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Color="Color.Success">
-                        <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Size="Size.Small" Class="mr-1" />
-                        @Localizer["QuestCompleted"]
-                    </MudChip>
-                }
+                @AvailabilityBadge(inline: false)
 
                 <MudDivider Vertical="true" FlexItem="true" />
 
@@ -449,6 +446,12 @@
 
     private bool IsFailed => Item.IsTaskFailed(Task, Progress);
 
+    /// <summary>
+    /// Where the task stands for the player: completed, failed, in progress,
+    /// available now, locked, or gated by something RatScanner cannot evaluate.
+    /// </summary>
+    private QuestAvailability Availability => Task.GetAvailability();
+
     private bool LevelMet => !Item.HasTracker || Task.MinPlayerLevel <= (Progress.PlayerLevel ?? 0);
 
     /// <summary>Loyalty level of the giving trader that unlocks this task.</summary>
@@ -505,6 +508,53 @@
         LocalProgressStore.Changed -= OnLocalProgressChanged;
         RatScannerMain.Instance.TarkovTrackerDB.Changed -= OnLocalProgressChanged;
     }
+
+    /// <summary>
+    /// The availability badge, built once here so every list that shows a task
+    /// renders it the same way and the contexts cannot drift apart.
+    ///
+    /// <paramref name="inline"/> sizes the chip to an 18px line for the search
+    /// row under the task name, whose 48px height a default-sized chip overruns.
+    /// </summary>
+    private RenderFragment AvailabilityBadge(bool inline) {
+        var availability = Availability;
+        var style = inline ? "height:18px;min-height:18px;margin:1px 0 0 0;font-size:11px;" : null;
+
+        return @<MudChip T="string" Size="Size.Small" Variant="Variant.Text" Style="@style"
+                         Color="@AvailabilityColor(availability)" Icon="@AvailabilityIcon(availability)">
+            @AvailabilityText(availability)
+        </MudChip>;
+    }
+
+    private static string AvailabilityText(QuestAvailability availability) => availability switch {
+        QuestAvailability.Completed => LocalizationService.Translate("QuestCompleted"),
+        QuestAvailability.Failed => LocalizationService.Translate("QuestFailed"),
+        QuestAvailability.InProgress => LocalizationService.Translate("QuestInProgress"),
+        QuestAvailability.Available => LocalizationService.Translate("QuestAvailable"),
+        QuestAvailability.Locked => LocalizationService.Translate("QuestLocked"),
+        _ => LocalizationService.Translate("QuestStatusUnknown"),
+    };
+
+    /// <summary>
+    /// Colour says whether the task is in reach, the icon says which state it is:
+    /// locked shares Failed's red and available shares Completed's green, so a
+    /// list reads as "go / not yet" at a glance and the icon disambiguates.
+    /// </summary>
+    private static Color AvailabilityColor(QuestAvailability availability) => availability switch {
+        QuestAvailability.Completed or QuestAvailability.Available => Color.Success,
+        QuestAvailability.InProgress => Color.Primary,
+        QuestAvailability.Failed or QuestAvailability.Locked => Color.Error,
+        _ => Color.Default,
+    };
+
+    private static string AvailabilityIcon(QuestAvailability availability) => availability switch {
+        QuestAvailability.Completed => Icons.Material.Filled.CheckCircle,
+        QuestAvailability.Failed => Icons.Material.Filled.Cancel,
+        QuestAvailability.InProgress => Icons.Material.Filled.Autorenew,
+        QuestAvailability.Available => Icons.Material.Filled.LockOpen,
+        QuestAvailability.Locked => Icons.Material.Filled.Lock,
+        _ => Icons.Material.Filled.HelpOutline,
+    };
 
     private static string StatusText(TaskRequirementEntry entry) => entry.Status switch {
         TaskState.Complete => LocalizationService.Translate("QuestCompleted"),

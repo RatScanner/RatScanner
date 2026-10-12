@@ -205,6 +205,8 @@
   "QuestOnTaskCompletion": "Po ukonczeniu zadania",
   "QuestCompleted": "Ukonczone",
   "QuestFailed": "Nieudane",
+  "QuestAvailable": "Dostępne",
+  "QuestLocked": "Zablokowane",
   "QuestAnyOf": "DOWOLNE",
   "QuestFirHint": "Musisz znaleźć podczas wyprawy lub wytworzyć",
   "QuestAnyOfHint": "Dowolny z wymienionych przedmiotów spełnia ten cel",

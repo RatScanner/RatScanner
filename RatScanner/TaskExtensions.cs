@@ -81,24 +81,64 @@ public static class TaskExtensions {
         return (objectives.Count(o => taskComplete || o.IsComplete), objectives.Count);
     }
     /// <summary>
-    /// Whether the task can be taken on right now: no failed prerequisite, all
-    /// prerequisites done, and the player level requirement met.
+    /// Whether the player can take the task on, or where it stands when they
+    /// already have it.
+    ///
+    /// The single source for every task badge: the search list, the interactive
+    /// overlay and the map all read this, so they cannot disagree about a task.
+    /// The gate evaluation itself lives in
+    /// <see cref="QuestNeedClassifier.ClassifyGate"/>; this only turns its
+    /// answer into the player-facing state.
     /// </summary>
-    public static bool IsUnlocked(this TarkovTask task) {
-        var prerequisites = GetPrerequisites(task);
-        if (prerequisites.Any(p => p.IsFailed)) {
-            return false;
-        }
-
-        if (prerequisites.Count > 0 && prerequisites.Any(p => !p.IsComplete)) {
-            return false;
-        }
-
-        return task.MinPlayerLevel <= PlayerLevel;
+    public static QuestAvailability GetAvailability(this TarkovTask task) {
+        ArgumentNullException.ThrowIfNull(task);
+        return AvailabilityFor(task, GetTaskLookup(), GetChainIndex(), Item.SelfProgress);
     }
 
-    /// <summary>Player level from the tracker, or 0 when it is unknown.</summary>
-    private static int PlayerLevel => Item.SelfProgress.PlayerLevel ?? 0;
+    /// <summary>
+    /// The availability state for a task against an explicit catalogue and
+    /// progress snapshot, with no dependency on the app's own live state.
+    ///
+    /// Split out from <see cref="GetAvailability"/> so the states can be measured
+    /// over a whole feed and a profile (the reflection probe in the development
+    /// skill) instead of only being observable by eye in the running app.
+    /// </summary>
+    internal static QuestAvailability AvailabilityFor(
+        TarkovTask task,
+        IReadOnlyDictionary<string, TarkovTask> tasksById,
+        QuestChainIndex chains,
+        UserProgress progress) {
+        // Terminal states first: only the tracker can say a task was actually
+        // completed or failed, and a failed task is never merely available.
+        if (Item.IsTaskComplete(task, progress)) {
+            return QuestAvailability.Completed;
+        }
+
+        if (Item.IsTaskFailed(task, progress)) {
+            return QuestAvailability.Failed;
+        }
+
+        // Recorded, non-invalid objective progress proves the player already has
+        // the task, so every unlock gate was crossed: it is running, not just
+        // offerable.
+        if (QuestNeedClassifier.TaskShowsProgress(task, progress)) {
+            return QuestAvailability.InProgress;
+        }
+
+        return QuestNeedClassifier.ClassifyGate(task, tasksById, chains, progress, out _) switch {
+            QuestGate.ApplicableNow or QuestGate.AvailableNow or QuestGate.ActiveNow =>
+                QuestAvailability.Available,
+
+            // A known unmet gate (player level, prerequisite) and a gate that can
+            // never open again (a prerequisite that ended in a state the task
+            // does not accept, or the other faction's task) are both out of reach.
+            QuestGate.FutureKnown or QuestGate.NotApplicable => QuestAvailability.Locked,
+
+            // ConditionalUnknown: gated by something RatScanner cannot evaluate
+            // (trader loyalty, dialogue, Lightkeeper, story-chain counters).
+            _ => QuestAvailability.Unknown,
+        };
+    }
 
     /// <summary>
     /// How many of a trader's tasks are done, out of all the tasks they hand out.
@@ -171,7 +211,8 @@ public static class TaskExtensions {
         }
 
         var progress = Item.SelfProgress;
-        var tasksById = TarkovDevAPI.GetTasks().ToDictionary(t => t.Id, t => t);
+        var tasksById = GetTaskLookup();
+        var chains = GetChainIndex();
 
         return
         [
@@ -182,7 +223,7 @@ public static class TaskExtensions {
                 // Finished or failed objectives are history, not somewhere to go.
                 if (Item.IsTaskComplete(task, progress) || Item.IsTaskFailed(task, progress)) return false;
 
-                var gate = QuestNeedClassifier.ClassifyGate(task, tasksById, progress, out _);
+                var gate = QuestNeedClassifier.ClassifyGate(task, tasksById, chains, progress, out _);
                 return gate is QuestGate.ApplicableNow or QuestGate.AvailableNow or QuestGate.ActiveNow;
             })
         ];
@@ -299,8 +340,18 @@ public static class TaskExtensions {
     }
 
     private static Dictionary<string, Item>? _itemLookup;
+    private static Dictionary<string, TarkovTask>? _taskLookup;
+    private static QuestChainIndex? _chainIndex;
 
-    internal static void InvalidateItemLookup() => _itemLookup = null;
+    /// <summary>
+    /// Drops the catalogue-derived caches. Also the hook for a language or game
+    /// mode change, since those key the underlying API cache.
+    /// </summary>
+    internal static void InvalidateItemLookup() {
+        _itemLookup = null;
+        _taskLookup = null;
+        _chainIndex = null;
+    }
 
     /// <summary>
     /// Item catalogue keyed by id. Cached because reward lookups would otherwise
@@ -308,6 +359,46 @@ public static class TaskExtensions {
     /// </summary>
     internal static IReadOnlyDictionary<string, Item> GetItemLookup() =>
         _itemLookup ??= TarkovDevAPI.GetItems().ToDictionary(i => i.Id, StringComparer.Ordinal);
+
+    /// <summary>
+    /// Task catalogue keyed by id, as the gate evaluation expects it. Cached for
+    /// the same reason as the item lookup: a search list would otherwise rebuild
+    /// the map once per row, on every repaint.
+    /// </summary>
+    internal static IReadOnlyDictionary<string, TarkovTask> GetTaskLookup() =>
+        _taskLookup ??= TarkovDevAPI.GetTasks().ToDictionary(t => t.Id, t => t);
+
+    /// <summary>
+    /// Story-chain counters over the whole catalogue. Cached alongside the other
+    /// catalogue views because it is a derivation of them, not of progress.
+    /// </summary>
+    internal static QuestChainIndex GetChainIndex() =>
+        _chainIndex ??= QuestChainIndex.Build(TarkovDevAPI.GetTasks());
+}
+
+/// <summary>
+/// Whether the player can take a task on, or where it stands when they already
+/// have it. One value per task badge so the search list, the overlay and the map
+/// cannot disagree about a task.
+/// </summary>
+public enum QuestAvailability {
+    /// <summary>Gated by a condition RatScanner cannot evaluate.</summary>
+    Unknown,
+
+    /// <summary>Out of reach: a known unmet gate, or one that can never open again.</summary>
+    Locked,
+
+    /// <summary>No unmet gate RatScanner can see — the task can be taken on now.</summary>
+    Available,
+
+    /// <summary>Started and unfinished.</summary>
+    InProgress,
+
+    /// <summary>Done according to the tracker.</summary>
+    Completed,
+
+    /// <summary>Failed according to the tracker.</summary>
+    Failed,
 }
 
 /// <summary>State of a prerequisite task.</summary>

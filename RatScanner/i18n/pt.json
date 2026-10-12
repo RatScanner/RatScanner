@@ -205,6 +205,8 @@
   "QuestOnTaskCompletion": "Ao completar a tarefa",
   "QuestCompleted": "Concluida",
   "QuestFailed": "Falhou",
+  "QuestAvailable": "Disponível",
+  "QuestLocked": "Bloqueada",
   "QuestAnyOf": "QUALQUER",
   "QuestFirHint": "Deve ser encontrado em incursão ou fabricado",
   "QuestAnyOfHint": "Qualquer um dos itens listados cumpre este objetivo",

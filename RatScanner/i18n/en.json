@@ -205,6 +205,8 @@
   "QuestOnTaskCompletion": "On Task Completion",
   "QuestCompleted": "Completed",
   "QuestFailed": "Failed",
+  "QuestAvailable": "Available",
+  "QuestLocked": "Locked",
   "QuestAnyOf": "ANY",
   "QuestFirHint": "Must be found in raid or crafted",
   "QuestAnyOfHint": "Any one of the listed items satisfies this objective",

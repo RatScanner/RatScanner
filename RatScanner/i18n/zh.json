@@ -205,6 +205,8 @@
   "QuestOnTaskCompletion": "完成任务时",
   "QuestCompleted": "已完成",
   "QuestFailed": "已失败",
+  "QuestAvailable": "可接取",
+  "QuestLocked": "未解锁",
   "QuestAnyOf": "任一",
   "QuestFirHint": "必须在突袭中找到或制作",
   "QuestAnyOfHint": "列出的任何物品都可满足此任务目标",

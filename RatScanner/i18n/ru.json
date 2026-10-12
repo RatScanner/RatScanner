@@ -205,6 +205,8 @@
   "QuestOnTaskCompletion": "По завершении задания",
   "QuestCompleted": "Выполнена",
   "QuestFailed": "Провалена",
+  "QuestAvailable": "Доступно",
+  "QuestLocked": "Заблокировано",
   "QuestAnyOf": "ЛЮБОЙ",
   "QuestFirHint": "Нужно найти в рейде или изготовить",
   "QuestAnyOfHint": "Подойдёт любой из указанных предметов",

@@ -205,6 +205,8 @@
   "QuestOnTaskCompletion": "Bei Aufgabenabschluss",
   "QuestCompleted": "Abgeschlossen",
   "QuestFailed": "Fehlgeschlagen",
+  "QuestAvailable": "Verfügbar",
+  "QuestLocked": "Gesperrt",
   "QuestAnyOf": "BELIEBIG",
   "QuestFirHint": "Muss im Raid gefunden oder hergestellt worden sein",
   "QuestAnyOfHint": "Jeder der aufgeführten Gegenstände erfüllt dieses Ziel",
