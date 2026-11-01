@@ -30,29 +30,27 @@
                 <MudStack Row="true" Spacing="1" AlignItems="AlignItems.Center" Class="flex-none">
                     @* Availability scope: the default shows what the player can act
                        on now. The toggle adds what is still out of reach. *@
-                    <MudChip T="string" Size="Size.Small"
-                             Variant="@(ShowLocked ? Variant.Filled : Variant.Outlined)"
-                             Color="@(ShowLocked ? Color.Primary : Color.Default)"
-                             Icon="@Icons.Material.Filled.Lock"
-                             OnClick="@(() => ShowLocked = !ShowLocked)">
-                        @Localizer["QuestsShowLocked"]
-                    </MudChip>
+                    <MudSwitch T="bool" Checked="@ShowLocked" CheckedChanged="@((bool v) => ShowLocked = v)"
+                               Color="Color.Primary" Dense="true"
+                               Label="@Localizer["QuestsShowLocked"]" Class="ma-0" />
 
-                    @* Grouping: by trader (default) or by map. *@
-                    <MudChip T="string" Size="Size.Small"
-                             Variant="@(GroupByMap ? Variant.Outlined : Variant.Filled)"
-                             Color="@(GroupByMap ? Color.Default : Color.Primary)"
-                             Icon="@Icons.Material.Filled.Person"
-                             OnClick="@(() => GroupByMap = false)">
-                        @Localizer["QuestsGroupTrader"]
-                    </MudChip>
-                    <MudChip T="string" Size="Size.Small"
-                             Variant="@(GroupByMap ? Variant.Filled : Variant.Outlined)"
-                             Color="@(GroupByMap ? Color.Primary : Color.Default)"
-                             Icon="@Icons.Material.Filled.Map"
-                             OnClick="@(() => GroupByMap = true)">
-                        @Localizer["QuestsGroupMap"]
-                    </MudChip>
+                    <MudDivider Vertical="true" FlexItem="true" Class="mx-1" Style="height:20px;" />
+
+                    @* Grouping: segmented control, exactly one of trader (default) or map. *@
+                    <MudButtonGroup Variant="Variant.Outlined" OverrideStyles="false" Size="Size.Small" Color="Color.Primary">
+                        <MudButton StartIcon="@Icons.Material.Filled.Person"
+                                   Variant="@(GroupByMap ? Variant.Outlined : Variant.Filled)"
+                                   Color="@(GroupByMap ? Color.Default : Color.Primary)"
+                                   OnClick="@(() => GroupByMap = false)">
+                            @Localizer["QuestsGroupTrader"]
+                        </MudButton>
+                        <MudButton StartIcon="@Icons.Material.Filled.Map"
+                                   Variant="@(GroupByMap ? Variant.Filled : Variant.Outlined)"
+                                   Color="@(GroupByMap ? Color.Primary : Color.Default)"
+                                   OnClick="@(() => GroupByMap = true)">
+                            @Localizer["QuestsGroupMap"]
+                        </MudButton>
+                    </MudButtonGroup>
                 </MudStack>
             </MudStack>
         </MudItem>
