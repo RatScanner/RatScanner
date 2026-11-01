@@ -48,8 +48,6 @@
 		</PackageReference>
 		<PackageReference Include="Microsoft.Windows.Compatibility" Version="8.0.7" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-		<PackageReference Include="RatEye" Version="4.0.1" />
-		<PackageReference Include="RatStash" Version="6.0.0" />
 		<PackageReference Include="Roslynator.Analyzers" Version="5.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -57,6 +55,29 @@
 		<PackageReference Include="SingleInstanceCore" Version="2.2.2" />
 		<PackageReference Include="System.Drawing.Common" Version="8.0.7" />
 		<PackageReference Include="Tesseract" Version="5.2.0" />
+	</ItemGroup>
+
+	<!-- Use sibling checkouts of RatEye/RatStash when present, otherwise fall back to NuGet.
+	     Override with -p:UseLocalRatEye=false / -p:UseLocalRatStash=false -->
+	<PropertyGroup>
+		<RatEyeProject>$(MSBuildThisFileDirectory)..\..\RatEye\RatEye\RatEye.csproj</RatEyeProject>
+		<RatStashProject>$(MSBuildThisFileDirectory)..\..\RatStash\RatStash\RatStash.csproj</RatStashProject>
+		<UseLocalRatEye Condition="'$(UseLocalRatEye)' == '' And Exists('$(RatEyeProject)')">true</UseLocalRatEye>
+		<UseLocalRatStash Condition="'$(UseLocalRatStash)' == '' And Exists('$(RatStashProject)')">true</UseLocalRatStash>
+	</PropertyGroup>
+
+	<ItemGroup Condition="'$(UseLocalRatEye)' == 'true'">
+		<ProjectReference Include="$(RatEyeProject)" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(UseLocalRatEye)' != 'true'">
+		<PackageReference Include="RatEye" Version="4.0.1" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(UseLocalRatStash)' == 'true'">
+		<ProjectReference Include="$(RatStashProject)" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(UseLocalRatStash)' != 'true'">
+		<PackageReference Include="RatStash" Version="6.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
