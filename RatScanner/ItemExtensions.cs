@@ -411,11 +411,6 @@ public partial class Item {
 		public bool HasNonFirNeed => NonFoundInRaid > 0;
 	}
 
-	/// <summary>How the player can obtain this item besides looting.</summary>
-	public readonly record struct AcquisitionInfo(bool CanCraft, int CraftRecipeCount, bool CanBarter, int BarterOfferCount) {
-		public bool Any => CanCraft || CanBarter;
-	}
-
 	private int RemainingForObjective(
 		TaskObjective objective,
 		UserProgress progress,

@@ -1,0 +1,37 @@
+@using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Web
+@using MudBlazor
+@using RatScanner.Pages.InteractableOverlay.Components
+@using RatScanner.TarkovDev
+@using RatScanner.TarkovDev.Json
+
+<MudThemeProvider Theme="_theme" />
+<main style="padding:16px; color:#eee; background:#1e1e1e; min-height:100vh;">
+    <nav style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button @onclick="() => Select(0)">Product</button>
+        <button @onclick="() => Select(1)">Ingredient</button>
+        <button @onclick="() => Select(2)">Empty</button>
+        <button @onclick="() => Select(3)">Unavailable</button>
+        <button @onclick="() => Select(4)">Cached</button>
+        <button @onclick="() => Select(5)">Loading</button>
+        <button @onclick="() => Select(6)">Unknown names</button>
+    </nav>
+    <ItemRecipeDetails @key="_state" Model="_model" ItemId="@(_state == 1 ? "ingredient" : "product")" Loading="@(_state == 5)" OnRetry="() => Select(0)" />
+</main>
+
+@code {
+    private readonly MudTheme _theme = new() { Palette = new PaletteDark() };
+    private ItemRecipeDetailsModel _model = Program.Fixture();
+    private int _state;
+    private void Select(int state) {
+        _state = state;
+        _model = state switch {
+            1 => Program.Fixture("ingredient"),
+            2 => Program.Fixture("missing"),
+            3 => Program.Fixture(sources: new(new(null, false), new(RecipeCatalog.Parse(Program.Barters, false), false))),
+            4 => Program.Fixture(sources: new(new(RecipeCatalog.Parse(Program.Crafts, true), true), new(RecipeCatalog.Parse(Program.Barters, false), false))),
+            6 => ItemRecipeDetailsModel.Create(Program.Fixture().Sources, "product", [], [], [], []),
+            _ => Program.Fixture(),
+        };
+    }
+}

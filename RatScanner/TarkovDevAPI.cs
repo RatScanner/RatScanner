@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace RatScanner;
 
-public static class TarkovDevAPI {
+public static partial class TarkovDevAPI {
 	private class ItemsResponse {
 		[JsonProperty("items")]
 		public Dictionary<string, Item> Items { get; set; } = [];
@@ -64,15 +64,15 @@ public static class TarkovDevAPI {
 		return $"{ApiEndpoint}{gameMode}/{endpoint}";
 	}
 
-	private static async Task<string> Get(string url) {
+	private static async Task<string> Get(string url, CancellationToken cancellationToken = default) {
 		using HttpRequestMessage request = new(HttpMethod.Get, url);
 		request.Headers.UserAgent.ParseAdd($"RatScanner-Client/{RatConfig.Version}");
 
-		var responseTask = await HttpClient.SendAsync(request).ConfigureAwait(false);
+		using var responseTask = await HttpClient.SendAsync(request, cancellationToken).ConfigureAwait(false);
 
 		return responseTask.StatusCode != HttpStatusCode.OK
 			? throw new Exception($"Tarkov.dev API request failed. {responseTask.ReasonPhrase}")
-			: await responseTask.Content.ReadAsStringAsync().ConfigureAwait(false);
+			: await responseTask.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 	}
 
 	/// <summary>

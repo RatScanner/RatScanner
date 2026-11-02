@@ -1,0 +1,21 @@
+@using RatScanner.TarkovDev
+@using RatScanner.TarkovDev.Json
+@using System.Threading.Tasks
+@implements System.IDisposable
+
+<ItemRecipeDetails @key="_state.Selection" Model="_state.Model" ItemId="ItemId" Loading="_state.Loading" OnRetry="ReloadAsync" />
+
+@code {
+    [Parameter] public string ItemId { get; set; } = string.Empty;
+    [Parameter] public GameMode GameMode { get; set; }
+
+    private readonly ItemRecipeSelection _state = new(TarkovDevAPI.GetRecipesAsync, TarkovDevAPI.GetRecipeDetails,
+        error => Logger.LogWarning("Could not load recipe details.", error));
+
+    protected override Task OnParametersSetAsync() => _state.LoadAsync(ItemId, GameMode);
+    private Task ReloadAsync() {
+        _state.Clear();
+        return _state.LoadAsync(ItemId, GameMode);
+    }
+    public void Dispose() => _state.Clear();
+}

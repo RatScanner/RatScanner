@@ -138,10 +138,6 @@
         // Fetch quest and hideout data
         var questReport = Item.GetQuestNeedReport();
         var hideoutBreakdown = Item.GetHideoutRequirementBreakdown();
-        var acquisition = new Item.AcquisitionInfo(true, 4, false, 0
-        @* Item.CraftsFor?.Count > 0, Item.CraftsFor?.Count ?? 0, *@
-        @* Item.BartersFor?.Count > 0, Item.BartersFor?.Count ?? 0 *@
-        );
 
         <MudText Typo="Typo.subtitle1" Class="font-weight-bold px-1 pb-1"
                  Style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
@@ -263,20 +259,6 @@
                                             Hideout: <b>@hideoutBreakdown.Total</b>@(hideoutBreakdown.HasFirNeed ? $" ({hideoutBreakdown.FoundInRaid} FIR)" : "")
                                         </MudChip>
 
-                                        <!-- Acquisition Chips -->
-                                        @if (acquisition.CanCraft) {
-                                            <MudChip T="string" Icon="@Icons.Material.Filled.Build" Variant="Variant.Outlined"
-                                                     Color="Color.Info" Size="Size.Small">
-                                                Crafts (@acquisition.CraftRecipeCount)
-                                            </MudChip>
-                                        }
-
-                                        @if (acquisition.CanBarter) {
-                                            <MudChip T="string" Icon="@Icons.Material.Filled.SyncAlt" Variant="Variant.Outlined"
-                                                     Color="Color.Info" Size="Size.Small">
-                                                Barters (@acquisition.BarterOfferCount)
-                                            </MudChip>
-                                        }
                                     </MudFlexWrap>
 
                                     <MudIconButton Icon="@Constants.Icon.TarkovDev" Size="Size.Small"
@@ -288,6 +270,10 @@
                         </MudStack>
                     </div>
                 </div>
+            }
+
+            @if (Detail == DetailLevel.Full) {
+                <ItemRecipes @key="(RatConfig.GameMode, RatConfig.NameScan.Language)" ItemId="@Item.Id" GameMode="@RatConfig.GameMode" />
             }
 
             @if (Detail == DetailLevel.Full && Item.Properties?.PropertiesType == "ItemPropertiesAmmo") {

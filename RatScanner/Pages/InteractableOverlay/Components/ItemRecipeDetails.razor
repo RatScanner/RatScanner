@@ -1,0 +1,78 @@
+@using RatScanner.TarkovDev
+@using System
+@using System.Globalization
+@using System.Linq
+@inject LocalizationService Localizer
+
+<section class="item-recipes" aria-label="@Localizer["RecipeHeading"]" @onclick:stopPropagation="true">
+    <MudText Typo="Typo.subtitle2">@Localizer["RecipeHeading"]</MudText>
+    @if (Loading) {
+        <p role="status">@Localizer["RecipeLoading"]</p>
+    }
+    else if (Model != null) {
+        @if (!Model.Sources.Crafts.Available) {
+            <p role="status">@Localizer["RecipeCraftsUnavailable"]</p>
+        }
+        @if (!Model.Sources.Barters.Available) {
+            <p role="status">@Localizer["RecipeBartersUnavailable"]</p>
+        }
+        @if (Model.Sources.Crafts.Stale || Model.Sources.Barters.Stale) {
+            <p role="status">@Localizer["RecipeCached"]</p>
+        }
+        @if (OnRetry.HasDelegate && (!Model.Sources.Crafts.Available || !Model.Sources.Barters.Available || Model.Sources.Crafts.Stale || Model.Sources.Barters.Stale)) {
+            <MudButton Size="Size.Small" Variant="Variant.Outlined" OnClick="OnRetry">@Localizer["RecipeRetry"]</MudButton>
+        }
+        @if (Model.Sources.Crafts.Available && Model.Sources.Barters.Available && Model.Groups.All(g => g.Recipes.Length == 0)) {
+            <p>@Localizer["RecipeNone"]</p>
+        }
+        @foreach (var group in Model.Groups.Where(g => g.Recipes.Length > 0)) {
+            <details @key="group.TitleKey">
+                <summary>@Localizer[group.TitleKey] (@group.Recipes.Length)</summary>
+                <div class="recipe-entries">
+                    @foreach (var recipe in group.Recipes) {
+                        <article @key="recipe.Id">
+                            <strong>@(recipe.Source ?? Localizer[recipe.Craft ? "RecipeStation" : "RecipeTrader"]) · @(recipe.Craft ? LocalizationService.Format("RecipeLevel", recipe.Level) : $"LL{recipe.Level}")</strong>
+                            @if (recipe.DurationSeconds > 0) {
+                                <span> · @TimeSpan.FromSeconds(recipe.DurationSeconds).ToString("g", CultureInfo.CurrentCulture)</span>
+                            }
+                            <p class="recipe-output">
+                                @Localizer[recipe.Craft ? "RecipeCraftOutput" : "RecipeBarterOutput"]:
+                                <a href="@ItemUrl(recipe.Product.ItemId)" target="_blank" rel="noopener noreferrer">@(recipe.Product.Name ?? Localizer["RecipeUnknownItem"])</a>
+                                × @Quantity(recipe.Product.Count)
+                            </p>
+                            @if (recipe.UnlockQuest != null) {
+                                <p>@LocalizationService.Format("RecipeQuestUnlock", recipe.UnlockQuest.Length == 0 ? Localizer["RecipeUnknownQuest"] : recipe.UnlockQuest)</p>
+                            }
+                            @if (recipe.GameEditions.Length > 0) {
+                                <p>@Localizer["RecipeEditions"]: @string.Join(", ", recipe.GameEditions.Select(e => e.Replace('_', ' ')))</p>
+                            }
+                            <span>@Localizer["RecipeIngredients"]:</span>
+                            <ul>
+                                @foreach (var ingredient in recipe.Ingredients) {
+                                    <li class="@(ingredient.ItemId == ItemId ? "recipe-selected" : "")">
+                                        <a href="@ItemUrl(ingredient.ItemId)" target="_blank" rel="noopener noreferrer">@(ingredient.Name ?? Localizer[ingredient.QuestItem ? "RecipeQuestItem" : "RecipeUnknownItem"])</a>
+                                        × @Quantity(ingredient.Count)
+                                        @if (ingredient.Tool) { <span> · @Localizer["RecipeTool"]</span> }
+                                        @if (ingredient.Functional) { <span> · @Localizer["RecipeFunctional"]</span> }
+                                        @if (ingredient.MinLevel.HasValue) { <span> · @LocalizationService.Format("RecipeMinimumLevel", ingredient.MinLevel.Value)</span> }
+                                        @if (ingredient.QuestItem && ingredient.Name != null) { <span> · @Localizer["RecipeQuestItem"]</span> }
+                                    </li>
+                                }
+                            </ul>
+                        </article>
+                    }
+                </div>
+            </details>
+        }
+    }
+</section>
+
+@code {
+    [Parameter] public ItemRecipeDetailsModel? Model { get; set; }
+    [Parameter] public string ItemId { get; set; } = string.Empty;
+    [Parameter] public bool Loading { get; set; }
+    [Parameter] public EventCallback OnRetry { get; set; }
+
+    private static string Quantity(decimal count) => count.ToString("0.############################", CultureInfo.CurrentCulture);
+    private static string ItemUrl(string id) => $"https://tarkov.dev/item/{Uri.EscapeDataString(id)}";
+}

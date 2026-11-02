@@ -1,0 +1,44 @@
+.item-recipes {
+    margin-top: 8px;
+    padding: 8px;
+    border: 1px solid var(--mud-palette-lines-default);
+    border-radius: var(--mud-default-borderradius);
+    overflow-wrap: anywhere;
+}
+
+.item-recipes p {
+    margin: 4px 0;
+    font-size: 0.875rem;
+}
+
+.item-recipes summary {
+    cursor: pointer;
+    padding: 6px 0;
+    font-weight: 500;
+}
+
+.recipe-entries {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 0 8px;
+    font-size: 0.875rem;
+}
+
+.recipe-entries article {
+    padding: 8px 0;
+    border-top: 1px solid var(--mud-palette-lines-default);
+}
+
+.recipe-entries ul {
+    margin: 4px 0;
+    padding-left: 20px;
+}
+
+.item-recipes a {
+    color: var(--mud-palette-info);
+    text-decoration: underline;
+}
+
+.recipe-selected {
+    font-weight: 700;
+}
