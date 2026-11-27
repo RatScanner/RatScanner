@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -15,7 +15,8 @@ namespace RatScanner;
 internal static class Logger {
 	private static readonly Lock SyncObject = new();
 
-	private static readonly Queue<string> Backlog = new();
+	private static readonly ConcurrentQueue<string> Backlog = new();
+	private static int _processingBacklog;
 
 	private static bool Crashed = false;
 
@@ -150,22 +151,40 @@ internal static class Logger {
 	private static void AppendToLog(string content) {
 		var text = "[" + DateTime.UtcNow.ToUniversalTime().TimeOfDay + "] > " + content + "\n";
 		Backlog.Enqueue(text);
-		_ = Task.Run(() => ProcessBacklog());
+		if (Interlocked.CompareExchange(ref _processingBacklog, 1, 0) == 0)
+			_ = Task.Run(ProcessBacklog);
 	}
 
 	private static void AppendToLogRaw(string text) {
 		Debug.WriteLine(text);
-		File.AppendAllText(RatConfig.Paths.LogFile, text, Encoding.UTF8);
+		try {
+			File.AppendAllText(RatConfig.Paths.LogFile, text, Encoding.UTF8);
+		} catch (Exception e) when (e is IOException or UnauthorizedAccessException) {
+			// Keep the drain worker available when the log file cannot be written.
+			Debug.WriteLine(e);
+		}
 	}
 
 	private static void ProcessBacklog() {
-		lock (SyncObject) {
-			for (var i = 0; i < Backlog.Count; i++) AppendToLogRaw(Backlog.Dequeue());
+		while (true) {
+			lock (SyncObject) {
+				var batch = new StringBuilder();
+				while (Backlog.TryDequeue(out var entry)) batch.Append(entry);
+				if (batch.Length > 0) AppendToLogRaw(batch.ToString());
+			}
+
+			// Release ownership before checking for entries queued while this worker was active.
+			Interlocked.Exchange(ref _processingBacklog, 0);
+			if (Backlog.IsEmpty || Interlocked.CompareExchange(ref _processingBacklog, 1, 0) != 0)
+				return;
 		}
 	}
 
 	internal static void Clear() {
-		File.Delete(RatConfig.Paths.LogFile);
+		lock (SyncObject) {
+			File.Delete(RatConfig.Paths.LogFile);
+			while (Backlog.TryDequeue(out _)) { }
+		}
 	}
 
 	internal static void ClearMats(string pattern = "*.png") {
