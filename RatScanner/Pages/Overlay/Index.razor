@@ -3,12 +3,11 @@
 @using System.Globalization
 @inject MenuVM MenuVM
 @inject RatScanner.VirtualScreenOffset VirtualScreenOffset
-@inject SettingsVM SettingsVM;
 @inject IJSRuntime JSRuntime;
 @implements IDisposable
 
 <div
-    style="transform-origin: top left; transform: scale(@((1f / SettingsVM.ScreenScale).ToString(CultureInfo.InvariantCulture)));">
+    style="transform-origin: top left; transform: scale(@((1d / VirtualScreenOffset.DeviceScale).ToString(CultureInfo.InvariantCulture)));">
     @foreach (var itemScan in MenuVM.ItemScans) {
         var item = itemScan.Item;
         @if (itemScan != null
@@ -115,7 +114,10 @@
 
     protected override void OnInitialized() {
         MenuVM.PropertyChanged += PropertyChangeHandler;
+        VirtualScreenOffset.Changed += OverlayGeometryChanged;
     }
+
+    private void OverlayGeometryChanged() => _ = InvokeAsync(StateHasChanged);
 
     private void PropertyChangeHandler(object? sender, EventArgs e) {
         _ = InvokeAsync(() => StateHasChanged());
@@ -123,5 +125,6 @@
 
     public void Dispose() {
         MenuVM.PropertyChanged -= PropertyChangeHandler;
+        VirtualScreenOffset.Changed -= OverlayGeometryChanged;
     }
 }

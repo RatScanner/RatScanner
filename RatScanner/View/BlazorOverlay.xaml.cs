@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Interop;
+using System.Windows.Media;
 
 namespace RatScanner.View;
 
@@ -13,12 +14,15 @@ namespace RatScanner.View;
 /// Interaction logic for BlazorOverlay.xaml
 /// </summary>
 public partial class BlazorOverlay : Window {
+	private readonly VirtualScreenOffset _virtualScreenOffset;
 	private bool _shown;
 
 	public BlazorOverlay(ServiceProvider serviceProvider) {
 		Resources.Add("services", serviceProvider);
+		_virtualScreenOffset = serviceProvider.GetRequiredService<VirtualScreenOffset>();
 
 		InitializeComponent();
+		DpiChanged += (_, e) => _virtualScreenOffset.UpdateScale(e.NewDpi.DpiScaleX);
 	}
 
 	internal void SetVisible(bool visible) {
@@ -54,7 +58,11 @@ public partial class BlazorOverlay : Window {
 		}
 
 		var handle = new WindowInteropHelper(this).Handle;
-		_ = NativeMethods.SetWindowPos(handle, 0, left, top, right - left, bottom - top, 0);
+		if (!NativeMethods.SetWindowPos(handle, 0, left, top, right - left, bottom - top, 0)) return;
+
+		// WebView2 uses the overlay window's DPI for CSS pixels.
+		var dpi = NativeMethods.GetDpiForWindow(handle);
+		_virtualScreenOffset.Update(left, top, dpi > 0 ? dpi / 96.0 : VisualTreeHelper.GetDpi(this).DpiScaleX);
 	}
 
 	private void SetWindowStyle() {
@@ -77,6 +85,9 @@ public partial class BlazorOverlay : Window {
 	}
 
 	private static partial class NativeMethods {
+		[LibraryImport("user32.dll")]
+		public static partial uint GetDpiForWindow(nint hWnd);
+
 		[LibraryImport("user32.dll", EntryPoint = "GetWindowLongPtrW")]
 		public static partial nint GetWindowLongPtr(nint hWnd, int nIndex);
 
