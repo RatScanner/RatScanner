@@ -16,8 +16,8 @@
             @if (itemScan is ItemIconScan iconScan) {
                 var leftPos = iconScan.GetToolTipPosition().X - VirtualScreenOffset.XOffset;
                 var topPos = iconScan.GetToolTipPosition().Y - VirtualScreenOffset.YOffset;
-                var width = iconScan.Icon.ItemSize.X;
-                var height = iconScan.Icon.ItemSize.Y;
+                var width = iconScan.OverlaySize.Width;
+                var height = iconScan.OverlaySize.Height;
 
                 <div
                     style="font-size: smaller; position: absolute; left: @(leftPos)px; top: @(topPos)px; width: @(width)px; height: @(height)px; ">

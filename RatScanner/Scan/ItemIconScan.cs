@@ -1,6 +1,7 @@
 ﻿using RatEye;
 using RatStash;
 using System;
+using System.Drawing;
 using System.Linq;
 using Icon = RatEye.Processing.Icon;
 
@@ -10,10 +11,11 @@ public class ItemIconScan : ItemScan {
 	public bool Rotated;
 	public ItemExtraInfo ItemExtraInfo;
 	public Icon Icon;
+	public Size OverlaySize { get; }
 
 	private readonly Vector2 _toolTipPosition;
 
-	public ItemIconScan(Icon icon, Vector2 toolTipPosition, int duration) {
+	public ItemIconScan(Icon icon, Vector2 toolTipPosition, Size overlaySize, int duration) {
 		Icon = icon;
 		var iconItem = icon.Item;
 		Item = TarkovDevAPI.GetItems().FirstOrDefault(item => item.Id == iconItem.Id) ?? throw new Exception($"Unknown item: {icon.Item.Id}");
@@ -23,6 +25,7 @@ public class ItemIconScan : ItemScan {
 		IconPath = icon.IconPath;
 
 		_toolTipPosition = toolTipPosition;
+		OverlaySize = overlaySize;
 		DissapearAt = DateTimeOffset.Now.ToUnixTimeMilliseconds() + duration;
 	}
 
