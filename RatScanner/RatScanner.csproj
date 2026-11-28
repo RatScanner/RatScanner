@@ -55,8 +55,15 @@
 		</PackageReference>
 		<PackageReference Include="SingleInstanceCore" Version="2.2.2" />
 		<PackageReference Include="System.Drawing.Common" Version="8.0.7" />
-		<PackageReference Include="Tesseract" Version="5.2.0" />
+		<PackageReference Include="Tesseract" Version="5.2.0" GeneratePathProperty="true" />
 	</ItemGroup>
+
+	<!-- The Tesseract loader needs the native libraries alongside the single-file executable. -->
+	<Target Name="PublishTesseractNativeLibraries" AfterTargets="Publish"
+	        Condition="'$(RuntimeIdentifier)' == 'win-x64' And '$(PublishSingleFile)' == 'true'">
+		<Copy SourceFiles="$(PkgTesseract)\x64\leptonica-1.82.0.dll;$(PkgTesseract)\x64\tesseract50.dll"
+		      DestinationFolder="$(PublishDir)x64" SkipUnchangedFiles="true" />
+	</Target>
 
 	<!-- Use sibling checkouts of RatEye/RatStash when present, otherwise fall back to NuGet.
 	     Override with -p:UseLocalRatEye=false / -p:UseLocalRatStash=false -->
