@@ -470,6 +470,7 @@ public partial class Item {
 	/// Remaining hideout upgrade needs, split by FIR attribute on the station item requirement.
 	/// </summary>
 	public RequirementBreakdown GetHideoutRequirementBreakdown(UserProgress progress) {
+		var showNonFir = RatConfig.Tracking.ShowNonFIRNeeds;
 		var fir = 0;
 		var nonFir = 0;
 		var stations = TarkovDevAPI.GetHideoutStations();
@@ -487,7 +488,7 @@ public partial class Item {
 				if (level.ItemRequirements == null)
 					continue;
 				foreach (var requiredItem in level.ItemRequirements) {
-					if (requiredItem.ItemId != Id)
+					if (requiredItem.ItemId != Id || (!showNonFir && !requiredItem.FoundInRaid))
 						continue;
 
 					var remaining = requiredItem.Count;
