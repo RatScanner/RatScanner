@@ -11,6 +11,9 @@ on:
       - main
       - dev
 
+permissions:
+  contents: read
+
 jobs:
   build:
     runs-on: windows-latest
@@ -40,12 +43,31 @@ jobs:
         with:
           name: RatScanner
           path: ./publish/
+      - name: Upload release archive
+        if: startsWith(github.ref, 'refs/tags/v') && github.event_name != 'pull_request'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: RatScanner-release-archive
+          path: RatScanner.zip
+          if-no-files-found: error
+          compression-level: 0
+
+  draft-release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v') && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download release archive
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: RatScanner-release-archive
       - name: Draft Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         with:
           files: RatScanner.zip
           draft: true
+          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        if: startsWith(github.ref, 'refs/tags/v') && github.event_name != 'pull_request'
-      
