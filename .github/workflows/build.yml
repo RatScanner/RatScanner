@@ -28,6 +28,8 @@ jobs:
           dotnet-version: 10.0.x
       - name: Restore Dependencies
         run: dotnet restore
+      - name: Test
+        run: dotnet test RatScanner.Tests/RatScanner.Tests.csproj --no-restore
       - name: Publish
         run: dotnet publish RatScanner/RatScanner.csproj -c Release -o publish -p:PublishSingleFile=true --runtime win-x64 --self-contained
       - name: Include Data

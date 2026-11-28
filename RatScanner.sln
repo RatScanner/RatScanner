@@ -5,6 +5,8 @@ VisualStudioVersion = 17.1.31911.260
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RatScanner", "RatScanner\RatScanner.csproj", "{6C9373BE-454F-4A4A-850E-17AC27C76992}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RatScanner.Tests", "RatScanner.Tests\RatScanner.Tests.csproj", "{7C49CE40-C60D-4A4C-8E7D-879B703942F6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,18 @@ Global
 		{6C9373BE-454F-4A4A-850E-17AC27C76992}.Release|x64.Build.0 = Release|Any CPU
 		{6C9373BE-454F-4A4A-850E-17AC27C76992}.Release|x86.ActiveCfg = Release|Any CPU
 		{6C9373BE-454F-4A4A-850E-17AC27C76992}.Release|x86.Build.0 = Release|Any CPU
+		{7C49CE40-C60D-4A4C-8E7D-879B703942F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C49CE40-C60D-4A4C-8E7D-879B703942F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C49CE40-C60D-4A4C-8E7D-879B703942F6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7C49CE40-C60D-4A4C-8E7D-879B703942F6}.Debug|x64.Build.0 = Debug|Any CPU
+		{7C49CE40-C60D-4A4C-8E7D-879B703942F6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7C49CE40-C60D-4A4C-8E7D-879B703942F6}.Debug|x86.Build.0 = Debug|Any CPU
+		{7C49CE40-C60D-4A4C-8E7D-879B703942F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C49CE40-C60D-4A4C-8E7D-879B703942F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C49CE40-C60D-4A4C-8E7D-879B703942F6}.Release|x64.ActiveCfg = Release|Any CPU
+		{7C49CE40-C60D-4A4C-8E7D-879B703942F6}.Release|x64.Build.0 = Release|Any CPU
+		{7C49CE40-C60D-4A4C-8E7D-879B703942F6}.Release|x86.ActiveCfg = Release|Any CPU
+		{7C49CE40-C60D-4A4C-8E7D-879B703942F6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
