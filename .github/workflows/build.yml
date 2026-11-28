@@ -29,9 +29,28 @@ jobs:
         run: dotnet publish RatScanner/RatScanner.csproj -c Release -o publish -p:PublishSingleFile=true --runtime win-x64 --self-contained
       - name: Include Data
         run: |
-          curl -L "https://github.com/RatScanner/RatScannerData/releases/latest/download/Data.zip" --output "publish/Data.zip"
-          7z x publish/Data.zip -opublish/Data
-          Remove-Item publish/Data.zip
+          $release = Invoke-RestMethod -Uri 'https://api.github.com/repos/RatScanner/RatScannerData/releases/latest'
+          foreach ($name in 'Data.zip', 'Data.zip.sha256') {
+            $asset = $release.assets | Where-Object name -EQ $name
+            if (-not $asset.browser_download_url) {
+              throw "RatScannerData release $($release.tag_name) is missing $name."
+            }
+            Invoke-WebRequest -Uri $asset.browser_download_url -OutFile (Join-Path $env:RUNNER_TEMP $name)
+          }
+
+          $archive = Join-Path $env:RUNNER_TEMP 'Data.zip'
+          $checksum = Get-Content -LiteralPath (Join-Path $env:RUNNER_TEMP 'Data.zip.sha256') -Raw
+          if ($checksum -notmatch '\A\s*(?<sha>[0-9a-f]{64})(?:[ \t]+\*?Data\.zip)?\s*\z') {
+            throw 'Data.zip.sha256 must contain one SHA-256 digest for Data.zip.'
+          }
+          if ((Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash -ne $Matches.sha) {
+            throw "Data.zip SHA-256 mismatch for RatScannerData release $($release.tag_name)."
+          }
+
+          7z x $archive -opublish/Data
+          if ($LASTEXITCODE -ne 0) {
+            throw "Data.zip extraction failed with exit code $LASTEXITCODE."
+          }
       - name: Include Updater
         run: curl -L "https://github.com/RatScanner/RatUpdater/releases/latest/download/RatUpdater.exe" --output "publish/RatUpdater.exe"
       - name: Zip Content
