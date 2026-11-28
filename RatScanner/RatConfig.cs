@@ -2,8 +2,11 @@ using Newtonsoft.Json.Linq;
 using RatScanner.TarkovDev.Json;
 using RatStash;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -24,7 +27,23 @@ internal static partial class RatConfig {
 	private static partial IntPtr MonitorFromPoint(NativePoint pt, uint dwFlags);
 
 	[LibraryImport("Shcore.dll", EntryPoint = "GetDpiForMonitor")]
-	private static partial IntPtr GetDpiForMonitor(IntPtr hmonitor, DpiType dpiType, out uint dpiX, out uint dpiY);
+	private static partial int GetDpiForMonitor(IntPtr hmonitor, DpiType dpiType, out uint dpiX, out uint dpiY);
+
+	[StructLayout(LayoutKind.Sequential)]
+	private struct NativeRect {
+		public int Left;
+		public int Top;
+		public int Right;
+		public int Bottom;
+	}
+
+	[LibraryImport("user32.dll")]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	private static partial bool GetClientRect(nint window, out NativeRect rect);
+
+	[LibraryImport("user32.dll")]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	private static partial bool IsIconic(nint window);
 
 	// Version
 	public static string Version => Process.GetCurrentProcess().MainModule?.FileVersionInfo.ProductVersion ?? "Unknown";
@@ -213,7 +232,6 @@ internal static partial class RatConfig {
 	internal static int ScreenWidth = 1920;
 	internal static int ScreenHeight = 1080;
 	internal static float ScreenScale = 1f;
-	internal static bool SetScreen = false;
 	/// <summary>
 	/// When true the user has pinned the screen resolution / scale by hand in the
 	/// Advanced settings, so the auto-detected values are no longer used.
@@ -326,10 +344,12 @@ internal static partial class RatConfig {
 
 		config.Section = "Other";
 		OverrideScreenConfig = config.ReadBool(nameof(OverrideScreenConfig), OverrideScreenConfig);
-		if (!SetScreen || OverrideScreenConfig) {
+		if (OverrideScreenConfig) {
 			ScreenWidth = config.ReadInt(nameof(ScreenWidth), ScreenWidth);
 			ScreenHeight = config.ReadInt(nameof(ScreenHeight), ScreenHeight);
 			ScreenScale = config.ReadFloat(nameof(ScreenScale), ScreenScale);
+		} else if (configFileExists && isSupportedConfigVersion) {
+			TrySetScreenConfig();
 		}
 
 		GameMode = (GameMode)config.ReadInt(nameof(GameMode), (int)GameMode);
@@ -453,14 +473,13 @@ internal static partial class RatConfig {
 	}
 
 	/// <summary>
-	/// Get the current screen config from tarkov's config files or default to the primary screen
+	/// Detect the game window, then fall back to Tarkov's saved settings or the primary screen.
 	/// </summary>
 	internal static void TrySetScreenConfig() {
 		(var width, var height, var scale) = GetTarkovScreenConfig();
 		ScreenWidth = width;
 		ScreenHeight = height;
 		ScreenScale = (float)scale;
-		SetScreen = true;
 	}
 
 	public enum DpiType {
@@ -478,39 +497,82 @@ internal static partial class RatConfig {
 	public static double GetScalingForScreen(Screen screen) {
 		NativePoint pointOnScreen = new() { X = screen.Bounds.X + 1, Y = screen.Bounds.Y + 1 };
 		var mon = MonitorFromPoint(pointOnScreen, 2 /*MONITOR_DEFAULTTONEAREST*/);
-		_ = GetDpiForMonitor(mon, DpiType.Effective, out var dpiX, out _);
-		return dpiX / 96.0;
+		return GetDpiForMonitor(mon, DpiType.Effective, out var dpiX, out _) == 0 && dpiX > 0 ? dpiX / 96.0 : 1;
 	}
 
-	private static (int widht, int height, double scale) GetTarkovScreenConfig() {
+	private static (int width, int height, double scale) GetTarkovScreenConfig() =>
+		GetTarkovWindowConfig() ?? GetSavedScreenConfig();
+
+	private static (int width, int height, double scale) GetSavedScreenConfig() {
+		var primary = Screen.PrimaryScreen;
 		try {
 			var configPath = Environment.ExpandEnvironmentVariables(@"%AppData%\Battlestate Games\Escape From Tarkov\Settings\Graphics.ini");
 			using FileStream file = new(configPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
 			using StreamReader reader = new(file, Encoding.UTF8);
-
 			var json = JObject.Parse(reader.ReadToEnd());
 
-			var activeDisplay = json["DisplaySettings"]["Display"].ToObject<int>();
-			var windowRes = json["Stored"][activeDisplay.ToString()]["WindowResolution"];
-			var width = windowRes["Width"].ToObject<int>();
-			var height = windowRes["Height"].ToObject<int>();
-
-			var usedScreen = Screen.AllScreens[activeDisplay];
-			var scale = GetScalingForScreen(usedScreen);
-
-			return (width, height, scale);
-		} catch (Exception e) {
+			if (TryReadGraphicsResolution(json, out var display, out var width, out var height)) {
+				var screen = Screen.AllScreens.ElementAtOrDefault(display) ?? primary;
+				return (width, height, screen is null ? 1 : GetScalingForScreen(screen));
+			}
+			Logger.LogWarning("No usable display resolution in Escape From Tarkov graphic settings.");
+		} catch (Exception e) when (e is IOException or UnauthorizedAccessException or Newtonsoft.Json.JsonException) {
 			Logger.LogWarning("Unable to query Escape From Tarkov graphic settings.", e);
-
-			var width = Screen.PrimaryScreen.Bounds.Width;
-			var height = Screen.PrimaryScreen.Bounds.Height;
-			var scale = GetScalingForScreen(Screen.PrimaryScreen);
-
-			var message = $"Detected {width}x{height} Resolution at {scale} Scale.\n\n";
-			message += "You can adjust this inside the settings.";
-			Logger.ShowMessage(message);
-
-			return (width, height, scale);
 		}
+
+		return primary is null ? (1920, 1080, 1) : (primary.Bounds.Width, primary.Bounds.Height, GetScalingForScreen(primary));
 	}
+
+	private static (int width, int height, double scale)? GetTarkovWindowConfig() {
+		var processes = Process.GetProcessesByName("EscapeFromTarkov");
+		try {
+			foreach (var process in processes) {
+				try {
+					var window = GetWindowConfig(process.MainWindowHandle);
+					if (window is not null) return window;
+				} catch (Exception e) when (e is InvalidOperationException or Win32Exception) {
+					Logger.LogWarning("Unable to query the Escape From Tarkov window.", e);
+				}
+			}
+		} finally {
+			foreach (var process in processes) process.Dispose();
+		}
+		return null;
+	}
+
+	private static (int width, int height, double scale)? GetWindowConfig(nint window) {
+		if (window == 0 || IsIconic(window) || !GetClientRect(window, out var rect)) return null;
+		var width = rect.Right - rect.Left;
+		var height = rect.Bottom - rect.Top;
+		return IsValidResolution(width, height) ? (width, height, GetScalingForScreen(Screen.FromHandle(window))) : null;
+	}
+
+	private static bool TryReadGraphicsResolution(JObject json, out int display, out int width, out int height) {
+		var settings = json["DisplaySettings"] as JObject;
+		var activeDisplay = ReadGraphicsInt(settings?["Display"]);
+		display = activeDisplay;
+		width = height = 0;
+		if (activeDisplay < 0) return false;
+		if (TryReadResolution(settings?["Resolution"], out width, out height)) return true;
+
+		var stored = json["Stored"] switch {
+			JArray displays => displays.OfType<JObject>().FirstOrDefault(entry => ReadGraphicsInt(entry["Index"]) == activeDisplay),
+			JObject displays => displays[activeDisplay.ToString(CultureInfo.InvariantCulture)] as JObject,
+			_ => null,
+		};
+		return TryReadResolution(stored?["WindowResolution"], out width, out height)
+			|| TryReadResolution(stored?["FullScreenResolution"], out width, out height);
+	}
+
+	private static bool TryReadResolution(JToken? token, out int width, out int height) {
+		var resolution = token as JObject;
+		width = ReadGraphicsInt(resolution?["Width"]);
+		height = ReadGraphicsInt(resolution?["Height"]);
+		return IsValidResolution(width, height);
+	}
+
+	private static int ReadGraphicsInt(JToken? token) =>
+		token is JValue value && int.TryParse(value.ToString(CultureInfo.InvariantCulture), NumberStyles.Integer, CultureInfo.InvariantCulture, out var number) ? number : -1;
+
+	private static bool IsValidResolution(int width, int height) => width is >= 100 and <= 99999 && height is >= 100 and <= 99999;
 }
