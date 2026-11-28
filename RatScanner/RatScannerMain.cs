@@ -510,11 +510,11 @@ public class RatScannerMain : INotifyPropertyChanged {
 
 			if (icon?.DetectionConfidence <= 0 || icon?.Item == null) return;
 
-			var toolTipPosition = position;
-			toolTipPosition += icon.Position + icon.ItemPosition;
-			toolTipPosition -= new Vector2(RatConfig.IconScan.ScanWidth, RatConfig.IconScan.ScanHeight) / 2;
-
-			ItemIconScan tempIconScan = new(icon, toolTipPosition, RatConfig.ToolTip.Duration);
+			var match = icon.Position + icon.ItemPosition;
+			var bounds = IconOverlayBounds.FitToGrid(screenshot,
+				new Rectangle(match.X, match.Y, icon.ItemSize.X, icon.ItemSize.Y));
+			var toolTipPosition = screenshotPosition + new Vector2(bounds.X, bounds.Y);
+			ItemIconScan tempIconScan = new(icon, toolTipPosition, bounds.Size, RatConfig.ToolTip.Duration);
 
 			ItemScans.Enqueue(tempIconScan);
 			RefreshOverlay();
