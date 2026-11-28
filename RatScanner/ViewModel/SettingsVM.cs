@@ -387,11 +387,16 @@ internal class SettingsVM : INotifyPropertyChanged {
 		RatConfig.Hotkeys.OpenTarkovDev = OpenTarkovDevHotkey;
 		RatConfig.Hotkeys.OpenMap = OpenMapHotkey;
 
+		RatConfig.OverrideScreenConfig = OverrideScreenConfig;
 		if (OverrideScreenConfig) {
 			RatConfig.ScreenWidth = ScreenWidth;
 			RatConfig.ScreenHeight = ScreenHeight;
 			RatConfig.ScreenScale = ScreenScale;
-			RatConfig.OverrideScreenConfig = true;
+		} else if (updateScreenOverride) {
+			RatConfig.TrySetScreenConfig();
+			ScreenWidth = RatConfig.ScreenWidth;
+			ScreenHeight = RatConfig.ScreenHeight;
+			ScreenScale = RatConfig.ScreenScale;
 		}
 		var gameModeChanged = RatConfig.GameMode != GameMode;
 
