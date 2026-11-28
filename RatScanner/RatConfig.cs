@@ -231,10 +231,9 @@ internal static partial class RatConfig {
 
 	internal static int ScreenWidth = 1920;
 	internal static int ScreenHeight = 1080;
-	internal static float ScreenScale = 1f;
+	internal static float ScreenScale { get; private set; } = 1f;
 	/// <summary>
-	/// When true the user has pinned the screen resolution / scale by hand in the
-	/// Advanced settings, so the auto-detected values are no longer used.
+	/// When true the user has pinned the screen resolution in Advanced settings.
 	/// </summary>
 	internal static bool OverrideScreenConfig = false;
 	internal static int LastWindowPositionX = int.MinValue;
@@ -344,12 +343,10 @@ internal static partial class RatConfig {
 
 		config.Section = "Other";
 		OverrideScreenConfig = config.ReadBool(nameof(OverrideScreenConfig), OverrideScreenConfig);
+		if (configFileExists && isSupportedConfigVersion) TrySetScreenConfig();
 		if (OverrideScreenConfig) {
 			ScreenWidth = config.ReadInt(nameof(ScreenWidth), ScreenWidth);
 			ScreenHeight = config.ReadInt(nameof(ScreenHeight), ScreenHeight);
-			ScreenScale = config.ReadFloat(nameof(ScreenScale), ScreenScale);
-		} else if (configFileExists && isSupportedConfigVersion) {
-			TrySetScreenConfig();
 		}
 
 		GameMode = (GameMode)config.ReadInt(nameof(GameMode), (int)GameMode);
@@ -440,7 +437,6 @@ internal static partial class RatConfig {
 		config.Section = "Other";
 		config.WriteInt(nameof(ScreenWidth), ScreenWidth);
 		config.WriteInt(nameof(ScreenHeight), ScreenHeight);
-		config.WriteFloat(nameof(ScreenScale), ScreenScale);
 		config.WriteBool(nameof(OverrideScreenConfig), OverrideScreenConfig);
 		config.WriteInt(nameof(GameMode), (int)GameMode);
 		config.WriteBool(nameof(MinimizeToTray), MinimizeToTray);

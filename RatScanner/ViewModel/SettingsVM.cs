@@ -69,7 +69,6 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 	public int ScreenWidth { get; set; }
 	public int ScreenHeight { get; set; }
-	public float ScreenScale { get; set; }
 	public bool OverrideScreenConfig { get; set; }
 	public GameMode GameMode { get; set; }
 	public bool MinimizeToTray { get; set; }
@@ -157,7 +156,6 @@ internal class SettingsVM : INotifyPropertyChanged {
 
 		ScreenWidth = RatConfig.ScreenWidth;
 		ScreenHeight = RatConfig.ScreenHeight;
-		ScreenScale = RatConfig.ScreenScale;
 		OverrideScreenConfig = RatConfig.OverrideScreenConfig;
 		GameMode = RatConfig.GameMode;
 		MinimizeToTray = RatConfig.MinimizeToTray;
@@ -307,7 +305,7 @@ internal class SettingsVM : INotifyPropertyChanged {
 	public async Task SaveSettings() {
 		_ = NameScanLanguage != (int)RatConfig.NameScan.Language;
 		var updateResolution = ScreenWidth != RatConfig.ScreenWidth || ScreenHeight != RatConfig.ScreenHeight;
-		var updateScreenOverride = OverrideScreenConfig != RatConfig.OverrideScreenConfig || ScreenScale != RatConfig.ScreenScale;
+		var updateScreenOverride = OverrideScreenConfig != RatConfig.OverrideScreenConfig;
 		var updateLanguage = RatConfig.NameScan.Language != (Language)NameScanLanguage;
 		var updateUiLanguage = RatConfig.UserInterface.Language != UiLanguage;
 
@@ -391,12 +389,10 @@ internal class SettingsVM : INotifyPropertyChanged {
 		if (OverrideScreenConfig) {
 			RatConfig.ScreenWidth = ScreenWidth;
 			RatConfig.ScreenHeight = ScreenHeight;
-			RatConfig.ScreenScale = ScreenScale;
 		} else if (updateScreenOverride) {
 			RatConfig.TrySetScreenConfig();
 			ScreenWidth = RatConfig.ScreenWidth;
 			ScreenHeight = RatConfig.ScreenHeight;
-			ScreenScale = RatConfig.ScreenScale;
 		}
 		var gameModeChanged = RatConfig.GameMode != GameMode;
 
