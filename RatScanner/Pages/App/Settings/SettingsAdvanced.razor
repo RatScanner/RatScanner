@@ -37,15 +37,6 @@
                                      ValueChanged="@((int v) => { SettingsVM.ScreenHeight = v; SettingsVM.MarkDirty(); })"
                                      Variant="Variant.Outlined" Margin="Margin.Dense" HideSpinButtons="true" Min="100" Max="99999" />
                 </div>
-                <div class="resolution-field">
-                    <MudText Typo="Typo.caption" Color="Color.Secondary" Class="resolution-label">
-                        @Localizer["ScaleLabel"]
-                    </MudText>
-                    <MudNumericField T="float" Value="@SettingsVM.ScreenScale"
-                                     ValueChanged="@((float v) => { SettingsVM.ScreenScale = v; SettingsVM.MarkDirty(); })"
-                                     Variant="Variant.Outlined" Margin="Margin.Dense"
-                                     HideSpinButtons="true" Converter="@_percentageConverter" Min="0.1f" Max="8f" />
-                </div>
             </div>
         </SettingsRow>
     </SettingsCard>
@@ -78,16 +69,8 @@
 </div>
 
 @code {
-    private static readonly Converter<float> _percentageConverter = new() {
-        SetFunc = value => (int)(value * 100) + "%",
-        GetFunc = text => {
-            text = text?.TrimEnd('%') ?? "";
-            return int.TryParse(text, out var num) ? num / 100f : 1f;
-        },
-    };
-
     private string DetectedResolution => string.Join("  ·  ",
-        new[] { $"{SettingsVM.ScreenWidth}×{SettingsVM.ScreenHeight}", $"{SettingsVM.ScreenScale * 100:0.#}%" });
+        new[] { $"{SettingsVM.ScreenWidth}×{SettingsVM.ScreenHeight}", $"{RatConfig.ScreenScale * 100:0.#}%" });
 
     private string ConfigPath => RatConfig.Paths.ConfigFile;
 
@@ -148,7 +131,7 @@
         display: grid;
         /* Fixed tracks rather than 1fr: the fields have a natural minimum width and
            would otherwise overflow the row and starve the label into wrapping. */
-        grid-template-columns: repeat(3, 110px);
+        grid-template-columns: repeat(2, 110px);
         gap: 10px;
         flex: 0 0 auto;
     }
