@@ -1,4 +1,5 @@
 ﻿using RatEye;
+using RatEye.Processing;
 using RatScanner.Pages.InteractableOverlay.Services;
 using RatScanner.Properties;
 using RatScanner.Scan;
@@ -471,21 +472,26 @@ public class RatScannerMain : INotifyPropertyChanged {
 
 			if (multiInspection.Inspections.Count == 0) return;
 
-			foreach (var inspection in multiInspection.Inspections) {
-				var scale = RatEyeEngine.Config.ProcessingConfig.Scale;
-				var toolTipPosition = inspection.MarkerPosition;
-				toolTipPosition += position;
-				var marker = RatEyeEngine.Config.ProcessingConfig.InspectionConfig.Marker;
-				toolTipPosition += new Vector2(0, (int)(marker.Height * scale));
-
-				ItemNameScan tempNameScan = new(
-						inspection,
-						toolTipPosition,
-						RatConfig.ToolTip.Duration);
-
-				ItemScans.Enqueue(tempNameScan);
+			var processing = RatEyeEngine.Config.ProcessingConfig;
+			var markerHeight = (int)(processing.InspectionConfig.Marker.Height * processing.Scale);
+			foreach (var (inspection, toolTipPosition, item) in GetFullScreenNameMatches(
+				multiInspection.Inspections, position, markerHeight, static inspection => inspection.Item
+			)) {
+				ItemScans.Enqueue(new ItemNameScan(inspection, toolTipPosition, RatConfig.ToolTip.Duration, item));
 			}
 			RefreshOverlay();
+		}
+	}
+
+	internal static IEnumerable<(Inspection Inspection, Vector2 ToolTipPosition, Item Item)> GetFullScreenNameMatches(
+		IEnumerable<Inspection> inspections, Vector2 screenOrigin, int markerHeight, Func<Inspection, Item?> readItem
+	) {
+		foreach (var inspection in inspections) {
+			// RatEye can adjust the marker position when it reads the title.
+			var toolTipPosition = inspection.MarkerPosition + screenOrigin + new Vector2(0, markerHeight);
+			var item = readItem(inspection);
+			if (item is null) continue;
+			yield return (inspection, toolTipPosition, item);
 		}
 	}
 

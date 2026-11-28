@@ -8,9 +8,12 @@ namespace RatScanner.Scan;
 public class ItemNameScan : ItemScan {
 	private readonly Vector2 _toolTipPosition;
 
-	public ItemNameScan(Inspection inspection, Vector2 toolTipPosition, int duration) {
-		var inspectionItem = inspection.Item;
-		Item = TarkovDevAPI.GetItems().FirstOrDefault(item => item.Id == inspectionItem.Id) ?? throw new Exception($"Unknown item: {inspection.Item.Id}");
+	public ItemNameScan(Inspection inspection, Vector2 toolTipPosition, int duration)
+		: this(inspection, toolTipPosition, duration, inspection.Item) {
+	}
+
+	internal ItemNameScan(Inspection inspection, Vector2 toolTipPosition, int duration, RatStash.Item inspectionItem) {
+		Item = TarkovDevAPI.GetItems().FirstOrDefault(item => item.Id == inspectionItem.Id) ?? throw new Exception($"Unknown item: {inspectionItem.Id}");
 		Confidence = inspection.MarkerConfidence;
 		IconPath = inspection.IconPath;
 		_toolTipPosition = toolTipPosition;
